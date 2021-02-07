@@ -21,6 +21,7 @@ class KubernetesCli < Formula
   depends_on "go" => :build
 
   uses_from_macos "rsync" => :build
+  patch :DATA
 
   def install
     # Don't dirty the git tree
@@ -57,3 +58,15 @@ class KubernetesCli < Formula
     end
   end
 end
+__END__
+index bef1d837..154eecfd 100755
+--- a/hack/lib/golang.sh
++++ b/hack/lib/golang.sh
+@@ -49,6 +49,7 @@ readonly KUBE_SUPPORTED_CLIENT_PLATFORMS=(
+   linux/s390x
+   linux/ppc64le
+   darwin/amd64
++  darwin/arm64
+   windows/amd64
+   windows/386
+ )
