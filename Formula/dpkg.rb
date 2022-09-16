@@ -1,12 +1,11 @@
 class Dpkg < Formula
   desc "Debian package management system"
   homepage "https://wiki.debian.org/Teams/Dpkg"
-  # Please always keep the Homebrew mirror as the primary URL as the
+  # Please use a mirror as the primary URL as the
   # dpkg site removes tarballs regularly which means we get issues
   # unnecessarily and older versions of the formula are broken.
-  url "https://dl.bintray.com/homebrew/mirror/dpkg-1.20.7.1.tar.xz"
-  mirror "https://deb.debian.org/debian/pool/main/d/dpkg/dpkg_1.20.7.1.tar.xz"
-  sha256 "0aad2de687f797ef8ebdabc7bafd16dc1497f1ce23bd9146f9aa73f396a5636f"
+  url "https://deb.debian.org/debian/pool/main/d/dpkg/dpkg_1.21.9.tar.xz"
+  sha256 "a0aba375625459260cbc89933a12b3188a713c840e3aaefc14bf2d9adee19642"
   license "GPL-2.0-only"
 
   livecheck do
@@ -15,28 +14,39 @@ class Dpkg < Formula
   end
 
   bottle do
-    sha256 big_sur:  "98559763f10864c5abc70a89c611c02fa96388096d273fbb70082a74dd5dcea5"
-    sha256 catalina: "ed00b85c2d82dbe87ceb6c61d1af774544186d7d46a6b4229c234ce53984fcc4"
-    sha256 mojave:   "0ba7f0d1822ecd02c8f334cbe9c43fb9ebc0df6ee701641fcb0155ad7b093559"
+    sha256 arm64_monterey: "32e8e22b3eb7935517621fd6121e40f894792d8de2c8659dfda13fdaeb4143dd"
+    sha256 arm64_big_sur:  "c38a7e505ee994e1b746e0e3566d92cb9ca646291ddfe826bb5dd54d8a31ab1e"
+    sha256 monterey:       "8f76d6e5756b136e26835049af0ba825c75c9a55cbcc7f1b0de3c5256c75fa83"
+    sha256 big_sur:        "f20bf1eb154f7b44af780a0cec1f7472be29ce542ea3832317ce1dee99422109"
+    sha256 catalina:       "ccdded206405d6efc722169acadcc2c8770200b9ced532a32ff547475e055f56"
+    sha256 x86_64_linux:   "07d05636a56fdf0942f835be23e0dc226292cd8c84c0f45c16a4a1b37a569f3b"
   end
 
   depends_on "pkg-config" => :build
+  depends_on "po4a" => :build
   depends_on "gettext"
   depends_on "gnu-tar"
   depends_on "gpatch"
   depends_on "perl"
-  depends_on "po4a"
   depends_on "xz" # For LZMA
 
   uses_from_macos "bzip2"
   uses_from_macos "zlib"
+
+  on_linux do
+    keg_only "not linked to prevent conflicts with system dpkg"
+  end
 
   patch :DATA
 
   def install
     # We need to specify a recent gnutar, otherwise various dpkg C programs will
     # use the system "tar", which will fail because it lacks certain switches.
-    ENV["TAR"] = Formula["gnu-tar"].opt_bin/"gtar"
+    ENV["TAR"] = if OS.mac?
+      Formula["gnu-tar"].opt_bin/"gtar"
+    else
+      Formula["gnu-tar"].opt_bin/"tar"
+    end
 
     # Since 1.18.24 dpkg mandates the use of GNU patch to prevent occurrences
     # of the CVE-2017-8283 vulnerability.

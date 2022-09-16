@@ -1,10 +1,9 @@
 class AtkmmAT228 < Formula
   desc "Official C++ interface for the ATK accessibility toolkit library"
   homepage "https://www.gtkmm.org/"
-  url "https://download.gnome.org/sources/atkmm/2.28/atkmm-2.28.1.tar.xz"
-  sha256 "116876604770641a450e39c1f50302884848ce9cc48d43c5dc8e8efc31f31bad"
+  url "https://download.gnome.org/sources/atkmm/2.28/atkmm-2.28.3.tar.xz"
+  sha256 "7c2088b486a909be8da2b18304e56c5f90884d1343c8da7367ea5cd3258b9969"
   license "LGPL-2.1-or-later"
-  revision 1
 
   livecheck do
     url :stable
@@ -12,10 +11,12 @@ class AtkmmAT228 < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "f74f19f6e1f6757a9eeb848f4091e0adb7f19b321fb15856697c5f7354684699"
-    sha256 cellar: :any, big_sur:       "0819a047abff34b69f124d18d0bde9a441919580bf7510945a0a18530450270c"
-    sha256 cellar: :any, catalina:      "f9aff58445d0a3941de032d92ae5fe40e2bb1bfbfbcff5ae8bd1b41d41365957"
-    sha256 cellar: :any, mojave:        "1524ca8c602a0fe3f3750be64957a68d7c6d2bcdcb4c47ed24800bd2f9f2a0ff"
+    sha256 cellar: :any, arm64_monterey: "876683a0c5f4da334dadb0142c564fb2007d9a3a66c7696dbfdc03dfb9162f9f"
+    sha256 cellar: :any, arm64_big_sur:  "1b957048c912011d829c1b4842c8e7cb94526e80500046d732010881d33109ec"
+    sha256 cellar: :any, monterey:       "8ca4c71ef66437838731e95a460d66430554fd3468b3c8856e638b09d94f2bc5"
+    sha256 cellar: :any, big_sur:        "473ce70bed27eac91868d6b8214c027b08e88abea444076d20615462842b86a2"
+    sha256 cellar: :any, catalina:       "4d2aeadd4d5114932d7d90ac2d53ed409e84b1703112e6dc5a0e8a5992d214b2"
+    sha256               x86_64_linux:   "0b1ed87427fb65199370db6a27c2bb18c0ebf330782ff32297bf1519c74d764d"
   end
 
   depends_on "meson" => :build
@@ -72,9 +73,7 @@ class AtkmmAT228 < Formula
       -lgobject-2.0
       -lsigc-2.0
     ]
-    on_macos do
-      flags << "-lintl"
-    end
+    flags << "-lintl" if OS.mac?
     system ENV.cxx, "-std=c++11", "test.cpp", "-o", "test", *flags
     system "./test"
   end

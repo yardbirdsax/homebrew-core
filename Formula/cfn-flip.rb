@@ -3,33 +3,31 @@ class CfnFlip < Formula
 
   desc "Convert AWS CloudFormation templates between JSON and YAML formats"
   homepage "https://github.com/awslabs/aws-cfn-template-flip"
-  url "https://files.pythonhosted.org/packages/76/5a/314a934b75f2f52d1845e4344b9bbdacdd76d82784b678ec27c2ed57fd2c/cfn_flip-1.2.3.tar.gz"
-  sha256 "2bed32a1f4dca26dc64178d52511fd4ef778b5ccbcf32559cac884ace75bde6a"
+  url "https://files.pythonhosted.org/packages/ca/75/8eba0bb52a6c58e347bc4c839b249d9f42380de93ed12a14eba4355387b4/cfn_flip-1.3.0.tar.gz"
+  sha256 "003e02a089c35e1230ffd0e1bcfbbc4b12cc7d2deb2fcc6c4228ac9819307362"
   license "Apache-2.0"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "c697eb2c6521e79bbdf5a834866914b9316383789a8ac885d7f1439b2c2774d2"
-    sha256 cellar: :any_skip_relocation, big_sur:       "6e839991d90501ef68afcec82bd4445dcf24242b33a31bd5ebf3004799e81512"
-    sha256 cellar: :any_skip_relocation, catalina:      "e0f813ad41397d94b167cbcae814862abf436cd46b0996f83da0dae5e3d6d717"
-    sha256 cellar: :any_skip_relocation, mojave:        "d22cab76b33a3b6b836aa723242befc46fb8028fe282af1d4ccee64e4a21165a"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "29ecc4856f9b64362498cf82765cef635f7b12f6b8570a19f5c223ca007a4e0c"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "75a83673127fec043584cb8f92c7526eef72475d7f3502568ba48f190e73f82f"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c35c36d9db398cb2685e977f6367fd45f9cef1b86284a6b42d56ee81a7a24acd"
+    sha256 cellar: :any_skip_relocation, monterey:       "ecb3dba5049db0bd732cdb472aa2afda1ec8293f0bbcbdee4a549d1b578895b6"
+    sha256 cellar: :any_skip_relocation, big_sur:        "2f728b55aa81f3607d306f7d971fc3ef3869705a951eecdf7fa9835947d776a5"
+    sha256 cellar: :any_skip_relocation, catalina:       "6d22b33221912b856ce5e91c2735a9d49c87135a9dee43e41382689880ea6124"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0cbebefb06eb1cf524a75a605d36d98d1b7435f2bf116ba9d40e78d743918f3b"
   end
 
-  depends_on "python@3.9"
+  depends_on "python@3.10"
+  depends_on "six"
 
   resource "click" do
-    url "https://files.pythonhosted.org/packages/27/6f/be940c8b1f1d69daceeb0032fee6c34d7bd70e3e649ccac0951500b4720e/click-7.1.2.tar.gz"
-    sha256 "d2b5255c7c6349bc1bd1e59e08cd12acbbd63ce649f2588755783aa94dfb6b1a"
+    url "https://files.pythonhosted.org/packages/59/87/84326af34517fca8c58418d148f2403df25303e02736832403587318e9e8/click-8.1.3.tar.gz"
+    sha256 "7682dc8afb30297001674575ea00d1814d808d6a36af415a82bd481d37ba7b8e"
   end
 
   resource "PyYAML" do
-    url "https://files.pythonhosted.org/packages/64/c2/b80047c7ac2478f9501676c988a5411ed5572f35d1beff9cae07d321512c/PyYAML-5.3.1.tar.gz"
-    sha256 "b8eac752c5e14d3eca0e6dd9199cd627518cb5ec06add0de9d32baeee6fe645d"
-  end
-
-  resource "six" do
-    url "https://files.pythonhosted.org/packages/6b/34/415834bfdafca3c5f451532e8a8d9ba89a21c9743a0c59fbd0205c7f9426/six-1.15.0.tar.gz"
-    sha256 "30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"
+    url "https://files.pythonhosted.org/packages/36/2b/61d51a2c4f25ef062ae3f74576b01638bebad5e045f747ff12643df63844/PyYAML-6.0.tar.gz"
+    sha256 "68fb519c14306fec9720a2a5b45bc9f0c8d1b9c72adf45c37baedfcd949c35a2"
   end
 
   def install

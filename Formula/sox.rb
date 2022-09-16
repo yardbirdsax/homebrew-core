@@ -3,15 +3,15 @@ class Sox < Formula
   homepage "https://sox.sourceforge.io/"
   url "https://downloads.sourceforge.net/project/sox/sox/14.4.2/sox-14.4.2.tar.gz"
   sha256 "b45f598643ffbd8e363ff24d61166ccec4836fea6d3888881b8df53e3bb55f6c"
-  revision 3
+  revision 4
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "8070949420a9a02f3d5e1a99bd460d064e34c361798bae5c4554ac8e1aeb2d49"
-    sha256 cellar: :any, big_sur:       "e3f62a35b06c9e79516f575a923b3aafc5357f370f4ae5c2812c67c8862ae11c"
-    sha256 cellar: :any, catalina:      "fc412be07e577c2161763dfb509f4fb43f4fe3bca206a1b0b370687df0a264fa"
-    sha256 cellar: :any, mojave:        "4906207f83bd0f4ea1a67d040891711e9a9e8830216e451072f2957ca566b83d"
-    sha256 cellar: :any, high_sierra:   "c0bb4ba7ec922d9a8c71c2ba84e28c66c67e4fdeae970011ea45e937f43c18bd"
-    sha256 cellar: :any, sierra:        "dc8c294bb96c0b7ebc3ade73476c6031664bb8e81a32ece87ce84f815deeced5"
+    sha256 cellar: :any,                 arm64_monterey: "9edfc17be097b8ae7741ddee5d34b5d7c581a98c58e9c565cce34556639161ef"
+    sha256 cellar: :any,                 arm64_big_sur:  "f7d948bc4bc997329cd35f2ef6da417577a928a56241ef69d1e12f77a68f30a5"
+    sha256 cellar: :any,                 monterey:       "453f0d46ba72d4a83978a34ab8ec0c91e4a4704d07f2bc99e0983d7743d952dc"
+    sha256 cellar: :any,                 big_sur:        "924b191728e113ba1894fe0eb14980f41cdac32ba13f47670a1629d8ab7a234d"
+    sha256 cellar: :any,                 catalina:       "3075e15314703e3b5c9057a876677b42792ba64278b0b450a28735e795701d6a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ae857033a9b5eef278e3dea57f5e786806c1195df92240432d328852587be2f1"
   end
 
   depends_on "pkg-config" => :build
@@ -22,6 +22,12 @@ class Sox < Formula
   depends_on "libvorbis"
   depends_on "mad"
   depends_on "opusfile"
+
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-pre-0.4.2.418-big_sur.diff"
+    sha256 "83af02f2aa2b746bb7225872cab29a253264be49db0ecebb12f841562d9a2923"
+  end
 
   def install
     system "./configure", "--disable-debug",

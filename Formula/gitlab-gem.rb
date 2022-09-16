@@ -1,22 +1,24 @@
 class GitlabGem < Formula
   desc "Ruby client and CLI for GitLab API"
   homepage "https://github.com/NARKOZ/gitlab"
-  url "https://github.com/NARKOZ/gitlab/archive/v4.17.0.tar.gz"
-  sha256 "53d2658073e1ffdca0b67b971b4280542b4d831bfb9baf06836e8063cfadb801"
+  url "https://github.com/NARKOZ/gitlab/archive/v4.19.0.tar.gz"
+  sha256 "f747fa76db258d4df54d564eb7f7c164d15a9f4937583e885d79aab3f04023fe"
   license "BSD-2-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "9f1b74846038c11a6b60b05e7d43f24e0c13ad57fca5477959d4353e50f43736"
-    sha256 cellar: :any_skip_relocation, big_sur:       "7c4a0fb41401e668a957c23d934896ead423f78ee65099b451c34a5b5243224f"
-    sha256 cellar: :any_skip_relocation, catalina:      "9fb83bdf349a57916534fd40a2e38db4a893b713207abe572117e21d21e9df7b"
-    sha256 cellar: :any_skip_relocation, mojave:        "2bd6150b2c26c4b746ffc8c2f43c05b311ec33c08f88a82946d08e63f6dea9d8"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "86b43558c3f09fc837044a34807dcf485098351a237f81394b52dfa4467416b9"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b163e735208a52ae23a48b72b21e838062e834e112aa0e215e0aca85ca8d52c4"
+    sha256 cellar: :any_skip_relocation, monterey:       "86b43558c3f09fc837044a34807dcf485098351a237f81394b52dfa4467416b9"
+    sha256 cellar: :any_skip_relocation, big_sur:        "b163e735208a52ae23a48b72b21e838062e834e112aa0e215e0aca85ca8d52c4"
+    sha256 cellar: :any_skip_relocation, catalina:       "b163e735208a52ae23a48b72b21e838062e834e112aa0e215e0aca85ca8d52c4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "95066291140c4f67a5b74667427a3ead59f5d7e5b6dbd7611a5f5fbe2cdae83f"
   end
 
   uses_from_macos "ruby", since: :catalina
 
   resource "httparty" do
-    url "https://rubygems.org/gems/httparty-0.18.1.gem"
-    sha256 "878fe8038e344b219dbba9e20c442914a2be251d2f4a20bcdeb31f25dcb2f79d"
+    url "https://rubygems.org/gems/httparty-0.20.0.gem"
+    sha256 "490d2a028a5accc611f1685d479d80ef80b129140d24a93c53c119f578614867"
   end
 
   resource "mime-types" do

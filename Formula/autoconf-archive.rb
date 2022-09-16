@@ -1,18 +1,18 @@
 class AutoconfArchive < Formula
   desc "Collection of over 500 reusable autoconf macros"
   homepage "https://savannah.gnu.org/projects/autoconf-archive/"
-  url "https://ftp.gnu.org/gnu/autoconf-archive/autoconf-archive-2019.01.06.tar.xz"
-  mirror "https://ftpmirror.gnu.org/autoconf-archive/autoconf-archive-2019.01.06.tar.xz"
-  sha256 "17195c833098da79de5778ee90948f4c5d90ed1a0cf8391b4ab348e2ec511e3f"
+  url "https://ftp.gnu.org/gnu/autoconf-archive/autoconf-archive-2022.09.03.tar.xz"
+  mirror "https://ftpmirror.gnu.org/autoconf-archive/autoconf-archive-2022.09.03.tar.xz"
+  sha256 "e07454f00d8cae7907bed42d0747798927809947684d94c37207a4d63a32f423"
   license "GPL-3.0"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "c5adb533acd2e940523d4d49878a64ca53acd120144a448b55627ce6876af06e"
-    sha256 cellar: :any_skip_relocation, big_sur:       "4927fe28a3553eb7b369ae1c8f4c4ae52a8897f2409ca0438c2a334466c89163"
-    sha256 cellar: :any_skip_relocation, catalina:      "75309bbf34fa9694b048206e2f79c477e8259c22df8173b43b9ec4294cff0f63"
-    sha256 cellar: :any_skip_relocation, mojave:        "18bec44cb2eb240971a855df50102aa6d5e6eadab4a325b3b562a04057991d0c"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "ef88538afd7d325b368f15e592a62e087b4bddc66f09e65551cc3597fb3da7a3"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "07da3d145d395749125f2402925fd6995056bf303f9514ed9018cb9140b8d2fd"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "07da3d145d395749125f2402925fd6995056bf303f9514ed9018cb9140b8d2fd"
+    sha256 cellar: :any_skip_relocation, monterey:       "e7e7b1edebfa9d71d86a1885139b5271986eaddb691f5a5b826337910595fe68"
+    sha256 cellar: :any_skip_relocation, big_sur:        "e7e7b1edebfa9d71d86a1885139b5271986eaddb691f5a5b826337910595fe68"
+    sha256 cellar: :any_skip_relocation, catalina:       "e7e7b1edebfa9d71d86a1885139b5271986eaddb691f5a5b826337910595fe68"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1e8d9592853fb11e37c161cf4eba16e4ba34b1720ac61d016793ca5ab7d34e19"
   end
 
   # autoconf-archive is useless without autoconf

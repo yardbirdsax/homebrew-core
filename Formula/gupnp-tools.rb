@@ -1,16 +1,17 @@
 class GupnpTools < Formula
   desc "Free replacements of Intel's UPnP tools"
   homepage "https://wiki.gnome.org/GUPnP/"
-  url "https://download.gnome.org/sources/gupnp-tools/0.10/gupnp-tools-0.10.0.tar.xz"
-  sha256 "41da7ff5ba8e2425adcb64ca5e04c81f57ca20ec6fdb84923939fdad42c6a18d"
-  revision 4
+  url "https://download.gnome.org/sources/gupnp-tools/0.10/gupnp-tools-0.10.3.tar.xz"
+  sha256 "457f4d923935b078415cd2ba88d78db60079b725926b7ee106e4565efe3204de"
+  license all_of: ["GPL-2.0-or-later", "LGPL-2.0-or-later"]
 
   bottle do
-    sha256 arm64_big_sur: "f1686d0d5c09941c2b86710da491917d38e0a6395a035048079f324e4ef6220d"
-    sha256 big_sur:       "38763acd7675374f6fb83bb6fc9c11fd66cc0b0e76b1dc1f16a1602ea73cecc9"
-    sha256 catalina:      "4100de40650880fa3ad8023c65e07c651aaf1286da8865a3e865f55016eb330e"
-    sha256 mojave:        "6a4d56ae6c680111619ad67125ffe3ee96944404771bbfdf7cdf6db0322a5379"
-    sha256 high_sierra:   "b4e8473364799562c90c9637f33b5ef999c53d7404eac8f6ce2921f62d056324"
+    sha256 arm64_monterey: "4a8eeaa71391a753f942f64f84a8f025b513e0252c773f7e819516323dfa7be9"
+    sha256 arm64_big_sur:  "4a89ac625c324da31a85f5c00a109dd40074da7546219596ed57ec640950f6f2"
+    sha256 monterey:       "01c141f24a86702b11699b6e4bd0544b0e0ecbc3a4bc5e8936603bcf383df8b0"
+    sha256 big_sur:        "1c0669b9521ee028984176288ebe98da99f05092da4e887d286317e39a9b1df4"
+    sha256 catalina:       "745c99c44c7aab8b7c609ee679d4867cda900468759ce3abbb2624222649af2e"
+    sha256 x86_64_linux:   "002c5f55aa4ac266d215a73ae4336dcab858f3aea5da1977b5c77e532d3699b7"
   end
 
   depends_on "meson" => :build
@@ -21,7 +22,7 @@ class GupnpTools < Formula
   depends_on "gtksourceview4"
   depends_on "gupnp"
   depends_on "gupnp-av"
-  depends_on "libsoup"
+  depends_on "libsoup@2"
 
   def install
     mkdir "build" do

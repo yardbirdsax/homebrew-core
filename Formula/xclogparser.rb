@@ -1,17 +1,22 @@
 class Xclogparser < Formula
   desc "Tool to parse the SLF serialization format used by Xcode"
-  homepage "https://github.com/spotify/XCLogParser"
-  url "https://github.com/spotify/XCLogParser/archive/v0.2.22.tar.gz"
-  sha256 "0d707b86b4bc239501d7d7be47b1bcaa4082f36ab6e7d16c64dddd3d870e35f1"
+  homepage "https://github.com/MobileNativeFoundation/XCLogParser"
+  url "https://github.com/MobileNativeFoundation/XCLogParser/archive/v0.2.34.tar.gz"
+  sha256 "25e1275229064e314ce6f1107541891a5a6438c76a10ecc6d2b592f5a441713b"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "02e68d6bd5c8343eeefbfc39de1babde9686df5792cb4a6b3134efef12fa0cac"
-    sha256 cellar: :any_skip_relocation, big_sur:       "63c7f8315964482db3d4d6cf3a0417d6e62f6dc8bc162d729f7da301aac219fb"
-    sha256 cellar: :any_skip_relocation, catalina:      "2621211d63b9e7b2d5feadbd41aea9f71a953032b00b91a67b483b17b6b4bba0"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "994fa1ec0e1e3f31bf142c624b757eeb919b6768ad26537cac04b7210ceb9fd3"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "4213857270f8c4a2183b1db5e4d19b362d773fae69e0325e312a13357af18904"
+    sha256 cellar: :any_skip_relocation, monterey:       "1c4a457594ceefe0bd397520db0d20ff2284f18c27eb5e73bd21227b2f0bfd9e"
+    sha256 cellar: :any_skip_relocation, big_sur:        "cc3ef11105330e603348299884e3b639220d2c0fecde7c3f4a67bc15aadeac40"
+    sha256 cellar: :any_skip_relocation, catalina:       "8b1cf6b196da874f6bf466356579df3d7a644cbdc66c8c141e374c4736a74b4b"
+    sha256                               x86_64_linux:   "1022ff8d803b5607c74040b869f94169b917689d62f09e8244e87eb21ab4b4f1"
   end
 
   depends_on xcode: "12.0"
+
+  uses_from_macos "swift"
 
   resource "test_log" do
     url "https://github.com/tinder-maxwellelliott/XCLogParser/releases/download/0.2.9/test.xcactivitylog"

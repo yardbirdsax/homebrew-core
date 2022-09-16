@@ -1,22 +1,32 @@
 class I686ElfBinutils < Formula
   desc "GNU Binutils for i686-elf cross development"
   homepage "https://www.gnu.org/software/binutils/"
-  url "https://ftp.gnu.org/gnu/binutils/binutils-2.36.tar.xz"
-  mirror "https://ftpmirror.gnu.org/binutils/binutils-2.36.tar.xz"
-  sha256 "5788292cc5bbcca0848545af05986f6b17058b105be59e99ba7d0f9eb5336fb8"
+  url "https://ftp.gnu.org/gnu/binutils/binutils-2.39.tar.xz"
+  mirror "https://ftpmirror.gnu.org/binutils/binutils-2.39.tar.xz"
+  sha256 "645c25f563b8adc0a81dbd6a41cffbf4d37083a382e02d5d3df4f65c09516d00"
   license "GPL-3.0-or-later"
 
-  bottle do
-    sha256 arm64_big_sur: "e5b3899557c9de0e40411d07977a45f12aca0cfd5ddb11f24621c336bf1b5a34"
-    sha256 big_sur:       "7ff73624acb4bc0671e9ae35f661f5118c8ed198e0a3db132f21be96e569d1ee"
-    sha256 catalina:      "f364786230b8fad53479825413cbaa1a3a763ab6d5db878eecb4f5905649ea7b"
-    sha256 mojave:        "4d026755aba1104a8af8ddde405521acb74103ab1a8a7df2a4eeb4f00f0863ce"
+  livecheck do
+    formula "binutils"
   end
 
+  bottle do
+    sha256 arm64_monterey: "b165b5ea4d9c0f6c48ae911424b947d0b5fbefe7326a4b08264bcab238adc311"
+    sha256 arm64_big_sur:  "e6fd77d3044070196bcc97994e30103314c202cafbb8d388297b016fe743906a"
+    sha256 monterey:       "9f98933cb5be01be6656c48b0a6af873d052c0a8d2035764aabacb0aa30f7609"
+    sha256 big_sur:        "770b6be941d02848584d1cde5563ccd28c858016818283ac74e57e5c88026f3b"
+    sha256 catalina:       "de959fa65f1b4ecbf25f0684f652fab3b65fd1112e17a4b92d1295a49dea7c08"
+    sha256 x86_64_linux:   "02f56bd4afbcefb52a060a677150939ccbdb13c19cfa6fc3e99796564c1cb864"
+  end
+
+  uses_from_macos "texinfo"
+
   def install
-    system "./configure", "--target=i686-elf",
+    target = "i686-elf"
+    system "./configure", "--target=#{target}",
                           "--prefix=#{prefix}",
-                          "--infodir=#{info}/i686-elf-binutils",
+                          "--libdir=#{lib}/#{target}",
+                          "--infodir=#{info}/#{target}",
                           "--disable-nls"
     system "make"
     system "make", "install"

@@ -1,18 +1,21 @@
 class Pict < Formula
   desc "Pairwise Independent Combinatorial Tool"
   homepage "https://github.com/Microsoft/pict/"
-  url "https://github.com/Microsoft/pict/archive/v3.7.1.tar.gz"
-  sha256 "4fc7939c708f9c8d6346430b3b90f122f2cc5e341f172f94eb711b1c48f2518a"
+  url "https://github.com/Microsoft/pict/archive/v3.7.4.tar.gz"
+  sha256 "42af3ac7948d5dfed66525c4b6a58464dfd8f78a370b1fc03a8d35be2179928f"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "a6094b78fd5c2e77ad655567d713503dee99c00e8ee4c2ef7ff38ce0bf361337"
-    sha256 cellar: :any_skip_relocation, big_sur:       "6fd0d56a35c640dc6731062aec132549be6bbcf1cf5fae9b089b22c07df2082a"
-    sha256 cellar: :any_skip_relocation, catalina:      "0310bc54de6de7c0901d59c6177129b4d1b989e839eb7ced09b01f41398b8355"
-    sha256 cellar: :any_skip_relocation, mojave:        "ee531627e5fa6a0e8ba68aeb1e7bc5c420fb307bedccbc5b8aa248b73291a665"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "f6ebf8ee9bb2ff705de0f9975cc96a4284a127b093ece87b44643d83f5b636de"
-    sha256 cellar: :any_skip_relocation, sierra:        "6ba3b37a9a8a0ce77430baddda0f57eebd71ad4adcf412c8f2f6b935073d7548"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "f3b42cd438f51790b14275f2ff2d7d6dc897f8ce32489c997602d8dd5f8984f2"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "863064a24888d6aef5013b37eeb22abd0fdce747badfe27c189959b01d9c7a16"
+    sha256 cellar: :any_skip_relocation, monterey:       "2acd315ec72d1d92cca685e2e6953539d2d9d37d18ea0889ad5e67c06f83b4ee"
+    sha256 cellar: :any_skip_relocation, big_sur:        "96d58480ac15db41e7bd9831c9287afaefd1bce20d275e1a2642c070cd3fdb8b"
+    sha256 cellar: :any_skip_relocation, catalina:       "1320678e6b2a2f174d88162541e72fff108adb4b4ff4c34eedbc435b4022fa74"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7bc79051760ece4228b1b8effde4c16289f250aa9f6feb14f05e6065e3aba070"
   end
+
+  fails_with gcc: "5"
 
   resource "testfile" do
     url "https://gist.githubusercontent.com/glsorre/9f67891c69c21cbf477c6cedff8ee910/raw/84ec65cf37e0a8df5428c6c607dbf397c2297e06/pict.txt"
@@ -26,8 +29,11 @@ class Pict < Formula
 
   test do
     resource("testfile").stage testpath
-    output = shell_output("#{bin}/pict pict.txt").split("\n")
-    assert_equal output[0], "LANGUAGES\tCURRIENCIES"
-    assert_equal output[4], "en_US\tGBP"
+    output = shell_output("#{bin}/pict pict.txt")
+    assert_equal output.split("\n")[0], "LANGUAGES\tCURRIENCIES"
+    assert_match "en_US\tGBP", output
+    assert_match "en_US\tUSD", output
+    assert_match "en_UK\tGBP", output
+    assert_match "en_UK\tUSD", output
   end
 end

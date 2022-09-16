@@ -1,32 +1,27 @@
 class Einstein < Formula
   desc "Remake of the old DOS game Sherlock"
-  homepage "https://web.archive.org/web/20120621005109/games.flowix.com/en/index.html"
-  url "https://web.archive.org/web/20120621005109/games.flowix.com/files/einstein/einstein-2.0-src.tar.gz"
-  sha256 "0f2d1c7d46d36f27a856b98cd4bbb95813970c8e803444772be7bd9bec45a548"
+  homepage "https://github.com/lksj/einstein-puzzle"
+  url "https://github.com/lksj/einstein-puzzle/archive/refs/tags/v2.1.1.tar.gz"
+  sha256 "46cf0806c3792b995343e46bec02426065f66421c870781475d6d365522c10fc"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "6499a95257a847e4d273da330d52a71da6dcf4f3de754515eb158ab850f5e0f2"
-    sha256 cellar: :any, big_sur:       "79969ac055b92c9d66391bc912592df75af67046abd57bde81c248a4a68dbfbe"
-    sha256 cellar: :any, catalina:      "54ce5ebd0b06256ecdda309bc0a0b500a0bf29411021fb5525dd647b923c3354"
-    sha256 cellar: :any, mojave:        "1430c04b154114c5ada29708033872f75a1c1ca361d997747aac748806d0182d"
-    sha256 cellar: :any, high_sierra:   "faa76a6c3363ec2c5f814940560db5fb52d8d7af89149dae7bbdf14967c51e3a"
-    sha256 cellar: :any, sierra:        "b2f4290bc28e3dd1c528b7c58fa363f8e5832c00283fa79f2f9243d8e5a02c4c"
-    sha256 cellar: :any, el_capitan:    "d0424faaf640750ab3ff8e8e24216a93227b9ff40d33405e3a55a7bdf14d1a36"
-    sha256 cellar: :any, yosemite:      "e884bcdb8f1644707fceb03a8d7732a528495e9655216eff42336c64fdd90179"
+    sha256 cellar: :any,                 arm64_monterey: "40ca9b96841289d975500232b4f60c89359b68d81837231f8fa8f363e13f1c9a"
+    sha256 cellar: :any,                 arm64_big_sur:  "febb782f0a81b23076ca4edc880ca0dd161b083370da8025950aff95e7f1a930"
+    sha256 cellar: :any,                 monterey:       "edb114fe30d3527c77c4896310d24569188f4bed430740c2e914f9e0a340ad4f"
+    sha256 cellar: :any,                 big_sur:        "80aaf55aa6e90c8122f2de289c62bc4419b9a4ec69f80bf4c3373462317aa311"
+    sha256 cellar: :any,                 catalina:       "8c085442e58bea866e93f786daf3eb4910146a7234046559c5dc85a1c5b7297c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7fa7dcdc2fdb1ed00d35a14215d27da414e32d94818c76cc15da63a293371f06"
   end
 
   depends_on "sdl"
   depends_on "sdl_mixer"
   depends_on "sdl_ttf"
 
-  # Fixes a cast error on compilation
-  patch :p0 do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/85fa66a9/einstein/2.0.patch"
-    sha256 "c538ccb769c53aee4555ed6514c287444193290889853e1b53948a2cac7baf11"
-  end
-
   def install
-    system "make"
+    # Temporary Homebrew-specific work around for linker flag ordering problem in Ubuntu 16.04.
+    # Remove after migration to 18.04.
+    inreplace "Makefile", "$(LNFLAGS) $(OBJECTS)", "$(OBJECTS) $(LNFLAGS)" unless OS.mac?
+    system "make", "PREFIX=#{HOMEBREW_PREFIX}"
 
     bin.install "einstein"
     (pkgshare/"res").install "einstein.res"

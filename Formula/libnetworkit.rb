@@ -1,29 +1,46 @@
 class Libnetworkit < Formula
   desc "NetworKit is an OS-toolkit for large-scale network analysis"
   homepage "https://networkit.github.io"
-  url "https://github.com/networkit/networkit/archive/8.0.tar.gz"
-  sha256 "cdf9571043edbe76c447622ed33efe9cba2880f887ca231d98f6d3c22027e20e"
+  url "https://github.com/networkit/networkit/archive/10.0.tar.gz"
+  sha256 "77187a96dea59e5ba1f60de7ed63d45672671310f0b844a1361557762c2063f3"
   license "MIT"
 
+  livecheck do
+    formula "networkit"
+  end
+
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "5f2bff7d671e380fdd61d0f19526dca6497ff2846ff0569721b93b7067efa11f"
-    sha256 cellar: :any, big_sur:       "af356f704e84e2bd01c3eba35b52db809985536c2be04cc0642a2fd1599db6e0"
-    sha256 cellar: :any, catalina:      "66137ce8956685d9ff6a905553e4275f0eb963a439900c111fa1568f03c4462d"
-    sha256 cellar: :any, mojave:        "6a6dc69af2c96f1a4745e480026dd093f59369018965f1e85b7e0a7b5a03a29a"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "f412ddb92c943b849582a36a9acb6b4deefff24098a158ed911c9b73fba09613"
+    sha256 cellar: :any,                 arm64_big_sur:  "f35f2328303856caa57b80f77eb7d086e54b8eb69ef5fdd90095001a3c7ee75e"
+    sha256 cellar: :any,                 monterey:       "02e0ce1069e1d3b420da7cc290255d9f2c0c7fb166bb575b8b219416fa9c6f1f"
+    sha256 cellar: :any,                 big_sur:        "8a7b5ed41ed3d65512547ac593df74db3af3dcd70547996775f434d92d0d24c4"
+    sha256 cellar: :any,                 catalina:       "86fe07599074e4be03ba5aa653f49f995aa9353dee1f98427b7b68d80542e18b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "944d9df37170ba7101900432c4e1bca1e8d742f11429387f59d604d645a7b718"
   end
 
   depends_on "cmake" => :build
-  depends_on "libomp"
   depends_on "tlx"
+  depends_on "ttmath"
+
+  on_macos do
+    depends_on "libomp"
+  end
+
+  fails_with gcc: "5"
 
   def install
     mkdir "build" do
-      system "cmake", ".", *std_cmake_args,
-                           "-DNETWORKIT_EXT_TLX=#{Formula["tlx"].opt_prefix}",
-                           "-DOpenMP_CXX_FLAGS='-Xpreprocessor -fopenmp -I#{Formula["libomp"].opt_prefix}/include'",
-                           "-DOpenMP_CXX_LIB_NAMES='omp'",
-                           "-DOpenMP_omp_LIBRARY=#{Formula["libomp"].opt_prefix}/lib/libomp.dylib",
-                           ".."
+      flags = ["-DNETWORKIT_EXT_TLX=#{Formula["tlx"].opt_prefix}"]
+      # GCC includes libgomp for OpenMP support and does not need any extra flags to use it.
+      if OS.mac?
+        flags += [
+          "-DOpenMP_CXX_FLAGS='-Xpreprocessor -fopenmp -I#{Formula["libomp"].opt_prefix}/include'",
+          "-DOpenMP_CXX_LIB_NAMES='omp'",
+          "-DOpenMP_omp_LIBRARY=#{Formula["libomp"].opt_prefix}/lib/libomp.dylib",
+        ]
+      end
+      system "cmake", ".", *std_cmake_args, *flags, ".."
       system "make", "install"
     end
   end
@@ -38,7 +55,7 @@ class Libnetworkit < Formula
         return 0;
       }
     EOS
-    system ENV.cxx, "test.cpp", "-L#{lib}", "-lnetworkit", "-o", "test", "-std=c++11"
+    system ENV.cxx, "test.cpp", "-L#{lib}", "-lnetworkit", "-o", "test", "-std=c++14"
     system "./test"
   end
 end

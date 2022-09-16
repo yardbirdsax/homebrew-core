@@ -1,15 +1,17 @@
 class Aide < Formula
   desc "File and directory integrity checker"
   homepage "https://aide.github.io/"
-  url "https://github.com/aide/aide/releases/download/v0.17.1/aide-0.17.1.tar.gz"
-  sha256 "a401c951938f1169ceaec868ce3594736e89c5c881578c263d8a824a06b0002d"
+  url "https://github.com/aide/aide/releases/download/v0.17.4/aide-0.17.4.tar.gz"
+  sha256 "c81505246f3ffc2e76036d43a77212ae82895b5881d9b9e25c1361b1a9b7a846"
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "d95d123bfb33e1d42ed6a47cda73d62a05e31a635bf4b35b86225c1e68daa5d6"
-    sha256 cellar: :any, big_sur:       "f405f1835d4baebec9ab71892154f8be7e49b3675a72a253bac0362001bec6df"
-    sha256 cellar: :any, catalina:      "c3e7c313d1fa123f7c141bb49e9570325ecc161e867c5af6660660640fa2b568"
-    sha256 cellar: :any, mojave:        "d6a35681437639f1334c52bb96cf2b9ce14c82f8cacbea393f1cb4e098a88473"
+    sha256 cellar: :any,                 arm64_monterey: "b0c84efe8e1900637012961de81510d4b161add9251fc83614141cc149e0c575"
+    sha256 cellar: :any,                 arm64_big_sur:  "7d5c7b012260f55372992d7e692f53c72d14e8b265db4869af5641f0b44f8435"
+    sha256 cellar: :any,                 monterey:       "f19c632ec5e607e4fa4687cc3b49f644d678a957e93ab5e74df37c51df97203a"
+    sha256 cellar: :any,                 big_sur:        "c619712d6930437e597f599e5e62f0047fd9ce985aae1ed964d1cc5a03fdf5ef"
+    sha256 cellar: :any,                 catalina:       "aa1ae5486d07a19d0729947adcc180518ad1b6a46fc29c0b450e95868b80a05a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ef25683c89e216c309bd49f0422a83111ca6535e695822b3962cce5ed77bacee"
   end
 
   head do
@@ -40,11 +42,11 @@ class Aide < Formula
       --sysconfdir=#{etc}
       --prefix=#{prefix}
     ]
-    on_macos do
-      args << "--with-curl"
-    end
-    on_linux do
-      args << "--with-curl=" + Formula["curl"].prefix
+
+    args << if OS.mac?
+      "--with-curl"
+    else
+      "--with-curl=#{Formula["curl"].prefix}"
     end
 
     system "./configure", *args

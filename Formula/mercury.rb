@@ -1,25 +1,27 @@
 class Mercury < Formula
   desc "Logic/functional programming language"
   homepage "https://mercurylang.org/"
-  url "https://dl.mercurylang.org/release/mercury-srcdist-20.06.tar.gz"
-  sha256 "b9c6965d41af49b4218d2444440c4860630d6f50c18dc6f1f4f8374d114f79be"
+  url "https://dl.mercurylang.org/release/mercury-srcdist-22.01.3.tar.gz"
+  sha256 "d5b4b4b7b3a4a63a18731d97034b44f131bf589b6d1b10e8ebc4becef000d048"
   license all_of: ["GPL-2.0-only", "LGPL-2.0-only", "MIT"]
 
+  livecheck do
+    url "https://dl.mercurylang.org/"
+    regex(/href=.*?mercury-srcdist[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
+
   bottle do
-    rebuild 1
-    sha256 cellar: :any, big_sur:     "2b02e97a19000e9c576fdd5c48b29300e210b9464fff7a0b7b68879555b9723b"
-    sha256 cellar: :any, catalina:    "ede7304ce96165ca6382118eacb3997e0732b875db721640002d203db9e66346"
-    sha256 cellar: :any, mojave:      "ac95cc73104a5621d7a561ae9957561206541633bff5adaf22ed36e21517add1"
-    sha256 cellar: :any, high_sierra: "60240308ebcc05ca33a4d40a787745cd4f60b445c9d94302505253bfd4697f6f"
+    sha256 cellar: :any,                 arm64_monterey: "d4d7da746a3903308c29bdaf2a958a5fe2a8a39479b7915336189510daba2415"
+    sha256 cellar: :any,                 arm64_big_sur:  "ff56525679c46110bb62e291836a5f41603346a3c907d7b6c95ca9d7d9200903"
+    sha256 cellar: :any,                 monterey:       "3d8523d289526f717bcb3547492f5ab73b687b7fd93b8f93e123d993c5020f02"
+    sha256 cellar: :any,                 big_sur:        "b655f38b5eab501a46de0681b8861a98eacd26b86561c46cc3b1c9ee09a682f4"
+    sha256 cellar: :any,                 catalina:       "b28cfbfa350b95d12542948cb547bd9e93f23d9d9eb41c319e70e9eb7aa2f124"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5adad7ca5952d6548e893639c131f6fa000fc6564d077f37df1b69398ea35093"
   end
 
   depends_on "openjdk"
 
-  # Disable advanced segfault handling due to broken header detection.
-  patch do
-    url "https://github.com/Mercury-Language/mercury/commit/37ed70d43878cd53c8da40bf410e0a312835c036.patch?full_index=1"
-    sha256 "f01aca048464341dcf6e345056050e2c45236839cca17ac01fc944131d1641c0"
-  end
+  uses_from_macos "flex"
 
   def install
     system "./configure", "--prefix=#{prefix}",

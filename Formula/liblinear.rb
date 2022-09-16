@@ -1,10 +1,10 @@
 class Liblinear < Formula
   desc "Library for large linear classification"
   homepage "https://www.csie.ntu.edu.tw/~cjlin/liblinear/"
-  url "https://www.csie.ntu.edu.tw/~cjlin/liblinear/oldfiles/liblinear-2.42.tar.gz"
-  sha256 "cf44f13809f506be10c8434fdbf4d4f7a3c6f8da9e93b6e03fb8a80a8e9c938d"
+  url "https://www.csie.ntu.edu.tw/~cjlin/liblinear/oldfiles/liblinear-2.45.tar.gz"
+  sha256 "3c64eec45c01943a656baac7aeb8ffd782fe0aea53629aa9f5fdb8eec177c92f"
   license "BSD-3-Clause"
-  head "https://github.com/cjlin1/liblinear.git"
+  head "https://github.com/cjlin1/liblinear.git", branch: "master"
 
   livecheck do
     url "https://www.csie.ntu.edu.tw/~cjlin/liblinear/oldfiles/"
@@ -12,24 +12,30 @@ class Liblinear < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "3d10c6424ded069cf0642018690d5e87725ca7ad6ca0b762e00446c6d05718b9"
-    sha256 cellar: :any, big_sur:       "6afbe67a6cb651a0ac829b421c2a4e7f875b7eb41ceb7a8acfe24c8be2203114"
-    sha256 cellar: :any, catalina:      "b1ff692bb0430cc95e14ef736a8b1730afa826887648f91835869181922a2136"
-    sha256 cellar: :any, mojave:        "9481d9d47bea60aff197812d668bb3fef9702e1922da016bc5c6d8bde7f32c08"
-    sha256 cellar: :any, high_sierra:   "0ed1af625144027e73642a9b2eff35593a086692ef1abea5af6ab85ab3869abd"
+    sha256 cellar: :any,                 arm64_monterey: "1dc65a0cd23d37bc4ef5676080e6a0e6b953289152532586791f6117d51c2ffa"
+    sha256 cellar: :any,                 arm64_big_sur:  "729f76538f19c370424f033c884e46a9cb83cdb99d64703d6e5f7345bb170cce"
+    sha256 cellar: :any,                 monterey:       "5a5b15fee1584548ebdeb166c81efda7038d6941501b685be49775f9ed4775c2"
+    sha256 cellar: :any,                 big_sur:        "356369ca1df9b188b922ce4bfd74f1e215eaa766a656b6ae0e9085314138d351"
+    sha256 cellar: :any,                 catalina:       "a610ba5a1bcb6ee808f10c1bb2877139ee95d67406beb917f89eabf266445cfe"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d65dafb6eac0a56233687510ad736495633467dbdb1f15c976ece952ecca15be"
   end
 
   # Fix sonames
   patch :p0 do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/b1dbde5b1d7c/liblinear/patch-Makefile.diff"
-    sha256 "b7cd43329264ed0568f27e305841aa24817dccc71e5ff3c384eef9ac6aa6620a"
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/7aed87f97f54f98f79495fb9fe071cfa4766403f/liblinear/patch-Makefile.diff"
+    sha256 "a51e794f06d73d544123af07cda8a4b21e7934498d21b7a6ed1a3e997f363155"
   end
 
   def install
+    soversion_regex = /^SHVER = (\d+)$/
+    soversion = (buildpath/"Makefile").read
+                                      .lines
+                                      .grep(soversion_regex)
+                                      .first[soversion_regex, 1]
     system "make", "all"
     bin.install "predict", "train"
-    lib.install "liblinear.dylib"
-    lib.install_symlink "liblinear.dylib" => "liblinear.1.dylib"
+    lib.install shared_library("liblinear", soversion)
+    lib.install_symlink shared_library("liblinear", soversion) => shared_library("liblinear")
     include.install "linear.h"
   end
 

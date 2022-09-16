@@ -1,35 +1,27 @@
 class Akamai < Formula
   desc "CLI toolkit for working with Akamai's APIs"
   homepage "https://github.com/akamai/cli"
-  url "https://github.com/akamai/cli/archive/1.1.5.tar.gz"
-  sha256 "759c3c3bc59c2623fc8a5f91907f55d870f77aef1839f2ecc703db5c469b852a"
+  url "https://github.com/akamai/cli/archive/refs/tags/v1.5.2.tar.gz"
+  sha256 "33e4e41ea3697bf84d99354f993edab5ef45a160f92f8e5da094cb12c624980c"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, big_sur:     "6a34e6b26f58c2401efee9e063d44db8e753672751c3f7e9a6783e87f1ba8c70"
-    sha256 cellar: :any_skip_relocation, catalina:    "a986f3bfc261227cd44447d5ff9cdfb461c50c002118d36caed068f5859432e1"
-    sha256 cellar: :any_skip_relocation, mojave:      "ce3ea6b8dba89d48bfec3be3bbf5701e7b1dcdde7a2f76a97dd668752b1e95fb"
-    sha256 cellar: :any_skip_relocation, high_sierra: "2b6d07c4926858e1be33bef070a925a6746f396fa27566aaa313d5a2673cb25f"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "f0b2a860ee65e6e249894d19f0a03b423f4b0e774105066f5836c6449b53131a"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b06521e34515aecdb81e1dad94b442ed5e9f1062f2ba320d1bf0e0079d2ea185"
+    sha256 cellar: :any_skip_relocation, monterey:       "3f3091301abecbdddf70e049839b142f15b028aa3847948d660499a4cf88f33f"
+    sha256 cellar: :any_skip_relocation, big_sur:        "dd39fdf7552c28df9cccc57e8d607705ee0f507c2562c6fe1b38e82042e72a98"
+    sha256 cellar: :any_skip_relocation, catalina:       "ce6876e71487eda4afd75fc8b5c6ffcad506f9c47258aaa7522bd94b2228f3e2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a2b41487911bfb7001c932fa5c94ceda01818c57bc350b86999f7f64791a62f2"
   end
 
-  depends_on "dep" => :build
-  depends_on "go" => :build
+  depends_on "go" => [:build, :test]
 
   def install
-    ENV["GOPATH"] = buildpath
-    ENV["GLIDE_HOME"] = HOMEBREW_CACHE/"glide_home/#{name}"
-
-    srcpath = buildpath/"src/github.com/akamai/cli"
-    srcpath.install buildpath.children
-
-    cd srcpath do
-      system "dep", "ensure", "-vendor-only"
-      system "go", "build", "-tags", "noautoupgrade nofirstrun", "-o", bin/"akamai"
-      prefix.install_metafiles
-    end
+    system "go", "build", "-tags", "noautoupgrade nofirstrun", *std_go_args, "cli/main.go"
   end
 
   test do
-    assert_match "Purge", shell_output("#{bin}/akamai install --force purge")
+    assert_match "diagnostics", shell_output("#{bin}/akamai install diagnostics")
+    system bin/"akamai", "uninstall", "diagnostics"
   end
 end

@@ -2,8 +2,8 @@ class Asymptote < Formula
   desc "Powerful descriptive vector graphics language"
   homepage "https://asymptote.sourceforge.io"
   # Keep version in sync with manual below
-  url "https://downloads.sourceforge.net/project/asymptote/2.68/asymptote-2.68.src.tgz"
-  sha256 "e1e85a5db14dc809a43189f85415bd0845bcb9eec7aea5533767838d045b02b2"
+  url "https://downloads.sourceforge.net/project/asymptote/2.82/asymptote-2.82.src.tgz"
+  sha256 "4f6fbc5aa058c8d38513546be5b233bb5d7fa50e39486f3d8624aa7595ae748d"
   license "LGPL-3.0-only"
 
   livecheck do
@@ -12,10 +12,12 @@ class Asymptote < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "6b5ed92e317909ee5dd60b85d76998860f5388391ce4c109277262d47cdcbdfd"
-    sha256 big_sur:       "6f1ebb862336eef8285a4b7dee6b4beff0720975cfa6d5927c638c354a62adf9"
-    sha256 catalina:      "e0a8838e707147ab51685dfedbeefd089d43e4fac4b6d6743cbd9cf3d714f3c0"
-    sha256 mojave:        "300e42702c4b0cb41f14f1a5ddf28930d2b5b73e58a75706a026f85936c68134"
+    sha256 arm64_monterey: "4784ec0590b2dd8af194008fc9c33d89035762f579d0d44d60ddc16f2c4cc75c"
+    sha256 arm64_big_sur:  "ab9f9655049e0e406046cccfa56425226d64c5ae76329f46ca39529f5d117428"
+    sha256 monterey:       "fb203e04b75e5c1034f7afece17ec41b601143ecf2d3d3d336b512b63b0a53d6"
+    sha256 big_sur:        "ed81192f92d5c258a5ca1a6d2d4dde3bac89f42f0c8f592c276b5cf976f357bf"
+    sha256 catalina:       "603b162fc137b2014bbc10aeffa0dd80bfafa51fb45bdc030dfcaa877f907224"
+    sha256 x86_64_linux:   "a7ac112a23b63fb687619a714c2a72baa070c4f72e8c512e5647daaefdedc2a0"
   end
 
   depends_on "glm" => :build
@@ -26,13 +28,17 @@ class Asymptote < Formula
 
   uses_from_macos "ncurses"
 
+  on_linux do
+    depends_on "freeglut"
+  end
+
   resource "manual" do
-    url "https://downloads.sourceforge.net/project/asymptote/2.68/asymptote.pdf"
-    sha256 "f41f62e58c7d3199a71136e89749afa7e242f501973d81516e1cac4fae88f889"
+    url "https://downloads.sourceforge.net/project/asymptote/2.81/asymptote.pdf"
+    sha256 "543c3a9a87292c76083953688db28e20eb33d7f2e67e7808454f7e3d136de930"
   end
 
   def install
-    system "./configure", "--prefix=#{prefix}"
+    system "./configure", *std_configure_args
 
     # Avoid use of MacTeX with these commands
     # (instead of `make all && make install`)

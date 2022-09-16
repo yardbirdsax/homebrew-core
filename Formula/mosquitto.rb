@@ -1,8 +1,8 @@
 class Mosquitto < Formula
   desc "Message broker implementing the MQTT protocol"
   homepage "https://mosquitto.org/"
-  url "https://mosquitto.org/files/source/mosquitto-2.0.7.tar.gz"
-  sha256 "a98054f0b8161588975ef24e1d467550d3935f4c16ccee63ecb623248a28356e"
+  url "https://mosquitto.org/files/source/mosquitto-2.0.15.tar.gz"
+  sha256 "4735b1d32e3f91c7a8896741d88a3022e89730a1ee897946decfa0df27039ac6"
   # dual-licensed under EPL-1.0 and EDL-1.0 (Eclipse Distribution License v1.0),
   # EDL-1.0 is not in the SPDX list
   license "EPL-1.0"
@@ -13,14 +13,17 @@ class Mosquitto < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "7523d8429b97e657496c4f72efaaeb19da7a0b68a251f9788d4bbbfb6e9a86f5"
-    sha256 big_sur:       "b3c839f2215608319ab5b099dca732688b93e06236d7939b8620666d9332db48"
-    sha256 catalina:      "6af0ebda89b84e8204258137838b686073c67f026a4aa3a3a403577b5c59720d"
-    sha256 mojave:        "5a44cee40174d3d95b9072d9ed9000f1bd26a37e1d26ff2784bc1df66c958c5f"
+    sha256 arm64_monterey: "f14f8cc7ed101e7422f0f9d24e79d18061bf71e28fbdb85d30bb3b7fcc3e8ab8"
+    sha256 arm64_big_sur:  "e650529e5ae101a0d9f27535b1fcdc9fc8987b53b59e6e9589062b36e17212b7"
+    sha256 monterey:       "3d0a5aef85420aae906b0b0eb5c112c27af783c87d80a51ccdddfeeaa4daf386"
+    sha256 big_sur:        "530901fe4e49c78bdb19b515044bf42b3347a6b4a51306a39c797fa43a2304dc"
+    sha256 catalina:       "ce1a1c006b2b83759fd5537d9300d4ffd30d4e2b379e26af94c26594bbafa9b1"
+    sha256 x86_64_linux:   "11d51e10b009e0d087595a15e69896778c17634d91b5f3de97ab6862ef5c791b"
   end
 
   depends_on "cmake" => :build
   depends_on "pkg-config" => :build
+  depends_on "cjson"
   depends_on "libwebsockets"
   depends_on "openssl@1.1"
 
@@ -32,8 +35,9 @@ class Mosquitto < Formula
 
   def install
     system "cmake", ".", *std_cmake_args,
+                    "-DWITH_PLUGINS=OFF",
                     "-DWITH_WEBSOCKETS=ON",
-                    "-DCMAKE_INSTALL_RPATH=#{lib}"
+                    "-DCMAKE_INSTALL_RPATH=#{rpath}"
     system "make", "install"
   end
 
@@ -49,35 +53,18 @@ class Mosquitto < Formula
     EOS
   end
 
-  plist_options manual: "mosquitto -c #{HOMEBREW_PREFIX}/etc/mosquitto/mosquitto.conf"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-      <dict>
-        <key>Label</key>
-        <string>#{plist_name}</string>
-        <key>ProgramArguments</key>
-        <array>
-          <string>#{opt_sbin}/mosquitto</string>
-          <string>-c</string>
-          <string>#{etc}/mosquitto/mosquitto.conf</string>
-        </array>
-        <key>RunAtLoad</key>
-        <true/>
-        <key>KeepAlive</key>
-        <false/>
-        <key>WorkingDirectory</key>
-        <string>#{var}/mosquitto</string>
-      </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_sbin/"mosquitto", "-c", etc/"mosquitto/mosquitto.conf"]
+    keep_alive false
+    working_dir var/"mosquitto"
   end
 
   test do
     quiet_system "#{sbin}/mosquitto", "-h"
     assert_equal 3, $CHILD_STATUS.exitstatus
+    quiet_system "#{bin}/mosquitto_ctrl", "dynsec", "help"
+    assert_equal 0, $CHILD_STATUS.exitstatus
+    quiet_system "#{bin}/mosquitto_passwd", "-c", "-b", "/tmp/mosquitto.pass", "foo", "bar"
+    assert_equal 0, $CHILD_STATUS.exitstatus
   end
 end

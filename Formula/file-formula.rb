@@ -1,19 +1,25 @@
 # "File" is a reserved class name
 class FileFormula < Formula
   desc "Utility to determine file types"
-  homepage "https://www.darwinsys.com/file/"
-  url "https://astron.com/pub/file/file-5.39.tar.gz"
-  sha256 "f05d286a76d9556243d0cb05814929c2ecf3a5ba07963f8f70bfaaa70517fad1"
-  license "BSD-2-Clause"
-  revision 1
-  head "https://github.com/file/file.git"
+  homepage "https://darwinsys.com/file/"
+  url "https://astron.com/pub/file/file-5.43.tar.gz"
+  sha256 "8c8015e91ae0e8d0321d94c78239892ef9dbc70c4ade0008c0e95894abfb1991"
+  # file-formula has a BSD-2-Clause-like license
+  license :cannot_represent
+  head "https://github.com/file/file.git", branch: "master"
+
+  livecheck do
+    url "https://astron.com/pub/file/"
+    regex(/href=.*?file[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "f445ca085b3a17adff424d53d4870c85c8fe49ab170a0cef36439d1fd2cd1c0a"
-    sha256 cellar: :any, big_sur:       "bce0170e833223ef66813d4a7dacb045e55456c0b8fc539f3559d68406328493"
-    sha256 cellar: :any, catalina:      "8aa09b20fce4cadcb67695d44d7db1530767659b7880f4ff28147f3f8bd11cc1"
-    sha256 cellar: :any, mojave:        "d2f3b7a6a4661b5b3cae9a28edc24a3d56c417056ee1b526c83b14d3b3d4ee53"
-    sha256 cellar: :any, high_sierra:   "66591e58e59f306dffc9b6b644d48af675326d33712749ab0c0763f46d4a9af0"
+    sha256 cellar: :any,                 arm64_monterey: "4670bf33cb4a2a2ec2167ba316f91d61ef524e67c0ec232ca2f513e4c6cc4a62"
+    sha256 cellar: :any,                 arm64_big_sur:  "983ef3239b886fa044a56adc2797f63b4d2930d7e68f589e8cd386d4663f2fe7"
+    sha256 cellar: :any,                 monterey:       "70ff46e2a33856064bfd7ab5752a26e2479fbef2c031cbca2a3c7c0eee867c33"
+    sha256 cellar: :any,                 big_sur:        "91a17666871d695c9c0df10afdb2b41835da1a8114dcba529e65f0feeffe2c8f"
+    sha256 cellar: :any,                 catalina:       "95ce9f08f5efa8f6c43390ab8ddc1f1807bba036419985f529ad1678c60cd595"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "156e61105587eaf3a1b7ee41b5a427cae1aa3eb873b07cf320989458957365e1"
   end
 
   keg_only :provided_by_macos

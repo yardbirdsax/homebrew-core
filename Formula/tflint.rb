@@ -1,16 +1,18 @@
 class Tflint < Formula
   desc "Linter for Terraform files"
   homepage "https://github.com/terraform-linters/tflint"
-  url "https://github.com/terraform-linters/tflint/archive/v0.24.1.tar.gz"
-  sha256 "aaabeca85020c518189509b1628b83cf52f2749579f308ff4bcdff8a10bb3b99"
+  url "https://github.com/terraform-linters/tflint/archive/v0.40.0.tar.gz"
+  sha256 "0ea93cb2c3cee6212dc2b12d2a462c25c498098bd2baf50a74bea77d5cd74f2d"
   license "MPL-2.0"
-  head "https://github.com/terraform-linters/tflint.git"
+  head "https://github.com/terraform-linters/tflint.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "f59f8f1abf34e6bacf352453235a9f83da8e31e06db8ab33ba1a016c0faa0517"
-    sha256 cellar: :any_skip_relocation, big_sur:       "ae2af08ef4a81aaa4396631d42aa4dc5f789ae3cccbef346223700c985cdd928"
-    sha256 cellar: :any_skip_relocation, catalina:      "caa165af722c3bfdd6e38d5c6617d75d0c7c91019eacbb74f2c536eda3947f4c"
-    sha256 cellar: :any_skip_relocation, mojave:        "6276be551e92dbd5d91047b0a6b0fe09f9d09994913944ab7608efd650ebc8dd"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "45ff2532cc4087f25f6612090e8efd667ee52287a3e6a7c69c22a3491592ecd4"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "36d39d4251d59e104f833df3631b14fb0f2e9c8d06a0b30f737c5b7687f4fc0b"
+    sha256 cellar: :any_skip_relocation, monterey:       "04f7701f29917bc4c77eac6dc543c6e0e9a54fc7f30d6600539fb99c724999f4"
+    sha256 cellar: :any_skip_relocation, big_sur:        "b4facd3e84152a2280510ca0fd9e58df30aa717867e3988c59ea2f051fd79773"
+    sha256 cellar: :any_skip_relocation, catalina:       "20993b0ab0322bce5d7489744cbc09ca8e04f3c605f980465d13313ce4ea8424"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "289b397e641f76cff0528bb064f5b9085400b52345c7fe54a3cb087b305be399"
   end
 
   depends_on "go" => :build
@@ -21,6 +23,15 @@ class Tflint < Formula
 
   test do
     (testpath/"test.tf").write <<~EOS
+      terraform {
+        required_providers {
+          aws = {
+            source = "hashicorp/aws"
+            version = "~> 4"
+          }
+        }
+      }
+
       provider "aws" {
         region = var.aws_region
       }

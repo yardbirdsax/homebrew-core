@@ -1,31 +1,31 @@
 class Itstool < Formula
   desc "Make XML documents translatable through PO files"
   homepage "http://itstool.org/"
-  url "https://github.com/itstool/itstool/archive/2.0.6.tar.gz"
-  sha256 "bda0b08e9a1db885c9d7d1545535e9814dd8931d5b8dd5ab4a47bd769d0130c6"
-  license "GPL-3.0"
-  revision 2
-  head "https://github.com/itstool/itstool.git"
+  url "https://github.com/itstool/itstool/archive/2.0.7.tar.gz"
+  sha256 "fba78a37dc3535e4686c7f57407b97d03c676e3a57beac5fb2315162b0cc3176"
+  license "GPL-3.0-or-later"
+  revision 1
+  head "https://github.com/itstool/itstool.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "ebdfd10f93422be39bb585681691ebe51e50c627b9bb2ea2b4129ef94c00d932"
-    sha256 cellar: :any_skip_relocation, big_sur:       "81eaa38336a86c12673ffc93418fdbcc7244cd8be71c9a2c07864e0a19994ea5"
-    sha256 cellar: :any_skip_relocation, catalina:      "f860a74756beaab039bffa02a4c8b8258f1a54a692532f4a1e57d0b4431c7ab9"
-    sha256 cellar: :any_skip_relocation, mojave:        "d3b26ca21d37e4e0eb6e7318571a69aa021034bc69936749e8891213c16465c9"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "1ee274a6df78727bfcba1221ea16b5c2fa55819c66e2de9168c7915fd3238508"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "108962bdce11e7b353a94f61ae30c82212295963d157cd667fb9af6069801cbd"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "108962bdce11e7b353a94f61ae30c82212295963d157cd667fb9af6069801cbd"
+    sha256 cellar: :any_skip_relocation, monterey:       "211f56048a0498fd935fac91466be64590276ae236d5a60be45ff2061713087f"
+    sha256 cellar: :any_skip_relocation, big_sur:        "211f56048a0498fd935fac91466be64590276ae236d5a60be45ff2061713087f"
+    sha256 cellar: :any_skip_relocation, catalina:       "211f56048a0498fd935fac91466be64590276ae236d5a60be45ff2061713087f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "108962bdce11e7b353a94f61ae30c82212295963d157cd667fb9af6069801cbd"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libxml2"
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   def install
-    xy = Language::Python.major_minor_version Formula["python@3.9"].opt_bin/"python3"
-    ENV.append_path "PYTHONPATH", "#{Formula["libxml2"].opt_lib}/python#{xy}/site-packages"
+    python3 = "python3.10"
+    ENV.append_path "PYTHONPATH", Formula["libxml2"].opt_prefix/Language::Python.site_packages(python3)
 
-    system "./autogen.sh", "--prefix=#{libexec}",
-                           "PYTHON=#{Formula["python@3.9"].opt_bin}/python3"
+    system "./autogen.sh", "--prefix=#{libexec}", "PYTHON=#{which(python3)}"
     system "make", "install"
 
     bin.install Dir["#{libexec}/bin/*"]

@@ -7,9 +7,13 @@ class MavenAT32 < Formula
   license "Apache-2.0"
   revision 1
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "bac2ed0bb786b98885700fdee9f2535005b0d89caebed6a6d8791d9948476206"
+  end
 
   keg_only :versioned_formula
+
+  disable! date: "2022-07-31", because: :unmaintained
 
   depends_on "openjdk"
 

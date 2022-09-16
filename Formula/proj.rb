@@ -1,24 +1,22 @@
 class Proj < Formula
   desc "Cartographic Projections Library"
   homepage "https://proj.org/"
-  url "https://github.com/OSGeo/PROJ/releases/download/7.2.1/proj-7.2.1.tar.gz"
-  sha256 "b384f42e5fb9c6d01fe5fa4d31da2e91329668863a684f97be5d4760dbbf0a14"
+  url "https://github.com/OSGeo/PROJ/releases/download/9.1.0/proj-9.1.0.tar.gz"
+  sha256 "81b2239b94cad0886222cde4f53cb49d34905aad2a1317244a0c30a553db2315"
   license "MIT"
+  head "https://github.com/OSGeo/proj.git", branch: "master"
 
   bottle do
-    sha256 arm64_big_sur: "943adb4dfac31337c9bbbaf30ae8cf4812455e291abee79a4c22b60aaca8f312"
-    sha256 big_sur:       "dc7c6c5685716e0aa6d2bc58a118ff9767ee90f08a7ab7cf334e41acabbdd5ce"
-    sha256 catalina:      "0e9876b6205673f8f1536dbde4550e303d802c339c68601400575ac7fae4d0de"
-    sha256 mojave:        "998ab40cb3bc023d4d4abd6a2efdcc7e91b1f6018a51bc9db6715ab864c1eb39"
+    sha256 arm64_monterey: "c2fc067271d23d5251a8448f9980e58abdcc901469d869a84800ec9047c9ff3e"
+    sha256 arm64_big_sur:  "f599eb7a880fa923ab464eedb1a57b84ef7b72355893a67d4fd008eb8869176a"
+    sha256 monterey:       "bac994a37c6330d1c446b6ff817cd6a5abb041fb239a5d45a7cf940aa0c56058"
+    sha256 big_sur:        "b8b0f822096fae82ec8ee81d31a78c5f58834b63f0e20da99223f8f051ebff01"
+    sha256 catalina:       "fefdbbbd06bb34124d4c5475c4a1acb426aa575fa0b6dc9140f6c2a5da41efff"
+    sha256 x86_64_linux:   "d261b008621c4a7362ecb4d62ae64dca94f38ab924be673091ed8fd754690acc"
   end
 
-  head do
-    url "https://github.com/OSGeo/proj.git"
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool" => :build
-  end
-
+  depends_on "cmake" => :build
+  depends_on "libtool" => :build
   depends_on "pkg-config" => :build
   depends_on "libtiff"
 
@@ -30,17 +28,21 @@ class Proj < Formula
   skip_clean :la
 
   # The datum grid files are required to support datum shifting
-  resource "datumgrid" do
-    url "https://download.osgeo.org/proj/proj-datumgrid-1.8.zip"
-    sha256 "b9838ae7e5f27ee732fb0bfed618f85b36e8bb56d7afb287d506338e9f33861e"
+  resource "proj-data" do
+    url "https://download.osgeo.org/proj/proj-data-1.11.tar.gz"
+    sha256 "a67b7ce4622c30be6bce3a43461e8d848da153c3b171beebbbea28f64d4ef363"
   end
 
   def install
-    (buildpath/"nad").install resource("datumgrid")
-    system "./autogen.sh" if build.head?
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args, "-DCMAKE_INSTALL_RPATH=#{rpath}"
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
+    system "cmake", "-S", ".", "-B", "static", *std_cmake_args, "-DBUILD_SHARED_LIBS=OFF"
+    system "cmake", "--build", "static"
+    lib.install Dir["static/lib/*.a"]
+    resource("proj-data").stage do
+      cp_r Dir["*"], pkgshare
+    end
   end
 
   test do

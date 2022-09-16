@@ -3,34 +3,37 @@ class Ffmpegthumbnailer < Formula
   homepage "https://github.com/dirkvdb/ffmpegthumbnailer"
   url "https://github.com/dirkvdb/ffmpegthumbnailer/archive/2.2.2.tar.gz"
   sha256 "8c4c42ab68144a9e2349710d42c0248407a87e7dc0ba4366891905322b331f92"
-  license "GPL-2.0"
-  revision 5
-  head "https://github.com/dirkvdb/ffmpegthumbnailer.git"
+  license "GPL-2.0-or-later"
+  revision 8
+  head "https://github.com/dirkvdb/ffmpegthumbnailer.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any, big_sur:  "4fd57eb89e6dc46c1b6cba15da66c1654eafd456f290ec3eadf9fe8421b199dc"
-    sha256 cellar: :any, catalina: "d2a7c731a25115ba59ca6294dac86c3c4421b587045a8e54afc4cc1ade6c25f4"
-    sha256 cellar: :any, mojave:   "31c8f2982ec0c2086c0f3698de799c94c67431c5826bc221b95ee466998e8b33"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "726df608338d6bedd7a01a39251bf3ef7ef05ef898aa768621a26f3910f83b2a"
+    sha256 cellar: :any,                 arm64_big_sur:  "fc6ee18ce9bb3e0a244d910273dcfe497fe6ad0a3ddac5db845e70c88efd9494"
+    sha256 cellar: :any,                 monterey:       "ef2bdff1a7bb4de0676c920a06bb2e169215a0557f443f25535d1f04f7406269"
+    sha256 cellar: :any,                 big_sur:        "84cfd73c163a152b40dadb9fe8829f07049aec62309b194ddaf2c9a5bbd435f2"
+    sha256 cellar: :any,                 catalina:       "c5dc4f08d22937f9a66aae08aab1e1e8e98c166407c696953a8b33cb7c5d9767"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6970edbfd982c1d4f95c30fe663413441c69c7509742b9adace3c286fce75895"
   end
 
   depends_on "cmake" => :build
   depends_on "pkg-config" => :build
-  depends_on "ffmpeg"
-  depends_on "jpeg"
+  depends_on "ffmpeg@4"
+  depends_on "jpeg-turbo"
   depends_on "libpng"
 
   def install
-    args = std_cmake_args
-    args << "-DENABLE_GIO=ON"
-    args << "-DENABLE_THUMBNAILER=ON"
-
-    system "cmake", *args
-    system "make"
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args,
+                    "-DCMAKE_INSTALL_RPATH=#{rpath}",
+                    "-DENABLE_GIO=ON",
+                    "-DENABLE_THUMBNAILER=ON"
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
-    f = Formula["ffmpeg"].opt_bin/"ffmpeg"
+    f = Formula["ffmpeg@4"].opt_bin/"ffmpeg"
     png = test_fixtures("test.png")
     system f.to_s, "-loop", "1", "-i", png.to_s, "-c:v", "libx264", "-t", "30",
                    "-pix_fmt", "yuv420p", "v.mp4"

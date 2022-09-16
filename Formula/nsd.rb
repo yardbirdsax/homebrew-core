@@ -1,8 +1,8 @@
 class Nsd < Formula
   desc "Name server daemon"
   homepage "https://www.nlnetlabs.nl/projects/nsd/"
-  url "https://www.nlnetlabs.nl/downloads/nsd/nsd-4.3.5.tar.gz"
-  sha256 "7da2b43e30b3d7f307722c608f719bfb169f0d985c764a34fa0669dc33484472"
+  url "https://www.nlnetlabs.nl/downloads/nsd/nsd-4.6.0.tar.gz"
+  sha256 "09062d9b83dfcdde4e4e53ec3615496d68c2821d8381d0d464ebea31a5975c81"
   license "BSD-3-Clause"
 
   # We check the GitHub repo tags instead of
@@ -10,14 +10,16 @@ class Nsd < Formula
   # tendency to lead to an `execution expired` error.
   livecheck do
     url "https://github.com/NLnetLabs/nsd.git"
-    regex(/^NSD[._-]v?(\d+(?:[-_.]\d+)+).REL$/i)
+    regex(/^NSD[._-]v?(\d+(?:[._]\d+)+)[._-]REL$/i)
   end
 
   bottle do
-    sha256 arm64_big_sur: "8747dcfda2d586a4884351199cfc427aefacd3f17b9a95ddd92cb78296d5ac6e"
-    sha256 big_sur:       "3f7f34e3f1ad35123efbc45e0f5453d18d931a54b32357c3461b015fc76474dd"
-    sha256 catalina:      "c7bf16604821f3604d9308c289f4c408f0711cbec714f0f62aa6ea6b0485bd96"
-    sha256 mojave:        "056cb5f3bd860c59493827c7336e320b931353dae9fe0650113f1ca497f9c32e"
+    sha256 arm64_monterey: "eb1748e23dbdd462828ae89da55c35b2aa05b5c3dd587da3a09c679f1e528d1a"
+    sha256 arm64_big_sur:  "a34549c04aad76d4436d3ea96bfeb40382497002b5dd294bfdec9592b149f64e"
+    sha256 monterey:       "9a53af7722e58e842810eb8818459f435253656e5d0785f01bc23eb6e4957c92"
+    sha256 big_sur:        "cc40feb2a8f0fadd9e0efaebb48aa0ae1c46eaa2629be8721fcdcceb0b6b841c"
+    sha256 catalina:       "3b5674fa6a5149317eb3e684d703f9b859f43895ab7777e3e2a36b397c9c6643"
+    sha256 x86_64_linux:   "25eb58224d17ae889a1b8c9f02c048e48ab1338f6f9c09271ee2a89b81873118"
   end
 
   depends_on "libevent"

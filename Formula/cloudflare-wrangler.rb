@@ -1,18 +1,23 @@
 class CloudflareWrangler < Formula
   desc "CLI tool for Cloudflare Workers"
   homepage "https://github.com/cloudflare/wrangler"
-  url "https://github.com/cloudflare/wrangler/archive/v1.13.0.tar.gz"
-  sha256 "078ca2e7941f6476c18594fa7e7d26da35dfae2b65557d3ad6d598844cf915b4"
+  url "https://github.com/cloudflare/wrangler/archive/v1.19.13.tar.gz"
+  sha256 "7715e3e35eb4a5983c99f697f273bb136e7b122a9dee453e9f8fcf77a51c42db"
   license any_of: ["Apache-2.0", "MIT"]
+  head "https://github.com/cloudflare/wrangler.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "c49e743e5cd86844ead5b202dfa826151b3432d3cdb9b9d8bdd898a54081d939"
-    sha256 cellar: :any_skip_relocation, big_sur:       "204fcffdf240bd56163b9566680e2966ba56aaf2d6ebda9189f92e106a3c85f3"
-    sha256 cellar: :any_skip_relocation, catalina:      "dc78dcffc04845809392da83c962a30f002675cbe9f126ef0bc4e5c2c544e9de"
-    sha256 cellar: :any_skip_relocation, mojave:        "64b4d6e3303f79e8826b194499726fb8647a1ac37544ae05b2e278172f161777"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "f84b69516bbe150fef52a9dd20619008dcb80572ccea80412013e4054fa9a594"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ad4f239eee085f4aa2dfd7fccf64bf64446a25cd661d6e9593567d67f48c3a80"
+    sha256 cellar: :any_skip_relocation, monterey:       "dabdde3faa724209d1100f35191bedcc6b1c4e091c0936d64aff45317dcc50f6"
+    sha256 cellar: :any_skip_relocation, big_sur:        "63e222a03ab1f63317ad25a57f2a1c8c30d0f6c5c015fe7408f87f3305cc16b3"
+    sha256 cellar: :any_skip_relocation, catalina:       "d3107d9cbfee644078a2d0254ae96d9716d202a0cb08f7200f5d416fcdfaf3c4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c40cdcd3ed3657dfc7faddbe5f7fc5486e3b3dc5883272a4f3e643c5f0a78cf2"
   end
 
   depends_on "rust" => :build
+
+  uses_from_macos "zlib"
 
   def install
     system "cargo", "install", *std_cargo_args
@@ -20,6 +25,6 @@ class CloudflareWrangler < Formula
 
   test do
     output = shell_output("CF_API_TOKEN=AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA #{bin}/wrangler whoami 2>&1", 1)
-    assert_match /Code 9109: (?:Invalid access token|Max auth failures reached)/, output
+    assert_match "Failed to retrieve information about the email associated with", output
   end
 end

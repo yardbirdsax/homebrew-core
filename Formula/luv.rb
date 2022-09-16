@@ -1,20 +1,23 @@
 class Luv < Formula
   desc "Bare libuv bindings for lua"
   homepage "https://github.com/luvit/luv"
-  url "https://github.com/luvit/luv/archive/1.36.0-0.tar.gz"
-  version "1.36.0-0"
-  sha256 "739d733d32741a9e6caa3ff3a4416dcf121f39f622ee143c7d63130ce7de27be"
+  url "https://github.com/luvit/luv/archive/1.44.2-1.tar.gz"
+  sha256 "f8c69908e17ec8ab370253d1508e23deaecfc0c4752d2efb77e427e579501104"
   license "Apache-2.0"
+  head "https://github.com/luvit/luv.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "f6206cb6d576a9d76340207c9bb0ea606fa436396e8e6f47c8f112cb5ff30b9a"
-    sha256 cellar: :any, big_sur:       "7c8d417a89cd453f5a10beedf86a79a48280289fea2992677c6cf299f62dff5c"
-    sha256 cellar: :any, catalina:      "8916140ae938a0094f5633e9d2822824f94463c70d8b9c7212b61d8813c48021"
-    sha256 cellar: :any, mojave:        "5fad043a019896b644261362348caf757e256890c46fc4e268ad79710d45b57b"
+    sha256 cellar: :any,                 arm64_monterey: "1d5aaf149019d3d775b093efaa51fda452248eccf109e961325d0a8de917f947"
+    sha256 cellar: :any,                 arm64_big_sur:  "ce3cf05ca363a0978151a8f1ae096bb1d13d26718d2dfc25c3618e6156a4f6e2"
+    sha256 cellar: :any,                 monterey:       "1644986934f6275f3f7f632e074cdc9866ad3c2b83661035cd99f5f7912831c9"
+    sha256 cellar: :any,                 big_sur:        "4c93fce6a32d76a35e365d1fb23b08c3bcfaf0de2426f8490d38128c9d2d8781"
+    sha256 cellar: :any,                 catalina:       "c2d5d6718df8309860cd392047a071770d3c298f29a441f4639d47d909cd873a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4c1bd86d334299bd8b6af4f0d4080f2b5dab6033778e65a90424be090f10374b"
   end
 
   depends_on "cmake" => :build
-  depends_on "luajit-openresty" => [:build, :test]
+  depends_on "lua" => [:build, :test]
+  depends_on "luajit" => [:build, :test]
   depends_on "libuv"
 
   resource "lua-compat-5.3" do
@@ -23,31 +26,33 @@ class Luv < Formula
   end
 
   def install
-    resource("lua-compat-5.3").stage buildpath/"deps/lua-compat-5.3"
+    resource("lua-compat-5.3").stage buildpath/"deps/lua-compat-5.3" unless build.head?
 
-    args = std_cmake_args + %W[
+    args = %W[
       -DWITH_SHARED_LIBUV=ON
-      -DWITH_LUA_ENGINE=LuaJIT
       -DLUA_BUILD_TYPE=System
       -DLUA_COMPAT53_DIR=#{buildpath}/deps/lua-compat-5.3
+      -DBUILD_MODULE=ON
     ]
 
-    system "cmake", ".", "-B", "build-module", *args
-    cd "build-module" do
-      system "cmake", "--build", "."
-      system "cmake", "--build", ".", "--target", "install"
-    end
+    system "cmake", "-S", ".", "-B", "buildjit",
+                    "-DWITH_LUA_ENGINE=LuaJIT",
+                    "-DBUILD_STATIC_LIBS=ON",
+                    "-DBUILD_SHARED_LIBS=ON",
+                    *args, *std_cmake_args
+    system "cmake", "--build", "buildjit"
+    system "cmake", "--install", "buildjit"
 
-    system "cmake", ".", "-B", "build-static", *args, "-DBUILD_MODULE=OFF", "-DBUILD_STATIC_LIBS=ON"
-    cd "build-static" do
-      system "cmake", "--build", "."
-      system "cmake", "--build", ".", "--target", "install"
-    end
+    system "cmake", "-S", ".", "-B", "buildlua",
+                    "-DWITH_LUA_ENGINE=Lua",
+                    "-DBUILD_STATIC_LIBS=OFF",
+                    "-DBUILD_SHARED_LIBS=OFF",
+                    *args, *std_cmake_args
+    system "cmake", "--build", "buildlua"
+    system "cmake", "--install", "buildlua"
   end
 
   test do
-    ENV["LUA_CPATH"] = lib/"lua/5.1/?.so"
-    ENV.prepend_path "PATH", Formula["luajit-openresty"].opt_bin
     (testpath/"test.lua").write <<~EOS
       local uv = require('luv')
       local timer = uv.new_timer()
@@ -58,6 +63,13 @@ class Luv < Formula
       print("Sleeping");
       uv.run()
     EOS
-    system "luajit", testpath/"test.lua"
+
+    expected = <<~EOS
+      Sleeping
+      Awake!
+    EOS
+
+    assert_equal expected, shell_output("luajit test.lua")
+    assert_equal expected, shell_output("lua test.lua")
   end
 end

@@ -1,15 +1,18 @@
 class Smartmontools < Formula
   desc "SMART hard drive monitoring"
   homepage "https://www.smartmontools.org/"
-  url "https://downloads.sourceforge.net/project/smartmontools/smartmontools/7.2/smartmontools-7.2.tar.gz"
-  sha256 "5cd98a27e6393168bc6aaea070d9e1cd551b0f898c52f66b2ff2e5d274118cd6"
+  url "https://downloads.sourceforge.net/project/smartmontools/smartmontools/7.3/smartmontools-7.3.tar.gz"
+  sha256 "a544f8808d0c58cfb0e7424ca1841cb858a974922b035d505d4e4c248be3a22b"
   license "GPL-2.0-or-later"
+  revision 1
 
   bottle do
-    sha256 arm64_big_sur: "27f51cc884f31b7ba77754294e701a9a219e06e8070d4e7630310cf1d01c0b1e"
-    sha256 big_sur:       "9cccb94c747cd2897d458da6a31c2e5c03acfd81faa30c99260fe77ec8c140f0"
-    sha256 catalina:      "34aa008976f95dc5568c90c0b99eccdcec7983df3787ac4be1e02284f307c1e7"
-    sha256 mojave:        "3f699e7deb392d47d805cf4dad81e53cf67fe0186b00f42e798235fa9079f388"
+    sha256 arm64_monterey: "de5a9816fe979e1f6e95727f2b23946e8d6594718b0b0fcb77da6b3b01bd47b3"
+    sha256 arm64_big_sur:  "3ae9274990e2845f9d833e267c3443da5d8ef6daedf0293233847710b2116c72"
+    sha256 monterey:       "7df715580bf7adde46c4abac502ee920cd2384be22a279f8da5813db2f974253"
+    sha256 big_sur:        "b353b05f39600a28070f9aeb7c4cff62bf250deff02a03ee8aa4ecabb9639925"
+    sha256 catalina:       "c79a0e6dc93a4e0416b5724cecb1a36d6f0977ae0143698abad407eb013b15cb"
+    sha256 x86_64_linux:   "5702653e6385bc4388d919fcfebe0ee26860627ab3117b117d582fa79f13ae46"
   end
 
   def install
@@ -22,7 +25,8 @@ class Smartmontools < Formula
                           "--sysconfdir=#{etc}",
                           "--localstatedir=#{var}",
                           "--with-savestates",
-                          "--with-attributelog"
+                          "--with-attributelog",
+                          "--with-nvme-devicescan"
     system "make", "install"
   end
 

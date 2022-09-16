@@ -1,22 +1,24 @@
 class Cassowary < Formula
   desc "Modern cross-platform HTTP load-testing tool written in Go"
   homepage "https://github.com/rogerwelin/cassowary"
-  url "https://github.com/rogerwelin/cassowary/archive/v0.12.0.tar.gz"
-  sha256 "e6df0f7ee0a93aa8abc87e241d64f3906f3a21e845aacc494d22ffb9517ef81e"
+  url "https://github.com/rogerwelin/cassowary/archive/refs/tags/v0.14.1.tar.gz"
+  sha256 "1f10e23af218d661e8493e111d425da0ef6f4408d845a473fdbaf45dd6e2d94d"
   license "MIT"
-  head "https://github.com/rogerwelin/cassowary.git"
+  head "https://github.com/rogerwelin/cassowary.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "3a66cf898e85a56861cbfc4073e73a29b8c222a0cb921ae92fffe56694a4b250"
-    sha256 cellar: :any_skip_relocation, big_sur:       "2329ffcb5f5f4777ec17661461c25a650e60c02bacfe0f7ebc738e1217c7fa27"
-    sha256 cellar: :any_skip_relocation, catalina:      "83d6b17ca128c3830cec6e8ef31452e2f303f92f1fd9090d48711b639cb9c76e"
-    sha256 cellar: :any_skip_relocation, mojave:        "f6ac1ec8b86f43a9e64b407d9797d47a6e74200ebd3caf90fa9d856c8860772a"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "51cc4994f99f679935450d266d095b3181a6ea881ed3557ba8de708666dca0cc"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "35468f258ee836f1aea6b6e6bdf540fb50ae475c1af3e5d164fc9058088ddd7d"
+    sha256 cellar: :any_skip_relocation, monterey:       "0d2b43d7d17e11efdab072de93497b89ed93416cf2682c3c721ef77d2aa8b778"
+    sha256 cellar: :any_skip_relocation, big_sur:        "26959efc426320546612ddefe82338fae95639304e5bdd881285e0ca1c947ef5"
+    sha256 cellar: :any_skip_relocation, catalina:       "bc565d13bc8df0a15533bb64db4c545e7b532304d9b6cb997363858f2253dda0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e3d321b0a788a95f9f955a6ce212c4a025248cbfb8a1793232062d132e852c0a"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", "-ldflags", "-s -w -X main.version=#{version}", *std_go_args, "./cmd/cassowary"
+    system "go", "build", *std_go_args(ldflags: "-s -w -X main.version=#{version}"), "./cmd/cassowary"
   end
 
   test do

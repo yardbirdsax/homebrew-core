@@ -1,27 +1,33 @@
 class Ocp < Formula
   desc "UNIX port of the Open Cubic Player"
   homepage "https://stian.cubic.org/project-ocp.php"
-  url "https://stian.cubic.org/ocp/ocp-0.2.2.tar.xz"
-  sha256 "afd07a6ae2af4733eb06e516cb607276ee084d1d30aa1cf0c3fd6e62f1d3a144"
+  url "https://stian.cubic.org/ocp/ocp-0.2.99.tar.xz"
+  sha256 "d00165e206403b876b18edfc264abc8b6ce3d772be7e784fe4d358e37e57affd"
   license "GPL-2.0-or-later"
-  head "https://github.com/mywave82/opencubicplayer.git"
+  revision 1
+  head "https://github.com/mywave82/opencubicplayer.git", branch: "master"
 
   livecheck do
-    url :head
-    regex(/^v?(\d+(?:\.\d+)+)$/i)
+    url :homepage
+    regex(/href=.*?ocp[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 arm64_big_sur: "a26bc2cdded0a238a1fbe376be1c7ccd755b28352bc918b05fcb726b64347f3a"
-    sha256 big_sur:       "3aa881d279e6b72656bd08b9394b3ca5eeddc78b91529735ebbc59a3fad91c33"
-    sha256 catalina:      "ea5ae27e76002683c28eefae03de9d5867d88eb8b6491e4d28b736937fc871a5"
-    sha256 mojave:        "f7ea663318cf0f5a221b53bbc080094fe5931760d3cde229f44dc95f3aa8eba9"
+    sha256 arm64_monterey: "e195a02f6dab9fc8e4b30e31547034b13039fba747661a4766687140e7eb7b68"
+    sha256 arm64_big_sur:  "75911d550ddb535f734d993be08f7dabed15c104ee5baddac6f8372ef2e20c9a"
+    sha256 monterey:       "2893b8000462f2f34f6a7a55f8e1108c6acfc4dcf722a72851501095cb87e024"
+    sha256 big_sur:        "1779607df1ff5012c075b874e1ff5326d1555a696f136c1d24e81f01921e2dc9"
+    sha256 catalina:       "bb3ee3bacf36067cf20a370b9d971390111a3ffce3097a914c2f208a8d147a69"
+    sha256 x86_64_linux:   "85106bb45b1a796245a230d29bec2bc482de065720753196548381f10c7a6c19"
   end
 
   depends_on "pkg-config" => :build
   depends_on "xa" => :build
+  depends_on "cjson"
   depends_on "flac"
+  depends_on "freetype"
   depends_on "jpeg-turbo"
+  depends_on "libdiscid"
   depends_on "libpng"
   depends_on "libvorbis"
   depends_on "mad"
@@ -29,21 +35,47 @@ class Ocp < Formula
   uses_from_macos "ncurses"
   uses_from_macos "zlib"
 
+  on_catalina :or_newer do
+    depends_on "sdl2"
+  end
+
+  on_system :linux, macos: :mojave_or_older do
+    depends_on "sdl"
+  end
+
+  on_linux do
+    depends_on "util-linux" => :build # for `hexdump`
+  end
+
+  resource "unifont" do
+    url "https://ftp.gnu.org/gnu/unifont/unifont-14.0.02/unifont-14.0.02.tar.gz"
+    sha256 "401bb9c3741372c1316fec87c392887037e9e828fae64fd7bee2775bbe4545f7"
+  end
+
   def install
     ENV.deparallelize
+
+    # Required for SDL2
+    resource("unifont").stage do |r|
+      cd "font/precompiled" do
+        share.install "unifont-#{r.version}.ttf" => "unifont.ttf"
+        share.install "unifont_csur-#{r.version}.ttf" => "unifont_csur.ttf"
+        share.install "unifont_upper-#{r.version}.ttf" => "unifont_upper.ttf"
+      end
+    end
 
     args = %W[
       --prefix=#{prefix}
       --without-x11
-      --without-sdl
-      --without-sdl2
       --without-desktop_file_install
+      --with-unifontdir=#{share}
     ]
 
-    # Workaround for bad compiler version check: https://github.com/mywave82/opencubicplayer/issues/30
-    inreplace "configure",
-              "2.95.[2-9]|2.95.[2-9][-].*|3.[0-9]|3.[0-9].[0-9]|3.[0-9]|3.[0-9].[0-9]-*|4.*|5.*|6.*|7*|8*|9*|10*",
-              "[1-9]*"
+    args << if MacOS.version < :catalina
+      "--without-sdl2"
+    else
+      "--without-sdl"
+    end
 
     system "./configure", *args
     system "make"

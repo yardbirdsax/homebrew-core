@@ -1,21 +1,26 @@
 class Sqlite < Formula
   desc "Command-line interface for SQLite"
-  homepage "https://sqlite.org/"
-  url "https://www.sqlite.org/2020/sqlite-autoconf-3340000.tar.gz"
-  version "3.34.0"
-  sha256 "bf6db7fae37d51754737747aaaf413b4d6b3b5fbacd52bdb2d0d6e5b2edd9aee"
+  homepage "https://sqlite.org/index.html"
+  url "https://sqlite.org/2022/sqlite-autoconf-3390300.tar.gz"
+  version "3.39.3"
+  sha256 "7868fb3082be3f2cf4491c6fba6de2bddcbc293a35fefb0624ee3c13f01422b9"
   license "blessing"
 
   livecheck do
-    url "https://sqlite.org/news.html"
-    regex(%r{v?(\d+(?:\.\d+)+)</h3>}i)
+    url :homepage
+    regex(%r{href=.*?releaselog/v?(\d+(?:[._]\d+)+)\.html}i)
+    strategy :page_match do |page, regex|
+      page.scan(regex).map { |match| match&.first&.gsub("_", ".") }
+    end
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "0a8e636f4fe9870f64c15b40fa1e1e0027431d39690f117cad7456e84b89582c"
-    sha256 cellar: :any, big_sur:       "cdf256befc0752680a6742469b217e0dae42c691cb3565923d4bf2c5a0583152"
-    sha256 cellar: :any, catalina:      "7e04c1fcd0294ec7625e43eea05714d8bb4d15d24675c99484f1403fdcb438ec"
-    sha256 cellar: :any, mojave:        "64729f1390a8379a9c7e6c8579dda0a0c450328868ebeb7e7e632aa448bda2d1"
+    sha256 cellar: :any,                 arm64_monterey: "6bdbd6a23d81f9b99a6a24a598e800279f6557b925165449f599a522ad52fbba"
+    sha256 cellar: :any,                 arm64_big_sur:  "dc0ce6a29888b6e0a6182f3b3c82a9e20ba8965a22680c272468c857b903c016"
+    sha256 cellar: :any,                 monterey:       "dead8c9a98fec5c8bacdb4a852281e7dba98c932f3a84d1be08373ca4aae50ef"
+    sha256 cellar: :any,                 big_sur:        "cc1847edaf1a3b0e754fa4606e69be987603ee64adf477e531b726a0e040fac8"
+    sha256 cellar: :any,                 catalina:       "48cd92147d5f950accb03e9f7fec2f7124a3ade875fcdaf63b5ce947274200c8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "32b13296bfbcf213b279ab16dbcdb5151bd87733119b8c67123c6b453850a628"
   end
 
   keg_only :provided_by_macos

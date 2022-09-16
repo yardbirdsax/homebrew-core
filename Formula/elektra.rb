@@ -1,10 +1,10 @@
 class Elektra < Formula
   desc "Framework to access config settings in a global key database"
-  homepage "https://libelektra.org/"
-  url "https://www.libelektra.org/ftp/elektra/releases/elektra-0.9.3.tar.gz"
-  sha256 "5022a6ebf004d892ded03fcf6eb3d223942a7fadd2d68f14d847d1f7f243e1d7"
+  homepage "https://www.libelektra.org/home"
+  url "https://www.libelektra.org/ftp/elektra/releases/elektra-0.9.10.tar.gz"
+  sha256 "ee50fb5e9814b45a8e99f39435b1461d4b7a7daa27eee240bdbfed98f2c4c0f5"
   license "BSD-3-Clause"
-  head "https://github.com/ElektraInitiative/libelektra.git"
+  head "https://github.com/ElektraInitiative/libelektra.git", branch: "master"
 
   livecheck do
     url "https://www.libelektra.org/ftp/elektra/releases/"
@@ -12,10 +12,12 @@ class Elektra < Formula
   end
 
   bottle do
-    sha256 big_sur:     "262acb6c0f4ecbfb8622f06d7e9f754a076991f2fef9cde53fc76fb8c0f30518"
-    sha256 catalina:    "686d067559aa7e9f57b419a92c703d382abdf75b413b6d67854dec5ebf15873c"
-    sha256 mojave:      "25e5bc4305fcde829a674d3734b9b18204d64acaf47027b322919703d9065b1f"
-    sha256 high_sierra: "218f8e1b129c4796301062e43a842b2d39f7996c204f69d9f15857304a8230d0"
+    sha256 arm64_monterey: "c5f7a09d64f19cd3474dae214fb24d33c7fd8935eb57c6eebcbfba9e06956825"
+    sha256 arm64_big_sur:  "82e55cb29a2e11c555dc23e617581ab4cd2e1f699c9005e1c9614fc25281c505"
+    sha256 monterey:       "4c979274ddcddc7375d23dd2bcd87472fc6b95ecf4acdd1cd995e119f5d7a657"
+    sha256 big_sur:        "1b3480d48cd12985264bd1380aa78ecd5384f403a8288669156d3b170cf914ac"
+    sha256 catalina:       "c44e21a140c93ec947b905ec626929c4811fa463499ebb217e22364d752a8df9"
+    sha256 x86_64_linux:   "b74dccff8c603fcf6e55431b58995ba78e6b1f43a6d6336f127ab38534e685aa"
   end
 
   depends_on "cmake" => :build
@@ -24,13 +26,9 @@ class Elektra < Formula
   def install
     mkdir "build" do
       system "cmake", "..", "-DBINDINGS=cpp", "-DTOOLS=kdb;",
-                            "-DPLUGINS=NODEP", *std_cmake_args
+                            "-DPLUGINS=NODEP;-tracer", *std_cmake_args
       system "make", "install"
     end
-
-    # Avoid references to the Homebrew shims directory
-    inreplace Dir[prefix/"share/elektra/test_data/gen/gen/highlevel/*.check.sh"],
-              HOMEBREW_SHIMS_PATH/"mac/super/", ""
 
     bash_completion.install "scripts/completion/kdb-bash-completion" => "kdb"
     fish_completion.install "scripts/completion/kdb.fish"
@@ -38,7 +36,7 @@ class Elektra < Formula
   end
 
   test do
-    output = shell_output("#{bin}/kdb get system/elektra/version/infos/licence")
+    output = shell_output("#{bin}/kdb get system:/elektra/version/infos/licence")
     assert_match "BSD", output
     shell_output("#{bin}/kdb plugin-list").split.each do |plugin|
       system "#{bin}/kdb", "plugin-check", plugin

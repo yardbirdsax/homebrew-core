@@ -1,38 +1,55 @@
 class Libvirt < Formula
   desc "C virtualization API"
-  homepage "https://www.libvirt.org"
-  url "https://libvirt.org/sources/libvirt-7.0.0.tar.xz"
-  sha256 "ca3833844d08c22867f1d1a46edc36bda7d6fe1a4f267e7d77100b79fc9ddd89"
+  homepage "https://libvirt.org/"
+  url "https://libvirt.org/sources/libvirt-8.7.0.tar.xz"
+  sha256 "72e63a0f27911e339afd8269c6e8b029721893940edec11e09e471944f60e538"
   license all_of: ["LGPL-2.1-or-later", "GPL-2.0-or-later"]
+  head "https://gitlab.com/libvirt/libvirt.git", branch: "master"
 
   livecheck do
     url "https://libvirt.org/sources/"
-    regex(/href=.*?libvirt[._-]v?([\d.]+)\.t/i)
+    regex(/href=.*?libvirt[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 big_sur:  "e938967382f8bbaf26fa13347af40cd447277bcefd66363057a16aa84599dc71"
-    sha256 catalina: "34251a1f80e19044ac5b7f59978fef583ca543ec0da3a2ce202274585ccb14af"
-    sha256 mojave:   "c067a0606d1ed6bdf8d9a3338bfc31c3ee4e856ee9b55f52b8bc004b39db5083"
+    rebuild 1
+    sha256 arm64_monterey: "fa48c8a6c5142745ab9a45986de4a880aedb7871f91ec0ee13d798da12c87718"
+    sha256 arm64_big_sur:  "7a30b97876d627424dcd89f4a4dc998eb0d002280120b556bba6bf721aae4f1f"
+    sha256 monterey:       "164b10e7549c2eb47c82dc7910b541fa59223b4c3e292dbf1f57e49ae166b1c2"
+    sha256 big_sur:        "3716c37b8d7ce8d69217d33fe4fde0aed115b5c2ecf84716138deeb2cf3cdf07"
+    sha256 catalina:       "1b65b1e372d38f4d17f445e5e99f70d7bd89c3a9b50d63ebbbe119ff10971ecb"
+    sha256 x86_64_linux:   "e57b83bd5972ee640aa84b3c7f724d4b7b8a9d3512e6a56ada75840584ff0775"
   end
 
-  head do
-    url "https://github.com/libvirt/libvirt.git"
-  end
   depends_on "docutils" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "perl" => :build
   depends_on "pkg-config" => :build
-  depends_on "python@3.9" => :build
-  depends_on "rpcgen" => :build
+  depends_on "python@3.10" => :build
   depends_on "gettext"
   depends_on "glib"
+  depends_on "gnu-sed"
   depends_on "gnutls"
+  depends_on "grep"
   depends_on "libgcrypt"
   depends_on "libiscsi"
   depends_on "libssh2"
   depends_on "yajl"
+
+  uses_from_macos "curl"
+  uses_from_macos "libxslt"
+
+  on_macos do
+    depends_on "rpcgen" => :build
+  end
+
+  on_linux do
+    depends_on "libtirpc"
+    depends_on "linux-headers@5.16"
+  end
+
+  fails_with gcc: "5"
 
   def install
     mkdir "build" do
@@ -42,7 +59,9 @@ class Libvirt < Formula
         --sysconfdir=#{etc}
         -Ddriver_esx=enabled
         -Ddriver_qemu=enabled
+        -Ddriver_network=enabled
         -Dinit_script=none
+        -Dqemu_datadir=#{Formula["qemu"].opt_pkgshare}
       ]
       system "meson", *std_meson_args, *args, ".."
       system "meson", "compile"
@@ -50,34 +69,10 @@ class Libvirt < Formula
     end
   end
 
-  plist_options manual: "libvirtd"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>EnvironmentVariables</key>
-          <dict>
-            <key>PATH</key>
-            <string>#{HOMEBREW_PREFIX}/bin</string>
-          </dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{sbin}/libvirtd</string>
-            <string>-f</string>
-            <string>#{etc}/libvirt/libvirtd.conf</string>
-          </array>
-          <key>KeepAlive</key>
-          <true/>
-          <key>RunAtLoad</key>
-          <true/>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_sbin/"libvirtd", "-f", etc/"libvirt/libvirtd.conf"]
+    keep_alive true
+    environment_variables PATH: HOMEBREW_PREFIX/"bin"
   end
 
   test do

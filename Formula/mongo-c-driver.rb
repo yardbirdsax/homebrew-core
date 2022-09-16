@@ -1,16 +1,23 @@
 class MongoCDriver < Formula
   desc "C driver for MongoDB"
   homepage "https://github.com/mongodb/mongo-c-driver"
-  url "https://github.com/mongodb/mongo-c-driver/releases/download/1.17.4/mongo-c-driver-1.17.4.tar.gz"
-  sha256 "9ec8fe7fb54d636886fa823460658ccf660e3d82520d10810fb7c9d302ac974f"
+  url "https://github.com/mongodb/mongo-c-driver/releases/download/1.23.0/mongo-c-driver-1.23.0.tar.gz"
+  sha256 "2b91d6a9c1a80ec82c5643676e44f1a9edf3849c7f25d490e1b5587eb408ad93"
   license "Apache-2.0"
-  head "https://github.com/mongodb/mongo-c-driver.git"
+  head "https://github.com/mongodb/mongo-c-driver.git", branch: "master"
+
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
 
   bottle do
-    sha256 arm64_big_sur: "45c1f1d31d63c3ea4bee65f5c6a56d871fef8c91eac8d2018e49226175f5bad0"
-    sha256 big_sur:       "3ac6fad5ce56f4052ec8e0817aadefdd69caba8fb53479ca42227e04b681ee3b"
-    sha256 catalina:      "47387c38d9b91dfb46d5257f64f8292f53acbb6f5fa17ca34ad3a44d236f1ae3"
-    sha256 mojave:        "c3328d3c7dcae9408a29f9b4976d3cdeae255ce8ddfdd43df711706c53c0d6d0"
+    sha256 cellar: :any,                 arm64_monterey: "8989617e5bcb60a51fee7918af052e59d6419d9c84f79003053152f610bb7603"
+    sha256 cellar: :any,                 arm64_big_sur:  "2566f105a6cdd5d34af7fc5a8a719a77f0b5e3dc8ddb61d9519277e8bb9f4975"
+    sha256 cellar: :any,                 monterey:       "3b6cbfbc7bafd609e9472a3f8ecb194ccdd3ccf14b9ff194f0d22f74478cfdcc"
+    sha256 cellar: :any,                 big_sur:        "a17d50cc7ae9217acf771420b8a81ec747af87dfb632a42ef6880abed8e30fb3"
+    sha256 cellar: :any,                 catalina:       "01a0f270a7701a8706337520c74de77bac2c0b88d044a80a8aa1d4def8b165d0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "690d394b4b8ac71acc05cf8a49bd8035123259abe5a719c8091c519f3f7cb4cf"
   end
 
   depends_on "cmake" => :build
@@ -23,7 +30,8 @@ class MongoCDriver < Formula
   def install
     cmake_args = std_cmake_args
     cmake_args << "-DBUILD_VERSION=1.18.0-pre" if build.head?
-    cmake_args << "-DCMAKE_INSTALL_RPATH=#{lib}"
+    cmake_args << "-DCMAKE_INSTALL_RPATH=#{rpath}"
+    cmake_args << "-DMONGOC_TEST_USE_CRYPT_SHARED=FALSE"
     inreplace "src/libmongoc/src/mongoc/mongoc-config.h.in", "@MONGOC_CC@", ENV.cc
     system "cmake", ".", *cmake_args
     system "make", "install"

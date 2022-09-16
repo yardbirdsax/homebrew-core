@@ -1,20 +1,25 @@
 class Nss < Formula
   desc "Libraries for security-enabled client and server applications"
   homepage "https://developer.mozilla.org/en-US/docs/Mozilla/Projects/NSS"
-  url "https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_61_RTM/src/nss-3.61.tar.gz"
-  sha256 "312e2d804b34ccf0fec70b57cf8cd6ac853f8ced60df53e30ebb0a7bcd0e1370"
+  url "https://ftp.mozilla.org/pub/security/nss/releases/NSS_3_82_RTM/src/nss-3.82.tar.gz"
+  sha256 "32bf673b72c2f9953ed3b4c7033abf5a6cad302854a24ae588c575a6567c1573"
   license "MPL-2.0"
 
   livecheck do
     url "https://ftp.mozilla.org/pub/security/nss/releases/"
     regex(%r{href=.*?NSS[._-]v?(\d+(?:[._]\d+)+)[._-]RTM/?["' >]}i)
+    strategy :page_match do |page, regex|
+      page.scan(regex).map { |match| match.first.tr("_", ".") }
+    end
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "fb2e0ca15986a088d7c745b4bb79a775bdc790a713e5fad4caf705fad4e3799d"
-    sha256 cellar: :any, big_sur:       "8056292df9295e56731a0b05a6d9d6a81aba4ce42ade6b0d396e5f5bb8d4cfad"
-    sha256 cellar: :any, catalina:      "9397434fec5b5f91b80cab57feca33f70c0c7cad087da3bbd0f826bcadd7d5cc"
-    sha256 cellar: :any, mojave:        "56deeaaa1e946638c40eefd416c303a08c0dd01eb2fe234713c148c65a7c01e1"
+    sha256 cellar: :any,                 arm64_monterey: "05ceb46d404ff52ba65d965cd0ca302995c12c9f4a5cd43675fee721a976c68b"
+    sha256 cellar: :any,                 arm64_big_sur:  "dedcd56681d332afcc26e32dd4089343517afc25a434c4689f6df869296207e4"
+    sha256 cellar: :any,                 monterey:       "9033d5649e59824f55c306ae4dc72c57d2e13c2f3d4b47b35e196b20e1360dee"
+    sha256 cellar: :any,                 big_sur:        "fb75ad6072ab944b282c6e33a44d739485525609f53ee76a0abc3b298c4d10ab"
+    sha256 cellar: :any,                 catalina:       "79e43cc475f2d41cb6deb6020af9846e876a4eb769528c4a154f38f939a75ad4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "04497f992dc70ecf508b0728849e875ef1bfbeb41956a454b10da5c127170132"
   end
 
   depends_on "nspr"
@@ -22,8 +27,8 @@ class Nss < Formula
   uses_from_macos "sqlite"
   uses_from_macos "zlib"
 
+  conflicts_with "arabica", because: "both install `mangle` binaries"
   conflicts_with "resty", because: "both install `pp` binaries"
-  conflicts_with "googletest", because: "both install `libgtest.a`"
 
   def install
     ENV.deparallelize
@@ -32,6 +37,7 @@ class Nss < Formula
     args = %W[
       BUILD_OPT=1
       NSS_ALLOW_SSLKEYLOGFILE=1
+      NSS_DISABLE_GTESTS=1
       NSS_USE_SYSTEM_SQLITE=1
       NSPR_INCLUDE_DIR=#{Formula["nspr"].opt_include}/nspr
       NSPR_LIB_DIR=#{Formula["nspr"].opt_lib}
@@ -49,7 +55,8 @@ class Nss < Formula
     # rather than copying the referenced file.
     cd "../dist"
     bin.mkpath
-    Dir.glob("Darwin*/bin/*") do |file|
+    os = OS.kernel_name
+    Dir.glob("#{os}*/bin/*") do |file|
       cp file, bin unless file.include? ".dylib"
     end
 
@@ -59,14 +66,14 @@ class Nss < Formula
 
     lib.mkpath
     libexec.mkpath
-    Dir.glob("Darwin*/lib/*") do |file|
+    Dir.glob("#{os}*/lib/*") do |file|
       if file.include? ".chk"
         cp file, libexec
       else
         cp file, lib
       end
     end
-    # resolves conflict with openssl, see #28258
+    # resolves conflict with openssl, see legacy-homebrew#28258
     rm lib/"libssl.a"
 
     (bin/"nss-config").write config_file

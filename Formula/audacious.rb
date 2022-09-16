@@ -2,38 +2,43 @@ class Audacious < Formula
   desc "Free and advanced audio player based on GTK+"
   homepage "https://audacious-media-player.org/"
   license "BSD-2-Clause"
+  revision 2
 
   stable do
-    url "https://distfiles.audacious-media-player.org/audacious-4.0.5.tar.bz2"
-    sha256 "51aea9e6a3b17f5209d49283a2dee8b9a7cd7ea96028316909da9f0bfe931f09"
+    url "https://distfiles.audacious-media-player.org/audacious-4.2.tar.bz2"
+    sha256 "feb304e470a481fe2b3c4ca1c9cb3b23ec262540c12d0d1e6c22a5eb625e04b3"
 
     resource "plugins" do
-      url "https://distfiles.audacious-media-player.org/audacious-plugins-4.0.5.tar.bz2"
-      sha256 "9f0251922886934f2aa32739b5a30eadfefa7c70dd7b3e78f94aa6fc54e0c55b"
+      url "https://distfiles.audacious-media-player.org/audacious-plugins-4.2.tar.bz2"
+      sha256 "6fa0f69c3a1041eb877c37109513ab4a2a0a56a77d9e8c13a1581cf1439a417f"
     end
+  end
+
+  livecheck do
+    url "https://audacious-media-player.org/download"
+    regex(/href=.*?audacious[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_big_sur: "4f4511d090781e94963a91f317481905c85a0780041a8d58c8f5ada36ecd9c90"
-    sha256 big_sur:       "e881a43ee5969621e9ebdab13e086f3a07f98ea7d80e394ccad1b3f0dfbf91ba"
-    sha256 catalina:      "c67d5df8448485c10ca6f7ac21ffee103458a4c5efded90dbcd342bc57aab140"
-    sha256 mojave:        "e854112485da922a5e993eaf78b9e448fed06b5f3a9cf3ef3953f77656d3f86f"
+    sha256 arm64_monterey: "a3015cefc23d7e52def1896203de76922c652b8234ddc2cf0c4e4a90bace04d7"
+    sha256 arm64_big_sur:  "325d25c7d0998253960ad4344e5dbd0055806de247163d79724a0392dc5c3730"
+    sha256 monterey:       "4d85ec6a6ee927388bf4f1d3956116901798ca30f1a63a85c674df5037097ee9"
+    sha256 big_sur:        "3016b1ce25b2055357f52138030166773ec5445cf45c87032d7771133c352886"
+    sha256 catalina:       "0ab3edc5ffe3f71c8f7c453bdd929939264b4e4f51373909da3720111b96466d"
+    sha256 x86_64_linux:   "a9b7551315f0fab21041da8c8d6f864573ed83c9db54f01bc0b099cadac87583"
   end
 
   head do
-    url "https://github.com/audacious-media-player/audacious.git"
+    url "https://github.com/audacious-media-player/audacious.git", branch: "master"
 
     resource "plugins" do
-      url "https://github.com/audacious-media-player/audacious-plugins.git"
+      url "https://github.com/audacious-media-player/audacious-plugins.git", branch: "master"
     end
-
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool" => :build
   end
 
   depends_on "gettext" => :build
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
   depends_on "pkg-config" => :build
   depends_on "faad2"
   depends_on "ffmpeg"
@@ -49,41 +54,40 @@ class Audacious < Formula
   depends_on "libsamplerate"
   depends_on "libsoxr"
   depends_on "libvorbis"
-  depends_on :macos # Due to Python 2
   depends_on "mpg123"
   depends_on "neon"
-  depends_on "qt"
+  depends_on "qt@5"
   depends_on "sdl2"
   depends_on "wavpack"
 
+  fails_with gcc: "5"
+
   def install
-    args = %W[
-      --prefix=#{prefix}
-      --disable-dbus
-      --disable-gtk
-      --enable-qt
+    args = std_meson_args + %w[
+      -Dgtk=false
+      -Dqt=true
     ]
 
-    system "./autogen.sh" if build.head?
-    system "./configure", *args
-    system "make"
-    system "make", "install"
+    mkdir "build" do
+      system "meson", *args, "-Ddbus=false", ".."
+      system "ninja", "-v"
+      system "ninja", "install", "-v"
+    end
 
     resource("plugins").stage do
       args += %w[
-        --disable-coreaudio
-        --disable-mpris2
-        --enable-mac-media-keys
+        -Dcoreaudio=false
+        -Dmpris2=false
+        -Dmac-media-keys=true
+        -Dcpp_std=c++14
       ]
-      inreplace "src/glspectrum/gl-spectrum.cc", "#include <GL/", "#include <"
-      inreplace "src/qtglspectrum/gl-spectrum.cc", "#include <GL/", "#include <"
-      ENV.prepend_path "PKG_CONFIG_PATH", "#{lib}/pkgconfig"
 
-      system "./autogen.sh" if build.head?
-
-      system "./configure", *args
-      system "make"
-      system "make", "install"
+      ENV.prepend_path "PKG_CONFIG_PATH", lib/"pkgconfig"
+      mkdir "build" do
+        system "meson", *args, ".."
+        system "ninja", "-v"
+        system "ninja", "install", "-v"
+      end
     end
   end
 

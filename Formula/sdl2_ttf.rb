@@ -1,33 +1,43 @@
 class Sdl2Ttf < Formula
   desc "Library for using TrueType fonts in SDL applications"
-  homepage "https://www.libsdl.org/projects/SDL_ttf/"
-  url "https://www.libsdl.org/projects/SDL_ttf/release/SDL2_ttf-2.0.15.tar.gz"
-  sha256 "a9eceb1ad88c1f1545cd7bd28e7cbc0b2c14191d40238f531a15b01b1b22cd33"
-  head "https://hg.libsdl.org/SDL_ttf", using: :hg
-
-  livecheck do
-    url :homepage
-    regex(/SDL2_ttf[._-]v?(\d+(?:\.\d+)*)/i)
-  end
+  homepage "https://github.com/libsdl-org/SDL_ttf"
+  url "https://github.com/libsdl-org/SDL_ttf/releases/download/release-2.20.1/SDL2_ttf-2.20.1.tar.gz"
+  sha256 "78cdad51f3cc3ada6932b1bb6e914b33798ab970a1e817763f22ddbfd97d0c57"
+  license "Zlib"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any, arm64_big_sur: "e1eebedabe4c9625e852feeb68abdfac5c2f55767d70d81e708f74f84dc41e8c"
-    sha256 cellar: :any, big_sur:       "f69eb853fb10f18eb9791c024ec12bad7cc95e65322934dddc35de4eff3019b9"
-    sha256 cellar: :any, catalina:      "413959be382ea92bd59af9a29e5909d40db69c571447e2f0dec821cbff612d80"
-    sha256 cellar: :any, mojave:        "74582129be8cfea5e556efa95411f9fc2eebf111c7b4f9affc80a7e05fa19cd9"
-    sha256 cellar: :any, high_sierra:   "1867ff73485eaa12fc00def01be8e388443ac6c226065218bb435558fdb8bb22"
+    sha256 cellar: :any,                 arm64_monterey: "0717a73e3b400b75d4c95a1f041405d1e2a51d853084f4f4a2df509a0f5f66b4"
+    sha256 cellar: :any,                 arm64_big_sur:  "3c330912742dc8adec3f1c84d72cd0c6d2042e07668b4e0949dd19a48db93399"
+    sha256 cellar: :any,                 monterey:       "03664994cfddf5b0dc3c2e17882ac02d01e2f46f0c74b711cdaf8b850e97c721"
+    sha256 cellar: :any,                 big_sur:        "1d882966dfe5f2710325b20c9aaa3dc37e4fdc2698c8fb9f3d4252a62a3799be"
+    sha256 cellar: :any,                 catalina:       "b969e2ec3520ce18c9ab44e05e9fb4e406887c8d879d156c8eedc559ba9bfe30"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "69cd455ca76baafa15a74f4266c6dc5b3531c5146a7d420beeeae2e106ebdfc1"
+  end
+
+  head do
+    url "https://github.com/libsdl-org/SDL_ttf.git", branch: "main"
+
+    depends_on "autoconf" => :build
+    depends_on "automake" => :build
+    depends_on "libtool" => :build
   end
 
   depends_on "pkg-config" => :build
   depends_on "freetype"
+  depends_on "harfbuzz"
   depends_on "sdl2"
 
   def install
     inreplace "SDL2_ttf.pc.in", "@prefix@", HOMEBREW_PREFIX
 
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+    system "./autogen.sh" if build.head?
+
+    # `--enable-harfbuzz` is the default, but we pass it
+    # explicitly to generate an error when it isn't found.
+    system "./configure", "--disable-freetype-builtin",
+                          "--disable-harfbuzz-builtin",
+                          "--enable-harfbuzz",
+                          *std_configure_args
     system "make", "install"
   end
 
@@ -42,7 +52,7 @@ class Sdl2Ttf < Formula
           return success;
       }
     EOS
-    system ENV.cc, "-L#{lib}", "-lsdl2_ttf", "test.c", "-o", "test"
+    system ENV.cc, "test.c", "-I#{Formula["sdl2"].opt_include}/SDL2", "-L#{lib}", "-lSDL2_ttf", "-o", "test"
     system "./test"
   end
 end

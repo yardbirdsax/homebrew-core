@@ -1,28 +1,31 @@
 class TektoncdCli < Formula
   desc "CLI for interacting with TektonCD"
   homepage "https://github.com/tektoncd/cli"
-  url "https://github.com/tektoncd/cli/archive/v0.15.0.tar.gz"
-  sha256 "fceab0b1549d941915523b2cbf4dd08d621b06aaf034f8a5e087775283341a18"
+  url "https://github.com/tektoncd/cli/archive/v0.26.0.tar.gz"
+  sha256 "6be12ab8e741bdaebfb1f8095ece38f117f884566be8ac9397eeb105d0c4906a"
   license "Apache-2.0"
 
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
+
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "8d8c8237e6b1193eb3f49f9914cf1e934438773c7609ad81376aa9aad56d1629"
-    sha256 cellar: :any_skip_relocation, big_sur:       "70636db8c11992cfbe070adb7d1f74aa47096a00628724c35058703d3845adb5"
-    sha256 cellar: :any_skip_relocation, catalina:      "469b051b513331e5cee9b380c1586613ecfcbfc7e384419e4b27b2c48a35e2d3"
-    sha256 cellar: :any_skip_relocation, mojave:        "22ac2d25c1e8a1c41146137a3637e248e6e0a69a7af53995945db442f30ed805"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "d1e957261fab70713f7ee24080865a7fd8b5b77a6c7f2a400186b82bc809d40c"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "911bf4af0ac77c81b97c6220d85da151d8cd4adb9f5fda7a2299e0c66a455574"
+    sha256 cellar: :any_skip_relocation, monterey:       "69dfce4e130d0a776cebda96fe9b8b6eebce4151ec0f958c41f8dc4cb5e024f2"
+    sha256 cellar: :any_skip_relocation, big_sur:        "1ef91383ee4deb09adc7eaa3530dac0a8a6cc08c8d8e20ef64e8aa0b3fbecb61"
+    sha256 cellar: :any_skip_relocation, catalina:       "7eeedbb88b6a0cd7192421626325148b702a15e12cfaa2e6617f9c91d208cd11"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f02028301f67c8e4fae2c335c92f46ab72bd318b411548b61eda30985ac1fa29"
   end
 
   depends_on "go" => :build
 
   def install
     system "make", "bin/tkn"
-
     bin.install "bin/tkn" => "tkn"
-    output = Utils.safe_popen_read({ "SHELL" => "bash" }, bin/"tkn", "completion", "bash")
-    (bash_completion/"tkn").write output
-    output = Utils.safe_popen_read({ "SHELL" => "zsh" }, bin/"tkn", "completion", "zsh")
-    (zsh_completion/"_tkn").write output
-    prefix.install_metafiles
+
+    generate_completions_from_executable(bin/"tkn", "completion", base_name: "tkn")
   end
 
   test do

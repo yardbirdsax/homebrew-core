@@ -1,60 +1,43 @@
 class Pueue < Formula
   desc "Command-line tool for managing long-running shell commands"
   homepage "https://github.com/Nukesor/pueue"
-  url "https://github.com/Nukesor/pueue/archive/pueue-v0.11.1.tar.gz"
-  sha256 "72cdfb5a460c76bd26a0824fc68c984b88c70f65ff79e8b047e53f9d68b792ce"
+  url "https://github.com/Nukesor/pueue/archive/v2.1.0.tar.gz"
+  sha256 "cd5c6500e65960f6a102db5d0f0544f49eec8f74b2cc0df16ded8e2525a545f6"
   license "MIT"
-  head "https://github.com/Nukesor/pueue.git"
+  head "https://github.com/Nukesor/pueue.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "85465e35ad5470d8e42578f25fbdb38bf00e6855880c886317816f515de9f4d2"
-    sha256 cellar: :any_skip_relocation, big_sur:       "886f95008b45fbf70caf75a6172cb5872a8e19e1e1dbeb0e78f27ca9b5c50d00"
-    sha256 cellar: :any_skip_relocation, catalina:      "8d98cefc0bf5f1a64122ad769f570661a6d96de06910a42821a4912483a39ade"
-    sha256 cellar: :any_skip_relocation, mojave:        "949387054d56f8fab44cae482b659cbf3a40eb65c264c9d5acf5885b241e7795"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "c29548258ce75deb56323a25171c19fc8b65c59b3528c01cf54795e0eb599e4e"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ae3c5df9f8e5806b6491ffcd961e5b82e0ce0e1388d716a310b60e0a0830b2be"
+    sha256 cellar: :any_skip_relocation, monterey:       "c1a3476363b71812a96b2979534efcd5d2805499dac71f9282377812a18d1ad4"
+    sha256 cellar: :any_skip_relocation, big_sur:        "69320b094180e687430f5c804ad24e5bf1fe7d43e5e53459f47849e959d26da6"
+    sha256 cellar: :any_skip_relocation, catalina:       "5c6d4bef8102f8c314a7daa0098d6493631881d21edcfb48c1fabc16afd5beeb"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b86dcb78f19ae14358dae333087e1d54d1468280cacd2202baccda1da43174bf"
   end
 
   depends_on "rust" => :build
 
   def install
-    system "cargo", "install", "--locked", "--root", libexec, "--path", "pueue"
-    bin.install [libexec/"bin/pueue", libexec/"bin/pueued"]
+    system "cargo", "install", *std_cargo_args
 
-    system "./build_completions.sh"
-    bash_completion.install "utils/completions/pueue.bash" => "pueue"
-    fish_completion.install "utils/completions/pueue.fish" => "pueue.fish"
-    zsh_completion.install "utils/completions/_pueue" => "_pueue"
+    mkdir "utils/completions" do
+      system "#{bin}/pueue", "completions", "bash", "."
+      bash_completion.install "pueue.bash" => "pueue"
+      system "#{bin}/pueue", "completions", "fish", "."
+      fish_completion.install "pueue.fish" => "pueue.fish"
+      system "#{bin}/pueue", "completions", "zsh", "."
+      zsh_completion.install "_pueue" => "_pueue"
+    end
 
     prefix.install_metafiles
   end
 
-  plist_options manual: "pueued"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_bin}/pueued</string>
-            <string>--verbose</string>
-          </array>
-          <key>KeepAlive</key>
-          <false/>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>WorkingDirectory</key>
-          <string>#{var}</string>
-          <key>StandardErrorPath</key>
-          <string>#{var}/log/pueued.log</string>
-          <key>StandardOutPath</key>
-          <string>#{var}/log/pueued.log</string>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_bin/"pueued", "--verbose"]
+    keep_alive false
+    working_dir var
+    log_path var/"log/pueued.log"
+    error_log_path var/"log/pueued.log"
   end
 
   test do
@@ -64,7 +47,9 @@ class Pueue < Formula
     sleep 2
 
     begin
-      mkdir testpath/"Library/Preferences"
+      mkdir testpath/"Library/Preferences" # For macOS
+      mkdir testpath/".config" # For Linux
+
       output = shell_output("#{bin}/pueue status")
       assert_match "Task list is empty. Add tasks with `pueue add -- [cmd]`", output
 

@@ -2,8 +2,8 @@ class Wabt < Formula
   desc "Web Assembly Binary Toolkit"
   homepage "https://github.com/WebAssembly/wabt"
   url "https://github.com/WebAssembly/wabt.git",
-      tag:      "1.0.20",
-      revision: "830d32a41449278cacb0bf17530618d47c43340b"
+      tag:      "1.0.29",
+      revision: "c32fa597218dbe2c25b43a9837a8475b493ddb71"
   license "Apache-2.0"
 
   livecheck do
@@ -12,19 +12,23 @@ class Wabt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "f83360b912798f372cb57827a7b5cc89063f9d79c4eabf845429ccbf49c37e63"
-    sha256 cellar: :any_skip_relocation, big_sur:       "06bedfd798d896d5530c8801f830b1ace48bcce10ff438a393e2e01d4b8d1a7c"
-    sha256 cellar: :any_skip_relocation, catalina:      "910d30dea89023dadf308768eee1f8d186e88ff50210a5603c392e3dc33546b7"
-    sha256 cellar: :any_skip_relocation, mojave:        "e9eba56a16e053365d515a6637a1b12217cf65c2c3f81988a0d80af8fc2f0094"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "77e89094c8a0d95abeb513f6ff3bbfcecab82ed4cc740b7be1445cee79eef6a0"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "02e681e9b25d6171252c035319de538781d0fdf597556314d945ffe946d6a21e"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e69c6b33949769cbcc9af2ea6e7d9bb63329d93c354d1d0d6577d223981c36e4"
+    sha256 cellar: :any_skip_relocation, monterey:       "b12757b5ae82647afa2a2642eea763616bdf2f75b2ac2558e7c3eb8514502ce9"
+    sha256 cellar: :any_skip_relocation, big_sur:        "63d035b7f213271905159ef1244a6d771b3b7ae856bc34c610da8a9406f85c06"
+    sha256 cellar: :any_skip_relocation, catalina:       "9916c18c358a468f9364742cf4727b426caa1f0c183e55b384292853cd24f7c8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "47407a00ee59170838d074e8a4882f60b2307dbd8bfcb4a30334ef1c00925337"
   end
 
   depends_on "cmake" => :build
-  depends_on "python@3.9" => :build
+  depends_on "python@3.10" => :build
+
+  fails_with gcc: "5" # C++17
 
   def install
     mkdir "build" do
-      system "cmake", "..", "-DBUILD_TESTS=OFF", *std_cmake_args
+      system "cmake", "..", "-DBUILD_TESTS=OFF", "-DWITH_WASI=ON", *std_cmake_args
       system "make", "install"
     end
   end

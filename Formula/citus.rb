@@ -1,66 +1,68 @@
 class Citus < Formula
   desc "PostgreSQL-based distributed RDBMS"
   homepage "https://www.citusdata.com"
-  url "https://github.com/citusdata/citus/archive/v9.5.2.tar.gz"
-  sha256 "6fc06bf87249bee7e69c9b58593f802f314ea7fe6a151c0dddf4c61b13baac70"
-  license "AGPL-3.0"
-  head "https://github.com/citusdata/citus.git"
+  url "https://github.com/citusdata/citus/archive/v11.0.6.tar.gz"
+  sha256 "f3f2deb3e7f31844f4cc3bb0a311b52a4179cabe08c72b409819fa6f6e72f5f4"
+  license "AGPL-3.0-only"
+  revision 1
+  head "https://github.com/citusdata/citus.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "f29032feb2bd0477a38021454c484c9952494f55075b185adae841b7918d73ea"
-    sha256 cellar: :any, big_sur:       "88a89bc1f6b996f5b2aa2901fab714d1f556bff92ba8a6efe3ca17fa069082aa"
-    sha256 cellar: :any, catalina:      "262a38ac5a1a1b6933b1262894380193647879d1dcff4f27717e1514487cc15e"
-    sha256 cellar: :any, mojave:        "fa880201b2c78ed4884ba2188933b2acd1baa304f78ee7b4e8bcaebc6a44dea1"
+    sha256 cellar: :any,                 arm64_monterey: "8b100d270c5592ff2b31fe164fe52574f92bfde8a0be940033dad3dc7bb46a40"
+    sha256 cellar: :any,                 arm64_big_sur:  "91ff724e488baca4d611e5370ba17e4c809883d0fb6dc270dc296c0e3abe3867"
+    sha256 cellar: :any,                 monterey:       "186d97c45e8918e40feeb65b51ba4562515dc032ddb099ce03b664c4be2e07f8"
+    sha256 cellar: :any,                 big_sur:        "e9237364eb50e0228f5bd699b9dc9a5f1854f94ce3a7b40c43e037cef5ea2b56"
+    sha256 cellar: :any,                 catalina:       "29d036d72f03db70589b736fa5c11759c60fec3b627efbfcf503049864d45a3a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b76b4de2742d1664e46b153f20dde07e2bb98914b51b4121fdac7524448cbf21"
   end
 
-  depends_on "postgresql"
+  depends_on "lz4"
+  depends_on "postgresql@14"
   depends_on "readline"
+  depends_on "zstd"
+
+  uses_from_macos "curl"
+
+  def postgresql
+    Formula["postgresql@14"]
+  end
 
   def install
-    ENV["PG_CONFIG"] = Formula["postgresql"].opt_bin/"pg_config"
+    ENV["PG_CONFIG"] = postgresql.opt_bin/"pg_config"
 
     system "./configure"
-
-    # workaround for https://github.com/Homebrew/homebrew/issues/49948
-    system "make", "libpq=-L#{Formula["postgresql"].opt_lib} -lpq"
+    # workaround for https://github.com/Homebrew/legacy-homebrew/issues/49948
+    system "make", "libpq=-L#{postgresql.opt_lib} -lpq"
 
     # Use stage directory to prevent installing to pg_config-defined dirs,
     # which would not be within this package's Cellar.
     mkdir "stage"
     system "make", "install", "DESTDIR=#{buildpath}/stage"
 
-    bin.install Dir["stage/**/bin/*"]
-    lib.install Dir["stage/**/lib/*"]
-    include.install Dir["stage/**/include/*"]
-    (share/"postgresql/extension").install Dir["stage/**/share/postgresql/extension/*"]
+    stage_path = File.join("stage", HOMEBREW_PREFIX)
+    lib.install (buildpath/stage_path/"lib").children
+    include.install (buildpath/stage_path/"include").children
+    share.install (buildpath/stage_path/"share").children
+
+    bin.install (buildpath/File.join("stage", postgresql.bin.realpath)).children
   end
 
   test do
-    return if ENV["CI"]
+    pg_ctl = postgresql.opt_bin/"pg_ctl"
+    psql = postgresql.opt_bin/"psql"
+    port = free_port
 
-    pg_bin = Formula["postgresql"].opt_bin
-    pg_port = "55561"
-    system "#{pg_bin}/initdb", testpath/"test"
-    pid = fork do
-      exec("#{pg_bin}/postgres",
-           "-D", testpath/"test",
-           "-c", "shared_preload_libraries=citus",
-           "-p", pg_port)
-    end
+    system pg_ctl, "initdb", "-D", testpath/"test"
+    (testpath/"test/postgresql.conf").write <<~EOS, mode: "a+"
 
+      shared_preload_libraries = 'citus'
+      port = #{port}
+    EOS
+    system pg_ctl, "start", "-D", testpath/"test", "-l", testpath/"log"
     begin
-      sleep 2
-
-      count_workers_query = "SELECT COUNT(*) FROM master_get_active_worker_nodes();"
-
-      system "#{pg_bin}/createdb", "-p", pg_port, "test"
-      system "#{pg_bin}/psql", "-p", pg_port, "-d", "test", "--command", "CREATE EXTENSION citus;"
-
-      assert_equal "0", shell_output("#{pg_bin}/psql -p #{pg_port} -d test -Atc" \
-                                     "'#{count_workers_query}'").strip
+      system psql, "-p", port.to_s, "-c", "CREATE EXTENSION \"citus\";", "postgres"
     ensure
-      Process.kill 9, pid
-      Process.wait pid
+      system pg_ctl, "stop", "-D", testpath/"test"
     end
   end
 end

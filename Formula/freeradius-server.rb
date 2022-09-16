@@ -1,10 +1,20 @@
 class FreeradiusServer < Formula
   desc "High-performance and highly configurable RADIUS server"
   homepage "https://freeradius.org/"
-  url "https://github.com/FreeRADIUS/freeradius-server/archive/release_3_0_21.tar.gz"
-  sha256 "b2014372948a92f86cfe2cf43c58ef47921c03af05666eb9d6416bdc6eeaedc2"
-  license "GPL-2.0"
-  head "https://github.com/FreeRADIUS/freeradius-server.git"
+  license all_of: ["GPL-2.0-or-later", "LGPL-2.1-or-later"]
+  revision 2
+  head "https://github.com/FreeRADIUS/freeradius-server.git", branch: "master"
+
+  stable do
+    url "https://github.com/FreeRADIUS/freeradius-server/archive/refs/tags/release_3_2_0.tar.gz"
+    sha256 "2b8817472847e0b49395facd670be97071133730ffa825bb56386c89c18174f5"
+
+    # Fix -flat_namespace being used
+    patch do
+      url "https://github.com/FreeRADIUS/freeradius-server/commit/6c1cdb0e75ce36f6fadb8ade1a69ba5e16283689.patch?full_index=1"
+      sha256 "7e7d055d72736880ca8e1be70b81271dd02f2467156404280a117cb5dc8dccdc"
+    end
+  end
 
   livecheck do
     url :stable
@@ -12,16 +22,21 @@ class FreeradiusServer < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "4721314881382789163f956e5ab1edba62d3984a2d5b2ee714f57ed695ad03a4"
-    sha256 big_sur:       "d5870925f8214783c694f3c359d75a816c40f2e76ce0c0e7443357603cd0193e"
-    sha256 catalina:      "c3174a08eaeabce252f16224d93fcb1503584ac6b2d7733a6e80eb558cfefee5"
-    sha256 mojave:        "4c4dc47fe8af598594c4dd24184f7b5400e383e7649c6f6aa98f1663997b04ec"
-    sha256 high_sierra:   "2c8d33eddc1311f098175f2854173bbd4181d9f20fa0d1807950a84198fca6e1"
+    sha256 arm64_monterey: "9e9dea579267e8dcf6d69cb874f601dcc692f58e7ccb7d11d88380f7933ea376"
+    sha256 arm64_big_sur:  "5860266a3795b68fc118e19d6a2ea68bd445cc17b0869894f37decc77bb963a3"
+    sha256 monterey:       "4c595dab52d2a47da202656a38031aa51edba53c89369f0eb4afb32b70aec65e"
+    sha256 big_sur:        "c90fb82e17c159134073411bb5edf8b02346188db8a593b04b45a608dceb7ba6"
+    sha256 catalina:       "fe6289989dcb46376ebce0ab3df3db16e52da01f86c4f5b9a9c28e152e9a83b5"
+    sha256 x86_64_linux:   "7c3f7ab8b3b40bdb16f22c9d2a3e8ed9b05d5154cd8cd00ba773489dcfd8433f"
   end
 
+  depends_on "collectd"
   depends_on "openssl@1.1"
   depends_on "talloc"
 
+  uses_from_macos "krb5"
+  uses_from_macos "libpcap"
+  uses_from_macos "libxcrypt"
   uses_from_macos "perl"
   uses_from_macos "sqlite"
 

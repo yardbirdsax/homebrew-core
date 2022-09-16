@@ -1,28 +1,31 @@
 class Muffet < Formula
   desc "Fast website link checker in Go"
   homepage "https://github.com/raviqqe/muffet"
-  url "https://github.com/raviqqe/muffet/archive/v2.3.2.tar.gz"
-  sha256 "ee69f8c256fed8d0e692a35a5b206e24b04a00f7d82e8d9a645c28cf7d9b3b20"
+  url "https://github.com/raviqqe/muffet/archive/v2.6.1.tar.gz"
+  sha256 "3b457afa53990dd5fffbbaea138ec553e4be96caf2d196fece1ddab2ee4a3d57"
   license "MIT"
-  head "https://github.com/raviqqe/muffet.git"
+  head "https://github.com/raviqqe/muffet.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "a4bc44ac5a226e09826145e99e3ff61ab2a131f7f47c6d9ac0538c36d23ff860"
-    sha256 cellar: :any_skip_relocation, big_sur:       "69140cc1b455447e3d854ddf1f72bf111f16b1172bb6c6b252eb91bfd33ba9dc"
-    sha256 cellar: :any_skip_relocation, catalina:      "81e67b81c6f1ee2eb044713f4731fd52675c8680b50e9f7bbf8c88a6c759f50a"
-    sha256 cellar: :any_skip_relocation, mojave:        "8dd42b1d41d88aae4737aba6ad652449a3750e19b3ee633ebfe279289cd015a8"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "e5b674022320824926fc3ea853b87de186dd31c310fc1118622f11dcd380f846"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "8d49a42370922f06ef2ac7165a65578e456eadf392f48eaa2f070d010ff617d0"
+    sha256 cellar: :any_skip_relocation, monterey:       "b59af6ee74ca34cb0393c01bedf41fd73bc6790d2131a1249eb0b95e2d03d204"
+    sha256 cellar: :any_skip_relocation, big_sur:        "63e4208e32c188935346b3902b212576a623ad3585e4dc9d9aca013b1fbe2585"
+    sha256 cellar: :any_skip_relocation, catalina:       "49453b242f88d336505320022c65dab64100b481a492d724370809a4c7d833e2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7bde31c8f1a163c139ba871ca411f61813d276c45f59b1ecced6041015e87a5d"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", *std_go_args
+    system "go", "build", *std_go_args(ldflags: "-s -w")
   end
 
   test do
-    assert_match "failed to fetch root page: lookup does.not.exist: no such host",
-        shell_output("#{bin}/muffet https://does.not.exist 2>&1", 1)
+    assert_match(/failed to fetch root page: lookup does\.not\.exist.*: no such host/,
+                 shell_output("#{bin}/muffet https://does.not.exist 2>&1", 1))
 
-    system bin/"muffet", "https://httpbin.org/"
+    assert_match "https://httpbin.org/",
+                 shell_output("#{bin}/muffet https://httpbin.org 2>&1", 1)
   end
 end

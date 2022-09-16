@@ -1,20 +1,22 @@
 class Libmagic < Formula
   desc "Implementation of the file(1) command"
   homepage "https://www.darwinsys.com/file/"
-  url "https://astron.com/pub/file/file-5.39.tar.gz"
-  sha256 "f05d286a76d9556243d0cb05814929c2ecf3a5ba07963f8f70bfaaa70517fad1"
+  url "https://astron.com/pub/file/file-5.43.tar.gz"
+  sha256 "8c8015e91ae0e8d0321d94c78239892ef9dbc70c4ade0008c0e95894abfb1991"
+  # libmagic has a BSD-2-Clause-like license
+  license :cannot_represent
 
   livecheck do
-    url "https://astron.com/pub/file/"
-    regex(/href=.*?file[._-]v?(\d+(?:\.\d+)+)\.t/i)
+    formula "file-formula"
   end
 
   bottle do
-    sha256 arm64_big_sur: "e588a1adec77deda36340e9cce3375fde9ffcdabcd79ba86a429dbd14ea542fe"
-    sha256 big_sur:       "2a09f46305a9457a2bfae1069cbf8f6a473d77f69a6370e67f67c0decc96ca0a"
-    sha256 catalina:      "90b17cb74e853804227abdd32c6810ff535fb98e8862f946c49860b697faece0"
-    sha256 mojave:        "f32eb14fbef470d28a041ddefec932e8d96870b4a13dbac3f61d8c6de6e50f29"
-    sha256 high_sierra:   "110d2db0b588dc5a379124d024b228e8ee8aae58c95a6a0510e68dc36426a86a"
+    sha256 arm64_monterey: "d90f8e7fc431a98c90512506dd89e39f50b566329efbefa83a1926392a4d2454"
+    sha256 arm64_big_sur:  "dc07c487e28ec071a5e001504062dd742c8dc87ee14c9d28fb95024760c5c902"
+    sha256 monterey:       "1de7baf672db48278eab882713c696e07ef0fbd5d410c6fa20975ee80b52497f"
+    sha256 big_sur:        "77f8eee4e9b52d34121b0193d4cc697d72400826dbb76736e68fac60cc3e230a"
+    sha256 catalina:       "0755f82d6b3e7258ec880a84d734a0eb8ad49e362c64a8a196be0c5b50832475"
+    sha256 x86_64_linux:   "2e5ec384617e10bb3434063a9ce4c02a487324e14f9229126d8b4d5e97124dbc"
   end
 
   uses_from_macos "zlib"

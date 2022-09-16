@@ -2,10 +2,10 @@ class Flux < Formula
   desc "Lightweight scripting language for querying databases"
   homepage "https://www.influxdata.com/products/flux/"
   url "https://github.com/influxdata/flux.git",
-      tag:      "v0.105.0",
-      revision: "0f51f73f7773e149dfb9ed8132af49750fbb3298"
+      tag:      "v0.183.0",
+      revision: "e0cfb6641e20c78c9c0c4a45f681fcc5bc0ef683"
   license "MIT"
-  head "https://github.com/influxdata/flux.git"
+  head "https://github.com/influxdata/flux.git", branch: "master"
 
   livecheck do
     url :stable
@@ -13,24 +13,47 @@ class Flux < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "02d660830c1cb32f100f7eb32231ca2e6f2d94a4a506a2e2da10af8abedc57b2"
-    sha256 cellar: :any,                 big_sur:       "791262d2de5b0a1aff11f81aa8ac4efa853ede77460aa7cd9f45c310f4ec14c8"
-    sha256 cellar: :any,                 catalina:      "b1b4742477826eaf7e034d1478b6855008b10557ec690259ba87e97e1c559b48"
-    sha256 cellar: :any,                 mojave:        "90cb211a2adeaeae9497ab6d9dc409d1438e49b902560a45eae507f413cc87a8"
+    sha256 cellar: :any,                 arm64_monterey: "156c9778caadb9503107e3c899ea280799178762c06999362049f435c518cedf"
+    sha256 cellar: :any,                 arm64_big_sur:  "5d258591a57d285e62696b31c6344e8df65f34e487597b9aff1ba60c33cfcc58"
+    sha256 cellar: :any,                 monterey:       "d401dcb98170a718c04d91ec695bdc5a4ba174efd41d9bebcbcef71978741f45"
+    sha256 cellar: :any,                 big_sur:        "5266f8f1c85af932ba0b8a25c94597597f2d0acf36d3c18c8b5c7634a995626e"
+    sha256 cellar: :any,                 catalina:       "5c2043469a4d8a6fa280583a253dd6642529148a59cc5c4bd21383954ebf3e03"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "43af2f6d8799eb5ae0fa3c00eb02838f597308ca1227fbe8f4834a4f08fe989e"
   end
 
   depends_on "go" => :build
   depends_on "rust" => :build
 
+  on_linux do
+    depends_on "pkg-config" => :build
+  end
+
+  # NOTE: The version here is specified in the go.mod of influxdb.
+  # If you're upgrading to a newer influxdb version, check to see if this needs upgraded too.
+  resource "pkg-config-wrapper" do
+    url "https://github.com/influxdata/pkg-config/archive/v0.2.12.tar.gz"
+    sha256 "23b2ed6a2f04d42906f5a8c28c8d681d03d47a1c32435b5df008adac5b935f1a"
+  end
+
   def install
+    # Set up the influxdata pkg-config wrapper to enable just-in-time compilation & linking
+    # of the Rust components in the server.
+    resource("pkg-config-wrapper").stage do
+      system "go", "build", *std_go_args(output: buildpath/"bootstrap/pkg-config")
+    end
+    ENV.prepend_path "PATH", buildpath/"bootstrap"
+
     system "make", "build"
-    system "go", "build", "./cmd/flux"
-    bin.install %w[flux]
+    system "go", "build", *std_go_args(ldflags: "-s -w"), "./cmd/flux"
     include.install "libflux/include/influxdata"
     lib.install Dir["libflux/target/*/release/libflux.{dylib,a,so}"]
   end
 
   test do
-    assert_equal "8\n", shell_output("flux execute \"5.0 + 3.0\"")
+    (testpath/"test.flux").write <<~EOS
+      1.0   + 2.0
+    EOS
+    system bin/"flux", "fmt", "--write-result-to-source", testpath/"test.flux"
+    assert_equal "1.0 + 2.0\n", (testpath/"test.flux").read
   end
 end

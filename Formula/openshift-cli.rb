@@ -1,49 +1,55 @@
 class OpenshiftCli < Formula
   desc "OpenShift command-line interface tools"
   homepage "https://www.openshift.com/"
-  url "https://github.com/openshift/oc.git",
-      tag:      "openshift-clients-4.6.0-202006250705.p0",
-      revision: "51011e4849252c723b520643d27d3fa164d28c61",
-      shallow:  false
-  version "4.6.0"
   license "Apache-2.0"
-  head "https://github.com/openshift/oc.git", shallow: false
+  head "https://github.com/openshift/oc.git", branch: "master"
+
+  stable do
+    url "https://github.com/openshift/oc.git",
+        tag:      "openshift-clients-4.12.0-202208031327",
+        revision: "3c85519af6c4979c02ebb1886f45b366bbccbf55"
+  end
 
   livecheck do
     url :stable
-    regex(/^openshift-clients[._-](\d+(?:\.\d+)+)(?:[._-]p?\d+)?$/i)
+    regex(/^openshift-clients[._-](\d+(?:\.\d+)+(?:[._-]p?\d+)?)$/i)
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "a7d39145143c6b11463b66bb5ccfebb8b6a6f1f4ccba84de9f73fec38b60abd1"
-    sha256 cellar: :any_skip_relocation, big_sur:       "2920518f09aa3e294bc4aa304a9c83ec1cc80792483854f590623cf1f214ad34"
-    sha256 cellar: :any_skip_relocation, catalina:      "94c8c7573dd37d9fc9107e5ac2f5476913c567bd164522e6216f235ad43975fe"
-    sha256 cellar: :any_skip_relocation, mojave:        "b58b9fd99c7188d6b1c0722cd4797382cd30db6660f963c0a17ee2ecb26c0c75"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "f362d3ced8e3a03a53ef93c8afbda8e01efa9eda702ce411e09b0dbb55b633d3"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "0014adf50d782523d19caf3277f86b72a3d75aa5e98a6cc143214c6f3e8919c8"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a904e24d03b473663b6c47cd459e3e91f4bd78fcde7c08f8ffdd6dd7333a0fe9"
+    sha256 cellar: :any_skip_relocation, monterey:       "ebb452458353b75d29726d7650f59a0eb24edc60574e7a87269658ee958083dc"
+    sha256 cellar: :any_skip_relocation, big_sur:        "54738cd33c03203ab673f43b70202252fce2b9cd63d9be1f2d720c85addc8947"
+    sha256 cellar: :any_skip_relocation, catalina:       "8cb6b4c75b9a4d73bbfabdc2d8c58c6e91fcf648aac76e3967708a82e5d3949b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c7bd6d5061ac5ba80ae76957c4ce1283654c78e9fb248e067928b46d2f25870c"
   end
 
   depends_on "coreutils" => :build
-  depends_on "go" => :build
-  depends_on "heimdal" => :build
+  depends_on "go@1.18" => :build
   depends_on "socat"
 
+  uses_from_macos "krb5"
+
   def install
-    ENV["GOPATH"] = buildpath
-    dir = buildpath/"src/github.com/openshift/oc"
-    dir.install buildpath.children - [buildpath/".brew_home"]
+    arch = Hardware::CPU.intel? ? "amd64" : Hardware::CPU.arch.to_s
+    os = OS.kernel_name.downcase
 
-    cd dir do
-      if build.stable?
-        system "make", "cross-build-darwin-amd64", "WHAT=cmd/oc"
-      else
-        system "make", "cross-build-darwin-amd64", "WHAT=staging/src/github.com/openshift/oc/cmd/oc"
-      end
+    # See https://github.com/golang/go/issues/26487
+    ENV.O0 if OS.linux?
 
-      bin.install "_output/bin/darwin_amd64/oc"
-
-      bash_completion.install "contrib/completions/bash/oc"
-      zsh_completion.install "contrib/completions/zsh/oc" => "_oc"
+    args = ["cross-build-#{os}-#{arch}"]
+    args << if build.stable?
+      "WHAT=cmd/oc"
+    else
+      "WHAT=staging/src/github.com/openshift/oc/cmd/oc"
     end
+    args << "SHELL=/bin/bash" if OS.linux?
+
+    system "make", *args
+    bin.install "_output/bin/#{os}_#{arch}/oc"
+
+    bash_completion.install "contrib/completions/bash/oc"
+    zsh_completion.install "contrib/completions/zsh/oc" => "_oc"
   end
 
   test do

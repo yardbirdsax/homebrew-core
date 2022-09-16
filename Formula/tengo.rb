@@ -1,16 +1,17 @@
 class Tengo < Formula
   desc "Fast script language for Go"
   homepage "https://tengolang.com"
-  url "https://github.com/d5/tengo/archive/v2.6.2.tar.gz"
-  sha256 "6ec3e8d668aa2451cab9adfa3c8712660eac2622bf60e1e45d5bdb198433eb79"
+  url "https://github.com/d5/tengo/archive/v2.12.2.tar.gz"
+  sha256 "aae5ffbf4a407ed2dee45de10191c095b5d7991af3971bfe937f69fd75085b20"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "9d5f43136699df81970b5abb38b77f012698b30527037ee682977fdd2d64b7ff"
-    sha256 cellar: :any_skip_relocation, big_sur:       "cb5e85ed9514dee925ffa888f3227e51dce06a1729df74dc7bc9af2415a22dee"
-    sha256 cellar: :any_skip_relocation, catalina:      "85740f093117930ce8a885a1fd9cad7e260c222d2e38be2d7299464806bffee8"
-    sha256 cellar: :any_skip_relocation, mojave:        "843a89b74e67bc348c99419750292fd0e4ff2c77913badb99a4de784493c75b1"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "035c213b4c8b252bfb81667a80b3bdef77bdb0dd7bed28fa7c557b1958f0e3e1"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "7377f9cb1f6524fcd052a62173e79354ba51c6c1ceb83ceafe2279ce3cc2a653"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "7377f9cb1f6524fcd052a62173e79354ba51c6c1ceb83ceafe2279ce3cc2a653"
+    sha256 cellar: :any_skip_relocation, monterey:       "26ce101b0a56d218818e96be4224b362add6f37abdc4bdf1dd3381e5bc9ae8be"
+    sha256 cellar: :any_skip_relocation, big_sur:        "26ce101b0a56d218818e96be4224b362add6f37abdc4bdf1dd3381e5bc9ae8be"
+    sha256 cellar: :any_skip_relocation, catalina:       "26ce101b0a56d218818e96be4224b362add6f37abdc4bdf1dd3381e5bc9ae8be"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4ef701c42ede4cb8f9fdef985822e2c93db54f07ced458cbc67de62df7a331c8"
   end
 
   depends_on "go" => :build

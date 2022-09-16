@@ -4,13 +4,15 @@ class AzureStorageCpp < Formula
   url "https://github.com/Azure/azure-storage-cpp/archive/v7.5.0.tar.gz"
   sha256 "446a821d115949f6511b7eb01e6a0e4f014b17bfeba0f3dc33a51750a9d5eca5"
   license "Apache-2.0"
+  revision 2
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "de1bb0a0a6971e3131e8b4a6ee49e074f5644183f39e80fe1dcea0d0c96cb93c"
-    sha256 cellar: :any, big_sur:       "00886061ff55457f186d8ab05020f2ea1f900fd1e5e0a6e4f21dbbe27af9a4f9"
-    sha256 cellar: :any, catalina:      "cca19a55ebebdfbc2f38b1a358868b66238d3e0ac748019ad2ec82ec2475170f"
-    sha256 cellar: :any, mojave:        "7d6e3641f5a0ac840b508f83209f63bc511639112439017bab30afbd3d98611f"
-    sha256 cellar: :any, high_sierra:   "0513ca4194954b2e69a741c49068f27c043f3cc88535c288cce9f04048b3477b"
+    sha256 cellar: :any,                 arm64_monterey: "5a8a1e373496131a0128cfbccb1ae6f5e57fc91eaea968aabfe57767d3370fe0"
+    sha256 cellar: :any,                 arm64_big_sur:  "15d27a167c197bca0e649cb241bfdb7f49b2f6f8dbdc9b3ae36aa6562c15f96d"
+    sha256 cellar: :any,                 monterey:       "308598850ccde71d7f3f0b95b1f26e257eef415a9cdc140b5da34867555729cb"
+    sha256 cellar: :any,                 big_sur:        "778476a3c4cd8f88c475aff98086e9c704f19213eb46d250af145d51a3af8506"
+    sha256 cellar: :any,                 catalina:       "fe3ebcd4d1b7454738a7d76113040d6c9fbbbd16ba5265e42101f8575782af89"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "072a0ec3117267bc849068e88b6e48579e72904386ac44558e091dfa5e117ea2"
   end
 
   depends_on "cmake" => :build
@@ -18,6 +20,10 @@ class AzureStorageCpp < Formula
   depends_on "cpprestsdk"
   depends_on "gettext"
   depends_on "openssl@1.1"
+
+  on_linux do
+    depends_on "util-linux"
+  end
 
   def install
     system "cmake", "Microsoft.WindowsAzure.Storage",
@@ -41,7 +47,7 @@ class AzureStorageCpp < Formula
         catch(...){ return 1; }
       }
     EOS
-    flags = ["-stdlib=libc++", "-std=c++11", "-I#{include}",
+    flags = ["-std=c++11", "-I#{include}",
              "-I#{Formula["boost"].include}",
              "-I#{Formula["openssl@1.1"].include}",
              "-I#{Formula["cpprestsdk"].include}",
@@ -49,7 +55,8 @@ class AzureStorageCpp < Formula
              "-L#{Formula["cpprestsdk"].lib}",
              "-L#{Formula["openssl@1.1"].lib}",
              "-L#{lib}",
-             "-lcpprest", "-lboost_system-mt", "-lssl", "-lcrypto", "-lazurestorage"] + ENV.cflags.to_s.split
+             "-lcpprest", "-lboost_system-mt", "-lssl", "-lcrypto", "-lazurestorage"]
+    flags << "-stdlib=libc++" if OS.mac?
     system ENV.cxx, "-o", "test_azurestoragecpp", "test.cpp", *flags
     system "./test_azurestoragecpp"
   end

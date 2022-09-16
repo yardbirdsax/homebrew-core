@@ -1,16 +1,19 @@
 class Opencoarrays < Formula
   desc "Open-source coarray Fortran ABI, API, and compiler wrapper"
-  homepage "http://opencoarrays.org"
-  url "https://github.com/sourceryinstitute/OpenCoarrays/releases/download/2.9.2/OpenCoarrays-2.9.2.tar.gz"
-  sha256 "6c200ca49808c75b0a2dfa984304643613b6bc77cc0044bee093f9afe03698f7"
+  homepage "http://www.opencoarrays.org"
+  url "https://github.com/sourceryinstitute/OpenCoarrays/releases/download/2.10.0/OpenCoarrays-2.10.0.tar.gz"
+  sha256 "c08717aea6ed5c68057f80957188a621b9862ad0e1460470e7ec82cdd84ae798"
   license "BSD-3-Clause"
-  head "https://github.com/sourceryinstitute/opencoarrays.git"
+  revision 1
+  head "https://github.com/sourceryinstitute/opencoarrays.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "ae408eed3714792c3f7f725971ed131da9ae17606179431c6070bf5617a9644a"
-    sha256 cellar: :any, big_sur:       "c9c5f9e2866851c6d991a636e146e5847632000228f2dff63e8ea64cb6cea621"
-    sha256 cellar: :any, catalina:      "fadee1f47dc7c188886973395667274bd8c5af6e095cc1e6a427758f7d5ed931"
-    sha256 cellar: :any, mojave:        "fd57ea0d2ce0624a7bece27b2b9022d809c9665d899eed7c4840270909514e9c"
+    sha256 cellar: :any,                 arm64_monterey: "d2fd4f8c6e64fffd15b4fb795de364eb467115d27bbcf71c99a6d939f542dedd"
+    sha256 cellar: :any,                 arm64_big_sur:  "6684abc4a457e0070050540e33039e67e029bf67e9c70d0d71cf19f937eaaea8"
+    sha256 cellar: :any,                 monterey:       "0ee047c89942d0107278bb8e6eae2df44ad29aee0ba43174742ef99e95c18e59"
+    sha256 cellar: :any,                 big_sur:        "210cabf6956d14b6b36ca287dc6109032302ba449904b4ba8416cd02ac09899e"
+    sha256 cellar: :any,                 catalina:       "3178664ff0f5396520e247b571d9659794a19016ac07d5072cbde44dea58ff37"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1d66f679245fc38459780bb21b4523c446710cb837a3954e21904700e39c4bd6"
   end
 
   depends_on "cmake" => :build

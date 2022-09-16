@@ -1,48 +1,44 @@
 class Boost < Formula
   desc "Collection of portable C++ source libraries"
   homepage "https://www.boost.org/"
-  url "https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.tar.bz2"
-  mirror "https://dl.bintray.com/homebrew/mirror/boost_1_75_0.tar.bz2"
-  sha256 "953db31e016db7bb207f11432bef7df100516eeb746843fa0486a222e3fd49cb"
+  url "https://boostorg.jfrog.io/artifactory/main/release/1.79.0/source/boost_1_79_0.tar.bz2"
+  sha256 "475d589d51a7f8b3ba2ba4eda022b170e562ca3b760ee922c146b6c65856ef39"
   license "BSL-1.0"
-  revision 1
-  head "https://github.com/boostorg/boost.git"
+  revision 2
+  head "https://github.com/boostorg/boost.git", branch: "master"
 
   livecheck do
-    url "https://www.boost.org/feed/downloads.rss"
-    regex(/>Version v?(\d+(?:\.\d+)+)</i)
+    url "https://www.boost.org/users/download/"
+    regex(/href=.*?boost[._-]v?(\d+(?:[._]\d+)+)\.t/i)
+    strategy :page_match do |page, regex|
+      page.scan(regex).map { |match| match.first.tr("_", ".") }
+    end
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "8a97e74aca8be001c4db5516abcb7fabdf244d6ed0620be9b5b634f78f2279df"
-    sha256 cellar: :any, big_sur:       "a262002a81f7dc7b6fb23287713b35b51887b3126be72b2446d4f7dc0b587a9e"
-    sha256 cellar: :any, catalina:      "2da721bd2fefaaea273ed92b801e682ee180100189c113a8c8f1e97f9dff0e55"
-    sha256 cellar: :any, mojave:        "5257405fda53160eaf020dc974cad328d90d698181cd126e970cdc0d93bfcf73"
+    sha256 cellar: :any,                 arm64_monterey: "0d9c01b3a721dea9799d80908f4c844f97eb12dc2ac5ac1a075264ca8a387bc8"
+    sha256 cellar: :any,                 arm64_big_sur:  "cbdb8f401792700b78546e6345c6e68bff3f1ab2c690168bb2783d98d0141da7"
+    sha256 cellar: :any,                 monterey:       "99d46af21309a6df674a3fb8f870cd4da81f8bb4e75b02b56c506161f89dd7a4"
+    sha256 cellar: :any,                 big_sur:        "e0dc7e421e9b8359399729f9092edfbd4c1c90f64e8504edbcd0bfdbd747d5ac"
+    sha256 cellar: :any,                 catalina:       "40180c497e090fcb6e3494bd639534d7427372a2276015f7c67dbd08ea753456"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2fca78d431ee8a68474967ffaa3e1796eece997a2379fe9c851fd2dcc4038245"
   end
 
   depends_on "icu4c"
+  depends_on "xz"
+  depends_on "zstd"
 
   uses_from_macos "bzip2"
   uses_from_macos "zlib"
 
-  # Reduce INTERFACE_LINK_LIBRARIES exposure for shared libraries. Remove with the next release.
-  patch do
-    url "https://github.com/boostorg/boost_install/commit/7b3fc734242eea9af734d6cd8ccb3d8f6b64c5b2.patch?full_index=1"
-    sha256 "cd96f5c51fa510fa6cd194eb011c0a6f9beb377fa2e78821133372f76a3be349"
-    directory "tools/boost_install"
-  end
-
-  # Fix build on 64-bit arm
-  patch do
-    url "https://github.com/boostorg/build/commit/456be0b7ecca065fbccf380c2f51e0985e608ba0.patch?full_index=1"
-    sha256 "e7a78145452fc145ea5d6e5f61e72df7dcab3a6eebb2cade6b4cfae815687f3a"
-    directory "tools/build"
-  end
-
   def install
     # Force boost to compile with the desired compiler
     open("user-config.jam", "a") do |file|
-      file.write "using darwin : : #{ENV.cxx} ;\n"
+      if OS.mac?
+        file.write "using darwin : : #{ENV.cxx} ;\n"
+      else
+        file.write "using gcc : : #{ENV.cxx} ;\n"
+      end
     end
 
     # libdir should be set by --prefix but isn't
@@ -70,8 +66,6 @@ class Boost < Formula
       -j#{ENV.make_jobs}
       --layout=tagged-1.66
       --user-config=user-config.jam
-      -sNO_LZMA=1
-      -sNO_ZSTD=1
       install
       threading=multi,single
       link=shared,static
@@ -90,10 +84,19 @@ class Boost < Formula
   test do
     (testpath/"test.cpp").write <<~EOS
       #include <boost/algorithm/string.hpp>
+      #include <boost/iostreams/device/array.hpp>
+      #include <boost/iostreams/device/back_inserter.hpp>
+      #include <boost/iostreams/filter/zstd.hpp>
+      #include <boost/iostreams/filtering_stream.hpp>
+      #include <boost/iostreams/stream.hpp>
+
       #include <string>
+      #include <iostream>
       #include <vector>
       #include <assert.h>
+
       using namespace boost::algorithm;
+      using namespace boost::iostreams;
       using namespace std;
 
       int main()
@@ -104,10 +107,30 @@ class Boost < Formula
         assert(strVec.size()==2);
         assert(strVec[0]=="a");
         assert(strVec[1]=="b");
+
+        // Test boost::iostreams::zstd_compressor() linking
+        std::vector<char> v;
+        back_insert_device<std::vector<char>> snk{v};
+        filtering_ostream os;
+        os.push(zstd_compressor());
+        os.push(snk);
+        os << "Boost" << std::flush;
+        os.pop();
+
+        array_source src{v.data(), v.size()};
+        filtering_istream is;
+        is.push(zstd_decompressor());
+        is.push(src);
+        std::string s;
+        is >> s;
+
+        assert(s == "Boost");
+
         return 0;
       }
     EOS
-    system ENV.cxx, "test.cpp", "-std=c++14", "-stdlib=libc++", "-o", "test"
+    system ENV.cxx, "test.cpp", "-std=c++14", "-o", "test", "-L#{lib}", "-lboost_iostreams",
+                    "-L#{Formula["zstd"].opt_lib}", "-lzstd"
     system "./test"
   end
 end

@@ -1,23 +1,23 @@
 class Tcpflow < Formula
   desc "TCP/IP packet demultiplexer"
   homepage "https://github.com/simsong/tcpflow"
-  url "https://downloads.digitalcorpora.org/downloads/tcpflow/tcpflow-1.5.0.tar.gz"
-  sha256 "20abe3353a49a13dcde17ad318d839df6312aa6e958203ea710b37bede33d988"
+  url "https://downloads.digitalcorpora.org/downloads/tcpflow/tcpflow-1.6.1.tar.gz"
+  sha256 "436f93b1141be0abe593710947307d8f91129a5353c3a8c3c29e2ba0355e171e"
   license "GPL-3.0"
-  revision 1
 
   livecheck do
-    url "http://downloads.digitalcorpora.org/downloads/tcpflow/"
+    url "https://downloads.digitalcorpora.org/downloads/tcpflow/"
     regex(/href=.*?tcpflow[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "478038c100cf6ffc2ef287bab32f37fa3413da393e4a1293a22ab3b9dd1a8251"
-    sha256 cellar: :any, big_sur:       "adc2978737bdd9f205a3108818521906bf6d5bd8a57d8a4a6dd1e7855bf6eb06"
-    sha256 cellar: :any, catalina:      "ee9e12b090ff836bf8bd39024f7c8d075e03357bb7c4eca504838e118d06fd6d"
-    sha256 cellar: :any, mojave:        "ae7eb58e5d805e61b4fc79165574796bf59d2172977579b8716c2ea95631aa42"
-    sha256 cellar: :any, high_sierra:   "3b29b20c24395a16a17236a89a5b4ff1121ae2227af79717517b02825a4a7dd7"
-    sha256 cellar: :any, sierra:        "881535a6ab635522f3a64aa9b568ee9fc67476f4636236f17d2828c02518b8bf"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "805fe826bc05a38537a86946363e91a05e73b6bc96574f6fe88f91bf9a0b4d61"
+    sha256 cellar: :any,                 arm64_big_sur:  "e1be2cb499df5ec033fb82cad85f743d0d024cec296aacfb3a2199bd12dc76de"
+    sha256 cellar: :any,                 monterey:       "bd088bbedec62b5dcf6fb8d87a1a17d671e5f37226cb049dbba6a88f6b81424f"
+    sha256 cellar: :any,                 big_sur:        "0b4121ad0f6a47b419677f4593ae1baa54b01c256cc469bac969064d5ab4e895"
+    sha256 cellar: :any,                 catalina:       "0732205cc35bac2263dbb287294ff888ea4c383285489d31aac1ee8b1833200e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "fdc1b810dd8acb8ceea6bfe5c02dc03586f95c7572a0cb4acdebaccbc661b825"
   end
 
   head do
@@ -29,6 +29,12 @@ class Tcpflow < Formula
 
   depends_on "boost" => :build
   depends_on "openssl@1.1"
+
+  uses_from_macos "bzip2"
+  uses_from_macos "libpcap"
+  uses_from_macos "zlib"
+
+  fails_with gcc: "5"
 
   def install
     system "bash", "./bootstrap.sh" if build.head?

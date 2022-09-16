@@ -1,16 +1,24 @@
 class Mpd < Formula
   desc "Music Player Daemon"
   homepage "https://www.musicpd.org/"
-  url "https://www.musicpd.org/download/mpd/0.22/mpd-0.22.4.tar.xz"
-  sha256 "891ea993a539246fa8f670346e5aa6c8cc85ce4be739ff12261712b0b3149dd0"
+  url "https://www.musicpd.org/download/mpd/0.23/mpd-0.23.9.tar.xz"
+  sha256 "2becaba980402e8dc7972ccc3476e493b7ae2eeb720d31fa6712472ed48e9f2d"
   license "GPL-2.0-or-later"
-  head "https://github.com/MusicPlayerDaemon/MPD.git"
+  revision 2
+  head "https://github.com/MusicPlayerDaemon/MPD.git", branch: "master"
+
+  livecheck do
+    url "https://www.musicpd.org/download.html"
+    regex(/href=.*?mpd[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "802738717b4b021a445ca0e3fb21df4035ecb9b19cb424cf10a027adce163ddc"
-    sha256 cellar: :any, big_sur:       "293d2d667c2f43bc297ae7b3d77d63a975eea5d3147741116d229b5cfb5d2c5b"
-    sha256 cellar: :any, catalina:      "e9ce21bbe1ef07bbb152ce91c7fccfacfc7d94ba32c21866ce69a237079b3e90"
-    sha256 cellar: :any, mojave:        "d1706d2192de306c0884dff62de90409a3f89d5eb4f44a27b03362bae1365817"
+    sha256 cellar: :any, arm64_monterey: "124436d2f73c34e3583e1adc613f51529ab5abed906291dd838621ec7b9b21c4"
+    sha256 cellar: :any, arm64_big_sur:  "6a09ae779448e9b7a7d92bf342dcb078ca5ba575290bc462057b5fa374b548a2"
+    sha256 cellar: :any, monterey:       "cdfab2b417635beab09807daa140589e22435bc9e25326621d8414532bb41495"
+    sha256 cellar: :any, big_sur:        "e061cf900241b73fb3050fa1640e7b40f5c99ae7e48f9c487bccf5ef9edc7f80"
+    sha256 cellar: :any, catalina:       "ace352bac9c1b56cd0645956addf840cba48589f34d26704189b4bcedbed2c0b"
+    sha256               x86_64_linux:   "e743df83acf32841900d9bd557ce621030df8fbf667cfaabdb8d25e3edf73929"
   end
 
   depends_on "boost" => :build
@@ -22,6 +30,7 @@ class Mpd < Formula
   depends_on "ffmpeg"
   depends_on "flac"
   depends_on "fluid-synth"
+  depends_on "fmt"
   depends_on "glib"
   depends_on "icu4c"
   depends_on "lame"
@@ -38,15 +47,18 @@ class Mpd < Formula
   depends_on "opus"
   depends_on "sqlite"
 
+  uses_from_macos "curl"
+
+  fails_with gcc: "5"
+
   def install
     # mpd specifies -std=gnu++0x, but clang appears to try to build
     # that against libstdc++ anyway, which won't work.
     # The build is fine with G++.
     ENV.libcxx
 
-    args = std_meson_args + %W[
+    args = %W[
       --sysconfdir=#{etc}
-      -Dlibwrap=disabled
       -Dmad=disabled
       -Dmpcdec=disabled
       -Dsoundcloud=disabled
@@ -57,16 +69,16 @@ class Mpd < Formula
       -Dfluidsynth=enabled
       -Dnfs=enabled
       -Dshout=enabled
-      -Dupnp=enabled
+      -Dupnp=pupnp
       -Dvorbisenc=enabled
     ]
 
-    system "meson", *args, "output/release", "."
-    system "ninja", "-C", "output/release"
+    system "meson", "setup", "output/release", *args, *std_meson_args
+    system "meson", "compile", "-C", "output/release"
     ENV.deparallelize # Directories are created in parallel, so let's not do that
-    system "ninja", "-C", "output/release", "install"
+    system "meson", "install", "-C", "output/release"
 
-    (etc/"mpd").install "doc/mpdconf.example" => "mpd.conf"
+    pkgetc.install "doc/mpdconf.example" => "mpd.conf"
   end
 
   def caveats
@@ -79,35 +91,18 @@ class Mpd < Formula
     EOS
   end
 
-  plist_options manual: "mpd"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-      <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>WorkingDirectory</key>
-          <string>#{HOMEBREW_PREFIX}</string>
-          <key>ProgramArguments</key>
-          <array>
-              <string>#{opt_bin}/mpd</string>
-              <string>--no-daemon</string>
-          </array>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>KeepAlive</key>
-          <true/>
-          <key>ProcessType</key>
-          <string>Interactive</string>
-      </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_bin/"mpd", "--no-daemon"]
+    keep_alive true
+    process_type :interactive
+    working_dir HOMEBREW_PREFIX
   end
 
   test do
+    # oss_output: Error opening OSS device "/dev/dsp": No such file or directory
+    # oss_output: Error opening OSS device "/dev/sound/dsp": No such file or directory
+    return if OS.linux? && ENV["HOMEBREW_GITHUB_ACTIONS"]
+
     require "expect"
 
     port = free_port

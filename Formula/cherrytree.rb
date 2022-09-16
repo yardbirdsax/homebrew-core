@@ -1,37 +1,51 @@
 class Cherrytree < Formula
   desc "Hierarchical note taking application featuring rich text and syntax highlighting"
-  homepage "https://www.giuspen.com/cherrytree"
-  url "https://www.giuspen.com/software/cherrytree_0.99.30.tar.xz"
-  sha256 "dff54e8c484beb35531a9aa0987759bc3d7e426979473ada40d1d022fdc50120"
+  homepage "https://www.giuspen.com/cherrytree/"
+  url "https://www.giuspen.com/software/cherrytree_0.99.49.tar.xz"
+  sha256 "cb3f48903716c3dfca7b4638c57137642d99c76f1bfc2f5f9f5b442baff2cde1"
   license "GPL-3.0-or-later"
 
+  livecheck do
+    url :homepage
+    regex(/href=.*?cherrytree[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
+
   bottle do
-    sha256 arm64_big_sur: "a6eb90be4cceb143782258067f97c32b4711aa05e54393e01f0432a2c6d55a42"
-    sha256 big_sur:       "8aa0bfea8c3ab007a1e1c4ab3c630e1401d5cbd8495704e7d46b735617ddea6a"
-    sha256 catalina:      "a57359a66ac690a5396dd94298b530d25479a417fcce50ff9ac3d5663a255246"
-    sha256 mojave:        "0fe1ae41be30491106f3356761562072bd06390cccc6ac747b6924a41e57dfb1"
+    sha256 arm64_monterey: "d8f91c6fa407fd0a98a7c6b1400e048938d609fbc9f2c61a1d02d3bcc59df883"
+    sha256 arm64_big_sur:  "21b5282822b1af6bb82efe055a956e1deed9b5f4f4dc52b93979550e00b414d8"
+    sha256 monterey:       "3070463ee21957c6b1baaf07c1991833ab79ade71d0f6ecda403b74ee5836cc5"
+    sha256 big_sur:        "e7a171cfb88f42e4f31bd5de68bef2776f32e097f86a8b84c5d18872633c45da"
+    sha256 catalina:       "efd6609a798ca8603af61dbc6e8cb01f0ed30d1541b08d2bfbca57fe1698825c"
+    sha256 x86_64_linux:   "30cbbca27d1cd305b414bef397418118d7b8f7fbbb2673f3f7eae93e99a838a4"
   end
 
   depends_on "cmake" => :build
+  depends_on "ninja" => :build
   depends_on "pkg-config" => :build
-  depends_on "python@3.9" => :build
+  depends_on "python@3.10" => :build
   depends_on "adwaita-icon-theme"
   depends_on "fmt"
   depends_on "gspell"
   depends_on "gtksourceviewmm3"
   depends_on "libxml++"
   depends_on "spdlog"
+  depends_on "sqlite" # try to change to uses_from_macos after python is not a dependency
   depends_on "uchardet"
 
   uses_from_macos "curl"
 
+  fails_with gcc: "5" # Needs std::optional
+
   def install
-    system "cmake", ".", "-DBUILD_TESTING=''", *std_cmake_args
-    system "make"
-    system "make", "install"
+    system "cmake", ".", "-DBUILD_TESTING=''", "-GNinja", *std_cmake_args
+    system "ninja"
+    system "ninja", "install"
   end
 
   test do
+    # (cherrytree:46081): Gtk-WARNING **: 17:33:48.386: cannot open display
+    return if OS.linux? && ENV["HOMEBREW_GITHUB_ACTIONS"]
+
     (testpath/"homebrew.ctd").write <<~EOS
       <?xml version="1.0" encoding="UTF-8"?>
       <cherrytree>

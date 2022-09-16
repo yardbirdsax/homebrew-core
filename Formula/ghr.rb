@@ -1,33 +1,28 @@
 class Ghr < Formula
   desc "Upload multiple artifacts to GitHub Release in parallel"
   homepage "https://tcnksm.github.io/ghr"
-  url "https://github.com/tcnksm/ghr/archive/v0.13.0.tar.gz"
-  sha256 "53933c6436187f573128903701ce74ac341793e892d3c2f57c822c0ce3c49e11"
+  url "https://github.com/tcnksm/ghr/archive/v0.15.0.tar.gz"
+  sha256 "89180208e62bc56e1bc401ca5171291c75c2589d47732c34d8647b3e5e0522e5"
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "ac6c8b2b97ea0139b9e56142368385a293ee5d5275a4019e4d51a068fff8895c"
-    sha256 cellar: :any_skip_relocation, big_sur:       "fea6aecd86755e6a0cd3d11eb5fbba9d554e75c2bfae5619fbf528a1b713f160"
-    sha256 cellar: :any_skip_relocation, catalina:      "7fd9ae651a7adbedd46e266e04260fa221c84cf1595c04e644f3e720f8f76a48"
-    sha256 cellar: :any_skip_relocation, mojave:        "322df199f2e51c91d348638c3d7baed79c8e542755fe51634cc2c06ea99150a9"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "941dce22c70f320d75f5e961c3cfc33f837f6ee113a5a06c445e57cbdcfa34fb"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "0382889177cd5c07581d4a2d0359187a72c0941533bcd4454116ed9129ee35d2"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "723f6a46ed525ca4fd06386d63d7ea6e8818323c68260d7c0820edce3385917e"
+    sha256 cellar: :any_skip_relocation, monterey:       "23eeea8b179a396664221f26d037cba38dad060aa4d137af51e4e4d70169e2c8"
+    sha256 cellar: :any_skip_relocation, big_sur:        "d021279dc3e1bcbdcdfbf786639c67d9908f50dcf082198fbd7f1b3674467399"
+    sha256 cellar: :any_skip_relocation, catalina:       "08672e3a3aa193fa07716995d2d2d4803d8deb83e430cc5d4e47634d65b0e2fb"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d9156b8ae869f2f07f35ac086f93b52e2e50d504d2329c5bd505e4765967f708"
   end
 
   depends_on "go" => :build
 
   def install
-    # Avoid running `go get`
-    inreplace "Makefile", "go get ${u} -d", ""
-
-    system "make", "build"
-    bin.install "bin/ghr" => "ghr"
-    prefix.install_metafiles
+    system "go", "build", *std_go_args(ldflags: "-s -w")
   end
 
   test do
     ENV["GITHUB_TOKEN"] = nil
     args = "-username testbot -repository #{testpath} v#{version} #{Dir.pwd}"
-    assert_include "token not found", shell_output("#{bin}/ghr #{args}", 15)
+    assert_includes "token not found", shell_output("#{bin}/ghr #{args}", 15)
   end
 end

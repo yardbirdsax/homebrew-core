@@ -1,21 +1,25 @@
 class Qca < Formula
   desc "Qt Cryptographic Architecture (QCA)"
   homepage "https://userbase.kde.org/QCA"
-  url "https://download.kde.org/stable/qca/2.3.2/qca-2.3.2.tar.xz"
-  sha256 "4697600237c4bc3a979e87d2cc80624f27b06280e635f5d90ec7dd4d2a9f606d"
+  url "https://download.kde.org/stable/qca/2.3.4/qca-2.3.4.tar.xz"
+  sha256 "6b695881a7e3fd95f73aaee6eaeab96f6ad17e515e9c2b3d4b3272d7862ff5c4"
   license "LGPL-2.1-or-later"
-  head "https://invent.kde.org/libraries/qca.git"
+  revision 1
+  head "https://invent.kde.org/libraries/qca.git", branch: "master"
 
   livecheck do
-    url :head
-    regex(/^v?(\d+(?:\.\d+)+)$/i)
+    url "https://download.kde.org/stable/qca/"
+    regex(%r{href=["']?v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "a49811534e35b364eb5ef5934cf2f938a3a936d1361636e9679cdd66f68a84b3"
-    sha256 cellar: :any, big_sur:       "bd2f1c1a96765e12401294d47b5c238f73df154adf9f75cbd4e7b1743d5ff6e5"
-    sha256 cellar: :any, catalina:      "3eb85a38faa170044765c86ec4add3ab13a403bcd8b681e2c0f03f6a20d0c864"
-    sha256 cellar: :any, mojave:        "4c5fd2f5004d77a33179eb45e7dd4d04c93c0797460b381f36c3fad0e546fe39"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "16589df8730a36b0b7b9c1cf08a31450cd631504d008ca42b360f55c0e046542"
+    sha256 cellar: :any,                 arm64_big_sur:  "e385d8e8182b3ab1d0620b96fc450725ddb902953cc472a91a6222edae863ece"
+    sha256 cellar: :any,                 monterey:       "0a75b00d7c90332bba605e535950f7fbd6f0d314c218c0d5f3dbdfddd2104c5e"
+    sha256 cellar: :any,                 big_sur:        "a2f76da05b592bfc03fecc9f2243b64764e195c5456597cab1e776c4b335298e"
+    sha256 cellar: :any,                 catalina:       "0a53f741a3453fd8af203781f8dd8aad6dea1969b287022aa5cae2fb834972e0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7691afbaafb94e0cd81e573e69c80afe8cc224fe4dafec8e9c25ee3bfb7292c8"
   end
 
   depends_on "cmake" => :build
@@ -26,7 +30,9 @@ class Qca < Formula
   depends_on "nss"
   depends_on "openssl@1.1"
   depends_on "pkcs11-helper"
-  depends_on "qt"
+  depends_on "qt@5"
+
+  fails_with gcc: "5"
 
   def install
     args = std_cmake_args

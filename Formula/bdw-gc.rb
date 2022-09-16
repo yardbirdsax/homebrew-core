@@ -1,30 +1,26 @@
 class BdwGc < Formula
   desc "Garbage collector for C and C++"
   homepage "https://www.hboehm.info/gc/"
+  url "https://github.com/ivmai/bdwgc/releases/download/v8.2.2/gc-8.2.2.tar.gz"
+  sha256 "f30107bcb062e0920a790ffffa56d9512348546859364c23a14be264b38836a0"
   license "MIT"
-  revision 2
 
-  stable do
-    url "https://github.com/ivmai/bdwgc/releases/download/v8.0.4/gc-8.0.4.tar.gz"
-    sha256 "436a0ddc67b1ac0b0405b61a9675bca9e075c8156f4debd1d06f3a56c7cd289d"
-
-    # Extension to handle multithreading
-    # https://github.com/ivmai/bdwgc/pull/277
-    patch do
-      url "https://github.com/ivmai/bdwgc/commit/5668de71107022a316ee967162bc16c10754b9ce.patch?full_index=1"
-      sha256 "5c42d4b37cf4997bb6af3f9b00f5513644e1287c322607dc980a1955a09246e3"
-    end
+  livecheck do
+    url :stable
+    strategy :github_latest
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "ee743d115b619b02230863812224a1c33dc1d3430280728eb10990cc86caa994"
-    sha256 cellar: :any, big_sur:       "af8bfafe1425f3cc9923bd49a375f85c13255124ed7a952137fe924431adc1c4"
-    sha256 cellar: :any, catalina:      "73a3a75a47a0007a772fe229f11bc0710988af6a8603c56a0f7fae3d9a317149"
-    sha256 cellar: :any, mojave:        "960f60118f6f5cbf4e04a76e4c2103c7fb446e43e5db08362bca0b13763e137b"
+    sha256 cellar: :any,                 arm64_monterey: "01693d25c01c27b4ae2fc7c176f57c1c46849c24440f1da484df9a2e99074594"
+    sha256 cellar: :any,                 arm64_big_sur:  "162892760401052a1a6d6cb183bb6683c18905377489b9bf50151a80c816f967"
+    sha256 cellar: :any,                 monterey:       "706ba9acedc825db1634868bc7be96ee5c919091e8481ecd2267f62b1cd3d803"
+    sha256 cellar: :any,                 big_sur:        "a55727cc7d7a7dbc8f7e61aca70a94dc07dcaccbfbffc5f92fcdc77dec64eaa7"
+    sha256 cellar: :any,                 catalina:       "68e76db2edce7a83e900ff4152317eeee7ebf1deb2780cc134d003f01774f248"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "bf417b645bd80dee68a64b42624218531754802db112e4f08570bb881692c1d6"
   end
 
   head do
-    url "https://github.com/ivmai/bdwgc.git"
+    url "https://github.com/ivmai/bdwgc.git", branch: "master"
     depends_on "autoconf" => :build
     depends_on "automake" => :build
     depends_on "libtool"  => :build
@@ -32,6 +28,10 @@ class BdwGc < Formula
 
   depends_on "libatomic_ops" => :build
   depends_on "pkg-config" => :build
+
+  on_linux do
+    depends_on "gcc" => :test
+  end
 
   def install
     system "./autogen.sh" if build.head?
@@ -68,7 +68,7 @@ class BdwGc < Formula
       }
     EOS
 
-    system ENV.cc, "-I#{include}", "-L#{lib}", "-lgc", "-o", "test", "test.c"
+    system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-lgc", "-o", "test"
     system "./test"
   end
 end

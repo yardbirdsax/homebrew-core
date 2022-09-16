@@ -3,17 +3,18 @@ require "language/node"
 class Eleventy < Formula
   desc "Simpler static site generator"
   homepage "https://www.11ty.dev"
-  url "https://registry.npmjs.org/@11ty/eleventy/-/eleventy-0.11.1.tgz"
-  sha256 "55dfb1dedffff5598a1f9900250530ad8b1d7b91eb5ef0760ef8e27104f7ed5f"
+  url "https://registry.npmjs.org/@11ty/eleventy/-/eleventy-1.0.2.tgz"
+  sha256 "536144e7b38e1b27d44c23c611c4e7ab0442963879f3fa4c1acfe766696728f8"
   license "MIT"
-  head "https://github.com/11ty/eleventy.git"
+  head "https://github.com/11ty/eleventy.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "ab1fb1cab906237826c8153078356bb4341c9771aaaf8e38d51f6974be32c944"
-    sha256 cellar: :any_skip_relocation, big_sur:       "64da97482a293690e92c421891298f82c6c97a3fa3a96ef2c0b40b1a320d5593"
-    sha256 cellar: :any_skip_relocation, catalina:      "48934e50a9eee9eb34e6011eeb829c9995c102a5bd7d1c02eb041d0ba119ee52"
-    sha256 cellar: :any_skip_relocation, mojave:        "0d259029be276276315bfa3cef874a0af1cbe4553ad5a6d5e09794ad70a7a6fb"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "bd861131b89565c4637c60f11d7e2dfdb76220517005ab22bb8ef4f52720ed5c"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "3964b8a92c0fe9b3c731c4588c6d553775d1c83cb67a943b0aa2819d61ea2509"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "3964b8a92c0fe9b3c731c4588c6d553775d1c83cb67a943b0aa2819d61ea2509"
+    sha256 cellar: :any_skip_relocation, monterey:       "37efa77486af2fd8c2f60998b446545b35d5e4f7f60e13e657fccc9a195e5b5c"
+    sha256 cellar: :any_skip_relocation, big_sur:        "37efa77486af2fd8c2f60998b446545b35d5e4f7f60e13e657fccc9a195e5b5c"
+    sha256 cellar: :any_skip_relocation, catalina:       "37efa77486af2fd8c2f60998b446545b35d5e4f7f60e13e657fccc9a195e5b5c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f5a251c2696134b0376e1f3e3d15c061184b8f801b19c196171a2c4afdfe7a21"
   end
 
   depends_on "node"
@@ -21,6 +22,7 @@ class Eleventy < Formula
   def install
     system "npm", "install", *Language::Node.std_npm_install_args(libexec)
     bin.install_symlink Dir["#{libexec}/bin/*"]
+    deuniversalize_machos
   end
 
   test do

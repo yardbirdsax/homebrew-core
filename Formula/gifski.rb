@@ -1,23 +1,30 @@
 class Gifski < Formula
   desc "Highest-quality GIF encoder based on pngquant"
   homepage "https://gif.ski/"
-  url "https://github.com/ImageOptim/gifski/archive/1.2.6.tar.gz"
-  sha256 "60af3329dfb8e86626e3251f57e13b4cfc0db79c4324ffbdbae3a9d7462cd1ed"
+  url "https://github.com/ImageOptim/gifski/archive/1.7.2.tar.gz"
+  sha256 "a686cba9b9874d06ff138249119b796960d30fa06d036ce51df93d8dde6b829f"
   license "AGPL-3.0-only"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "5a4a8e2702fda194cfb372519d7740f2d82ccb5c1d165672210ed2c21fbeef80"
-    sha256 cellar: :any, big_sur:       "b0269f2aa746e8a4dcdeb5f27a7b91c0e894d73c2b5d8b3a4df1b1bf8aaa115f"
-    sha256 cellar: :any, catalina:      "ac9547281d15c75a5725aa21fa3d8b974c7b8b08e580d00c72e5d8058d1b696d"
-    sha256 cellar: :any, mojave:        "e06d9be5f774a40f746b99046ac7e7c8c517c9a84a9b15ca2b1231fbe6287e09"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "ad1d6084e9f06f1a8d8601f988a1e6fb7057174df5841e4a9157fac0a65a1a60"
+    sha256 cellar: :any,                 arm64_big_sur:  "d17cd7c01944d1868928debaea3b440fefb1f77d04f882f49e6c60f40bd9464b"
+    sha256 cellar: :any,                 monterey:       "a8ae5fd607d327693c41c953f3bd795bec2cdd2a6685aab118517b9cf6725100"
+    sha256 cellar: :any,                 big_sur:        "0052439c326c966371734039503ad38cbb0e81b560cff8967019d036be4a155e"
+    sha256 cellar: :any,                 catalina:       "b9eee9279bf404f00e01c6930aed817d8aab53b4314139d397d935ee064a4d58"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "02a02b16b00857089e0950b4ca09c6e77f1ec4b1eb4b6819f791e9d073f04b2c"
   end
 
   depends_on "pkg-config" => :build
   depends_on "rust" => :build
-  depends_on "ffmpeg"
+  depends_on "ffmpeg@4"
+
+  uses_from_macos "llvm" => :build
+
+  fails_with gcc: "5" # rubberband is built with GCC
 
   def install
-    system "cargo", "install", "--features=video", *std_cargo_args
+    system "cargo", "install", "--features", "video", *std_cargo_args
   end
 
   test do

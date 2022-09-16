@@ -1,10 +1,11 @@
 class Halide < Formula
   desc "Language for fast, portable data-parallel computation"
   homepage "https://halide-lang.org"
-  url "https://github.com/halide/Halide/archive/v10.0.0.tar.gz"
-  sha256 "23808f8e9746aea25349a16da92e89ae320990df3c315c309789fb209ee40f20"
+  url "https://github.com/halide/Halide/archive/v14.0.0.tar.gz"
+  sha256 "f9fc9765217cbd10e3a3e3883a60fc8f2dbbeaac634b45c789577a8a87999a01"
   license "MIT"
-  revision 1
+  revision 2
+  head "https://github.com/halide/Halide.git", branch: "main"
 
   livecheck do
     url :stable
@@ -12,31 +13,33 @@ class Halide < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "8f6e1c100dd2fbabef29fd1ffe9dbb30500c6fc095b38c2c7382ca82eb70e6ac"
-    sha256 cellar: :any, big_sur:       "061a4d20c6c8772a49b858e9cae542482e4383328ec8baaef0eb4613dc06f398"
-    sha256 cellar: :any, catalina:      "997ed23a3fcb238899272fab8a0f9c2948477fb53bdc1bf2382a31418bc51571"
-    sha256 cellar: :any, mojave:        "281f9219faf56e6e4b01e44bde6d9e8a4cd8bb0283e14aa6f2f78f6db4301dec"
-    sha256 cellar: :any, high_sierra:   "5aaa4023bfff9d9f1f18ee1efae442ff7e0c21c84acc220555504c42705d9c7c"
+    sha256 cellar: :any,                 arm64_monterey: "a0f08ad604bf0bce564b59dcc8834465ac394de21df82ba8bc2a5a8945ad1c14"
+    sha256 cellar: :any,                 arm64_big_sur:  "731f4579b98a53937dfa926d7ed743486a21623f63b999a9388bf03ca2b07dba"
+    sha256 cellar: :any,                 monterey:       "dccc07728f57b7ce390d3370a4f262c5e0dc0784a5ab61dca69f102c7a7f0a77"
+    sha256 cellar: :any,                 big_sur:        "70a1fad1c68157715403b5ace8a5a18812a69e4e9c50ab6152dfe3e06609cfde"
+    sha256 cellar: :any,                 catalina:       "b73bcf60ebb46fa3cc8b6caa7a60a4e666b20be11e93575cf1950da7f6b6e879"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9ffb43bc29d58a381f39f4a9760a3cfdf544ce514add06ed6545e7fa0d8ca84d"
   end
 
   depends_on "cmake" => :build
-  depends_on "jpeg"
-  depends_on "libomp"
+  depends_on "jpeg-turbo"
   depends_on "libpng"
   depends_on "llvm"
-  depends_on "python@3.9"
+  depends_on "python@3.10"
+
+  fails_with gcc: "5" # LLVM is built with Homebrew GCC
 
   def install
-    mkdir "build" do
-      system "cmake", "..", *std_cmake_args
-      system "make"
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args,
+                    "-DCMAKE_INSTALL_RPATH=#{rpath}",
+                    "-DHalide_SHARED_LLVM=ON"
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
-    cp share/"tutorial/lesson_01_basics.cpp", testpath
-    system ENV.cxx, "-std=c++11", "lesson_01_basics.cpp", "-L#{lib}", "-lHalide", "-o", "test"
+    cp share/"doc/Halide/tutorial/lesson_01_basics.cpp", testpath
+    system ENV.cxx, "-std=c++17", "lesson_01_basics.cpp", "-L#{lib}", "-lHalide", "-o", "test"
     assert_match "Success!", shell_output("./test")
   end
 end

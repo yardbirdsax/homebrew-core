@@ -2,16 +2,19 @@ class Aliddns < Formula
   desc "Aliyun(Alibaba Cloud) ddns for golang"
   homepage "https://github.com/OpenIoTHub/aliddns"
   url "https://github.com/OpenIoTHub/aliddns.git",
-      tag:      "v0.0.9",
-      revision: "37e4f959092b0c286019cab29ce36a0e434c6455"
+      tag:      "v0.0.13",
+      revision: "2c2214baf6b016ded184373252cff16bb377d3c0"
   license "MIT"
-  head "https://github.com/OpenIoTHub/aliddns.git"
+  head "https://github.com/OpenIoTHub/aliddns.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "16e5bfb49b749adb380450cde6092020afd9ef4d6ed3fa030c8c6ede11a6bf9d"
-    sha256 cellar: :any_skip_relocation, big_sur:       "cb06193d5ebd8d4faa2e358f6d40589653a0a593e7265e21dfc15bfc99816cab"
-    sha256 cellar: :any_skip_relocation, catalina:      "5bb2c74ba522eaf8713fb5c04b5e726e0bca16c4cfc406d7b4523187646acfdb"
-    sha256 cellar: :any_skip_relocation, mojave:        "a5f4c51abd1deb28e02f1dc97ea2fb4bcde0d297e0da9d6c5a3b4cfb0bf6c135"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "23ab8335a2b758f3557053847a848d61dfb53c614abd8e52eadd62352bc45c5f"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "779eac8f4e88b704f068d542d1c4f209a96edc5ded85e5ecfefa961d798d6620"
+    sha256 cellar: :any_skip_relocation, monterey:       "ad0bfb1477ef8ec7145eca1cbeb4147157c928ebd440a757f054de2d961f2578"
+    sha256 cellar: :any_skip_relocation, big_sur:        "107cb79b754c414f6ffc4bf48ad086e502ad1b39aba147177e3490258e840f8b"
+    sha256 cellar: :any_skip_relocation, catalina:       "67937c8e5e9379f4eb36adb24f5b1c5330d488dbe032e0cca376709c03f7b29b"
+    sha256 cellar: :any_skip_relocation, mojave:         "ee4a2ad57559bd87b208aa6a58d949b2271b99c767c1bc6e6d8a1fb4996f6e36"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c2f2e7a4c81fc402a372ea37b80dbf8f6190595122704088744f4ba7c5fc50ce"
   end
 
   depends_on "go" => :build
@@ -23,35 +26,15 @@ class Aliddns < Formula
       -X main.commit=#{Utils.git_head}
       -X main.builtBy=homebrew
     ]
-    system "go", "build", "-mod=vendor", "-ldflags", ldflags.join(" "), *std_go_args
+    system "go", "build", "-mod=vendor", *std_go_args(ldflags: ldflags)
     pkgetc.install "aliddns.yaml"
   end
 
-  plist_options manual: "aliddns -c #{HOMEBREW_PREFIX}/etc/aliddns/aliddns.yaml"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>KeepAlive</key>
-          <true/>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_bin}/aliddns</string>
-            <string>-c</string>
-            <string>#{etc}/aliddns/aliddns.yaml</string>
-          </array>
-          <key>StandardErrorPath</key>
-          <string>#{var}/log/aliddns.log</string>
-          <key>StandardOutPath</key>
-          <string>#{var}/log/aliddns.log</string>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_bin/"aliddns", "-c", etc/"aliddns/aliddns.yaml"]
+    keep_alive true
+    log_path var/"log/aliddns.log"
+    error_log_path var/"log/aliddns.log"
   end
 
   test do

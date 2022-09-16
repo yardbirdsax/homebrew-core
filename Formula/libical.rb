@@ -1,16 +1,18 @@
 class Libical < Formula
   desc "Implementation of iCalendar protocols and data formats"
   homepage "https://libical.github.io/libical/"
-  url "https://github.com/libical/libical/releases/download/v3.0.9/libical-3.0.9.tar.gz"
-  sha256 "bd26d98b7fcb2eb0cd5461747bbb02024ebe38e293ca53a7dfdcb2505265a728"
+  url "https://github.com/libical/libical/releases/download/v3.0.14/libical-3.0.14.tar.gz"
+  sha256 "4284b780356f1dc6a01f16083e7b836e63d3815e27ed0eaaad684712357ccc8f"
   license any_of: ["LGPL-2.1-or-later", "MPL-2.0"]
-  revision 1
+  revision 2
 
   bottle do
-    sha256 arm64_big_sur: "4444c686c12f4ccb5a2b1bba379b8b3e10b0c682e74664f003eddd188666d706"
-    sha256 big_sur:       "50b73e2b2e9de25823e1c8aaad76e16aa6d40d0926de9ed5b41165fccda96cc7"
-    sha256 catalina:      "56d8b3f3052c096d59cd1aae698c577e701958d358f4a60497e82d807995580c"
-    sha256 mojave:        "4a33de39cdae5faf12efb0767b48218b002a7f674fa6eaadbfea1288a8c1c5cb"
+    sha256 cellar: :any,                 arm64_monterey: "fd4d453a3cef1834346adea58fa384587c466649dfc9ad120c31dcea6d185199"
+    sha256 cellar: :any,                 arm64_big_sur:  "4a869794441e4433f054246f57a8e6bb2951f5425c21a1aa93164fd5b7417ed2"
+    sha256 cellar: :any,                 monterey:       "bd794dbb4e37466516dcbe502e715b6fff10201b2e439aed5b3a17988eb76df8"
+    sha256 cellar: :any,                 big_sur:        "ace3392af1b83116561a2e4caee6c808a96e6017ab2b5dccfc34952d81ba3dd8"
+    sha256 cellar: :any,                 catalina:       "9903de75b25ee53b2c0881b8e812733a85e32022b3c17a53146415a200610ed9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e0459f752a32ae67a4e4f29d69d6085d7ae1b5bebed208b41adf96710e99cad2"
   end
 
   depends_on "cmake" => :build
@@ -24,7 +26,7 @@ class Libical < Formula
     system "cmake", ".", "-DBDB_LIBRARY=BDB_LIBRARY-NOTFOUND",
                          "-DENABLE_GTK_DOC=OFF",
                          "-DSHARED_ONLY=ON",
-                         "-DCMAKE_INSTALL_RPATH=#{lib}",
+                         "-DCMAKE_INSTALL_RPATH=#{rpath}",
                          *std_cmake_args
     system "make", "install"
   end

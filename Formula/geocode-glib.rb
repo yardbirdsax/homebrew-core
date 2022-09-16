@@ -1,28 +1,33 @@
 class GeocodeGlib < Formula
   desc "GNOME library for gecoding and reverse geocoding"
-  homepage "https://developer.gnome.org/geocode-glib"
-  url "https://download.gnome.org/sources/geocode-glib/3.26/geocode-glib-3.26.2.tar.xz"
-  sha256 "01fe84cfa0be50c6e401147a2bc5e2f1574326e2293b55c69879be3e82030fd1"
+  homepage "https://gitlab.gnome.org/GNOME/geocode-glib"
+  url "https://download.gnome.org/sources/geocode-glib/3.26/geocode-glib-3.26.4.tar.xz"
+  sha256 "2d9a6826d158470449a173871221596da0f83ebdcff98b90c7049089056a37aa"
   license "GPL-2.0-or-later"
-  revision 1
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "878e80675652cec9dd995eb7d896681db3203a8567cce2b35577fbc952cb8be0"
-    sha256 cellar: :any, big_sur:       "7a36865ee432311c7a36e3541a430a1f32c80935e6b16e11d5454c09a8f773de"
-    sha256 cellar: :any, catalina:      "52ce343c52ad20417f87bde9889b0086768b657874d94fd39eb54141f20fcedd"
-    sha256 cellar: :any, mojave:        "e7d30594593bc5fcc430f548d304ec88ff053ab5eebcd6f4bd696fd8b0c4acc7"
-    sha256 cellar: :any, high_sierra:   "74d7d13e5d99f9d4f07674faa262d68b57d86b550e0504dbf0797e84de9e52fa"
+    sha256 cellar: :any, arm64_monterey: "e05e16cff98263e502be86ba8e0dacc2b9db8c206ab2e39328aa251958fa46ff"
+    sha256 cellar: :any, arm64_big_sur:  "5dc4f7038ee843898bc1d66c831de594045bc07d75803d9ceeb439979e974635"
+    sha256 cellar: :any, monterey:       "a852370762b744056678baa6be4c500f2ed664ac62e7e8f5158601b076526216"
+    sha256 cellar: :any, big_sur:        "641b09e8c9fc3bfcd486651f28cac679dde0d14c7d70d026030d8cb2e05848f7"
+    sha256 cellar: :any, catalina:       "d89e09d0947a2aaf675a5039e7199518592f19611a5cd21f0edda22cbf4d16d2"
+    sha256               x86_64_linux:   "e0224472f08ddfa0a81deb972c4bb6e15e1ff8ae53df5cbe47d130f20a7aa8fc"
   end
 
   depends_on "gobject-introspection" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkg-config" => :build
+  depends_on "glib"
   depends_on "gtk+3"
   depends_on "json-glib"
-  depends_on "libsoup"
+  depends_on "libsoup@2"
 
   def install
+    ENV.prepend_path "PKG_CONFIG_PATH", Formula["libsoup@2"].opt_lib/"pkgconfig"
+    ENV.prepend_path "XDG_DATA_DIRS", Formula["libsoup@2"].opt_share
+    ENV.prepend_path "XDG_DATA_DIRS", HOMEBREW_PREFIX/"share"
+
     mkdir "build" do
       system "meson", *std_meson_args, "-Denable-installed-tests=false", "-Denable-gtk-doc=false", ".."
       system "ninja"
@@ -31,7 +36,7 @@ class GeocodeGlib < Formula
   end
 
   def post_install
-    system "#{Formula["gtk+3"].opt_bin}/gtk3-update-icon-cache", "-f", "-t", "#{HOMEBREW_PREFIX}/share/icons/gnome"
+    system Formula["gtk+3"].opt_bin/"gtk3-update-icon-cache", "-f", "-t", "#{HOMEBREW_PREFIX}/share/icons/hicolor"
   end
 
   test do
@@ -59,9 +64,7 @@ class GeocodeGlib < Formula
       -lglib-2.0
       -lgobject-2.0
     ]
-    on_macos do
-      flags << "-lintl"
-    end
+    flags << "-lintl" if OS.mac?
     system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"
   end

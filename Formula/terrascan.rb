@@ -1,22 +1,24 @@
 class Terrascan < Formula
   desc "Detect compliance and security violations across Infrastructure as Code"
-  homepage "https://www.accurics.com/products/terrascan/"
-  url "https://github.com/accurics/terrascan/archive/v1.3.2.tar.gz"
-  sha256 "f5cab886ca8f0b233060524840280341bcdbc724fb79c08dfdb1ec8f66097a3a"
+  homepage "https://github.com/tenable/terrascan"
+  url "https://github.com/tenable/terrascan/archive/v1.15.2.tar.gz"
+  sha256 "348133d7285670b745a30609ab94c1d6de6079bf01ad48dbd2fc6c14b8be1513"
   license "Apache-2.0"
-  head "https://github.com/accurics/terrascan.git"
+  head "https://github.com/tenable/terrascan.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "22856f97720230a2db38399bca2ea948981abbcfab712cd92cc09107c042da74"
-    sha256 cellar: :any_skip_relocation, big_sur:       "430c828231b47110e56192e22359e52c0b2be9608b835750d6c2e8e7f9437e75"
-    sha256 cellar: :any_skip_relocation, catalina:      "3f8196d147f1a96e019272098e369baa73fa0904a490a310454042eba9f01ac2"
-    sha256 cellar: :any_skip_relocation, mojave:        "1687e46163119a6cb506a80591b905c5ebcf6b34a8a31294de1a977d190ac19f"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "79b0e3e584a961edccf6d97483dbeec29aac981d334a17b25a54b6a0eff10726"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "2a2b26ba4fb928a1d1f3f5492b412adfd10e27872f3d60b809d8cdcba3c0ea9a"
+    sha256 cellar: :any_skip_relocation, monterey:       "61abde8107ea430a6dc6df61b6e562379da63bd4ead284bdf9c4641876fce4bc"
+    sha256 cellar: :any_skip_relocation, big_sur:        "3cc64662700c0927078ed5491dc135907f76e1df4aee29b5511f684d4fe39d72"
+    sha256 cellar: :any_skip_relocation, catalina:       "5391d917a47967f97b249fceeb8cf632b6b2fcd0eac60abc2d8b9093f82f552f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8825c5897fc4f8524ec7bfb0f48640e4f89d5d86714b98864bd1ca7e992b3fcb"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", *std_go_args, "./cmd/terrascan"
+    system "go", "build", *std_go_args(ldflags: "-s -w"), "./cmd/terrascan"
   end
 
   test do
@@ -35,15 +37,14 @@ class Terrascan < Formula
     EOS
 
     expected = <<~EOS
-      \tPolicies Validated  :	159
-      \tViolated Policies   :	0
-      \tLow                 :	0
-      \tMedium              :	0
-      \tHigh                :	0
+      \tViolated Policies   :\t0
+      \tLow                 :\t0
+      \tMedium              :\t0
+      \tHigh                :\t0
     EOS
 
-    assert_match expected, shell_output("#{bin}/terrascan scan -f #{testpath}/ami.tf -t aws")
-
-    assert_match "version: v#{version}", shell_output("#{bin}/terrascan version")
+    output = shell_output("#{bin}/terrascan scan -f #{testpath}/ami.tf -t aws")
+    assert_match expected, output
+    assert_match(/Policies Validated\s+:\s+\d+/, output)
   end
 end

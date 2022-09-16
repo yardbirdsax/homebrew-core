@@ -1,16 +1,17 @@
 class Grex < Formula
   desc "Command-line tool for generating regular expressions"
   homepage "https://github.com/pemistahl/grex"
-  url "https://github.com/pemistahl/grex/archive/v1.1.0.tar.gz"
-  sha256 "52a9d5ddc15c7fb227c87147d991bfabe2aae1fbef8169893a9111dcd3aa641f"
+  url "https://github.com/pemistahl/grex/archive/v1.4.0.tar.gz"
+  sha256 "38610a97665a30a3b66519df41f979a39a0503d2e9ac6e1e3e3394ec305e7987"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "972e86f0ad63118acec99822c9a1836b874866cbbde963fec76dac07f560fc6f"
-    sha256 cellar: :any_skip_relocation, big_sur:       "69b19b50f9db286414869271c0622b0415784559a87b245caa67ea882b59a2ea"
-    sha256 cellar: :any_skip_relocation, catalina:      "a6a2e903b81404d8637492fdbdea4bd2bafc5b9e2ead89e565ed64ca27a8a9ad"
-    sha256 cellar: :any_skip_relocation, mojave:        "add77eeff9facb30f56b579ab893bcfafcae43699e629b3780f67b560fb59ad2"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "b09e46aabadbb7742e60b942386f994795fcfca48a2834b2dbc4bc7fdb500dcc"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "de4fa3ab2dcccdf2ce89b0b26b6ad7c411ca52768193374e09c5a9be498b7c01"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "93faa205dcca15ad00a4a2ccbe024e14b7c9e88132bd3dde0556ebe918b235b6"
+    sha256 cellar: :any_skip_relocation, monterey:       "3fe2becef0cb4f6696080ed09016d86315308acc0e948dd7cfa9bf0aae2fcbde"
+    sha256 cellar: :any_skip_relocation, big_sur:        "e9b1d18003ad754a1791960dacd2ace005c50b10ab583b635cf8f74eb0385c1f"
+    sha256 cellar: :any_skip_relocation, catalina:       "3956929a4fdb956eca7ae44648183cb458b01b24fc765c70c551fc13a8dce9b7"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d4009880a091af2ae1148a6d4234100e082d106a4b9644c8c5eb9ce171fd39b0"
   end
 
   depends_on "rust" => :build

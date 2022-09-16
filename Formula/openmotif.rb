@@ -4,20 +4,21 @@ class Openmotif < Formula
   url "https://downloads.sourceforge.net/project/motif/Motif%202.3.8%20Source%20Code/motif-2.3.8.tar.gz"
   sha256 "859b723666eeac7df018209d66045c9853b50b4218cecadb794e2359619ebce7"
   license "LGPL-2.1-or-later"
-  revision 1
+  revision 2
 
   bottle do
-    sha256 arm64_big_sur: "ae3f4bf92f1cbc78a985e8c27979a52c1a4c16696a74bb142a317f88f5c46082"
-    sha256 big_sur:       "ca698d287f8b964a34fa23cf2a8b6039fd5913d6169bbdf90bf90f6b580c8475"
-    sha256 catalina:      "07edf35230c5dca07fd5b4aa3a198d9ec706319e9b57ae62259f63d9726262f7"
-    sha256 mojave:        "b921f9634055bd7aaab722d156feca35da0742106036f23837241d53d1380648"
-    sha256 high_sierra:   "0ebe3e7a88d400291a3e0a3f46d40b500c1e0487f5f689535c8c468993e786da"
+    sha256 arm64_monterey: "3942656be5f95807753f8549c98d5263cc9bd510a9b73e4bb6256dfa8928bd76"
+    sha256 arm64_big_sur:  "004bb6002de4b145d78adfb0dfd3dc69de01012daa7632770329bf658cb52420"
+    sha256 monterey:       "3d8e123bd66804492e9c029dd8cf4f5c6eee742f55558e8aeda6cc80f41021cc"
+    sha256 big_sur:        "186bd2c9a8f7d69e31e4d00e206036f8128483627e1af8310b847d2e327bb413"
+    sha256 catalina:       "3cc1aea00676992dc09e499f10737729e964cab6fb8750d0d54c51a3716d1166"
+    sha256 x86_64_linux:   "a7ec8d4e5739b6c130dadce451e3d2ee44658e87958a93e67548afe2b36e6b62"
   end
 
   depends_on "pkg-config" => :build
   depends_on "fontconfig"
   depends_on "freetype"
-  depends_on "jpeg"
+  depends_on "jpeg-turbo"
   depends_on "libice"
   depends_on "libpng"
   depends_on "libsm"
@@ -34,10 +35,23 @@ class Openmotif < Formula
   conflicts_with "lesstif",
     because: "both Lesstif and Openmotif are complete replacements for each other"
 
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+  end
+
   def install
-    system "./configure", "--prefix=#{prefix}",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules"
+    if OS.linux?
+      # This patch is needed for Ubuntu 16.04 LTS, which uses
+      # --as-needed with ld.  It should no longer
+      # be needed on Ubuntu 18.04 LTS.
+      inreplace ["demos/programs/Exm/simple_app/Makefile.am", "demos/programs/Exm/simple_app/Makefile.in"],
+        /(LDADD.*\n.*libExm.a)/,
+        "\\1 -lX11"
+    end
+
+    system "./configure", *std_configure_args, "--disable-silent-rules"
     system "make"
     system "make", "install"
 
@@ -46,6 +60,6 @@ class Openmotif < Formula
   end
 
   test do
-    assert_match /no source file specified/, pipe_output("#{bin}/uil 2>&1")
+    assert_match "no source file specified", pipe_output("#{bin}/uil 2>&1")
   end
 end

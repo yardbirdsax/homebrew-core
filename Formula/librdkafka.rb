@@ -1,10 +1,10 @@
 class Librdkafka < Formula
   desc "Apache Kafka C/C++ library"
   homepage "https://github.com/edenhill/librdkafka"
-  url "https://github.com/edenhill/librdkafka/archive/v1.6.0.tar.gz"
-  sha256 "3130cbd391ef683dc9acf9f83fe82ff93b8730a1a34d0518e93c250929be9f6b"
+  url "https://github.com/edenhill/librdkafka/archive/refs/tags/v1.9.2.tar.gz"
+  sha256 "3fba157a9f80a0889c982acdd44608be8a46142270a389008b22d921be1198ad"
   license "BSD-2-Clause"
-  head "https://github.com/edenhill/librdkafka.git"
+  head "https://github.com/edenhill/librdkafka.git", branch: "master"
 
   livecheck do
     url :stable
@@ -12,18 +12,24 @@ class Librdkafka < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "1700456f7c796346d69369ff969b2cec001c4fb602e5d55db8121c7dc2ab78a9"
-    sha256 big_sur:       "860c7e63fcdf6eb225a19ed41129209b7e35109f63506b1eae9ce99409533dfe"
-    sha256 catalina:      "8f9ba2426166a7d12cf82570a1fe08eb569f00935757c0105dab8fc4f7c37772"
-    sha256 mojave:        "f067008cc0245579c74f656d90f8f1c886fde639d1b6c45414c497e9a260ac40"
+    sha256 cellar: :any,                 arm64_monterey: "51cf809caf8626828668859f212e29dd644a8cbe6bbd1740c10edf0b565f0c2f"
+    sha256 cellar: :any,                 arm64_big_sur:  "71fd99b66724e9cde7fc862eadd2043b3c0a072c5ef564d6400da24b47e4d26c"
+    sha256                               monterey:       "9b56f5818e278cec646eb2c93f3d32b19eddfeacb1ec96bff9ba95b7232031fd"
+    sha256                               big_sur:        "939f96a1a1f5fc8caeeb5e0256fe2ea3a319d27f7519739b2699aef96f1bbebb"
+    sha256                               catalina:       "09dee2fe5791509406023eb4510bd19ac9f32e675adbfebcdba3288864927083"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "939c1bf09ef24b036644cb8cd1f15c517e74f4ea6f015082308ac828ad135ee0"
   end
 
   depends_on "pkg-config" => :build
-  depends_on "python@3.9" => :build
+  depends_on "python@3.10" => :build
   depends_on "lz4"
   depends_on "lzlib"
   depends_on "openssl@1.1"
   depends_on "zstd"
+
+  uses_from_macos "curl"
+  uses_from_macos "cyrus-sasl"
+  uses_from_macos "zlib"
 
   def install
     system "./configure", "--prefix=#{prefix}"

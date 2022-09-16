@@ -1,9 +1,10 @@
 class Cdo < Formula
   desc "Climate Data Operators"
   homepage "https://code.mpimet.mpg.de/projects/cdo"
-  url "https://code.mpimet.mpg.de/attachments/download/24638/cdo-1.9.10.tar.gz"
-  sha256 "cc39c89bbb481d7b3945a06c56a8492047235f46ac363c4f0d980fccdde6677e"
+  url "https://code.mpimet.mpg.de/attachments/download/26823/cdo-2.0.5.tar.gz"
+  sha256 "edeebbf1c3b1a1f0c642dae6bc8c7624e0c54babe461064dc5c7daca4a5b0dce"
   license "GPL-2.0-only"
+  revision 1
 
   livecheck do
     url "https://code.mpimet.mpg.de/projects/cdo/files"
@@ -11,17 +12,19 @@ class Cdo < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "3d7b530430215b221d425f561c801d46cdd53a55d2386a816d1101cb9d1aa62a"
-    sha256 cellar: :any, big_sur:       "bfc4a37a38a61186ca6e8426899136d65bb7d66ab9987c16e5d422e6a955874d"
-    sha256 cellar: :any, catalina:      "955ae6b0e69ba8c32530c732011da18da59088f9758b84e8733ca3be9d973212"
-    sha256 cellar: :any, mojave:        "93c32ad2e784fec206d157300a97bab63cf934ad6da881f2f880fe97133493e4"
+    sha256 cellar: :any,                 arm64_monterey: "6263a211f02fdafd51bbfa3a0773a9fa81979b4c29b9d4e33da4417ab6dc6d51"
+    sha256 cellar: :any,                 arm64_big_sur:  "2656dc32acb71d11f5288aba8571de98a4411ee58e426437971759edfd38f1c3"
+    sha256 cellar: :any,                 monterey:       "043bece96c7875b42f3f5315a4beea11f2eeda4947199c206b01b29173c22e9f"
+    sha256 cellar: :any,                 big_sur:        "dd422128a9b8b836e849abcec45448435d3c2b21c33f9374cada7d98eed057e7"
+    sha256 cellar: :any,                 catalina:       "95c9af1513fe44f93dea7e59677c57d165588febe490b02b322701517e6e823b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "bd9ff737755e92c5a1a21d5a9aa8f30ef8f66eab9c8e3e1f62c0e4b0d4e5dd01"
   end
 
   depends_on "eccodes"
   depends_on "hdf5"
+  depends_on "libaec"
   depends_on "netcdf"
   depends_on "proj"
-  depends_on "szip"
 
   def install
     args = %W[
@@ -30,7 +33,7 @@ class Cdo < Formula
       --with-eccodes=#{Formula["eccodes"].opt_prefix}
       --with-netcdf=#{Formula["netcdf"].opt_prefix}
       --with-hdf5=#{Formula["hdf5"].opt_prefix}
-      --with-szlib=#{Formula["szip"].opt_prefix}
+      --with-szlib=#{Formula["libaec"].opt_prefix}
     ]
 
     system "./configure", *args

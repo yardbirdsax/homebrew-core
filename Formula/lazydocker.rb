@@ -2,16 +2,17 @@ class Lazydocker < Formula
   desc "Lazier way to manage everything docker"
   homepage "https://github.com/jesseduffield/lazydocker"
   url "https://github.com/jesseduffield/lazydocker.git",
-      tag:      "v0.10",
-      revision: "ff0a53bfadfb1bfef5a0e3db023d57fed36fe4eb"
+      tag:      "v0.18.1",
+      revision: "da650f4384219e13e0dad3de266501aa0b06859c"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "3bdd4a2361a64382d489fadd6c33880ebc974c5eba2a03c761fd13ae9ff8de7d"
-    sha256 cellar: :any_skip_relocation, big_sur:       "68be351eabf1834a34465ee7ee44ef5d006252235d90374e0a35e4f2bceb408d"
-    sha256 cellar: :any_skip_relocation, catalina:      "beb117f1a6967c87d619fb493ba6a4ec03b528ff55e568b8f740245e0679d1aa"
-    sha256 cellar: :any_skip_relocation, mojave:        "0caabdbda1ce740c6a76952d40c8b8dc28acf936860d5f117113a9c3370ba84c"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "129c5552e5b09b98e170878c7713e52310daa8c3ab507200935415e4621ee1ce"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "9c8876e29f2c452f66002a77f0e493dd265fa79c1cc5c94aeea1ee2e5b057b6b"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "da9c2d0be69ada88ce8501c86952b9ddb1bf1e15b0e1987902af6773a69852f6"
+    sha256 cellar: :any_skip_relocation, monterey:       "ce5c71afbc3cac80824a470c8fa9d7850f8850eb614c5f6b7eec07c9124688cd"
+    sha256 cellar: :any_skip_relocation, big_sur:        "a724f83fc4205118e6fe3821ecc5c3937fb09a8d6dc3597ffbbe8e8eaaae722c"
+    sha256 cellar: :any_skip_relocation, catalina:       "324bcc58bede260a450f38ca1c2889f058cdf0098cb18e3a2d01b21e5f9cfe13"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6ce48c73b9ae4156cec64dd53cea71ee8c4e799023af76d69f88ab8e5d4fe23b"
   end
 
   depends_on "go" => :build
@@ -24,6 +25,6 @@ class Lazydocker < Formula
   test do
     assert_match version.to_s, shell_output("#{bin}/lazydocker --version")
 
-    assert_match "reporting: undetermined", shell_output("#{bin}/lazydocker --config")
+    assert_match "language: auto", shell_output("#{bin}/lazydocker --config")
   end
 end

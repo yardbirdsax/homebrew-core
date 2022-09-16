@@ -1,10 +1,19 @@
 class SaneBackends < Formula
   desc "Backends for scanner access"
   homepage "http://www.sane-project.org/"
-  url "https://gitlab.com/sane-project/backends/uploads/8bf1cae2e1803aefab9e5331550e5d5d/sane-backends-1.0.31.tar.gz"
-  sha256 "4a3b10fcb398ed854777d979498645edfe66fcac2f2fd2b9117a79ff45e2a5aa"
   license "GPL-2.0-or-later"
-  head "https://gitlab.com/sane-project/backends.git"
+  revision 1
+
+  stable do
+    url "https://gitlab.com/sane-project/backends/uploads/7d30fab4e115029d91027b6a58d64b43/sane-backends-1.1.1.tar.gz"
+    sha256 "dd4b04c37a42f14c4619e8eea6a957f4c7c617fe59e32ae2872b373940a8b603"
+
+    # Fix -flat_namespace being used on Big Sur and later.
+    patch do
+      url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+      sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+    end
+  end
 
   livecheck do
     url :head
@@ -12,22 +21,17 @@ class SaneBackends < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "98d7eca159d5105a6bfa6dfd027830a16381347c22f92e75ab93a814380ff81b"
-    sha256 big_sur:       "a489f51d1f8513292a3c5139e937f9bca35f85019035d3e5ae275fe3b3dcd990"
-    sha256 catalina:      "7b263e24809b81b27db7d43c4ce92e6c09c003055e3da0874b7d7282fb3a35c8"
-    sha256 mojave:        "2bd03a03d1807d5d0e56695d567b1598696dc0e8e29ada67517665043854865b"
-    sha256 high_sierra:   "3b54db3fec1723a2cbd5705cd1d9344791ff4942cb2a51d62e5c166f8cca9a9a"
+    sha256 arm64_monterey: "1d403d6940c131a753c2305a830bb56599b733158edb3810e349a2c9a6fbcf54"
+    sha256 arm64_big_sur:  "597dbfeb7517f0b6d3a8c320fb3acbeb152cf74be7f91538ecb847a49e9ea53c"
+    sha256 monterey:       "5c2ba0815984ffc9597884db2b1fc13f1677a5dea344c73e0c090bf99cd8974b"
+    sha256 big_sur:        "381d3502dc3cd2c22e95e8a870578891b0da3580b800e70ab061029c47b52873"
+    sha256 catalina:       "b0d4a34cc8c506c4fc024edfdf13e5a1be13a551aaef21dfae8d8ffec3c2f93f"
+    sha256 x86_64_linux:   "be8cdd2d42cc791ba9773007c905ed73abeb3873e5d53cc1cc628ac4084f61d4"
   end
 
-  depends_on "pkg-config" => :build
-  depends_on "jpeg"
-  depends_on "libpng"
-  depends_on "libtiff"
-  depends_on "libusb"
-  depends_on "net-snmp"
-  depends_on "openssl@1.1"
+  head do
+    url "https://gitlab.com/sane-project/backends.git", branch: "master"
 
-  if build.head?
     depends_on "autoconf" => :build
     depends_on "autoconf-archive" => :build
     depends_on "automake" => :build
@@ -35,10 +39,20 @@ class SaneBackends < Formula
     depends_on "libtool" => :build
   end
 
+  depends_on "pkg-config" => :build
+  depends_on "jpeg-turbo"
+  depends_on "libpng"
+  depends_on "libtiff"
+  depends_on "libusb"
+  depends_on "net-snmp"
+  depends_on "openssl@1.1"
+
+  uses_from_macos "python" => :build
+  uses_from_macos "libxml2"
+
   def install
     system "./autogen.sh" if build.head?
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
+    system "./configure", *std_configure_args,
                           "--localstatedir=#{var}",
                           "--without-gphoto2",
                           "--enable-local-backends",

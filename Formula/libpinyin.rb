@@ -1,15 +1,17 @@
 class Libpinyin < Formula
   desc "Library to deal with pinyin"
   homepage "https://github.com/libpinyin/libpinyin"
-  url "https://github.com/libpinyin/libpinyin/archive/2.6.0.tar.gz"
-  sha256 "2b52f617a99567a8ace478ee82ccc62d1761e3d1db2f1e05ba05b416708c35d2"
+  url "https://github.com/libpinyin/libpinyin/archive/2.6.2.tar.gz"
+  sha256 "73f428a1c76a44a9ff666ae3c71b9ce4d96d07bc5b5af8081a85ef66a0383777"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "ccce070c15525539c1b1573e1ade80fc81a70007a08377698b30f0180384db59"
-    sha256 cellar: :any, big_sur:       "e4ffe7193d01eb5e040da9f4a9f8b53f214a989b0f07553cce636e31325032a2"
-    sha256 cellar: :any, catalina:      "134f8fe1749c65e65c222f14dbd0d2b758e82df5dc5193d31e6fda2b43056773"
-    sha256 cellar: :any, mojave:        "b9a8e06f0534bb5e9c15f27be8d4bd78be2082e3ea241d2d3500c9357e5a786b"
+    sha256 cellar: :any,                 arm64_monterey: "0ad30a7fa33d9c0a1c8581c2419503d1d78b003ddcee423c37bac04cafe93c8b"
+    sha256 cellar: :any,                 arm64_big_sur:  "27a64914df992d5c46d8b48b857330192efd499b68e9b14530209f38dbeff6f7"
+    sha256 cellar: :any,                 monterey:       "17c216d7bb3b88f0949728385f2fb6c34192c7237bfccacffdab2e3fa66f25db"
+    sha256 cellar: :any,                 big_sur:        "04aef79d829825812370a7f379d2c4fc71295cc44b55836dee114695cca1c774"
+    sha256 cellar: :any,                 catalina:       "0bee752e798e97e0d6e49686e87b68004858dacbcd3117c11d7ee4187961d200"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7b4d994fc8832b0919775a0e16f769fe8d1a2e5ea82227c1012b5cdf6a0c8bb7"
   end
 
   depends_on "autoconf" => :build

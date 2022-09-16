@@ -1,23 +1,24 @@
 class Bibtexconv < Formula
   desc "BibTeX file converter"
   homepage "https://www.uni-due.de/~be0001/bibtexconv/"
-  url "https://github.com/dreibh/bibtexconv/archive/bibtexconv-1.1.21.tar.gz"
-  sha256 "65dc0f452dc035f33119729730e61625f59781a75807cc7409766aef79ad5c5a"
+  url "https://github.com/dreibh/bibtexconv/archive/bibtexconv-1.3.3.tar.gz"
+  sha256 "c0ce86b5f1eed75ed77cb5cf7c4f3dcea2a7bab512c4ed43489434a21a7967a4"
   license "GPL-3.0-or-later"
-  head "https://github.com/dreibh/bibtexconv.git"
+  head "https://github.com/dreibh/bibtexconv.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "2c90a1c81f350093a862088c37e3a492277a09cfc714af431f0f1564306e88cb"
-    sha256 cellar: :any, big_sur:       "3325b26408a05b02c8a9002993168aa97fec5c7749556c47dcd0494aed99ad8a"
-    sha256 cellar: :any, catalina:      "825df161159801283a8a9a500e2854417c3d4d461c8012e782e0bea6f9accced"
-    sha256 cellar: :any, mojave:        "21f9bb60c2858343772d50f1cb6fa5075800a6804491643a9db6dd02d3224785"
-    sha256 cellar: :any, high_sierra:   "9820d6c2634a28a2c8fd510a71d5929cf1f83c7e5bcaffc41056536a3c3df9a9"
+    sha256 cellar: :any,                 arm64_monterey: "d7c6015e882860d515b54a3e6a6a6abb7c4edd7961becbc0d95a11f4a0dff77a"
+    sha256 cellar: :any,                 arm64_big_sur:  "8d4e447363f8766392f2bfa002064d4b6d2fafb1da008b2dea974f667556ee69"
+    sha256 cellar: :any,                 monterey:       "ebb0bfcb99948aae3a54efa62e20e846ec5e22a5e5bdfe6cf6d88107d91da4be"
+    sha256 cellar: :any,                 big_sur:        "39e037b0bbe3f988e9cf19381ef6307f25fdebdaa3f58222ec0261daeeefe0c2"
+    sha256 cellar: :any,                 catalina:       "eae65bd16d3413b0e5de89afffea434da1dcb687d55a12f241270fa181f74b81"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ccb78d8a1951b4e9e2fae9482f0daf5fd1678e06302a14d313c21e024c6bdb27"
   end
 
+  depends_on "bison" => :build
   depends_on "cmake" => :build
   depends_on "openssl@1.1"
 
-  uses_from_macos "bison" => :build
   uses_from_macos "flex" => :build
   uses_from_macos "curl"
 

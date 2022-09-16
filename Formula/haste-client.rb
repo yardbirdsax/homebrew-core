@@ -2,47 +2,47 @@ class HasteClient < Formula
   desc "CLI client for haste-server"
   homepage "https://hastebin.com/"
   license "MIT"
-  revision 5
-  head "https://github.com/seejohnrun/haste-client.git"
+  revision 6
+  head "https://github.com/toptal/haste-client.git", branch: "master"
 
   stable do
-    url "https://github.com/seejohnrun/haste-client/archive/v0.2.3.tar.gz"
+    url "https://github.com/toptal/haste-client/archive/v0.2.3.tar.gz"
     sha256 "becbc13c964bb88841a440db4daff8e535e49cc03df7e1eddf16f95e2696cbaf"
 
     # Remove for > 0.2.3
     # Upstream commit from 19 Jul 2017 "Bump version to 0.2.3"
     patch do
-      url "https://github.com/seejohnrun/haste-client/commit/1037d89.patch?full_index=1"
+      url "https://github.com/toptal/haste-client/commit/1037d89.patch?full_index=1"
       sha256 "1e9c47f35c65f253fd762c673b7677921b333c02d2c4e4ae5f182fcd6a5747c6"
     end
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "46460dfe45de7b60b0d9c164f605983e912a42e6bb9278b7e278c1774a041b78"
-    sha256 cellar: :any_skip_relocation, big_sur:       "cc90f925bb8d3c217849d04d57ba540cfd1859a555ae78fb89a3d500c61c5e4a"
-    sha256 cellar: :any_skip_relocation, catalina:      "d7b5efc8934cbfb2534db7db7b8418142472f980b8f4165c317ab51cc4f14824"
-    sha256 cellar: :any_skip_relocation, mojave:        "c38551ce841f7a3cd825e1ae20b774836aba13fe6e129c1539eadde9b9e64a02"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "a97b7aaf38ec730bffa45ffc073ccf4921b4e5714069a21bf63e682a9d21527e"
-    sha256 cellar: :any_skip_relocation, sierra:        "746af59be7c010e6e13b67d1f98766c0237061eabca601e5f0cad935e1c648bf"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "bdc96fa486c1eda47dce4e807857784edb28f9b37b39ca4644cb4363a686d335"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b37f0ea5d4c45a13c49e4e88572a6998e9704d34ad145f763ba32e51af85e89a"
+    sha256 cellar: :any_skip_relocation, monterey:       "bdc96fa486c1eda47dce4e807857784edb28f9b37b39ca4644cb4363a686d335"
+    sha256 cellar: :any_skip_relocation, big_sur:        "b37f0ea5d4c45a13c49e4e88572a6998e9704d34ad145f763ba32e51af85e89a"
+    sha256 cellar: :any_skip_relocation, catalina:       "b37f0ea5d4c45a13c49e4e88572a6998e9704d34ad145f763ba32e51af85e89a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f58ba7733cf6b73c7ad7be755d4d31c88af9577a43f9cd4658d8732bdd8bad3b"
   end
 
-  depends_on "ruby" if MacOS.version <= :sierra
+  uses_from_macos "ruby", since: :high_sierra
 
   resource "faraday" do
-    url "https://rubygems.org/gems/faraday-0.12.2.gem"
-    sha256 "6299046a78613ce330b67060e648a132ba7cca4f0ea769bc1d2bbcb22a23ec94"
+    url "https://rubygems.org/gems/faraday-0.17.4.gem"
+    sha256 "11677b5b261fbbfd4d959f702078d81c0bb66006c00ab2f329f32784778e4d9c"
   end
 
-  if MacOS.version <= :sierra
-    resource "json" do
-      url "https://rubygems.org/gems/json-2.1.0.gem"
-      sha256 "b76fd09b881088c6c64a12721a1528f2f747a1c2ee52fab4c1f60db8af946607"
+  resource "json" do
+    on_system :linux, macos: :sierra_or_older do
+      url "https://rubygems.org/gems/json-2.5.1.gem"
+      sha256 "918d8c41dacb7cfdbe0c7bbd6014a5372f0cf1c454ca150e9f4010fe80cc3153"
     end
   end
 
   resource "multipart-post" do
-    url "https://rubygems.org/gems/multipart-post-2.0.0.gem"
-    sha256 "3dc44e50d3df3d42da2b86272c568fd7b75c928d8af3cc5f9834e2e5d9586026"
+    url "https://rubygems.org/gems/multipart-post-2.1.1.gem"
+    sha256 "d2dd7aa957650e0d99e0513cd388401b069f09528441b87d884609c8e94ffcfd"
   end
 
   def install

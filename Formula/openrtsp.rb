@@ -1,33 +1,37 @@
 class Openrtsp < Formula
   desc "Command-line RTSP client"
   homepage "http://www.live555.com/openRTSP"
-  url "http://www.live555.com/liveMedia/public/live.2020.11.05.tar.gz"
-  mirror "https://download.videolan.org/pub/videolan/testing/contrib/live555/live.2020.11.05.tar.gz"
+  url "http://www.live555.com/liveMedia/public/live.2022.07.14.tar.gz"
+  mirror "https://download.videolan.org/pub/videolan/testing/contrib/live555/live.2022.07.14.tar.gz"
   # Keep a mirror as upstream tarballs are removed after each version
-  sha256 "89bdfba7fd215e16be2c9d46a797bf85c5f7f7c46b53dc8af2d1171a658da5b7"
+  sha256 "56b5a40662dd3f43187e2162b7732d92fed38bc7563e6ae776b6caa3e0694420"
   license "LGPL-3.0-or-later"
 
-  bottle do
-    sha256 cellar: :any, big_sur:     "fce2e67f55b717cd6889b5f2bc4e21bcde69acc87ed561f5a5bab17dc1aafe8a"
-    sha256 cellar: :any, catalina:    "4dfd0982dd0e9480a654f8b3d85ac4e66b60ab582306a8aafa9ad060eb86051d"
-    sha256 cellar: :any, mojave:      "c7bc407cea25d6f3a7e89237f8241067622a630903c4649091fcf3843c9820c3"
-    sha256 cellar: :any, high_sierra: "c99d793ff2f28434edbadc70d466a7316ef7d7b8095002d78090218a9b4abe76"
+  livecheck do
+    url "http://www.live555.com/liveMedia/public/"
+    regex(/href=.*?live[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-  # could not get it build since 2020.11.22
-  # upstream open issue, https://github.com/rgaufman/live555/issues/29
-  disable! date: "2021-11-22", because: :does_not_build
+  bottle do
+    sha256 cellar: :any,                 arm64_monterey: "9538e0be8658025b29b1d413478215b83d02af05d338bc53ceb9249e85d0ece8"
+    sha256 cellar: :any,                 arm64_big_sur:  "5d79f6183a29cef73b228c51b9c7fd8eadcc49e83a38015f3bc66c02df657186"
+    sha256 cellar: :any,                 monterey:       "56b0d6938774e857cddf7d1329dff61bd6ff07efe2cfebb3700e0ed138c65c5e"
+    sha256 cellar: :any,                 big_sur:        "3d8a12b09eb0d09e0f44faf1b25e8f42ca56697b19315d68029ec93bf9d12a7b"
+    sha256 cellar: :any,                 catalina:       "84a94b86d1f5fda4f303318da0bde3efe4adc11c21be4304fca140e76f404409"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "59b546fbd05fb723867dda85a489197cfd22052c8eeed1e8177d2b1da94e36aa"
+  end
 
   depends_on "openssl@1.1"
 
   def install
     # Avoid linkage to system OpenSSL
     libs = [
-      Formula["openssl@1.1"].opt_lib/"libcrypto.dylib",
-      Formula["openssl@1.1"].opt_lib/"libssl.dylib",
+      Formula["openssl@1.1"].opt_lib/shared_library("libcrypto"),
+      Formula["openssl@1.1"].opt_lib/shared_library("libssl"),
     ]
 
-    system "./genMakefiles", "macosx"
+    os_flag = OS.mac? ? "macosx-no-openssl" : "linux-no-openssl"
+    system "./genMakefiles", os_flag
     system "make", "PREFIX=#{prefix}",
            "LIBS_FOR_CONSOLE_APPLICATION=#{libs.join(" ")}", "install"
 

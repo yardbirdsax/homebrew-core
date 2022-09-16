@@ -1,8 +1,8 @@
 class PangommAT246 < Formula
   desc "C++ interface to Pango"
   homepage "https://www.pango.org/"
-  url "https://download.gnome.org/sources/pangomm/2.46/pangomm-2.46.0.tar.xz"
-  sha256 "d3787d04d6198b606f3efa357b3b452a7140e2a7dee56f9f9ce516d7d5fcec1b"
+  url "https://download.gnome.org/sources/pangomm/2.46/pangomm-2.46.2.tar.xz"
+  sha256 "57442ab4dc043877bfe3839915731ab2d693fc6634a71614422fb530c9eaa6f4"
   license "LGPL-2.1-only"
 
   livecheck do
@@ -11,10 +11,12 @@ class PangommAT246 < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "0268b741bd164b6cac87ac38ae0533836fe5b270ffc50b3fba764811e17c075b"
-    sha256 cellar: :any, big_sur:       "9a870c15a49dcf494cfb0c246be4644ad3e7c0d8cdf259f86e3406b819471d96"
-    sha256 cellar: :any, catalina:      "2bf76c319136106e007194615bc4eabff96845f7bcc7d256237b24eb15e0d179"
-    sha256 cellar: :any, mojave:        "34e3d85dd6821af7aa8e14c4a019fd858a16f303f7bbb13164b57348ed69bee7"
+    sha256 cellar: :any,                 arm64_monterey: "c794e69f80086920c974a7a8982034cee2a72c3543156346768ce6c11fd04e62"
+    sha256 cellar: :any,                 arm64_big_sur:  "28a5885682e8cabb5240af2d46c4d982f4a74e87e0909d573a5d8f11941dab22"
+    sha256 cellar: :any,                 monterey:       "2670e2d8fcc5bcfe06c37c6b68c3871286312202329033341ed52a22db42be0b"
+    sha256 cellar: :any,                 big_sur:        "41a5c473ca7eb840d0238df3147aeab957c757afc0eb65fff3c5dce3ed0f7c83"
+    sha256 cellar: :any,                 catalina:       "93c8dc4f62582d30a9c48995923bba460e8a10600c9406d6d690c5406f231614"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f2564f1187494082130a06400670c5b7b9d7a6e82f4c49172799ef00c3eacb22"
   end
 
   depends_on "meson" => :build
@@ -91,9 +93,7 @@ class PangommAT246 < Formula
       -lpangomm-1.4
       -lsigc-2.0
     ]
-    on_macos do
-      flags << "-lintl"
-    end
+    flags << "-lintl" if OS.mac?
     system ENV.cxx, "-std=c++11", "test.cpp", "-o", "test", *flags
     system "./test"
   end

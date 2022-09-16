@@ -1,17 +1,18 @@
 class Libmxml < Formula
   desc "Mini-XML library"
   homepage "https://michaelrsweet.github.io/mxml/"
-  url "https://github.com/michaelrsweet/mxml/releases/download/v3.2/mxml-3.2.tar.gz"
-  sha256 "b894f6c64964f2e77902564c17ba00f5d077a7a24054e7c1937903b0bd42c974"
+  url "https://github.com/michaelrsweet/mxml/releases/download/v3.3.1/mxml-3.3.1.tar.gz"
+  sha256 "0c663ed1fe393b5619f80101798202eea43534abd7c8aff389022fd8c1dacc32"
   license "Apache-2.0"
-  head "https://github.com/michaelrsweet/mxml.git"
+  head "https://github.com/michaelrsweet/mxml.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "c83d4a6556c0da6f962e37b07874d22a90c388751fc0b46db669ea2603d4b5bb"
-    sha256 cellar: :any, big_sur:       "70c41d09f15c8de8f93df010b73fe51211d262a86c69a25c0ea1028440267c01"
-    sha256 cellar: :any, catalina:      "680142115002908ad936e6cc27b507056d10b91a4c6d5ca250480090be71e21b"
-    sha256 cellar: :any, mojave:        "a8d373d3bef6a43d40ef8aed433257fbdc6ba7566b454565dcdeeb3b21290edc"
-    sha256 cellar: :any, high_sierra:   "6717fbc8fb911a1a3b076c1cb1d80ab9ea010456810d14995346973543cdc2f4"
+    sha256 cellar: :any,                 arm64_monterey: "9c13d0bd3840b69d130cd1f4741f9936d7b2a90297a9925d1325682c143fb2f6"
+    sha256 cellar: :any,                 arm64_big_sur:  "e5156d05dec405c83a198a997f668a3a92bdd9499220e7feffd46f4f4c1a4e19"
+    sha256 cellar: :any,                 monterey:       "f9e8125473110fef459d5d815a8e96e673815428eac1067f1e4b9c18d6c3aca9"
+    sha256 cellar: :any,                 big_sur:        "e2d1dab5660d84e5647b01117b907e07b58e5dade826bd6f5859c7538cab2066"
+    sha256 cellar: :any,                 catalina:       "5dd81ae17a13546014ce416999c1422d8ccb5129aa51f99dd0860d4836e24fc2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6b2a90260fc04202328638ea363fc8aa78e322e55f7b0eca1a7ad11d31c285e0"
   end
 
   depends_on xcode: :build # for docsetutil

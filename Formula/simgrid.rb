@@ -3,60 +3,56 @@ class Simgrid < Formula
 
   desc "Studies behavior of large-scale distributed systems"
   homepage "https://simgrid.org/"
-  url "https://framagit.org/simgrid/simgrid/uploads/98ec9471211bba09aa87d7866c9acead/simgrid-3.26.tar.gz"
-  sha256 "ac50da1eacc5a53b094a988a8ecde09962c29320f346b45e74dd32ab9d9f3e96"
+  url "https://framagit.org/simgrid/simgrid/uploads/caf09286c8e698d977f11e8f8451ba46/simgrid-3.31.tar.gz"
+  sha256 "4b44f77ad40c01cf4e3013957c9cbe39f33dec9304ff0c9c3d9056372ed4c61d"
+  revision 2
 
   livecheck do
-    url "https://framagit.org/simgrid/simgrid.git"
-    regex(/^v?(\d+(?:[._]\d+)+)$/i)
+    url :homepage
+    regex(/href=.*?simgrid[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 arm64_big_sur: "483bcf473f05f337322f46d7d9e42f032eec6eea51dbbc9766616f583117a20f"
-    sha256 big_sur:       "e955b530c04845a2411dd827c289ebf3945d45ba00bcc763591f7691ba80becb"
-    sha256 catalina:      "bf748370ffd539df857ae5365563b47a5bf685f6ea7bdcd27c3eaad31bf35d06"
-    sha256 mojave:        "64bc790d3fa33e14d1c9f067f4e047df4fbbcd630a439370adfc8ad39ab5ddd3"
+    rebuild 1
+    sha256 arm64_monterey: "a7f780421a4fe64b09697e3dc790db0b396b036cf1c8118d38bb53484202d954"
+    sha256 arm64_big_sur:  "f67457b09405aed911ec3f4ce21c815861f1b954c7d80c99e9ba772150cbb328"
+    sha256 monterey:       "5466aad2a86ca65784bce4ed606cabc09b39f3958e97332b82ebfdcfdc1928d7"
+    sha256 big_sur:        "d3a83a4169f7ef8283c31672286dd9170c2581b20b073cf2e8c562095c4268a7"
+    sha256 catalina:       "891890a255d468d9d8493edaffd8d99571f2f6175eea23ede3ca8d195c9aee93"
+    sha256 x86_64_linux:   "4104d5d62f87b7c2dd35d73ca1be525ffd2285154790048627ccced4d8e0b71f"
   end
 
   depends_on "cmake" => :build
   depends_on "doxygen" => :build
   depends_on "boost"
   depends_on "graphviz"
-  depends_on "pcre"
-  depends_on "python@3.9"
+  depends_on "python@3.10"
+
+  fails_with gcc: "5"
+
+  # Fix build with graphviz>=3 as headers no longer define NIL macros
+  patch do
+    url "https://framagit.org/simgrid/simgrid/-/commit/33ef49cf9e1ad1aeea86dca9a009d5a6e15e2920.diff"
+    sha256 "3bf50df79fd1f58e1919d0c3fa1cd808d50ed0133712e8d596805f25e27933ea"
+  end
 
   def install
     # Avoid superenv shim references
-    inreplace "src/smpi/smpicc.in", "@CMAKE_C_COMPILER@", "/usr/bin/clang"
-    inreplace "src/smpi/smpicxx.in", "@CMAKE_CXX_COMPILER@", "/usr/bin/clang++"
+    inreplace "src/smpi/smpicc.in", "@CMAKE_C_COMPILER@", DevelopmentTools.locate(ENV.cc)
+    inreplace "src/smpi/smpicxx.in", "@CMAKE_CXX_COMPILER@", DevelopmentTools.locate(ENV.cxx)
 
-    # FindPythonInterp is broken in CMake 3.19+
-    # REMOVE ME AT VERSION BUMP (after 3.25)
-    # https://framagit.org/simgrid/simgrid/-/issues/59
-    # https://framagit.org/simgrid/simgrid/-/commit/3a987e0a881dc1a0bb5a6203814f7960a5f4b07e
-    inreplace "CMakeLists.txt", "include(FindPythonInterp)", ""
-    python = Formula["python@3.9"]
-    python_version = python.version
-    # We removed CMake's ability to find Python, so we have to point to it ourselves
-    args = %W[
-      -DPYTHONINTERP_FOUND=TRUE
-      -DPYTHON_EXECUTABLE=#{python.opt_bin}/python3
-      -DPYTHON_VERSION_STRING=#{python_version}
-      -DPYTHON_VERSION_MAJOR=#{python_version.major}
-      -DPYTHON_VERSION_MINOR=#{python_version.minor}
-      -DPYTHON_VERSION_PATCH=#{python_version.patch}
-    ]
-    # End of local workaround, remove the above at version bump
+    # Work around build error: ld: library not found for -lcgraph
+    ENV.append "LDFLAGS", "-L#{Formula["graphviz"].opt_lib}"
 
-    system "cmake", ".",
+    system "cmake", "-S", ".", "-B", "build",
                     "-Denable_debug=on",
                     "-Denable_compile_optimizations=off",
                     "-Denable_fortran=off",
-                    *std_cmake_args,
-                    *args # Part of workaround, remove at version bump
-    system "make", "install"
+                    *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
 
-    bin.find { |f| rewrite_shebang detected_python_shebang, f }
+    rewrite_shebang detected_python_shebang, *bin.children
   end
 
   test do

@@ -5,41 +5,55 @@ class Sfml < Formula
   url "https://www.sfml-dev.org/files/SFML-2.5.1-sources.zip"
   sha256 "bf1e0643acb92369b24572b703473af60bac82caf5af61e77c063b779471bb7f"
   license "Zlib"
-  head "https://github.com/SFML/SFML.git"
+  revision 2
+  head "https://github.com/SFML/SFML.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "31e0ff91053fe22d7f014faf2ec909ce03da1afefc2e75a081216f0046bdb353"
-    sha256 cellar: :any, big_sur:       "ec35a3f32fb2272f553ece2d1ac714c03c0ef6f75ac3f9a4d5f517f55c7bf8f9"
-    sha256 cellar: :any, catalina:      "b94077b2fc05c84af837de5bdf0681c1538c07b320b40155dd7f81cff809d37c"
-    sha256 cellar: :any, mojave:        "3f4dd43eb91902d4c4f7558d965b372ace9b1227185c55db5172a7f599593caa"
-    sha256 cellar: :any, high_sierra:   "72544adffb4dea8194163d44f16588c2c85ab795ba02eb7b93a9d687f2958383"
-    sha256 cellar: :any, sierra:        "ab58d3643f256258efe63d74689bfb4eae7dd012665552e61eb6bb749af08f77"
+    sha256 cellar: :any,                 arm64_monterey: "31276f049496d80aed1bd4872b5764f26a74693445beb5d1142af08be061dad3"
+    sha256 cellar: :any,                 arm64_big_sur:  "66629eea47ae1f4be17c0c8a662b5a748d508bfd1fa45baac102b6d43977295a"
+    sha256 cellar: :any,                 monterey:       "2dea0d7dd5f7580840e0610bcdda13bb330009cb72d0d95dc57e5e2bdcbd7cad"
+    sha256 cellar: :any,                 big_sur:        "53876147c9bd9b7dd1f4f165eb398ada5afd80c416ab937868903a5798dadaed"
+    sha256 cellar: :any,                 catalina:       "6cd5cb0527db2de9870ce49e57d74195b1c42be618a28416c8ccfd5c6e82419f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "76eb5b0e6826209822a4e8fff4606f6c964e8aa8aaffd4edaef4d7a3811f7ed7"
   end
 
   depends_on "cmake" => :build
   depends_on "doxygen" => :build
   depends_on "flac"
   depends_on "freetype"
-  depends_on "jpeg"
   depends_on "libogg"
   depends_on "libvorbis"
 
-  # https://github.com/Homebrew/homebrew/issues/40301
+  on_linux do
+    depends_on "libx11"
+    depends_on "libxrandr"
+    depends_on "mesa"
+    depends_on "mesa-glu"
+    depends_on "openal-soft"
+    depends_on "systemd"
+  end
 
   def install
-    # error: expected function body after function declarator
-    ENV["SDKROOT"] = MacOS.sdk_path if MacOS.version == :sierra
+    # Fix "fatal error: 'os/availability.h' file not found" on 10.11 and
+    # "error: expected function body after function declarator" on 10.12
+    # Requires the CLT to be the active developer directory if Xcode is installed
+    ENV["SDKROOT"] = MacOS.sdk_path if MacOS.version <= :high_sierra
 
     # Always remove the "extlibs" to avoid install_name_tool failure
     # (https://github.com/Homebrew/homebrew/pull/35279) but leave the
     # headers that were moved there in https://github.com/SFML/SFML/pull/795
     rm_rf Dir["extlibs/*"] - ["extlibs/headers"]
 
-    system "cmake", ".", *std_cmake_args,
-                         "-DSFML_MISC_INSTALL_PREFIX=#{share}/SFML",
-                         "-DSFML_INSTALL_PKGCONFIG_FILES=TRUE",
-                         "-DSFML_BUILD_DOC=TRUE"
-    system "make", "install"
+    args = ["-DCMAKE_INSTALL_RPATH=#{opt_lib}",
+            "-DSFML_MISC_INSTALL_PREFIX=#{share}/SFML",
+            "-DSFML_INSTALL_PKGCONFIG_FILES=TRUE",
+            "-DSFML_BUILD_DOC=TRUE"]
+
+    args << "-DSFML_USE_SYSTEM_DEPS=ON" if OS.linux?
+
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args, *args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
@@ -50,8 +64,8 @@ class Sfml < Formula
         return 0;
       }
     EOS
-    system ENV.cxx, "-I#{include}/SFML/System", "-L#{lib}", "-lsfml-system",
-           testpath/"test.cpp", "-o", "test"
+    system ENV.cxx, "-I#{include}/SFML/System", testpath/"test.cpp",
+           "-L#{lib}", "-lsfml-system", "-o", "test"
     system "./test"
   end
 end

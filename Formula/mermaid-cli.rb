@@ -3,15 +3,21 @@ require "language/node"
 class MermaidCli < Formula
   desc "Command-line interface (CLI) for mermaid"
   homepage "https://github.com/mermaid-js/mermaid-cli"
-  url "https://registry.npmjs.org/@mermaid-js/mermaid-cli/-/mermaid-cli-8.9.0.tgz"
-  sha256 "deabdff01b246b1b95dd2605e202e3fca4499ac12112b39c7c696f68df56db42"
+  url "https://registry.npmjs.org/@mermaid-js/mermaid-cli/-/mermaid-cli-8.11.0.tgz"
+  sha256 "9fa34462054938ad996887a0e4081421c159728761e30254b0c0bae5b77df291"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any, big_sur:  "503f1999378800866e6acea39608d2e7a80fc6d7956bed3ad5a9a2c3fb6f7f54"
-    sha256 cellar: :any, catalina: "05015617b49fe9d215798fc16cc504afe92605fdf84fd93d1aeda3aa8c5f4e9f"
-    sha256 cellar: :any, mojave:   "a1ef6b374cd599b41251985613ea840345630921499e86903cf1bd8f89048bfc"
+    sha256 cellar: :any, arm64_big_sur: "00f8dbde25e1d468f6a7f2b03126e0739e490486aefcf47cda68626f1768257f"
+    sha256 cellar: :any, big_sur:       "b97919f1f15b8c36004a484cfe8ab6820a09e7f42bec6a493ecc2da5c8778a5c"
+    sha256 cellar: :any, catalina:      "b97919f1f15b8c36004a484cfe8ab6820a09e7f42bec6a493ecc2da5c8778a5c"
+    sha256 cellar: :any, mojave:        "b97919f1f15b8c36004a484cfe8ab6820a09e7f42bec6a493ecc2da5c8778a5c"
   end
+
+  # Needs Chromium for puppeteer. Chromium is currently installed as a pre-built.
+  # Ref: https://github.com/Homebrew/homebrew-core/pull/83338
+  # Ref: https://github.com/Homebrew/homebrew-core/issues/100192
+  deprecate! date: "2022-04-30", because: "installs a pre-built copy of Chromium"
 
   depends_on "node"
 

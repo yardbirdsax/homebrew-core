@@ -1,26 +1,29 @@
 class Libsixel < Formula
   desc "SIXEL encoder/decoder implementation"
   homepage "https://github.com/saitoha/sixel"
-  url "https://github.com/saitoha/libsixel/releases/download/v1.8.6/libsixel-1.8.6.tar.gz"
-  sha256 "9f6dcaf40d250614ce0121b153949c327c46a958cfd2e47750d8788b7ed28e6a"
+  url "https://github.com/libsixel/libsixel/archive/refs/tags/v1.10.3.tar.gz"
+  sha256 "028552eb8f2a37c6effda88ee5e8f6d87b5d9601182ddec784a9728865f821e0"
+  revision 1
+  head "https://github.com/libsixel/libsixel.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "7e366d97fff08d175c3da3380ec8ac35da1a8dcd5f3fccb002f6e1e5c783b5c5"
-    sha256 cellar: :any, big_sur:       "b2963fe42a38cea1521ac653c7009f278bd4ed1931ea567380b860d62edef0b7"
-    sha256 cellar: :any, catalina:      "520fa6d77af3c6cc84fb84b1a5b8797bb6e44396b70ad7654eb3362d2174d0ab"
-    sha256 cellar: :any, mojave:        "716d90122f113bd1c6b2ad7e872a476923981b4c26830c94ca68724437e860b1"
-    sha256 cellar: :any, high_sierra:   "9e061ce67b22c8ad8760bccc7e954ee46852285bc078087712538e102ce8215c"
+    sha256 cellar: :any,                 arm64_monterey: "056f4c105631db9ec5d1ac420ec491a51a130c03707147d5962383611d4d4aba"
+    sha256 cellar: :any,                 arm64_big_sur:  "6742e20e9eef3d16fd501c327abe0ceb535089eea12e07d6ad7a736ff6766400"
+    sha256 cellar: :any,                 monterey:       "43658b6a576c0792e99734ef9d82e9a9d767fddeaf86e4f7c724cd21ee941746"
+    sha256 cellar: :any,                 big_sur:        "920afd79faa01b7ec960901564a0b38e466ac9a7a29f7742be1d452c83b5e4f3"
+    sha256 cellar: :any,                 catalina:       "1e2c787edf46446c7fd9b40313dc2a72fe8dfa681030d0cf2f213568e8ea460d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f496efefbc5166488888d41e05cbdef0d9c581d152d6c79181a1bdffd0f36ff7"
   end
 
-  depends_on "jpeg"
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
+  depends_on "jpeg-turbo"
+  depends_on "libpng"
 
   def install
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--with-jpeg=#{Formula["jpeg"].prefix}",
-                          "--prefix=#{prefix}"
-    system "make", "install"
+    system "meson", *std_meson_args, "build", "-Dgdk-pixbuf2=disabled", "-Dtests=disabled"
+    system "meson", "compile", "-C", "build", "-v"
+    system "meson", "install", "-C", "build"
   end
 
   test do

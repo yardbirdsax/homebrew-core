@@ -1,26 +1,29 @@
 class Grpcui < Formula
   desc "Interactive web UI for gRPC, along the lines of postman"
   homepage "https://github.com/fullstorydev/grpcui"
-  url "https://github.com/fullstorydev/grpcui/archive/v1.1.0.tar.gz"
-  sha256 "1a7c0eac76805350ccf38d6db77ed959a04f7a4a76c60897decca21a2ff49933"
+  url "https://github.com/fullstorydev/grpcui/archive/v1.3.1.tar.gz"
+  sha256 "01cfa0bbaf9cfdaa61ae0341c83cde3372854133d62cb9b91c3a111eaa145815"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "20dfef3c9bf2caaac88ab5af5f934f208e7d24583450709a849f4e3d8cab6803"
-    sha256 cellar: :any_skip_relocation, big_sur:       "316b3929786b948f6d18d580c3bf9d59a414bba3acac1520017972af55cddca0"
-    sha256 cellar: :any_skip_relocation, catalina:      "c6c62dbe114c2bb1de1a0c19d7845bdf2fe758e1810721772888776332a28897"
-    sha256 cellar: :any_skip_relocation, mojave:        "9f5c2e8b3bdc9e0d4609819503f4a10de72cba88b7fb4aa614e5c315975f7436"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "af7abe614d2e96ce599ec1683ad9ec94c51daaf5d72613ad9c4bdedb7c9a4495"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "ba273507be5cfd956eca6209502841765d567470fa9fb345f7ea798edd0e813a"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "85fe72471da84abadc9c0856126401492c0b5adcf3ee5e130d8dc1d446ded77c"
+    sha256 cellar: :any_skip_relocation, monterey:       "6457e94f362363820b001de52fc7aaed951bc19025bb770492fac0ca781399a2"
+    sha256 cellar: :any_skip_relocation, big_sur:        "b8f838101ee7c939423536200c67c6d4b26a480cb812839d802cc93bd4224674"
+    sha256 cellar: :any_skip_relocation, catalina:       "19ebbde82058c600bb9fb9467643c7fd6b575745f0aa62dabff329c41fa0b44d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a243154ac04bccb01591b0f07c7c56dbf86e48ffbdea0d296295f7a91f18ca82"
   end
 
-  depends_on "go" => :build
+  # Bump to 1.18 on the next release, if possible.
+  depends_on "go@1.17" => :build
 
   def install
-    system "go", "build", *std_go_args, "-ldflags", "-X main.version=#{version}", "./cmd/grpcui"
+    system "go", "build", *std_go_args(ldflags: "-X main.version=#{version}"), "./cmd/grpcui"
   end
 
   test do
     host = "no.such.host.dev"
-    assert_match "#{host}: no such host", shell_output("#{bin}/grpcui #{host}:999 2>&1", 1)
+    output = shell_output("#{bin}/grpcui #{host}:999 2>&1", 1)
+    assert_match(/Failed to dial target host "#{Regexp.escape(host)}:999":.*: no such host/, output)
   end
 end

@@ -1,15 +1,17 @@
 class Libslirp < Formula
   desc "General purpose TCP-IP emulator"
   homepage "https://gitlab.freedesktop.org/slirp/libslirp"
-  url "https://gitlab.freedesktop.org/slirp/libslirp/-/archive/v4.4.0/libslirp-v4.4.0.tar.gz"
-  sha256 "43513390c57bee8c23b31545bfcb765200fccf859062b1c8101e72befdabce2e"
+  url "https://gitlab.freedesktop.org/slirp/libslirp/-/archive/v4.7.0/libslirp-v4.7.0.tar.gz"
+  sha256 "9398f0ec5a581d4e1cd6856b88ae83927e458d643788c3391a39e61b75db3d3b"
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "3cd403d0ace2d57d506d64ce0bfcc27d3f7adb3e5113481a585a2f8ab0e53f9c"
-    sha256 cellar: :any, big_sur:       "c246bdd605b4dd938e1973e3cc6e9855bfac88d2387aa40d41a85180554dc4ab"
-    sha256 cellar: :any, catalina:      "1e17da7e87c39a76d7597c6030d2ae12d3b2a79742b4533e0113e7442e610833"
-    sha256 cellar: :any, mojave:        "a2f636ece566472a1eb9db4761399a0a68bf1c2ca8b901a34d4205858704be90"
+    sha256 cellar: :any, arm64_monterey: "dbfc3fabef1a14eb7807e97bac7e318dbf0ca0ac631cb949cd165ca79c57d16d"
+    sha256 cellar: :any, arm64_big_sur:  "7ff75ad4ca2b56e4df3f139c1a265d1198174b676856f5eb019730d8f97db557"
+    sha256 cellar: :any, monterey:       "82fe4e66ac490e882aaf245d4bdf9382826d82fdb3c7bad29b7dc4e77a5b8657"
+    sha256 cellar: :any, big_sur:        "3b31c4120ac2abad0cb5480576b957d5dd335e9a7cfa4cea0ef7bcd27e6cdcc6"
+    sha256 cellar: :any, catalina:       "63ecdea6ce7b3784bab8f2aa956468a1b90c67bb5e466afd80ff8ecadfe4f09f"
+    sha256               x86_64_linux:   "dda8b4369eada1f246aebcc4f013966dfac010cb84045a5b80e034d9a725f582"
   end
 
   depends_on "meson" => :build

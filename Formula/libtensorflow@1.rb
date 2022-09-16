@@ -15,6 +15,8 @@ class LibtensorflowAT1 < Formula
 
   keg_only :versioned_formula
 
+  disable! date: "2022-07-31", because: :versioned_formula
+
   depends_on "bazel" => :build
   depends_on "python@3.9" => :build
 

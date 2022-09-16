@@ -1,34 +1,52 @@
 class OpenjdkAT11 < Formula
   desc "Development kit for the Java programming language"
   homepage "https://openjdk.java.net/"
-  url "https://hg.openjdk.java.net/jdk-updates/jdk11u/archive/jdk-11.0.9-ga.tar.bz2"
-  sha256 "0f35778a120da24dff1f752d128029d87448777a6ab9401c7cf5bc875f127d80"
+  url "https://github.com/openjdk/jdk11u/archive/refs/tags/jdk-11.0.16.1-ga.tar.gz"
+  sha256 "3008e50e258a5e9a488a814df2998b9823b6c2959d6a5a85221d333534d2f24c"
   license "GPL-2.0-only"
 
+  livecheck do
+    url :stable
+    regex(/^jdk[._-]v?(11(?:\.\d+)*)-ga$/i)
+  end
+
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "0257d7e29927678e60372f6d34153f9efb9e28d0d9eac7d80cddac131c6129a9"
-    sha256 cellar: :any, big_sur:       "610ed0bd964812cdce0f6e1a4b8c06fd867861c72be7ebff9f674362ba48b7b9"
-    sha256 cellar: :any, catalina:      "c640eade77c3ad69fef4d66872bbccc2e8782fcd5beee84ecb6c5b7dbb28081b"
-    sha256 cellar: :any, mojave:        "facf3c10d2f0183c5f55c2e7aad5bc9ad28da3979712a7fee342bb00b5dbdd5a"
-    sha256 cellar: :any, high_sierra:   "4e92d71376b9e07198245e434ba86c8caa95521f6dcec8454c726cec5a16c0d1"
+    sha256 cellar: :any,                 arm64_monterey: "9c4b44dbad256cd0b6c90f35722ffe0748f834b0796029dbec1cc768d7affc87"
+    sha256 cellar: :any,                 arm64_big_sur:  "ba5ec5c05afeef4a8d35893c845f493a681c6153aa31ef91e8ad5be2340ef5f7"
+    sha256 cellar: :any,                 monterey:       "b552bd2c8c776b1dc1d8def8b365baed60993f0bfcd580d0bb8aee051e789333"
+    sha256 cellar: :any,                 big_sur:        "ee9ad84f9610a3096b22a5cfe68b00d273e839f3de1bae74380c88ebc0f18192"
+    sha256 cellar: :any,                 catalina:       "6b9915b84f1d8f2c7ad87fe984b7aefaa6597781ca20586f2ab902bdad8430d3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ea25b4dd142c423ef91de19c7b9a82f77ab10e09deb1e5e4332c60af82bd1ff5"
   end
 
   keg_only :versioned_formula
 
   depends_on "autoconf" => :build
-  depends_on xcode: :build if Hardware::CPU.arm?
 
   on_linux do
     depends_on "pkg-config" => :build
     depends_on "alsa-lib"
+    depends_on "cups"
+    depends_on "fontconfig"
+    depends_on "libx11"
+    depends_on "libxext"
+    depends_on "libxrandr"
+    depends_on "libxrender"
+    depends_on "libxt"
+    depends_on "libxtst"
+    depends_on "unzip"
+    depends_on "zip"
+
+    ignore_missing_libraries "libjvm.so"
   end
 
   resource "boot-jdk" do
     on_macos do
-      if Hardware::CPU.arm?
-        url "https://download.java.net/java/GA/jdk11/9/GPL/openjdk-11.0.2_osx-x64_bin.tar.gz"
-        sha256 "f365750d4be6111be8a62feda24e265d97536712bc51783162982b8ad96a70ee"
-      else
+      on_arm do
+        url "https://cdn.azul.com/zulu/bin/zulu11.58.15-ca-jdk11.0.16-macosx_aarch64.tar.gz"
+        sha256 "cb71a8ad38755f881a692098ca02378183a7a9c5093d7e6ad98ca5e7bc74b937"
+      end
+      on_intel do
         url "https://download.java.net/java/GA/jdk10/10.0.2/19aef61b38124481863b1413dce1855f/13/openjdk-10.0.2_osx-x64_bin.tar.gz"
         sha256 "77ea7675ee29b85aa7df138014790f91047bfdafbc997cb41a1030a0417356d7"
       end
@@ -39,94 +57,64 @@ class OpenjdkAT11 < Formula
     end
   end
 
-  if Hardware::CPU.arm?
-    # Patch for Apple Silicon support
-    patch do
-      url "https://raw.githubusercontent.com/Homebrew/formula-patches/906561d5/openjdk%4011/aarch64.diff"
-      sha256 "67fbb8622df80e0ee86d6511fb07981f9c0288b9e75c4625b93add394828d658"
-    end
-  else
-    # Fix build on Xcode 12
-    patch do
-      url "https://raw.githubusercontent.com/Homebrew/formula-patches/2087f9d0/openjdk%4011/xcode12.diff"
-      sha256 "d995c4bd49fc41ff47c4dab6f83b79b4e639c423040b7340ea13db743dfced70"
-    end
-  end
-
   def install
-    framework_path = File.expand_path(
-      "../SharedFrameworks/ContentDeliveryServices.framework/Versions/Current/itms/java/Frameworks",
-      MacOS::Xcode.prefix,
-    )
-
-    boot_jdk_dir = Pathname.pwd/"boot-jdk"
-    resource("boot-jdk").stage boot_jdk_dir
-    boot_jdk = boot_jdk_dir/"Contents/Home"
+    boot_jdk = Pathname.pwd/"boot-jdk"
+    resource("boot-jdk").stage boot_jdk
+    boot_jdk /= "Contents/Home" if OS.mac? && !Hardware::CPU.arm?
     java_options = ENV.delete("_JAVA_OPTIONS")
 
-    # Inspecting .hg_archival.txt to find a build number
-    # The file looks like this:
-    #
-    # repo: fd16c54261b32be1aaedd863b7e856801b7f8543
-    # node: 4397fa4529b2794ddcdf3445c0611fe383243fb4
-    # branch: default
-    # tag: jdk-11.0.9+11
-    # tag: jdk-11.0.9-ga
-    #
-    build = File.read(".hg_archival.txt")
-                .scan(/^tag: jdk-#{version}\+(.+)$/)
-                .map(&:first)
-                .map(&:to_i)
-                .max
-    raise "cannot find build number in .hg_archival.txt" if build.nil?
-
     args = %W[
-      --without-version-pre
-      --without-version-opt
-      --with-version-build=#{build}
-      --with-toolchain-path=/usr/bin
-      --with-sysroot=#{MacOS.sdk_path}
-      --with-boot-jdk=#{boot_jdk}
+      --disable-hotspot-gtest
+      --disable-warnings-as-errors
       --with-boot-jdk-jvmargs=#{java_options}
+      --with-boot-jdk=#{boot_jdk}
       --with-debug-level=release
-      --with-native-debug-symbols=none
-      --enable-dtrace=auto
+      --with-conf-name=release
       --with-jvm-variants=server
+      --with-jvm-features=shenandoahgc
+      --with-native-debug-symbols=none
+      --with-vendor-bug-url=#{tap.issues_url}
+      --with-vendor-name=#{tap.user}
+      --with-vendor-url=#{tap.issues_url}
+      --with-vendor-version-string=#{tap.user}
+      --with-vendor-vm-bug-url=#{tap.issues_url}
+      --without-version-opt
+      --without-version-pre
     ]
 
-    if Hardware::CPU.arm?
-      args += %W[
-        --disable-warnings-as-errors
-        --openjdk-target=aarch64-apple-darwin
-        --with-build-jdk=#{boot_jdk}
-        --with-extra-cflags=-arch\ arm64
-        --with-extra-ldflags=-arch\ arm64\ -F#{framework_path}\ -headerpad_max_install_names
-        --with-extra-cxxflags=-arch\ arm64
+    args += if OS.mac?
+      %W[
+        --with-sysroot=#{MacOS.sdk_path}
+        --enable-dtrace=auto
+        --with-extra-ldflags=-headerpad_max_install_names
       ]
     else
-      args << "--with-extra-ldflags=-headerpad_max_install_names"
+      %W[
+        --with-x=#{HOMEBREW_PREFIX}
+        --with-cups=#{HOMEBREW_PREFIX}
+        --with-fontconfig=#{HOMEBREW_PREFIX}
+      ]
     end
 
     chmod 0755, "configure"
     system "./configure", *args
 
     ENV["MAKEFLAGS"] = "JOBS=#{ENV.make_jobs}"
-    system "make", "images"
+    system "make", "images", "CONF=release"
 
-    jdk = Dir["build/*/images/jdk-bundle/*"].first
-    libexec.install jdk => "openjdk.jdk"
-    bin.install_symlink Dir["#{libexec}/openjdk.jdk/Contents/Home/bin/*"]
-    include.install_symlink Dir["#{libexec}/openjdk.jdk/Contents/Home/include/*.h"]
-    include.install_symlink Dir["#{libexec}/openjdk.jdk/Contents/Home/include/darwin/*.h"]
+    cd "build/release/images" do
+      jdk = libexec
+      if OS.mac?
+        libexec.install Dir["jdk-bundle/*"].first => "openjdk.jdk"
+        jdk /= "openjdk.jdk/Contents/Home"
+      else
+        libexec.install Dir["jdk/*"]
+      end
 
-    if Hardware::CPU.arm?
-      dest = libexec/"openjdk.jdk/Contents/Home/lib/JavaNativeFoundation.framework"
-      # Copy JavaNativeFoundation.framework from Xcode
-      # https://gist.github.com/claui/ea4248aa64d6a1b06c6d6ed80bc2d2b8#gistcomment-3539574
-      cp_r "#{framework_path}/JavaNativeFoundation.framework", dest, remove_destination: true
-
-      # Replace Apple signature by ad-hoc one (otherwise relocation will break it)
-      system "codesign", "-f", "-s", "-", "#{dest}/Versions/A/JavaNativeFoundation"
+      bin.install_symlink Dir[jdk/"bin/*"]
+      include.install_symlink Dir[jdk/"include/*.h"]
+      include.install_symlink Dir[jdk/"include/*/*.h"]
+      man1.install_symlink Dir[jdk/"man/man1/*"]
     end
   end
 

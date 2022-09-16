@@ -2,26 +2,25 @@ class GoMd2man < Formula
   desc "Converts markdown into roff (man pages)"
   homepage "https://github.com/cpuguy83/go-md2man"
   url "https://github.com/cpuguy83/go-md2man.git",
-      tag:      "v2.0.0",
-      revision: "f79a8a8ca69da163eee19ab442bedad7a35bba5a"
+      tag:      "v2.0.2",
+      revision: "d97078115282836e16d0dca10b4b42ce60fc70e6"
   license "MIT"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "c8228c62cba90dfcda781325c0cd8709ee32e31f5ec7eb3471e822e7bb7627b4"
-    sha256 cellar: :any_skip_relocation, big_sur:       "c6f05023662243e7c46d5206a1a2af2db7c2bc584086608f18388e1a05ecc755"
-    sha256 cellar: :any_skip_relocation, catalina:      "1ff2123c31e56bc183a1b9b0e270c01ee31e16efc34c060e0d4ecbde87d9e16e"
-    sha256 cellar: :any_skip_relocation, mojave:        "1ff2123c31e56bc183a1b9b0e270c01ee31e16efc34c060e0d4ecbde87d9e16e"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "1ff2123c31e56bc183a1b9b0e270c01ee31e16efc34c060e0d4ecbde87d9e16e"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "5c90b9a66b208691bd21aac4d739b2a55abdb2b328a858fbcbc161b7e9fe6257"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5c90b9a66b208691bd21aac4d739b2a55abdb2b328a858fbcbc161b7e9fe6257"
+    sha256 cellar: :any_skip_relocation, monterey:       "bf229a23b6bfe77c80872668ccaa52da73fba7b3dcce34085661dbecb5bb9f75"
+    sha256 cellar: :any_skip_relocation, big_sur:        "bf229a23b6bfe77c80872668ccaa52da73fba7b3dcce34085661dbecb5bb9f75"
+    sha256 cellar: :any_skip_relocation, catalina:       "bf229a23b6bfe77c80872668ccaa52da73fba7b3dcce34085661dbecb5bb9f75"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1b64c10c08f4f0d6c663beedba7a143c448950c5bab845a8b1099d3f20bc38d4"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", "-ldflags", "-s -w", "-trimpath", "-o", bin/"go-md2man"
+    system "go", "build", *std_go_args(ldflags: "-s -w")
     system bin/"go-md2man", "-in=go-md2man.1.md", "-out=go-md2man.1"
     man1.install "go-md2man.1"
-    prefix.install_metafiles
   end
 
   test do

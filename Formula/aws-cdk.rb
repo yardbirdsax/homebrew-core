@@ -3,15 +3,17 @@ require "language/node"
 class AwsCdk < Formula
   desc "AWS Cloud Development Kit - framework for defining AWS infra as code"
   homepage "https://github.com/aws/aws-cdk"
-  url "https://registry.npmjs.org/aws-cdk/-/aws-cdk-1.88.0.tgz"
-  sha256 "13b58d2939b74afca6b48c2c9cd18df41f3578664ba568f1741d0a24430c54c6"
+  url "https://registry.npmjs.org/aws-cdk/-/aws-cdk-2.41.0.tgz"
+  sha256 "0e9939a2f800593899dceb10cb65cbdc5fc46faad41a1d0b29a63047537f27bd"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "db4f53ac6f43d594e001419e389e3cb7eaade2b8e55c49c0f77501cdcc55ae4b"
-    sha256 cellar: :any_skip_relocation, big_sur:       "3c42fe319ba690757281ad68420396425219bc796bf58ccd2830e9be2297deab"
-    sha256 cellar: :any_skip_relocation, catalina:      "a92171a5f012e5dcf1273e81fb5847ae0fdb26859dbf8fec9a5308d77043f8b4"
-    sha256 cellar: :any_skip_relocation, mojave:        "5ba181b093e520e08b06288996176cb83a5b9a18a39b1da5f64befd2262412d3"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "689eb32deba796586725df9c69696d2a10b3e6a9c3b61857f5fcb41e97e3caf2"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "689eb32deba796586725df9c69696d2a10b3e6a9c3b61857f5fcb41e97e3caf2"
+    sha256 cellar: :any_skip_relocation, monterey:       "ddab46ea8863c39a2524f89dd7a35b414df5b93c4ceccae81624e46439bfa193"
+    sha256 cellar: :any_skip_relocation, big_sur:        "ddab46ea8863c39a2524f89dd7a35b414df5b93c4ceccae81624e46439bfa193"
+    sha256 cellar: :any_skip_relocation, catalina:       "ddab46ea8863c39a2524f89dd7a35b414df5b93c4ceccae81624e46439bfa193"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c27a0cf6a817b4bf79635bd82568ed2a7b0998b418e557eb13b5d020d475cd6a"
   end
 
   depends_on "node"
@@ -19,6 +21,9 @@ class AwsCdk < Formula
   def install
     system "npm", "install", *Language::Node.std_npm_install_args(libexec)
     bin.install_symlink Dir["#{libexec}/bin/*"]
+
+    # Replace universal binaries with native slices.
+    deuniversalize_machos
   end
 
   test do

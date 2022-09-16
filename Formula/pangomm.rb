@@ -1,15 +1,18 @@
 class Pangomm < Formula
   desc "C++ interface to Pango"
   homepage "https://www.pango.org/"
-  url "https://download.gnome.org/sources/pangomm/2.48/pangomm-2.48.0.tar.xz"
-  sha256 "9e0ed474c33f8c2002ca9e2b61ca0d1f3d8e409e09e99f4d8c19eeafccf55b78"
+  url "https://download.gnome.org/sources/pangomm/2.50/pangomm-2.50.0.tar.xz"
+  sha256 "a27aa77e017b9afce9e751d85bd1cf890abbb3a58bf59d0fac917eef82db3b5b"
   license "LGPL-2.1-only"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "64e96cdf092ebfaf872dbe2764208492e3e5a16e08a76c7c251335c72b949812"
-    sha256 cellar: :any, big_sur:       "eb27b7d518bd474bf2fd5a63abba60e1a14c995a858b16ec0dbb4bc51068d1c8"
-    sha256 cellar: :any, catalina:      "5ad6d772ae04e2dd5553367d92052180088798ebb1de6438f0f242aec80dc138"
-    sha256 cellar: :any, mojave:        "e71d9e1eee7e3e9c4846af03f6a45cb4a28cd0afc3cb64bde31ac5610dc1b230"
+    rebuild 1
+    sha256 cellar: :any, arm64_monterey: "59de56c6a4d3f2b8a15333356753d1963837460e83a03bcfd573989b52b5af31"
+    sha256 cellar: :any, arm64_big_sur:  "c0a230a9aac8bbbb950d58676b14232ebc7a3361fd42b6bc55bbb4cfc505f48a"
+    sha256 cellar: :any, monterey:       "38fd4cffb42aa0aeee7b836b245d932681616bdaa99940289977cb3a62d9beba"
+    sha256 cellar: :any, big_sur:        "bdcec6b945cca9af6c9aaa8d7ae65ddd18f16b3acc5d053daaf6d5c111c8f20a"
+    sha256 cellar: :any, catalina:       "383a8e00e5459b350d53228fd5623d52bd9aa618eeeb8410ab7255158a5d3a74"
+    sha256               x86_64_linux:   "fa8fb430d4fc22f2f493e8ced97e2518f6403cbca50879eb14ec91f327217cda"
   end
 
   depends_on "meson" => :build
@@ -18,6 +21,8 @@ class Pangomm < Formula
   depends_on "cairomm"
   depends_on "glibmm"
   depends_on "pango"
+
+  fails_with gcc: "5"
 
   def install
     ENV.cxx11
@@ -28,6 +33,7 @@ class Pangomm < Formula
       system "ninja", "install"
     end
   end
+
   test do
     (testpath/"test.cpp").write <<~EOS
       #include <pangomm.h>
@@ -88,9 +94,7 @@ class Pangomm < Formula
       -lpangomm-2.48
       -lsigc-3.0
     ]
-    on_macos do
-      flags << "-lintl"
-    end
+    flags << "-lintl" if OS.mac?
     system ENV.cxx, "-std=c++17", "test.cpp", "-o", "test", *flags
     system "./test"
   end

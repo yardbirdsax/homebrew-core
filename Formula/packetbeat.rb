@@ -2,44 +2,31 @@ class Packetbeat < Formula
   desc "Lightweight Shipper for Network Data"
   homepage "https://www.elastic.co/products/beats/packetbeat"
   url "https://github.com/elastic/beats.git",
-      tag:      "v7.10.2",
-      revision: "aacf9ecd9c494aa0908f61fbca82c906b16562a8"
+      tag:      "v8.4.1",
+      revision: "fe210d46ebc339459e363ac313b07d4a9ba78fc7"
   license "Apache-2.0"
-  head "https://github.com/elastic/beats.git"
+  head "https://github.com/elastic/beats.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, big_sur:  "8bd73d32bee241d6f4f43be3eb69c1c0e06ee50ce5d5a5a2d2282330ca9316c4"
-    sha256 cellar: :any_skip_relocation, catalina: "c2bc84e64b6d9a7af55b33b0fa7acdd9f866ad5f61af51bbf7bc90c598bf1b63"
-    sha256 cellar: :any_skip_relocation, mojave:   "b53b4d74d544f5a20b2c750e74d7d64da875c8d75a3bd7a0f1b336e2c1240dc4"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "fd34608afa9637c2a2c0cf7ee7a4bc83dea40c227fea4fc0443d8639ce67bb48"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b7031653d44837a3536b49abf0d8024611873d3ba28d687448cd57cfe97a8fd7"
+    sha256 cellar: :any_skip_relocation, monterey:       "8c0682da837b47253ea1baf153f6e8a69daa4773fbc6f9039d33e238141234d5"
+    sha256 cellar: :any_skip_relocation, big_sur:        "2c640e8ff4b3afc38f1bacaf043d12946f3fd3a869cb86007029990be9b50192"
+    sha256 cellar: :any_skip_relocation, catalina:       "d02abe34cc72280aa9e6118fa7ae675d0324477b160a7a9fc24928f29ababba5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7ce3cf26140c161ab967cb6fd672f9bf193681353cf9d0c9fdc8cfe404c67d7b"
   end
 
   depends_on "go" => :build
-  depends_on "python@3.8" => :build
+  depends_on "mage" => :build
+  depends_on "python@3.10" => :build
 
-  resource "virtualenv" do
-    url "https://files.pythonhosted.org/packages/b1/72/2d70c5a1de409ceb3a27ff2ec007ecdd5cc52239e7c74990e32af57affe9/virtualenv-15.2.0.tar.gz"
-    sha256 "1d7e241b431e7afce47e77f8843a276f652699d1fa4f93b9d8ce0076fd7b0b54"
-  end
+  uses_from_macos "libpcap"
 
   def install
     # remove non open source files
     rm_rf "x-pack"
 
-    ENV["GOPATH"] = buildpath
-    (buildpath/"src/github.com/elastic/beats").install buildpath.children
-
-    xy = Language::Python.major_minor_version "python3"
-    ENV.prepend_create_path "PYTHONPATH", buildpath/"vendor/lib/python#{xy}/site-packages"
-
-    resource("virtualenv").stage do
-      system Formula["python@3.8"].opt_bin/"python3", *Language::Python.setup_install_args(buildpath/"vendor")
-    end
-
-    ENV.prepend_path "PATH", buildpath/"vendor/bin" # for virtualenv
-    ENV.prepend_path "PATH", buildpath/"bin" # for mage (build tool)
-
-    cd "src/github.com/elastic/beats/packetbeat" do
-      system "make", "mage"
+    cd "packetbeat" do
       # prevent downloading binary wheels during python setup
       system "make", "PIP_INSTALL_PARAMS=--no-binary :all", "python-env"
       system "mage", "-v", "build"
@@ -53,8 +40,6 @@ class Packetbeat < Formula
       prefix.install "_meta/kibana"
     end
 
-    prefix.install_metafiles buildpath/"src/github.com/elastic/beats"
-
     (bin/"packetbeat").write <<~EOS
       #!/bin/sh
       exec #{libexec}/bin/packetbeat \
@@ -66,28 +51,17 @@ class Packetbeat < Formula
     EOS
   end
 
-  plist_options manual: "packetbeat"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN"
-      "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>Program</key>
-          <string>#{opt_bin}/packetbeat</string>
-          <key>RunAtLoad</key>
-          <true/>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run opt_bin/"packetbeat"
   end
 
   test do
-    assert_match "0: en0", shell_output("#{bin}/packetbeat devices")
+    eth = if OS.mac?
+      "en"
+    else
+      "eth"
+    end
+    assert_match "0: #{eth}0", shell_output("#{bin}/packetbeat devices")
     assert_match version.to_s, shell_output("#{bin}/packetbeat version")
   end
 end

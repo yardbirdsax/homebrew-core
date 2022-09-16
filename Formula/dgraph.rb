@@ -1,24 +1,23 @@
 class Dgraph < Formula
   desc "Fast, Distributed Graph DB"
   homepage "https://dgraph.io"
-  url "https://github.com/dgraph-io/dgraph/archive/v20.11.1.tar.gz"
-  sha256 "b70c80d516b728081a67f6a4d2dbc8ffb74ba82df6068b5c3561e3fc96b5092d"
+  url "https://github.com/dgraph-io/dgraph/archive/v20.11.3.tar.gz"
+  sha256 "cf0ed5d61dff1d0438dc5b211972d8f64b40dcadebf35355060918c3cf0a6e62"
   # Source code in this repository is variously licensed under the Apache Public License 2.0 (APL)
   # and the Dgraph Community License (DCL). A copy of each license can be found in the licenses directory.
   license "Apache-2.0"
-  head "https://github.com/dgraph-io/dgraph.git"
-
-  livecheck do
-    url :stable
-    regex(/^v?(\d+(?:\.\d+)+)$/i)
-  end
+  head "https://github.com/dgraph-io/dgraph.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "783faa5e8541f8117d1a830675f4ebf97b44a75b2f8703fe5cd8fb0ad520f129"
-    sha256 cellar: :any_skip_relocation, big_sur:       "d9f6184eabe58ac2ffe70348101d7b5faa5592807b649c464749317c82a7331b"
-    sha256 cellar: :any_skip_relocation, catalina:      "39f4a8a78fe7dd86e091721069b65b6c41b6d874f5b6bdab3a04056b2b2a6fe8"
-    sha256 cellar: :any_skip_relocation, mojave:        "b5e991c811c8c43ac0df4a465192736aeb42bce572c34631ec4a31aa8de9c6c8"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "88693da8a26b8104d2362cc17f6f4311de51d96d1e0bd608e9042f77cdd6bf15"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "28d00b7cc12ab6eb34da4240b7075ee322ff51cd94223d7a8892c823f91bf5cc"
+    sha256 cellar: :any_skip_relocation, monterey:       "e9e8e32d5a6def3565d2d5f68dd1b6cf2a5d40f768fad0862213d24d1493a03b"
+    sha256 cellar: :any_skip_relocation, big_sur:        "9e2da2c025d3b8f89d4716be724942f7c284c9d0ac70c77fed7c287a31abdb56"
+    sha256 cellar: :any_skip_relocation, catalina:       "9d2545b3b0e293d8e48b4c23887bef147f1f1444735dacbf70eb9585bd25502e"
+    sha256 cellar: :any_skip_relocation, mojave:         "57fa2f974e4e0313fb58f7e35e2d9547a4d43319af7e84a4fc6619238e862885"
   end
+
+  disable! date: "2022-07-31", because: :unsupported
 
   depends_on "go" => :build
   depends_on "jemalloc"

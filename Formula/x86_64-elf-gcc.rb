@@ -1,15 +1,22 @@
 class X8664ElfGcc < Formula
   desc "GNU compiler collection for x86_64-elf"
   homepage "https://gcc.gnu.org"
-  url "https://ftp.gnu.org/gnu/gcc/gcc-10.2.0/gcc-10.2.0.tar.xz"
-  mirror "https://ftpmirror.gnu.org/gcc/gcc-10.2.0/gcc-10.2.0.tar.xz"
-  sha256 "b8dd4368bb9c7f0b98188317ee0254dd8cc99d1e3a18d0ff146c855fe16c1d8c"
+  url "https://ftp.gnu.org/gnu/gcc/gcc-12.2.0/gcc-12.2.0.tar.xz"
+  mirror "https://ftpmirror.gnu.org/gcc/gcc-12.2.0/gcc-12.2.0.tar.xz"
+  sha256 "e549cf9cf3594a00e27b6589d4322d70e0720cdd213f39beb4181e06926230ff"
+  license "GPL-3.0-or-later" => { with: "GCC-exception-3.1" }
+
+  livecheck do
+    formula "gcc"
+  end
 
   bottle do
-    sha256 big_sur:     "5ea6b9319ee06ff6e914f97e1af1243e5ec820a22ea3d33e7decae2effd228b5"
-    sha256 catalina:    "fabfa58ff9baa00f65192dac31f63133e8c98b1b2bf4ef49ba451f6331ed2cc2"
-    sha256 mojave:      "6775f752210fe04754eca0de749d7243e436da6a24118660faca5bbf62eedb16"
-    sha256 high_sierra: "ef83d1c3909cc2d7b42d5dca74909c548f653d34a55d141f8d5402992214d622"
+    sha256 arm64_monterey: "48cf54a665c501b6efa720f565758649c1f0ec81169fd283a85113109e414786"
+    sha256 arm64_big_sur:  "6fce8fb36d19f1002128e411674b84ae8d5bbd73e30487a0811879273a441360"
+    sha256 monterey:       "bf3fbf450237ab38d027286a2ac63019d11f9b785ef3c6f1202c6b07ab6e9a01"
+    sha256 big_sur:        "f775d00d861ad6f823d444bef48f0a23c4e7f1aca80d74a2ba7e7b7bf49f4ff5"
+    sha256 catalina:       "2dbebb5258e19b39ec7ca9abab06df50ca461dd3b40646694a737609d8e4e32e"
+    sha256 x86_64_linux:   "ceb074281119fd98f10171eb30f91f8ed823db696e00bcde7f10f49d3a5c5196"
   end
 
   depends_on "gmp"
@@ -18,17 +25,17 @@ class X8664ElfGcc < Formula
   depends_on "x86_64-elf-binutils"
 
   def install
+    target = "x86_64-elf"
     mkdir "x86_64-elf-gcc-build" do
-      system "../configure", "--target=x86_64-elf",
+      system "../configure", "--target=#{target}",
                              "--prefix=#{prefix}",
-                             "--infodir=#{info}/x86_64-elf-gcc",
+                             "--infodir=#{info}/#{target}",
                              "--disable-nls",
                              "--without-isl",
                              "--without-headers",
                              "--with-as=#{Formula["x86_64-elf-binutils"].bin}/x86_64-elf-as",
                              "--with-ld=#{Formula["x86_64-elf-binutils"].bin}/x86_64-elf-ld",
-                             "--enable-languages=c,c++",
-                             "SED=/usr/bin/sed"
+                             "--enable-languages=c,c++"
       system "make", "all-gcc"
       system "make", "install-gcc"
       system "make", "all-target-libgcc"

@@ -1,55 +1,26 @@
-class Python3Requirement < Requirement
-  fatal true
-  satisfy(build_env: false) { which "python3" }
-  def message
-    <<~EOS
-      An existing Python 3 installation is required in order to avoid cyclic
-      dependencies (as Homebrew's Python depends on libxcb).
-    EOS
-  end
-end
-
 class XcbProto < Formula
   desc "X.Org: XML-XCB protocol descriptions for libxcb code generation"
   homepage "https://www.x.org/"
-  url "https://xcb.freedesktop.org/dist/xcb-proto-1.14.tar.gz"
-  sha256 "1c3fa23d091fb5e4f1e9bf145a902161cec00d260fabf880a7a248b02ab27031"
+  url "https://xorg.freedesktop.org/archive/individual/proto/xcb-proto-1.15.2.tar.xz"
+  sha256 "7072beb1f680a2fe3f9e535b797c146d22528990c72f63ddb49d2f350a3653ed"
   license "MIT"
-  revision 2
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "5c0d6040951956079df0f6c8e58b0ec759dab7b0aebdeacaa05189c1fe0775ee"
-    sha256 cellar: :any_skip_relocation, big_sur:       "15460cb7e0d83e7c05e331a98ed4a82e2badb9c337009e8d5fa830d26be113ea"
-    sha256 cellar: :any_skip_relocation, catalina:      "9a4114ec613fb5d8ba41cc43dffb95059bbe7815e812d194ef7c6507281883f4"
-    sha256 cellar: :any_skip_relocation, mojave:        "432ed8c5ad796f9311c34f4bfd3290e42fc132bf0e106ed6e39462ff8d028ab1"
+    sha256 cellar: :any_skip_relocation, all: "2b0c1406f4a3f07a16b071a3641defce88bdf8c8ffa93884e2773572818029e5"
   end
 
   depends_on "pkg-config" => [:build, :test]
-
-  on_macos do
-    depends_on "python@3.9" => :build
-  end
-  on_linux do
-    # Use an existing Python 3, to avoid a cyclic dependency on Linux:
-    # python3 -> tcl-tk -> libx11 -> libxcb -> xcb-proto -> python3
-    depends_on Python3Requirement => :build
-  end
-
-  # Fix for Python 3.9. Use math.gcd() for Python >= 3.5.
-  # fractions.gcd() has been deprecated since Python 3.5.
-  patch do
-    url "https://gitlab.freedesktop.org/xorg/proto/xcbproto/-/commit/426ae35bee1fa0fdb8b5120b1dcd20cee6e34512.patch"
-    sha256 "58c56b9713cf4a597d7e8c634f276c2b7c139a3b1d3f5f87afd5946f8397d329"
-  end
+  depends_on "python@3.10" => :build
 
   def install
+    python = "python3.10"
+
     args = %W[
       --prefix=#{prefix}
       --sysconfdir=#{etc}
       --localstatedir=#{var}
       --disable-silent-rules
-      PYTHON=python3
+      PYTHON=#{python}
     ]
 
     system "./configure", *args

@@ -1,16 +1,18 @@
 class Pstoedit < Formula
   desc "Convert PostScript and PDF files to editable vector graphics"
   homepage "http://www.pstoedit.net/"
-  url "https://downloads.sourceforge.net/project/pstoedit/pstoedit/3.75/pstoedit-3.75.tar.gz"
-  sha256 "b7b5d8510b40a5b148f7751268712fcfd0c1ed2bb46f359f655b6fcdc53364cf"
-  license "GPL-2.0"
+  url "https://downloads.sourceforge.net/project/pstoedit/pstoedit/3.78/pstoedit-3.78.tar.gz"
+  sha256 "8cc28e34bc7f88d913780f8074e813dd5aaa0ac2056a6b36d4bf004a0e90d801"
+  license "GPL-2.0-or-later"
 
   bottle do
-    sha256 arm64_big_sur: "62d09abcd35a1d933545c501578d9583978eac45569bb7b3702f6fd1b5cbea9a"
-    sha256 big_sur:       "1eb7bdc1ab76c8ae40450b686b1948f3e037ca871d7c505657489d501e073a5a"
-    sha256 catalina:      "f048d902c088f0625c0c9e18d84b159493775b40e742812b040e7b517900260a"
-    sha256 mojave:        "1f3ec91e58d95e08081694b43e031ed83f13a73cecff15c55c532268282b0ad1"
-    sha256 high_sierra:   "22710dd8997d40cec3492c40960a9966b80b386bdbd3fed46515c66bb25053d7"
+    rebuild 1
+    sha256 arm64_monterey: "9f4bedee7e78de9078d4d799cbc52dc799b715668b10977a96d0858e17c024ef"
+    sha256 arm64_big_sur:  "a52e8b66f580278acb40be868a259d9e410bea922379fb5244ea63729606f876"
+    sha256 monterey:       "578d8dd21d622fef301739b3da93ced074113fd641503f39cb5313671d0d8b4f"
+    sha256 big_sur:        "8cf73733366948cd732643dd90b9f8122eb4a3c170961386f8a16f0d3438aa1b"
+    sha256 catalina:       "5dcbb6919e233abc953f621b23c536f554fcf497af4aa4b7ce639560e912252b"
+    sha256 x86_64_linux:   "0c915e6e038467fb683d484de48d2b61df78f3af0de3b2ca85bb69ef8cc998da"
   end
 
   depends_on "pkg-config" => :build
@@ -18,9 +20,11 @@ class Pstoedit < Formula
   depends_on "imagemagick"
   depends_on "plotutils"
 
-  def install
-    ENV.cxx11
+  # "You need a C++ compiler, e.g., g++ (newer than 6.0) to compile pstoedit."
+  fails_with gcc: "5"
 
+  def install
+    ENV.cxx11 if OS.mac?
     system "./configure", "--disable-dependency-tracking", "--prefix=#{prefix}"
     system "make", "install"
   end

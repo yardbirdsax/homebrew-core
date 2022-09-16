@@ -1,14 +1,19 @@
 class Osmcoastline < Formula
   desc "Extracts coastline data from OpenStreetMap planet file"
   homepage "https://osmcode.org/osmcoastline/"
-  url "https://github.com/osmcode/osmcoastline/archive/v2.3.0.tar.gz"
-  sha256 "b08ddcc8cb494a19cbf4d9f1501c47443fe374a4fe171e6f55c730ca1e710689"
+  url "https://github.com/osmcode/osmcoastline/archive/v2.3.1.tar.gz"
+  sha256 "ab4a94b9bc5a5ab37b14ac4e9cbdf113d5fcf2d5a040a4eed958ffbc6cc1aa63"
   license "GPL-3.0-or-later"
+  revision 5
 
   bottle do
-    sha256 cellar: :any, big_sur:  "484435d2e38ed650ac0244a4de44a1ab857db1f25f2270fa2e4809fb8873d24a"
-    sha256 cellar: :any, catalina: "c3777d42b345383e5a4949bc00b388d71a6b5e20695cc959bfd958d4b07885a1"
-    sha256 cellar: :any, mojave:   "6830542a881dd0b7aedd8af1a9c9d62b882d4f4e3eff66929a31e5592e23ea8a"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "8cf2013bade4dab5cfac258a2dc3f8f45d81a5426b7e3d43ffea2f23a6cc88b2"
+    sha256 cellar: :any,                 arm64_big_sur:  "2d66f5eb8a2c12d2e05874d877ecdf65f01a850b8539c2374cf49398d21414bf"
+    sha256 cellar: :any,                 monterey:       "532b6f87af7c10219e791e5fb1ee6be1fb3b4cdb3e72ae0bb7e9aa82c246c8e4"
+    sha256 cellar: :any,                 big_sur:        "91fb5971b1f93694ceea006794ad55cd56be046355e0bae1b7f4200d508b8585"
+    sha256 cellar: :any,                 catalina:       "126abf7580ab4ae6aae425218176ddd9b0b44a6554d7ab06c6a0f47fd8c752d2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6fd71a1becdab054689376a0d5c7c14bcfc557d1346818afe51fe76753171163"
   end
 
   depends_on "cmake" => :build
@@ -16,9 +21,12 @@ class Osmcoastline < Formula
   depends_on "gdal"
   depends_on "geos"
   depends_on "libspatialite"
+  depends_on "lz4"
 
   uses_from_macos "sqlite"
   uses_from_macos "zlib"
+
+  fails_with gcc: "5"
 
   def install
     protozero = Formula["libosmium"].opt_libexec/"include"

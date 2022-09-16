@@ -1,15 +1,47 @@
 class Singular < Formula
   desc "Computer algebra system for polynomial computations"
   homepage "https://www.singular.uni-kl.de/"
-  url "https://service.mathematik.uni-kl.de/ftp/pub/Math/Singular/src/4-2-0/singular-4.2.0.tar.gz"
-  sha256 "5b0f6c036b4a6f58bf620204b004ec6ca3a5007acc8352fec55eade2fc9d63f6"
-  license "GPL-2.0"
+  url "https://www.singular.uni-kl.de/ftp/pub/Math/Singular/SOURCES/4-3-1/singular-4.3.1p2.tar.gz"
+  version "4.3.1p2"
+  sha256 "95814bba0f0bd0290cd9799ec1d2ecc6f4c8a4e6429d9a02eb7f9c4e5649682a"
+  license "GPL-2.0-or-later"
+
+  livecheck do
+    url "https://www.singular.uni-kl.de/ftp/pub/Math/Singular/SOURCES/"
+    regex(%r{href=["']?v?(\d+(?:[.-]\d+)+)/?["' >]}i)
+    strategy :page_match do |page, regex|
+      # Match versions from directories
+      versions = page.scan(regex)
+                     .flatten
+                     .uniq
+                     .map { |v| Version.new(v.tr("-", ".")) }
+                     .reject { |v| v.patch >= 90 }
+                     .sort
+      next versions if versions.blank?
+
+      # Assume the last-sorted version is newest
+      newest_version = versions.last
+
+      # Fetch the page for the newest version directory
+      dir_page = Homebrew::Livecheck::Strategy.page_content(
+        URI.join(@url, "#{newest_version.to_s.tr(".", "-")}/"),
+      )
+      next versions if dir_page[:content].blank?
+
+      # Identify versions from files in the version directory
+      dir_versions = dir_page[:content].scan(/href=.*?singular[._-]v?(\d+(?:\.\d+)+(?:p\d+)?)\.t/i).flatten
+
+      dir_versions || versions
+    end
+  end
 
   bottle do
-    sha256 arm64_big_sur: "51ede0e2a1ab0fbdef4bfd7fd9136865bf10c9378a01a7f2517c469d90bc8ef8"
-    sha256 big_sur:       "26709b976c059b3cd9ebd8b3a5c397d6379503786dbd282a7b25a69af612cb1a"
-    sha256 catalina:      "bcbff484908f20d9677e051686bf44822430a12b18e4f8ec44782977f5ca1d2b"
-    sha256 mojave:        "f3e2e200d751f2b7d39d011388a4b2c7cb59ac67bf7ea3583b200a677ee9938c"
+    sha256 arm64_monterey: "7570ef9396f60a13517a9e42735f991f2bd5d08402808633299e43814d40ddb1"
+    sha256 arm64_big_sur:  "c549c126c15a56777dd54e20ee408fa1cf7945bd735fd615ab92c6e369bfaefd"
+    sha256 monterey:       "150e76c1e1eb10366afa1aefa3053c171e75e8813eaa4814298db4804659cdd8"
+    sha256 big_sur:        "e1acc9bf2daa815379592b57c3c1cecfcc7e7e2e167bd3c5e6ea90fc5ece2454"
+    sha256 catalina:       "732a3d7fc116f9b896042b73a727d6631f575885449eb5d7f2479d6410afe51f"
+    sha256 x86_64_linux:   "af277c92c81c40b8d53041986baea5713367e80d0d4b85f9dd5edd4e53dd4db6"
   end
 
   head do
@@ -23,15 +55,22 @@ class Singular < Formula
   depends_on "gmp"
   depends_on "mpfr"
   depends_on "ntl"
-  depends_on "python@3.9"
+  depends_on "python@3.10"
+
+  on_macos do
+    depends_on "autoconf" => :build
+    depends_on "automake" => :build
+    depends_on "libtool" => :build
+  end
 
   def install
-    system "./autogen.sh" if build.head?
+    # Run autogen on macOS so that -flat_namespace flag is not used.
+    system "./autogen.sh" if build.head? || OS.mac?
     system "./configure", "--disable-debug",
                           "--disable-dependency-tracking",
                           "--disable-silent-rules",
                           "--prefix=#{prefix}",
-                          "--with-python=#{Formula["python@3.9"].opt_bin}/python3",
+                          "--with-python=#{which("python3.10")}",
                           "CXXFLAGS=-std=c++11"
     system "make", "install"
   end

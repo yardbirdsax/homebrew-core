@@ -1,50 +1,65 @@
 class Binutils < Formula
   desc "GNU binary tools for native development"
   homepage "https://www.gnu.org/software/binutils/binutils.html"
-  url "https://ftp.gnu.org/gnu/binutils/binutils-2.36.tar.xz"
-  mirror "https://ftpmirror.gnu.org/binutils/binutils-2.36.tar.xz"
-  sha256 "5788292cc5bbcca0848545af05986f6b17058b105be59e99ba7d0f9eb5336fb8"
+  url "https://ftp.gnu.org/gnu/binutils/binutils-2.39.tar.xz"
+  mirror "https://ftpmirror.gnu.org/binutils/binutils-2.39.tar.xz"
+  sha256 "645c25f563b8adc0a81dbd6a41cffbf4d37083a382e02d5d3df4f65c09516d00"
   license all_of: ["GPL-2.0-or-later", "GPL-3.0-or-later", "LGPL-2.0-or-later", "LGPL-3.0-only"]
+  revision 1
 
   bottle do
-    sha256 arm64_big_sur: "5227a5695421c8471b43801b12e2935a7bbaffbad405552d7473f0c1c36c8d3e"
-    sha256 big_sur:       "464fb5fcf20ca249899299a48a210b3be8e9d72b02d62e9b325e8a2638a50b79"
-    sha256 catalina:      "c0124975e7089a2f6620325f31833de7c9e85f02aebbb415000ed36262025a55"
-    sha256 mojave:        "c9c2f5b15ad2dbb6028a7b4e803cee330dc6803bc670684935b20ff5f8d11e7d"
+    sha256                               arm64_monterey: "758ad6292041c3c53918b9177f30a5a15acfb3868cbc51d79dc51fcc5a661a4c"
+    sha256                               arm64_big_sur:  "93b1cfd89c43d8822fd6f78d4a573425891193e46de5cb3b86658db4f8f868dd"
+    sha256                               monterey:       "2ec016569ad18525d8f0598f2f6d42e4fb8b0e02178484acc3e885b381789a9b"
+    sha256                               big_sur:        "8842e0decbce5fe9718f492648730163ac9aa0cca4ccd08ec700ef95d0e07761"
+    sha256                               catalina:       "17e7dbd79aeaa50547888612f741c427a682fb269f6796345abd01710b89abcf"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "efa7497e2ea56d9b68ce41363cdc1a41cad032b3ae2fa2cbe819459011651809"
   end
 
   keg_only :shadowed_by_macos, "Apple's CLT provides the same tools"
 
+  uses_from_macos "bison" => :build
   uses_from_macos "zlib"
 
+  link_overwrite "bin/gold"
+  link_overwrite "bin/ld.gold"
+  link_overwrite "bin/dwp"
+
   def install
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--enable-deterministic-archives",
-                          "--prefix=#{prefix}",
-                          "--infodir=#{info}",
-                          "--mandir=#{man}",
-                          "--disable-werror",
-                          "--enable-interwork",
-                          "--enable-multilib",
-                          "--enable-64-bit-bfd",
-                          "--enable-gold",
-                          "--enable-plugins",
-                          "--enable-targets=all",
-                          "--with-system-zlib",
-                          "--disable-nls"
-    system "make"
-    system "make", "install"
-    bin.install_symlink "ld.gold" => "gold"
-    on_macos do
+    # Workaround https://sourceware.org/bugzilla/show_bug.cgi?id=28909
+    touch "gas/doc/.dirstamp", mtime: Time.utc(2022, 1, 1)
+    make_args = OS.mac? ? [] : ["MAKEINFO=true"] # for gprofng
+
+    args = [
+      "--disable-debug",
+      "--disable-dependency-tracking",
+      "--enable-deterministic-archives",
+      "--prefix=#{prefix}",
+      "--infodir=#{info}",
+      "--mandir=#{man}",
+      "--disable-werror",
+      "--enable-interwork",
+      "--enable-multilib",
+      "--enable-64-bit-bfd",
+      "--enable-gold",
+      "--enable-plugins",
+      "--enable-targets=all",
+      "--with-system-zlib",
+      "--disable-nls",
+    ]
+    system "./configure", *args
+    system "make", *make_args
+    system "make", "install", *make_args
+
+    if OS.mac?
       Dir["#{bin}/*"].each do |f|
         bin.install_symlink f => "g" + File.basename(f)
       end
-    end
-
-    on_linux do
+    else
+      bin.install_symlink "ld.gold" => "gold"
       # Reduce the size of the bottle.
-      system "strip", *Dir[bin/"*", lib/"*.a"]
+      bin_files = bin.children.select(&:elf?)
+      system "strip", *bin_files, *lib.glob("*.a")
     end
   end
 

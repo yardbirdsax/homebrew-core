@@ -3,51 +3,51 @@ class ShallowBackup < Formula
 
   desc "Git-integrated backup tool for macOS and Linux devs"
   homepage "https://github.com/alichtman/shallow-backup"
-  url "https://files.pythonhosted.org/packages/42/fc/4ecead7b7539b0fd29ef97fb6c3134327d1702936bb38797352862d0a924/shallow-backup-5.0.1.tar.gz"
-  sha256 "8c0a57e6a5004cf3dbc74a54da1a254e685077c973266e7198aca62441c72a0b"
+  url "https://files.pythonhosted.org/packages/2d/82/57f4cbb74da06af37773461da10cccd7163d67293750b2c977931d6d32ea/shallow-backup-5.2.tar.gz"
+  sha256 "2cd7b9f6f2d8d8c143403ca3b0d58aa27ce877e461eacdd26bb379d08747a0c9"
   license "MIT"
-  revision 1
-  head "https://github.com/alichtman/shallow-backup.git"
+  head "https://github.com/alichtman/shallow-backup.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "54e0db13cd94663dc668a6a219d4eb82146ee203b7734362c25e9d73f3f2b33e"
-    sha256 cellar: :any_skip_relocation, big_sur:       "e1ad3d711a2c18d700033fc80c16f21ebf40a1a0ba40d41352fe5c3e13339a5a"
-    sha256 cellar: :any_skip_relocation, catalina:      "180c2239489893d858f7a12d729d07c47d0eed52bb77b0fc31dedba920697672"
-    sha256 cellar: :any_skip_relocation, mojave:        "84fe6770d371202f7f6bda5e55b7dc1d54744faa38a25ed498d36eab4ef8be5f"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "f70ff045e9324f64e15bdb7d686533bb987146d0b9543b87b9bdff351ed97578"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ffbf5c0702cf37562521242aa6d8ef9e2811b888d0205b392d96eb03aa17badb"
+    sha256 cellar: :any_skip_relocation, monterey:       "e77bb5862dd882bcb0cfd58f993c13f119e9728428dba0c02192ea2db950cd10"
+    sha256 cellar: :any_skip_relocation, big_sur:        "3c95b3e5b000cf2621cdeaf45011404c1259ac85dcb368b4d505776ef6b152d4"
+    sha256 cellar: :any_skip_relocation, catalina:       "dc3f700edb16063a24ddf394ccc3a6e2d11c484da87bb6c1554d464e8a679036"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "de1e0cf53f78c2dd80842618d86f8a470c8222c27083f874601e345ce4277ab1"
   end
 
-  depends_on "python@3.9"
+  depends_on "python@3.10"
+  depends_on "six"
 
   resource "blessed" do
-    url "https://files.pythonhosted.org/packages/20/6b/80d2704532134a0acf513a2804d342686a66a779d28822eb48346dc2a861/blessed-1.17.6.tar.gz"
-    sha256 "a9a774fc6eda05248735b0d86e866d640ca2fef26038878f7e4d23f7749a1e40"
+    url "https://files.pythonhosted.org/packages/e5/ad/97453480e7bdfce94f05a983cf7ad7f1d90239efee53d5af28e622f0367f/blessed-1.19.1.tar.gz"
+    sha256 "9a0d099695bf621d4680dd6c73f6ad547f6a3442fbdbe80c4b1daa1edbc492fc"
   end
 
   resource "click" do
-    url "https://files.pythonhosted.org/packages/27/6f/be940c8b1f1d69daceeb0032fee6c34d7bd70e3e649ccac0951500b4720e/click-7.1.2.tar.gz"
-    sha256 "d2b5255c7c6349bc1bd1e59e08cd12acbbd63ce649f2588755783aa94dfb6b1a"
+    url "https://files.pythonhosted.org/packages/59/87/84326af34517fca8c58418d148f2403df25303e02736832403587318e9e8/click-8.1.3.tar.gz"
+    sha256 "7682dc8afb30297001674575ea00d1814d808d6a36af415a82bd481d37ba7b8e"
   end
 
   resource "colorama" do
-    url "https://files.pythonhosted.org/packages/82/75/f2a4c0c94c85e2693c229142eb448840fba0f9230111faa889d1f541d12d/colorama-0.4.3.tar.gz"
-    sha256 "e96da0d330793e2cb9485e9ddfd918d456036c7149416295932478192f4436a1"
+    url "https://files.pythonhosted.org/packages/2b/65/24d033a9325ce42ccbfa3ca2d0866c7e89cc68e5b9d92ecaba9feef631df/colorama-0.4.5.tar.gz"
+    sha256 "e6c6b4334fc50988a639d9b98aa429a0b57da6e17b9a44f0451f930b6967b7a4"
   end
 
   resource "gitdb" do
-    url "https://files.pythonhosted.org/packages/d1/05/eaf2ac564344030d8b3ce870b116d7bb559020163e80d9aa4a3d75f3e820/gitdb-4.0.5.tar.gz"
-    sha256 "c9e1f2d0db7ddb9a704c2a0217be31214e91a4fe1dea1efad19ae42ba0c285c9"
+    url "https://files.pythonhosted.org/packages/fc/44/64e02ef96f20b347385f0e9c03098659cb5a1285d36c3d17c56e534d80cf/gitdb-4.0.9.tar.gz"
+    sha256 "bac2fd45c0a1c9cf619e63a90d62bdc63892ef92387424b855792a6cabe789aa"
   end
 
   resource "GitPython" do
-    url "https://files.pythonhosted.org/packages/53/ea/fc34cddaa30bfc5e283f13e754fb3e2648ccd9f7019eaa3518fb5350ae51/GitPython-3.1.7.tar.gz"
-    sha256 "2db287d71a284e22e5c2846042d0602465c7434d910406990d5b74df4afb0858"
+    url "https://files.pythonhosted.org/packages/d6/39/5b91b6c40570dc1c753359de7492404ba8fe7d71af40b618a780c7ad1fc7/GitPython-3.1.27.tar.gz"
+    sha256 "1c885ce809e8ba2d88a29befeb385fcea06338d3640712b59ca623c220bb5704"
   end
 
-  # PyPi package doesn't contain requirements.txt - Hence GitHub package used
   resource "inquirer" do
-    url "https://github.com/magmax/python-inquirer/archive/2.7.0.tar.gz"
-    sha256 "0ed6c9ee4a6eab6d914dfe08903430066a2222234ca0146760471270d93f0992"
+    url "https://files.pythonhosted.org/packages/4a/3a/8028f3f48e314c89d2153d05e7a2e6e79a31bdf0f5332af3af8df9f306cc/inquirer-2.9.2.tar.gz"
+    sha256 "4a53cb9386601476e9f3241adace469ae6d1143ace2ee82f2768149e85861ab8"
   end
 
   resource "python-editor" do
@@ -55,20 +55,14 @@ class ShallowBackup < Formula
     sha256 "51fda6bcc5ddbbb7063b2af7509e43bd84bfc32a4ff71349ec7847713882327b"
   end
 
-  # There's no tar.gz on PyPi
   resource "readchar" do
-    url "https://github.com/magmax/python-readchar/archive/2.0.0.tar.gz"
-    sha256 "503c96fbdaa5e96162535dc0a8fb8525582a18a42214909d751f150c8029d694"
-  end
-
-  resource "six" do
-    url "https://files.pythonhosted.org/packages/6b/34/415834bfdafca3c5f451532e8a8d9ba89a21c9743a0c59fbd0205c7f9426/six-1.15.0.tar.gz"
-    sha256 "30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"
+    url "https://files.pythonhosted.org/packages/8d/ff/33df88cee8ab693302288fc7d2983e561bf7d78439b844407c976d52fa73/readchar-3.0.5.tar.gz"
+    sha256 "d1f5b71e98c37b7f3b695fba9db978ab84f4f8a0ed879653d83e1d90a4c482c0"
   end
 
   resource "smmap" do
-    url "https://files.pythonhosted.org/packages/75/fb/2f594e5364f9c986b2c89eb662fc6067292cb3df2b88ae31c939b9138bb9/smmap-3.0.4.tar.gz"
-    sha256 "9c98bbd1f9786d22f14b3d4126894d56befb835ec90cef151af566c7e19b5d24"
+    url "https://files.pythonhosted.org/packages/21/2d/39c6c57032f786f1965022563eec60623bb3e1409ade6ad834ff703724f3/smmap-5.0.0.tar.gz"
+    sha256 "c840e62059cd3be204b0c9c9f74be2c09d5648eddd4580d9314c3ecde0b30936"
   end
 
   resource "wcwidth" do
@@ -84,7 +78,7 @@ class ShallowBackup < Formula
     # Creates a config file and adds a test file to it
     # There is colour in stdout, hence there are ANSI escape codes
     assert_equal "\e[34m\e[1mCreating config file at: \e[22m#{pwd}/.config/shallow-backup.conf\e[0m\n" \
-    "\e[34m\e[1mAdded: \e[22m#{test_fixtures("test.svg")}\e[0m",
+                 "\e[34m\e[1mAdded: \e[22m#{test_fixtures("test.svg")}\e[0m",
     shell_output("#{bin}/shallow-backup --add-dot #{test_fixtures("test.svg")}").strip
 
     # Checks if config file was created

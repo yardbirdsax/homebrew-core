@@ -1,8 +1,8 @@
 class Packetq < Formula
-  desc "SQL-frontend to PCAP-files"
+  desc "SQL-like frontend to PCAP files"
   homepage "https://www.dns-oarc.net/tools/packetq"
-  url "https://www.dns-oarc.net/files/packetq/packetq-1.4.3.tar.gz"
-  sha256 "330fcdf63e56a97c5321726f48f28a76a7d574318dd235a16dac27f43277b0b7"
+  url "https://www.dns-oarc.net/files/packetq/packetq-1.7.1.tar.gz"
+  sha256 "a1b087335fcb018a5ded3d067d22ee906d24b6e932f018e959302be9b527c620"
   license "GPL-3.0-or-later"
 
   livecheck do
@@ -11,17 +11,18 @@ class Packetq < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "daad15e1b55f8d9fb135177127a169470374dd5e4c8631b1722586d1c66af8a7"
-    sha256 cellar: :any_skip_relocation, big_sur:       "78b947bf8208aceefdbca0119ed141b5617347ce08f20ce6493157ab4a567c77"
-    sha256 cellar: :any_skip_relocation, catalina:      "e09c6588aa801951e518c10e09339d496fa23ab88c0a837a06b963bf6c6a5ba9"
-    sha256 cellar: :any_skip_relocation, mojave:        "cf369b7e772dd7a390ca50f68e6b8eead2448414353ce313042ecaedb2f6ee88"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "58bfb682012318c49bb013b791771f94896d008d77f0ce1bb189d13ab55b20ea"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "05b37ea2ed6f049d5d85235a5713fb7e355ae63ec870847503424651f0b5b0ed"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c985f67ce185fe618952564a9eccf7927cb325be1ffec0b040f64b73061bff51"
+    sha256 cellar: :any_skip_relocation, monterey:       "085d057f267c86b2bb471deccb2768100ce3c75b87111c673b25d7b173852291"
+    sha256 cellar: :any_skip_relocation, big_sur:        "d7866c5cecef9997ef4a37966479be14c80d79a914b5c5d2b99123eb910cb1e9"
+    sha256 cellar: :any_skip_relocation, catalina:       "2f3b0e6dfcbee17aea1f379bb91eb51dee2805637447174ebdd7d6179bf5f23e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7409419d5186439ecb79302d818df6331bcfe63bd3a245f0738205f4702c047c"
   end
 
+  uses_from_macos "zlib"
+
   def install
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 

@@ -1,34 +1,49 @@
 class OpenSceneGraph < Formula
   desc "3D graphics toolkit"
   homepage "https://github.com/openscenegraph/OpenSceneGraph"
-  url "https://github.com/openscenegraph/OpenSceneGraph/archive/OpenSceneGraph-3.6.5.tar.gz"
-  sha256 "aea196550f02974d6d09291c5d83b51ca6a03b3767e234a8c0e21322927d1e12"
-  head "https://github.com/openscenegraph/OpenSceneGraph.git"
+  license "LGPL-2.1-or-later" => { with: "WxWindows-exception-3.1" }
+  revision 2
+  head "https://github.com/openscenegraph/OpenSceneGraph.git", branch: "master"
+
+  stable do
+    url "https://github.com/openscenegraph/OpenSceneGraph/archive/OpenSceneGraph-3.6.5.tar.gz"
+    sha256 "aea196550f02974d6d09291c5d83b51ca6a03b3767e234a8c0e21322927d1e12"
+
+    # patch to fix build from source when asio library is present
+    patch do
+      url "https://github.com/openscenegraph/OpenSceneGraph/commit/21f5a0adfb57dc4c28b696e93beface45de28194.patch?full_index=1"
+      sha256 "d1e4e33b50ab006420417c7998d7e0d43d0349e6f407b5eb92a3fc6636523fbf"
+    end
+  end
 
   bottle do
-    sha256 arm64_big_sur: "9a11319c94de36501730bd964da993853f111d9c5f4410dc31c2e7c6a0330d11"
-    sha256 big_sur:       "95b41df9411f5d26f4607b8ccdd2fa750ce6b7be88bb38906a48cc61eec20ff8"
-    sha256 catalina:      "a5af0114a8096d9bdc63682eb7a913b1a72b6f0d6cc20f526c0734b8111b7499"
-    sha256 mojave:        "35070bb7f3ac7460d14df196d7d0e9110fbdf84e61fa10b0ed2613d697310aa0"
-    sha256 high_sierra:   "9bbb98357b02428b90ffd8eadb5da85afcc2360aee2c8de8820fbed241f94a1d"
+    sha256 arm64_monterey: "cea275ac6fd59178f3d55ef6bf2ffedd5d8aab1431877007cba73d7844dc6091"
+    sha256 arm64_big_sur:  "637623babd3324b945b39a4af706874c3f48420854e7b591e0df2ef0d1c77dc1"
+    sha256 monterey:       "2f2617969f263e4aa08b51fb64d9a7023c42e2d14e2c075a7a4602ba95a726f3"
+    sha256 big_sur:        "95a78e9f79bdb83a94b9d9be412e4b4520f2467a2f55ea8479b494144175b2cf"
+    sha256 catalina:       "1d38f6730fda72b85bdd25600cd415e747f5ade8645a6f4270d9e87dd275103e"
+    sha256 x86_64_linux:   "43c4367454e8de65443937a3509f96d4d273b50431b0a4fde16607c88183b247"
   end
 
   depends_on "cmake" => :build
   depends_on "doxygen" => :build
   depends_on "graphviz" => :build
   depends_on "pkg-config" => :build
+  depends_on "fontconfig"
   depends_on "freetype"
-  depends_on "gtkglext"
   depends_on "jpeg-turbo"
-  depends_on "sdl"
+  depends_on "sdl2"
 
-  # patch necessary to ensure support for gtkglext-quartz
-  # filed as an issue to the developers https://github.com/openscenegraph/OpenSceneGraph/issues/34
-  patch :DATA
+  on_linux do
+    depends_on "librsvg"
+    depends_on "mesa"
+    depends_on "mesa-glu"
+  end
 
   def install
     # Fix "fatal error: 'os/availability.h' file not found" on 10.11 and
     # "error: expected function body after function declarator" on 10.12
+    # Requires the CLT to be the active developer directory if Xcode is installed
     ENV["SDKROOT"] = MacOS.sdk_path if MacOS.version <= :sierra
 
     args = std_cmake_args + %w[
@@ -37,12 +52,18 @@ class OpenSceneGraph < Formula
       -DCMAKE_DISABLE_FIND_PACKAGE_GDAL=ON
       -DCMAKE_DISABLE_FIND_PACKAGE_Jasper=ON
       -DCMAKE_DISABLE_FIND_PACKAGE_OpenEXR=ON
+      -DCMAKE_DISABLE_FIND_PACKAGE_SDL=ON
       -DCMAKE_DISABLE_FIND_PACKAGE_TIFF=ON
       -DCMAKE_CXX_FLAGS=-Wno-error=narrowing
-      -DCMAKE_OSX_ARCHITECTURES=x86_64
-      -DOSG_DEFAULT_IMAGE_PLUGIN_FOR_OSX=imageio
-      -DOSG_WINDOWING_SYSTEM=Cocoa
     ]
+
+    if OS.mac?
+      args += %w[
+        -DCMAKE_OSX_ARCHITECTURES=x86_64
+        -DOSG_DEFAULT_IMAGE_PLUGIN_FOR_OSX=imageio
+        -DOSG_WINDOWING_SYSTEM=Cocoa
+      ]
+    end
 
     mkdir "build" do
       system "cmake", "..", *args
@@ -68,18 +89,3 @@ class OpenSceneGraph < Formula
     assert_equal `./test`.chomp, version.to_s
   end
 end
-
-__END__
-diff --git a/CMakeModules/FindGtkGl.cmake b/CMakeModules/FindGtkGl.cmake
-index 321cede..6497589 100644
---- a/CMakeModules/FindGtkGl.cmake
-+++ b/CMakeModules/FindGtkGl.cmake
-@@ -10,7 +10,7 @@ IF(PKG_CONFIG_FOUND)
-     IF(WIN32)
-         PKG_CHECK_MODULES(GTKGL gtkglext-win32-1.0)
-     ELSE()
--        PKG_CHECK_MODULES(GTKGL gtkglext-x11-1.0)
-+        PKG_CHECK_MODULES(GTKGL gtkglext-quartz-1.0)
-     ENDIF()
-
- ENDIF()

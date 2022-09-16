@@ -3,9 +3,9 @@ class Spades < Formula
 
   desc "De novo genome sequence assembly"
   homepage "https://cab.spbu.ru/software/spades/"
-  url "https://cab.spbu.ru/files/release3.15.0/SPAdes-3.15.0.tar.gz"
-  mirror "https://github.com/ablab/spades/releases/download/v3.15.0/SPAdes-3.15.0.tar.gz"
-  sha256 "6719489fa4bed6dd96d78bdd4001a30806d5469170289085836711d1ffb8b28b"
+  url "https://cab.spbu.ru/files/release3.15.5/SPAdes-3.15.5.tar.gz"
+  mirror "https://github.com/ablab/spades/releases/download/v3.15.5/SPAdes-3.15.5.tar.gz"
+  sha256 "155c3640d571f2e7b19a05031d1fd0d19bd82df785d38870fb93bd241b12bbfa"
   license "GPL-2.0-only"
 
   livecheck do
@@ -14,13 +14,14 @@ class Spades < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, big_sur:  "85776ce52d23b7bf4fb0e9ecdd8bce77c722706a662b677ad74b13b62e43c8a3"
-    sha256 cellar: :any_skip_relocation, catalina: "4e80e0f7e271b2653d6fc9d425d3623096f349ab582f1f03e223c7ce815a4b5c"
-    sha256 cellar: :any_skip_relocation, mojave:   "e182a129f1519391ba6267c36eb1f6bb08df89edb33b0c4edb3c7473dad17791"
+    sha256 cellar: :any_skip_relocation, monterey:     "45b237f7a9c3ee0e0f0db024dba8f9077d93502e3a451d9c203e28357efe6a1a"
+    sha256 cellar: :any_skip_relocation, big_sur:      "a06c2ba0482096b9dc88db4cb010026d4d4653052513cfc848bf42a4ea392a0c"
+    sha256 cellar: :any_skip_relocation, catalina:     "68f170145b2359a752ac08f50a2b374baf87a724f581060c1798b3bcbd6f01f0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "3b0f86d7df758b572e3560d59da2acebd70874ba0a30139b2b826ce567a2b490"
   end
 
   depends_on "cmake" => :build
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   uses_from_macos "bzip2"
   uses_from_macos "ncurses"
@@ -40,7 +41,7 @@ class Spades < Formula
       system "cmake", "..", *std_cmake_args
       system "make", "install"
     end
-    bin.find { |f| rewrite_shebang detected_python_shebang, f }
+    rewrite_shebang detected_python_shebang, *bin.children
   end
 
   test do

@@ -2,11 +2,11 @@ class Juju < Formula
   desc "DevOps management tool"
   homepage "https://juju.is/"
   url "https://github.com/juju/juju.git",
-      tag:      "juju-2.8.7",
-      revision: "ee2cfeb2c8c716af763a011e184ddea879c0985d"
+      tag:      "juju-2.9.34",
+      revision: "20b8212e62c5d122e63141825a7733bf66c4c5a9"
   license "AGPL-3.0-only"
   version_scheme 1
-  head "https://github.com/juju/juju.git"
+  head "https://github.com/juju/juju.git", branch: "develop"
 
   livecheck do
     url :stable
@@ -14,11 +14,12 @@ class Juju < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "db336d2998265f523d77ae773691137d8524f27bad5d1500d291619324994288"
-    sha256 cellar: :any_skip_relocation, big_sur:       "75f2094e43822dc5e817cfe205e7bcd5a43d307cf38edefcbad475d55d948fea"
-    sha256 cellar: :any_skip_relocation, catalina:      "cb2e85deb8ea65f5bfacf7516796be7e572860eb5e821caed4f6f0bec12fe82a"
-    sha256 cellar: :any_skip_relocation, mojave:        "72ac63fc890000b160adbf747f795dcfee2b76226adaba3d0580e05647c46a11"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "ca2f5e1a00942a372e3ce5b237a1dc6bc890345c40d1fecc2b84ea4edf410416"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "3bf912cfc942848b406ba41dc675dfdf08e86da0a8b49785dce64e248c18605f"
+    sha256 cellar: :any_skip_relocation, monterey:       "b3677103a612f52516ad41a770f3db5601b52c655b218cd13ff3c0fec901466f"
+    sha256 cellar: :any_skip_relocation, big_sur:        "984ae41d611c8913ee5d4a72c36e220af4be0148464f37556fe74a898b464cd8"
+    sha256 cellar: :any_skip_relocation, catalina:       "646e67eb894602fc344a3d93948e2c9fcbb464d5435c8818edecfb55eeddf320"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d3282e75314a0b07384ed19c84a4cc5038f1d98dbb19b46ee9a0452e8981d33f"
   end
 
   depends_on "go" => :build
@@ -29,13 +30,8 @@ class Juju < Formula
       -X version.GitCommit=#{Utils.git_head}
       -X version.GitTreeState=clean
     ]
-    system "go", "build", *std_go_args,
-                 "-ldflags", ld_flags.join(" "),
-                 "./cmd/juju"
-    system "go", "build", *std_go_args,
-                 "-ldflags", ld_flags.join(" "),
-                 "-o", bin/"juju-metadata",
-                 "./cmd/plugins/juju-metadata"
+    system "go", "build", *std_go_args(ldflags: ld_flags), "./cmd/juju"
+    system "go", "build", *std_go_args(output: bin/"juju-metadata", ldflags: ld_flags), "./cmd/plugins/juju-metadata"
     bash_completion.install "etc/bash_completion.d/juju"
   end
 

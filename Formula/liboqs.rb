@@ -1,8 +1,8 @@
 class Liboqs < Formula
   desc "Library for quantum-safe cryptography"
   homepage "https://openquantumsafe.org/"
-  url "https://github.com/open-quantum-safe/liboqs/archive/0.4.0.tar.gz"
-  sha256 "05836cd2b5c70197b3b6eed68b97d0ccb2c445061d5c19c15aef7c959842de0b"
+  url "https://github.com/open-quantum-safe/liboqs/archive/0.7.2.tar.gz"
+  sha256 "8432209a3dc7d96af03460fc161676c89e14fca5aaa588a272eb43992b53de76"
   license "MIT"
 
   livecheck do
@@ -11,16 +11,21 @@ class Liboqs < Formula
   end
 
   bottle do
-    sha256 cellar: :any, big_sur:     "37ccef44b4ea6d76bbd98343ef266dda8d3f6b7c103f981a4194ecd841685017"
-    sha256 cellar: :any, catalina:    "ffd8b834836ed6b28606c173766f99d168c57b322153cbea5100bbbc27e1073d"
-    sha256 cellar: :any, mojave:      "1253594d96910c9bea3566d75461de4e497097dd24e94fcddb232dac3d2bdbfd"
-    sha256 cellar: :any, high_sierra: "c0fb642f6934a0413fbd2e4a32a02f8cd5e7b7491f3f6d6423ab4856cef8f5df"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "229cc26dc8f4ebd3f178ae31e40c1627a5e3b5dfd30d15c440e26dd8b3e289e3"
+    sha256 cellar: :any,                 arm64_big_sur:  "4e80fd4cfee7fd4cdaf4560befaddb01f02886123409036daeea2ab73ebf253a"
+    sha256 cellar: :any,                 monterey:       "41ac926d23bb6c05e82d4a30072a3e7b9f5bd573110b06fa931f032aa81cb1b2"
+    sha256 cellar: :any,                 big_sur:        "98ffdb22f4e52fb8ba6eba99834d3b9c729d2030f99d8691b059cb307ea60390"
+    sha256 cellar: :any,                 catalina:       "a4ab1395ce808507b8af6316ceb58d1a081c172e21bd24d107e98829620f5b86"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "10d3d91f8b15c231eb1f95bfb886761304429f210f30bfcfdbe45ac6541c4f01"
   end
 
   depends_on "cmake" => :build
   depends_on "doxygen" => :build
   depends_on "ninja" => :build
   depends_on "openssl@1.1"
+
+  fails_with gcc: "5"
 
   def install
     mkdir "build" do
@@ -33,7 +38,7 @@ class Liboqs < Formula
 
   test do
     cp pkgshare/"tests/example_kem.c", "test.c"
-    system ENV.cc, "-I#{include}", "-L#{lib}", "-loqs", "-o", "test", "test.c"
+    system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-loqs", "-o", "test"
     assert_match "operations completed", shell_output("./test")
   end
 end

@@ -1,19 +1,22 @@
 class MysqlConnectorCxx < Formula
   desc "MySQL database connector for C++ applications"
   homepage "https://dev.mysql.com/downloads/connector/cpp/"
-  url "https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.23-src.tar.gz"
-  sha256 "9af06495a6a080fed62da70978f1cb0c66f058edd5ea9eda9345a64bf8ec688f"
+  url "https://dev.mysql.com/get/Downloads/Connector-C++/mysql-connector-c++-8.0.30-src.tar.gz"
+  sha256 "5b2ceebe3986fe6d6b0c6f29b6912cb3a1cabf998d2c4c4127452768de75ab0b"
+  license "GPL-2.0-only" => { with: "Universal-FOSS-exception-1.0" }
 
   livecheck do
-    url :homepage
-    regex(/href=.*?mysql-connector-c%2B%2B[._-]v?(\d+.\d+.\d+)-/i)
+    url "https://dev.mysql.com/downloads/connector/cpp/?tpl=files&os=src"
+    regex(/href=.*?mysql-connector-c%2B%2B[._-]v?(\d+(?:\.\d+)+)[._-]src\.t/i)
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "9526dc9dfbcb3e82de1a20cac8f1f1c33637b979c34c1fb7e9f825a8a11b41e7"
-    sha256 cellar: :any, big_sur:       "7814f13c4b6bd77627e4eea7a82aebe2b97ebe83744dbdf5541509848f89a727"
-    sha256 cellar: :any, catalina:      "2e6246b9c2c7adf2c700d88ed5e0d07406c78c5479a064aa87f59a85f9bd8b3d"
-    sha256 cellar: :any, mojave:        "083e6ef2e4af3c9d45b0e2b2b2fa89beb63add05e1ef8d30ebc6a39d24fdd9e0"
+    sha256 cellar: :any,                 arm64_monterey: "681fac456c8676f2cd56dd849cb26c12d230f24e42f3b84f52090594fddd9b5e"
+    sha256 cellar: :any,                 arm64_big_sur:  "faa9e4a14708b37e160b71e6ca3d801e8f539087a5129b6cf80bccb7e82e0ed4"
+    sha256 cellar: :any,                 monterey:       "bf509a6346328acebe632c087ccf64d45d9aeeaee2a62e919e2cc0d547cff928"
+    sha256 cellar: :any,                 big_sur:        "177987159c619258613b2defb87f1ad686cea87c70c967ad0c80fb562fb2d659"
+    sha256 cellar: :any,                 catalina:       "71ae5ab9dafca521b0232834702259947cab9677d7df611690ed4bcf6bd61a5f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4e8577785defea700cd26ba07923c34703e5e4dbd8a29c571db04a6dc2eeaefa"
   end
 
   depends_on "boost" => :build

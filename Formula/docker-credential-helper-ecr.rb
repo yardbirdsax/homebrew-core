@@ -2,8 +2,8 @@ class DockerCredentialHelperEcr < Formula
   desc "Docker Credential Helper for Amazon ECR"
   homepage "https://github.com/awslabs/amazon-ecr-credential-helper"
   url "https://github.com/awslabs/amazon-ecr-credential-helper.git",
-      tag:      "v0.4.0",
-      revision: "1a5791b236421b509fbc30502211b1de51ca8e30"
+      tag:      "v0.6.0",
+      revision: "69c85dc22db6511932bbf119e1a0cc5c90c69a7f"
   license "Apache-2.0"
 
   livecheck do
@@ -12,24 +12,20 @@ class DockerCredentialHelperEcr < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, big_sur:     "fe14097587f1f22cba7ba36b49c738abc8027408cd6944e768030608deb49738"
-    sha256 cellar: :any_skip_relocation, catalina:    "d5e603dc272c983cfd10995ac0b39418308e26c791a28d1a56fc13282d5425bb"
-    sha256 cellar: :any_skip_relocation, mojave:      "2bcb4437b3096c71bc248e4bcbe4aa20d4cd801a63eb139c2250cd73f5c9f5cb"
-    sha256 cellar: :any_skip_relocation, high_sierra: "5db19be899dc7a06ab6e180bbf2972d6f8b4e44a092e6f7b2be35297f03044f5"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "e0d768a76a10449f70e88d0b25dd11dc9b8f8149f6b3c153fa93a018d2375fe8"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "dfd6561543c85f32a1eae09b00e0b0ea8ccdeada1073227cc87fed3916b40bd5"
+    sha256 cellar: :any_skip_relocation, monterey:       "e41c402435c1e0a079461dce61a5ad1a695ab3af689bae754a3e7ad9328583e7"
+    sha256 cellar: :any_skip_relocation, big_sur:        "8c15457c2a829da7ac19e2a52aa1c64f5199feb4cdcd4998df46ba45676c0db9"
+    sha256 cellar: :any_skip_relocation, catalina:       "4b6a17ed414ddad4cb9cba0e23eb0e427addaedb5dea660907ef0339967abee6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "81ccf231057d1fba63bb6b99d62693989df43125e25028bff5fdfa88e7c7cbb7"
   end
 
   depends_on "go" => :build
 
   def install
-    ENV["GOPATH"] = buildpath
-    dir = buildpath/"src/github.com/awslabs/amazon-ecr-credential-helper"
-    dir.install buildpath.children - [buildpath/".brew_home"]
-
-    cd dir do
-      system "make", "build"
-      bin.install "bin/local/docker-credential-ecr-login"
-      prefix.install_metafiles
-    end
+    system "make", "build"
+    bin.install "bin/local/docker-credential-ecr-login"
   end
 
   test do

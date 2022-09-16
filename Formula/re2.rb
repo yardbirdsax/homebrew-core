@@ -1,11 +1,11 @@
 class Re2 < Formula
   desc "Alternative to backtracking PCRE-style regular expression engines"
   homepage "https://github.com/google/re2"
-  url "https://github.com/google/re2/archive/2021-02-01.tar.gz"
-  version "20210201"
-  sha256 "d3e15031ced791b39f11964816ca2d4213f25d3b67fbbe82972c7b7666c456ba"
+  url "https://github.com/google/re2/archive/2022-06-01.tar.gz"
+  version "20220601"
+  sha256 "f89c61410a072e5cbcf8c27e3a778da7d6fd2f2b5b1445cd4f4508bee946ab0f"
   license "BSD-3-Clause"
-  head "https://github.com/google/re2.git"
+  head "https://github.com/google/re2.git", branch: "main"
 
   # The `strategy` block below is used to massage upstream tags into the
   # YYYYMMDD format used in the `version`. This is necessary for livecheck
@@ -19,10 +19,12 @@ class Re2 < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "13f404afed47230c0e201c243b9b56c73ad36f06f0f9585270b9f9dce05d60de"
-    sha256 cellar: :any, big_sur:       "358867c4ccf2d5f6ca6c87f1a228869937e0cd569e7c3ccb3e25466458e47b65"
-    sha256 cellar: :any, catalina:      "4879622aed1b28e66c1da31683c7bc19c287e7aded0cb0309df5186c7620cf7b"
-    sha256 cellar: :any, mojave:        "e67b8b92889ec6c0f70f37c9bcb171cc0f8e7d9fcc0a76842c92507372b90cfe"
+    sha256 cellar: :any,                 arm64_monterey: "5364a5325131113abec97c05282f85c29572094ac0ad2cbce9571e1dffd8fda1"
+    sha256 cellar: :any,                 arm64_big_sur:  "3d60ddeca55c3d3e629bf2edbf5cfa0b0eeaaf61360b2b9adbde91979c2595ba"
+    sha256 cellar: :any,                 monterey:       "568670d04b9bc92a07f6db624acda793834ad1c8bcb2f120386df77d7bd6385c"
+    sha256 cellar: :any,                 big_sur:        "e52a5ade3edeaf1d62170e1f4b43a4e73b71178d0e5f91300a4e29442905e7bd"
+    sha256 cellar: :any,                 catalina:       "2ca1a5a803d348e1487da767936165a12224b65940de3927e83ccd81c90ed443"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0f6532af8d10af84905b47b7e1fe9db19ae6b2ec9c17bca8c659137f66c56a8a"
   end
 
   depends_on "cmake" => :build
@@ -49,8 +51,8 @@ class Re2 < Formula
         return 0;
       }
     EOS
-    system ENV.cxx, "-std=c++11", "-I#{include}", "-L#{lib}", "-lre2",
-           "test.cpp", "-o", "test"
+    system ENV.cxx, "-std=c++11", "test.cpp", "-o", "test",
+                    "-I#{include}", "-L#{lib}", "-lre2"
     system "./test"
   end
 end

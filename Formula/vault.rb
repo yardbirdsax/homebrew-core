@@ -5,10 +5,10 @@ class Vault < Formula
   desc "Secures, stores, and tightly controls access to secrets"
   homepage "https://vaultproject.io/"
   url "https://github.com/hashicorp/vault.git",
-      tag:      "v1.6.2",
-      revision: "be65a227ef2e80f8588b3b13584b5c0d9238c1d7"
+      tag:      "v1.11.3",
+      revision: "17250b25303c6418c283c95b1d5a9c9f16174fe8"
   license "MPL-2.0"
-  head "https://github.com/hashicorp/vault.git"
+  head "https://github.com/hashicorp/vault.git", branch: "main"
 
   livecheck do
     url "https://releases.hashicorp.com/vault/"
@@ -16,54 +16,35 @@ class Vault < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, big_sur:  "ad51499dcf00457610616b2215f56cc9ad65b4448c3f7f29dc11a63c5175af41"
-    sha256 cellar: :any_skip_relocation, catalina: "8e74b52c077f59164841d2ef1c001cc774125c6e48eda784c0f2815255e87356"
-    sha256 cellar: :any_skip_relocation, mojave:   "68c388c43880ffb476a0f4754dbd618eafd76bd5f359d7446f4980f888dbe1bc"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "e7ba293887a946efb82796307e32b68c755e9f46372405a3c09ce638368c89bd"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ae1379cfe9e27825f237c253d6bae76d752685b46aab313aa7e20d987023b42b"
+    sha256 cellar: :any_skip_relocation, monterey:       "0d0b0519de19c34b2e38c6e8fe05d0723df0664b2e31019631ed3a98bed45fcd"
+    sha256 cellar: :any_skip_relocation, big_sur:        "8acab5c16fa3d555625963976f13ce57412af4bf71fae0e6184ef734b204ed19"
+    sha256 cellar: :any_skip_relocation, catalina:       "f9c51c292a85f52618453445dea925c9f86d835f9958e61d70645cf2293272d9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8493da41d5a645a9b23e9f6f68c7d7b0b9fe9aeb00a29cb7f9c62d79daec68c2"
   end
 
   depends_on "go" => :build
   depends_on "gox" => :build
-  depends_on "node@10" => :build
+  depends_on "node" => :build
+  depends_on "python@3.10" => :build
   depends_on "yarn" => :build
 
   def install
+    # Needs both `npm` and `python` in PATH
+    ENV.prepend_path "PATH", Formula["node"].opt_libexec/"bin"
+    ENV.prepend_path "PATH", Formula["python@3.10"].opt_libexec/"bin" if OS.mac?
     ENV.prepend_path "PATH", "#{ENV["GOPATH"]}/bin"
     system "make", "bootstrap", "static-dist", "dev-ui"
     bin.install "bin/vault"
   end
 
-  plist_options manual: "vault server -dev"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>KeepAlive</key>
-          <dict>
-            <key>SuccessfulExit</key>
-            <false/>
-          </dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_bin}/vault</string>
-            <string>server</string>
-            <string>-dev</string>
-          </array>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>WorkingDirectory</key>
-          <string>#{var}</string>
-          <key>StandardErrorPath</key>
-          <string>#{var}/log/vault.log</string>
-          <key>StandardOutPath</key>
-          <string>#{var}/log/vault.log</string>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_bin/"vault", "server", "-dev"]
+    keep_alive true
+    working_dir var
+    log_path var/"log/vault.log"
+    error_log_path var/"log/vault.log"
   end
 
   test do

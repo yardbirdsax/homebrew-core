@@ -1,8 +1,8 @@
 class Protobuf < Formula
   desc "Protocol buffers (Google's data interchange format)"
   homepage "https://github.com/protocolbuffers/protobuf/"
-  url "https://github.com/protocolbuffers/protobuf/releases/download/v3.14.0/protobuf-all-3.14.0.tar.gz"
-  sha256 "6dd0f6b20094910fbb7f1f7908688df01af2d4f6c5c21331b9f636048674aebf"
+  url "https://github.com/protocolbuffers/protobuf/releases/download/v21.6/protobuf-all-21.6.tar.gz"
+  sha256 "5c375b3b09faf4e6268d24afd48e39ca981cc22d721fca776780e4a66a9fa372"
   license "BSD-3-Clause"
 
   livecheck do
@@ -11,37 +11,26 @@ class Protobuf < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any, arm64_big_sur: "67c2e767fbab9efc667ea729cfd08d081a1d3d7e93d7a86f68f8bd4a26ca5e8f"
-    sha256 cellar: :any, big_sur:       "b06e8c4247465d7773a359eeeaa39385e564fefab77dbbb245ac928eea334ce9"
-    sha256 cellar: :any, catalina:      "8d53111626404e2b4f27718127a313dceea600a74a4d38ffe0870812d8f57eb4"
-    sha256 cellar: :any, mojave:        "0070627fe9b8c1818e54480c272cc00fa71bd5bd944b04d37ebe2e31604cb9c9"
+    sha256 cellar: :any,                 arm64_monterey: "11267e08f84d284a85749be270a2cda5aa6bafd37c55bd6947a9f9c1a972df1c"
+    sha256 cellar: :any,                 arm64_big_sur:  "4d6fea844ce0bd0d126bd487741bd2d2079335ac83d0aa2583a7b9b0fb17e7c5"
+    sha256 cellar: :any,                 monterey:       "a2896da738f5681b7e97130d1ffa58e5efbbbaf8646f4f7119c89193706730be"
+    sha256 cellar: :any,                 big_sur:        "789c1e874f6de8cbd84b0ad94a02ffd34b0faa44276ff3548f618a0d3c8b3223"
+    sha256 cellar: :any,                 catalina:       "7d71f7953e307680cbb5c93f3c473e5a61c1ecbb648483a384bcede0a0817c54"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d27d3c261ef65f18260d92cc18160195951db9201b5b942b6ae9df905b705ea5"
   end
 
   head do
-    url "https://github.com/protocolbuffers/protobuf.git"
+    url "https://github.com/protocolbuffers/protobuf.git", branch: "main"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
     depends_on "libtool" => :build
   end
 
+  depends_on "python@3.10" => [:build, :test]
   depends_on "python@3.9" => [:build, :test]
 
-  conflicts_with "percona-server", "percona-xtrabackup",
-    because: "both install libprotobuf(-lite) libraries"
-
-  resource "six" do
-    url "https://files.pythonhosted.org/packages/6b/34/415834bfdafca3c5f451532e8a8d9ba89a21c9743a0c59fbd0205c7f9426/six-1.15.0.tar.gz"
-    sha256 "30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"
-  end
-
-  # Fix build on Big Sur, remove in next version
-  # https://github.com/protocolbuffers/protobuf/pull/8126
-  patch do
-    url "https://github.com/atomiix/protobuf/commit/d065bd6910a0784232dbbbfd3e5806922d69c622.patch?full_index=1"
-    sha256 "5433b6247127f9ca622b15c9f669efbaac830fa717ed6220081bc1fc3c735f91"
-  end
+  uses_from_macos "zlib"
 
   def install
     # Don't build in debug mode. See:
@@ -64,18 +53,11 @@ class Protobuf < Formula
     ENV.append_to_cflags "-I#{include}"
     ENV.append_to_cflags "-L#{lib}"
 
-    resource("six").stage do
-      system Formula["python@3.9"].opt_bin/"python3", *Language::Python.setup_install_args(libexec)
+    cd "python" do
+      ["3.9", "3.10"].each do |xy|
+        system "python#{xy}", *Language::Python.setup_install_args(prefix, "python#{xy}"), "--cpp_implementation"
+      end
     end
-    chdir "python" do
-      system Formula["python@3.9"].opt_bin/"python3", *Language::Python.setup_install_args(libexec),
-                        "--cpp_implementation"
-    end
-
-    version = Language::Python.major_minor_version Formula["python@3.9"].opt_bin/"python3"
-    site_packages = "lib/python#{version}/site-packages"
-    pth_contents = "import site; site.addsitedir('#{libexec/site_packages}')\n"
-    (prefix/site_packages/"homebrew-protobuf.pth").write pth_contents
   end
 
   test do
@@ -91,6 +73,8 @@ class Protobuf < Formula
     EOS
     (testpath/"test.proto").write testdata
     system bin/"protoc", "test.proto", "--cpp_out=."
-    system Formula["python@3.9"].opt_bin/"python3", "-c", "import google.protobuf"
+
+    system Formula["python@3.9"].opt_bin/"python3.9", "-c", "import google.protobuf"
+    system Formula["python@3.10"].opt_bin/"python3.10", "-c", "import google.protobuf"
   end
 end

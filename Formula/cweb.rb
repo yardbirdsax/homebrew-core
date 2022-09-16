@@ -1,16 +1,26 @@
 class Cweb < Formula
   desc "Literate documentation system for C, C++, and Java"
   homepage "https://cs.stanford.edu/~knuth/cweb.html"
-  url "https://cs.stanford.edu/pub/cweb/cweb-3.64c.tar.gz"
-  mirror "https://www.ctan.org/tex-archive/web/c_cpp/cweb/cweb-3.64c.tar.gz"
-  sha256 "efbd6fbeca9b3e75629b69e9565ac6a0e4067f55bda6a0a3b7b6f9449d9ed81f"
+  url "https://github.com/ascherer/cweb/archive/cweb-4.8.1.tar.gz"
+  sha256 "3d1468408aaf2853bc8fbbc64b0f06e9be9c3c89638d78da907bf6f4656d52ce"
+  # See disucssions in this thread, https://github.com/ascherer/cweb/issues/29
+  license :cannot_represent
+
+  livecheck do
+    url :stable
+    regex(/^cweb[._-]v?(\d+(?:\.\d+)+[a-z]*?)$/i)
+  end
 
   bottle do
-    sha256 arm64_big_sur: "9a1237298f33f69283f923525eb5668911226d48043024bbbd44d337ad1bcdbe"
-    sha256 big_sur:       "2ee6617cf9da76e1e7cafbd49ed6e53fee15339c82df053eab55a398fb96f50b"
-    sha256 catalina:      "e100640669a1d066177514aae1c813f7c18b530c4cae5744d0431d850933648c"
-    sha256 mojave:        "410376faad622cd11745ca94c877135c1b4837ccdc8c7cab43bf12b4b849a3b9"
+    sha256                               arm64_monterey: "5de3449dadd66c5759b4aa073884336c9c935b3a4481d4355303b050897c3948"
+    sha256                               arm64_big_sur:  "1ae7da8bf50cadb46c67c6e3ece21e992942f354dba9e9ba4dd940b4150db086"
+    sha256                               monterey:       "3f29dcb1e90489af30f71b1d2080f1da44aa54523c03955a3d8390867d8fbb10"
+    sha256                               big_sur:        "5b04f2fc775e7997bd22d4fdff71bdd5d4e8776de60f7c7a79b68280b3b9df09"
+    sha256                               catalina:       "abb227be400bc74150619772ced22aa90bb2c1721b1ceca347f83259d6da6904"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7a01ccf4b26f6d1afb455970164dec856d58a0c523653726e873ca4db412ce08"
   end
+
+  conflicts_with "texlive", because: "both install `cweb` binaries"
 
   def install
     ENV.deparallelize

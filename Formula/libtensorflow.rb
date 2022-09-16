@@ -1,33 +1,37 @@
 class Libtensorflow < Formula
-  include Language::Python::Virtualenv
-
   desc "C interface for Google's OS library for Machine Intelligence"
   homepage "https://www.tensorflow.org/"
-  url "https://github.com/tensorflow/tensorflow/archive/v2.4.1.tar.gz"
-  sha256 "f681331f8fc0800883761c7709d13cda11942d4ad5ff9f44ad855e9dc78387e0"
+  url "https://github.com/tensorflow/tensorflow/archive/refs/tags/v2.10.0.tar.gz"
+  sha256 "b5a1bb04c84b6fe1538377e5a1f649bb5d5f0b2e3625a3c526ff3a8af88633e8"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any, big_sur:  "08c3da25d564c638f87d096085af086a132e88d668104f5c458bf58c0ae63bf2"
-    sha256 cellar: :any, catalina: "2d704812bd3b9c287093078e00f815a55cfbe66fbe3eeeffdb35c374ec8fc59f"
-    sha256 cellar: :any, mojave:   "12b0bbab4390838291cc2a27409ae24c79bf6d71f44a70c0ad62be7dbf102be5"
+    sha256 cellar: :any, arm64_monterey: "4ad5bdc8ac3fbf0702d0d8d065efa96b03fe5851f964600b5aa0f791ad9204fb"
+    sha256 cellar: :any, arm64_big_sur:  "5d50ef50dfe302cabf280a85ed89c86d40bdba97f561b228706e769d9cef1e0d"
+    sha256 cellar: :any, monterey:       "78740a9f2c6e557943fbd56cb781bb3c88bdbbe0f63e842cb1398f886e849d53"
+    sha256 cellar: :any, big_sur:        "de2d7d3c205862ceb91a94fc35cad67541a5a24b0933a1783203045bc14be549"
+    sha256 cellar: :any, catalina:       "94076eb515a7240b26d36add1e214643a4d7cc6b0bea3f4d66685af72cbe1469"
   end
 
-  depends_on "bazel" => :build
+  depends_on "bazelisk" => :build
   depends_on "numpy" => :build
-  depends_on "python@3.9" => :build
+  depends_on "python@3.10" => :build
 
-  resource "test-model" do
+  resource "homebrew-test-model" do
     url "https://github.com/tensorflow/models/raw/v1.13.0/samples/languages/java/training/model/graph.pb"
     sha256 "147fab50ddc945972818516418942157de5e7053d4b67e7fca0b0ada16733ecb"
   end
 
   def install
-    # Allow tensorflow to use current version of bazel
-    (buildpath / ".bazelversion").atomic_write Formula["bazel"].version
-
-    ENV["PYTHON_BIN_PATH"] = Formula["python@3.9"].opt_bin/"python3"
-    ENV["CC_OPT_FLAGS"] = "-march=native"
+    optflag = if Hardware::CPU.arm? && OS.mac?
+      "-mcpu=apple-m1"
+    elsif build.bottle?
+      "-march=#{Hardware.oldest_cpu}"
+    else
+      "-march=native"
+    end
+    ENV["CC_OPT_FLAGS"] = optflag
+    ENV["PYTHON_BIN_PATH"] = Formula["python@3.10"].opt_bin/"python3"
     ENV["TF_IGNORE_MAX_BAZEL_VERSION"] = "1"
     ENV["TF_NEED_JEMALLOC"] = "1"
     ENV["TF_NEED_GCP"] = "0"
@@ -49,10 +53,12 @@ class Libtensorflow < Formula
     ENV["TF_CONFIGURE_IOS"] = "0"
     system "./configure"
 
-    bazel_args =%W[
+    bazel_args = %W[
       --jobs=#{ENV.make_jobs}
       --compilation_mode=opt
-      --copt=-march=native
+      --copt=#{optflag}
+      --linkopt=-Wl,-rpath,#{rpath}
+      --verbose_failures
     ]
     targets = %w[
       tensorflow:libtensorflow.so
@@ -61,7 +67,7 @@ class Libtensorflow < Formula
       tensorflow/tools/graph_transforms:summarize_graph
       tensorflow/tools/graph_transforms:transform_graph
     ]
-    system "bazel", "build", *bazel_args, *targets
+    system Formula["bazelisk"].opt_bin/"bazelisk", "build", *bazel_args, *targets
 
     lib.install Dir["bazel-bin/tensorflow/*.so*", "bazel-bin/tensorflow/*.dylib*"]
     include.install "bazel-bin/tensorflow/include/tensorflow"
@@ -91,11 +97,11 @@ class Libtensorflow < Formula
     system ENV.cc, "-L#{lib}", "-ltensorflow", "-o", "test_tf", "test.c"
     assert_equal version, shell_output("./test_tf")
 
-    resource("test-model").stage(testpath)
+    resource("homebrew-test-model").stage(testpath)
 
     summarize_graph_output = shell_output("#{bin}/summarize_graph --in_graph=#{testpath}/graph.pb 2>&1")
     variables_match = /Found \d+ variables:.+$/.match(summarize_graph_output)
-    assert_not_nil variables_match, "Unexpected stdout from summarize_graph for graph.pb (no found variables)"
+    refute_nil variables_match, "Unexpected stdout from summarize_graph for graph.pb (no found variables)"
     variables_names = variables_match[0].scan(/name=([^,]+)/).flatten.sort
 
     transform_command = %W[
@@ -113,13 +119,13 @@ class Libtensorflow < Formula
 
     new_summarize_graph_output = shell_output("#{bin}/summarize_graph --in_graph=#{testpath}/graph-new.pb 2>&1")
     new_variables_match = /Found \d+ variables:.+$/.match(new_summarize_graph_output)
-    assert_not_nil new_variables_match, "Unexpected summarize_graph output for graph-new.pb (no found variables)"
+    refute_nil new_variables_match, "Unexpected summarize_graph output for graph-new.pb (no found variables)"
     new_variables_names = new_variables_match[0].scan(/name=([^,]+)/).flatten.sort
 
-    assert_not_equal variables_names, new_variables_names, "transform_graph didn't obfuscate variable names"
+    refute_equal variables_names, new_variables_names, "transform_graph didn't obfuscate variable names"
 
     benchmark_model_match = /benchmark_model -- (.+)$/.match(new_summarize_graph_output)
-    assert_not_nil benchmark_model_match,
+    refute_nil benchmark_model_match,
       "Unexpected summarize_graph output for graph-new.pb (no benchmark_model example)"
 
     benchmark_model_args = benchmark_model_match[1].split

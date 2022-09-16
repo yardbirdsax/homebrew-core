@@ -1,16 +1,18 @@
 class Fzf < Formula
   desc "Command-line fuzzy finder written in Go"
   homepage "https://github.com/junegunn/fzf"
-  url "https://github.com/junegunn/fzf/archive/0.25.1.tar.gz"
-  sha256 "b97cf9ab528391a49dfa45b459c767fb2626ade9f3a3f99d0108d7274f2eca8b"
+  url "https://github.com/junegunn/fzf/archive/0.33.0.tar.gz"
+  sha256 "136ddddfdb229631b08ea7e67be965bcf9c95f5fe1360b80b11f81aa64ba19ad"
   license "MIT"
-  head "https://github.com/junegunn/fzf.git"
+  head "https://github.com/junegunn/fzf.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "133beca7affe4d543f5aba15b11886b8ad3fc34a5e9eb791452b1355bcb70ee4"
-    sha256 cellar: :any_skip_relocation, big_sur:       "68e736426f331fde61f472219dfcee7e98eed1b286dfc04947295d9ff9e24dfa"
-    sha256 cellar: :any_skip_relocation, catalina:      "bf62f2448b75495f44f5a59d05a304e4ec5b99c08ca656b14a6b0e9823969830"
-    sha256 cellar: :any_skip_relocation, mojave:        "d523d435dc9ec2866d0cca2ba9cec1c28b4f92c5b56e664837ee1b798de1fc7b"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "c060989039ef838c48542fe25b68bf45a874f10b3ff8c6d70e5726382936e5b6"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c060989039ef838c48542fe25b68bf45a874f10b3ff8c6d70e5726382936e5b6"
+    sha256 cellar: :any_skip_relocation, monterey:       "1f16e48fca570e858b8fa11c9eef4c561f7796945a5355feb1a69f9aece42f16"
+    sha256 cellar: :any_skip_relocation, big_sur:        "1f16e48fca570e858b8fa11c9eef4c561f7796945a5355feb1a69f9aece42f16"
+    sha256 cellar: :any_skip_relocation, catalina:       "1f16e48fca570e858b8fa11c9eef4c561f7796945a5355feb1a69f9aece42f16"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "bd1c9f868dfbffa832b89e1db57883efd9015184a0093762ee319e5d6c2bc6d1"
   end
 
   depends_on "go" => :build
@@ -18,7 +20,7 @@ class Fzf < Formula
   uses_from_macos "ncurses"
 
   def install
-    system "go", "build", *std_go_args, "-ldflags", "-s -w -X main.version=#{version} -X main.revision=brew"
+    system "go", "build", *std_go_args(ldflags: "-s -w -X main.version=#{version} -X main.revision=brew")
 
     prefix.install "install", "uninstall"
     (prefix/"shell").install %w[bash zsh fish].map { |s| "shell/key-bindings.#{s}" }
@@ -40,6 +42,6 @@ class Fzf < Formula
 
   test do
     (testpath/"list").write %w[hello world].join($INPUT_RECORD_SEPARATOR)
-    assert_equal "world", shell_output("cat #{testpath}/list | #{bin}/fzf -f wld").chomp
+    assert_equal "world", pipe_output("#{bin}/fzf -f wld", (testpath/"list").read).chomp
   end
 end

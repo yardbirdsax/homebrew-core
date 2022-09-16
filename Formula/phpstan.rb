@@ -1,13 +1,27 @@
 class Phpstan < Formula
   desc "PHP Static Analysis Tool"
   homepage "https://github.com/phpstan/phpstan"
-  url "https://github.com/phpstan/phpstan/releases/download/0.12.72/phpstan.phar"
-  sha256 "f78a4415db5280f5c84221e6aa6a76ad342f44b28fe1b4388e54b21900c20bd8"
+  url "https://github.com/phpstan/phpstan/releases/download/1.8.5/phpstan.phar"
+  sha256 "e0e49c17f85dcd6038913ed867f96d65d92650ee3661a4d3b537db97d891af52"
   license "MIT"
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "94eb05211b4f9b2f1c0077d4edec5316a6edb6f1ee516664909a4de5e08e3277"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "94eb05211b4f9b2f1c0077d4edec5316a6edb6f1ee516664909a4de5e08e3277"
+    sha256 cellar: :any_skip_relocation, monterey:       "c72af05ba46acae652382474f20868a91d232c80a519a72ce9c815250bdd70e7"
+    sha256 cellar: :any_skip_relocation, big_sur:        "c72af05ba46acae652382474f20868a91d232c80a519a72ce9c815250bdd70e7"
+    sha256 cellar: :any_skip_relocation, catalina:       "c72af05ba46acae652382474f20868a91d232c80a519a72ce9c815250bdd70e7"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "94eb05211b4f9b2f1c0077d4edec5316a6edb6f1ee516664909a4de5e08e3277"
+  end
 
   depends_on "php" => :test
+
+  # Keg-relocation breaks the formula when it replaces `/usr/local` with a non-default prefix
+  on_macos do
+    on_intel do
+      pour_bottle? only_if: :default_prefix
+    end
+  end
 
   def install
     bin.install "phpstan.phar" => "phpstan"
@@ -72,7 +86,7 @@ class Phpstan < Formula
             }
         }
     EOS
-    assert_match /^\n \[OK\] No errors/,
-      shell_output("#{bin}/phpstan analyse --level max --autoload-file src/autoload.php src/Email.php")
+    assert_match(/^\n \[OK\] No errors/,
+      shell_output("#{bin}/phpstan analyse --level max --autoload-file src/autoload.php src/Email.php"))
   end
 end

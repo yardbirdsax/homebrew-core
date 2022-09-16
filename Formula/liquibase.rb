@@ -1,11 +1,23 @@
 class Liquibase < Formula
   desc "Library for database change tracking"
   homepage "https://www.liquibase.org/"
-  url "https://github.com/liquibase/liquibase/releases/download/v4.2.2/liquibase-4.2.2.tar.gz"
-  sha256 "807ef4b514d01fc62f7aaf4150a8435c90ccb5986f3272d3cfd1bd26c2cf7b4c"
+  url "https://github.com/liquibase/liquibase/releases/download/v4.16.1/liquibase-4.16.1.tar.gz"
+  sha256 "2f9787ee381a6bd1b712fada516481543b806587448d14540ccb79b53a996540"
   license "Apache-2.0"
 
-  bottle :unneeded
+  livecheck do
+    url "https://www.liquibase.org/download"
+    regex(/href=.*?liquibase[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "6e9eca48690a54b2fdcf16736819da4da9cfb87f0fc3efbfaf8bdf2fd91801ee"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "6e9eca48690a54b2fdcf16736819da4da9cfb87f0fc3efbfaf8bdf2fd91801ee"
+    sha256 cellar: :any_skip_relocation, monterey:       "c063178576202321005d8c2972d078fdf6edaf7fdf3df0a51801fee8a189316d"
+    sha256 cellar: :any_skip_relocation, big_sur:        "c063178576202321005d8c2972d078fdf6edaf7fdf3df0a51801fee8a189316d"
+    sha256 cellar: :any_skip_relocation, catalina:       "c063178576202321005d8c2972d078fdf6edaf7fdf3df0a51801fee8a189316d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6e9eca48690a54b2fdcf16736819da4da9cfb87f0fc3efbfaf8bdf2fd91801ee"
+  end
 
   depends_on "openjdk"
 
@@ -14,7 +26,7 @@ class Liquibase < Formula
     chmod 0755, "liquibase"
     prefix.install_metafiles
     libexec.install Dir["*"]
-    (bin/"liquibase").write_env_script libexec/"liquibase", JAVA_HOME: Formula["openjdk"].opt_prefix
+    (bin/"liquibase").write_env_script libexec/"liquibase", Language::Java.overridable_java_home_env
     (libexec/"lib").install_symlink Dir["#{libexec}/sdk/lib-sdk/slf4j*"]
   end
 

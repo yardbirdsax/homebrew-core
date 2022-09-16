@@ -1,19 +1,27 @@
 class Hwloc < Formula
   desc "Portable abstraction of the hierarchical topology of modern architectures"
   homepage "https://www.open-mpi.org/projects/hwloc/"
-  url "https://www.open-mpi.org/software/hwloc/v2.4/downloads/hwloc-2.4.0.tar.bz2"
-  sha256 "2b1f1b4adb542911096bdceceb16270e9918908dcd884ab85c2f929c2b3838e9"
+  url "https://download.open-mpi.org/release/hwloc/v2.8/hwloc-2.8.0.tar.bz2"
+  sha256 "348a72fcd48c32a823ee1da149ae992203e7ad033549e64aed6ea6eeb01f42c1"
   license "BSD-3-Clause"
 
+  livecheck do
+    url "https://www.mail-archive.com/hwloc-announce@lists.open-mpi.org/"
+    regex(/[\s,>]v?(\d+(?:\.\d+)+)(?:\s*?,|\s*?released)/i)
+  end
+
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "c2e4c957e5d881fbbf136ce97b14c7fd90a4bd9ed0eba7c786c9cac3e0429736"
-    sha256 cellar: :any, big_sur:       "ec7b2827de6ecaf19af60fe5c0b17cfca16a04adba68a12cd77b861d83c0311e"
-    sha256 cellar: :any, catalina:      "2891b4a4c672422f8a9c45083ec2ac39aeafc1cbdbc9d0446718f783a326d330"
-    sha256 cellar: :any, mojave:        "0b8cd8f304cedc64e8e2c47fc37b67e129c6cbb67d945d0147403259ad289f29"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "5a490d201828781f1d09be139c066761c8a21da6fe94eaeeb7833afeae694855"
+    sha256 cellar: :any,                 arm64_big_sur:  "c7b3b0ae09b9dbee5ffeb91120082ed0de28d4add7201a7f2399d5bc887f2838"
+    sha256 cellar: :any,                 monterey:       "42fdb0904f29f3f6635783d2d73a70e3ca44e5c95bf9295bdb4d00d23493d10f"
+    sha256 cellar: :any,                 big_sur:        "d7ac216b513863293f7c4d029741cefab3eb0eefc003c1562cc7007d782f3b20"
+    sha256 cellar: :any,                 catalina:       "2086a4a3b64ca762657b8bac2a8ef798799269911ebb1a12936242d6577be85d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ac3a8ad60253e5559ef20bb0f36a57bc35cb951f91139137fbf65733919410cb"
   end
 
   head do
-    url "https://github.com/open-mpi/hwloc.git"
+    url "https://github.com/open-mpi/hwloc.git", branch: "master"
     depends_on "autoconf" => :build
     depends_on "automake" => :build
     depends_on "libtool" => :build
@@ -25,14 +33,12 @@ class Hwloc < Formula
 
   def install
     system "./autogen.sh" if build.head?
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
+    system "./configure", *std_configure_args,
                           "--enable-shared",
                           "--enable-static",
-                          "--prefix=#{prefix}",
                           "--disable-cairo",
                           "--without-x"
-    system "make", "install"
+    system "make", "install", "bashcompletionsdir=#{bash_completion}"
 
     pkgshare.install "tests"
 

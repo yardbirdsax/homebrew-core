@@ -1,15 +1,17 @@
 class Draco < Formula
   desc "3D geometric mesh and point cloud compression library"
   homepage "https://google.github.io/draco/"
-  url "https://github.com/google/draco/archive/1.4.1.tar.gz"
-  sha256 "83aa5637d36a835103a61f96af7ff04c6d6528e643909466595d51ee715417a9"
+  url "https://github.com/google/draco/archive/1.5.3.tar.gz"
+  sha256 "7882a942a1da14a9ae9d557b1a3af7f44bdee7f5d42b745c4e474fb8b28d4e5e"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "834b335c5ea2e27b8256c6684fb1badeae6ad6b927436e329058dcbd51d85fca"
-    sha256 cellar: :any_skip_relocation, big_sur:       "8102f60a854f4b5bd365b10f1c5876459424191052811d0afb42aa037c0ada7d"
-    sha256 cellar: :any_skip_relocation, catalina:      "4a1088d41275a89ed0238d3eacca9740d9455e9fd2fcbf79b3147ad72c942b4d"
-    sha256 cellar: :any_skip_relocation, mojave:        "45e5548e468c702c7508ec6f2ef7aa2c4862e38af9130511b36d910c069271a0"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "8c3671a69a58b75e44ebba31b4fb959814a90d3a8fe37e066093493e3b8a8e0a"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b5aa7bd55ef40f2f7e6c7ac7c0c6f1a2a0abfc85319ab9a125bac55fa25cf917"
+    sha256 cellar: :any_skip_relocation, monterey:       "b17c66361bad70443be506ddf7c157d76bdd741ddffe9eee95bee91d7c5beb2a"
+    sha256 cellar: :any_skip_relocation, big_sur:        "318fd4fdcd7beb70556309dcc653d0bb5375c589c8e6d08b2fd2cf82b773cecd"
+    sha256 cellar: :any_skip_relocation, catalina:       "889d24be914c95f6ec096a194894f84ad91f34a2218bd874055dd5c2b83cde6a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d31d7fdb2a3b51488b2aeeab3e896842e268cdb58e5c6d0b4d80572e6c6060ba"
   end
 
   depends_on "cmake" => :build

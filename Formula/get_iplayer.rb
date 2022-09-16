@@ -1,17 +1,18 @@
 class GetIplayer < Formula
   desc "Utility for downloading TV and radio programmes from BBC iPlayer"
   homepage "https://github.com/get-iplayer/get_iplayer"
-  url "https://github.com/get-iplayer/get_iplayer/archive/v3.26.tar.gz"
-  sha256 "2ec105ccb47910d7f3ff7124ecaa839a8778837c12881358e627a132ba027b06"
-  license "GPL-3.0"
+  url "https://github.com/get-iplayer/get_iplayer/archive/v3.30.tar.gz"
+  sha256 "05a39d5447eecfc2f95a616bf8d4dcf59ca3b3a0ecda1f82882401e6d74e286c"
+  license "GPL-3.0-or-later"
   head "https://github.com/get-iplayer/get_iplayer.git", branch: "develop"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "47a134a820df23987618852d43c1d3abfd1537f9d78b04086b3c1e16d3456949"
-    sha256 cellar: :any_skip_relocation, big_sur:       "4b6f562b58e00a253c8dceb3117ab02e3bdbfd0d14af0c59284884a999c31dc9"
-    sha256 cellar: :any_skip_relocation, catalina:      "a3e2df4c8d889ff6230f0ef2bdace24455d15de97a0442b19139f7b8502dbf28"
-    sha256 cellar: :any_skip_relocation, mojave:        "574a33ef3208092d42fb8640da5ec55dd33b8114207f871329dfdd04813f77e1"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "7cb313cecc47bd886b3fa782cc90d790ba75af34567b6bd29af84a218abcec40"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "7641b6219cf7905e2b17af0d44e2e660e3ba5f5b42f041d7516a307015cb82c9"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "fc27b8a1fc4fe3936c9b807c87d2adb9979688448df2a4d285523bf6cb5cc84d"
+    sha256 cellar: :any_skip_relocation, monterey:       "c3a9acbdf16c9a0d28e325fb323bdbc3f5e50e63b642390480abf3e82605bef5"
+    sha256 cellar: :any_skip_relocation, big_sur:        "6b81e930f416bd55566ef52e82781dd4b81110c2e77eede7af954e0d3e0bff74"
+    sha256 cellar: :any_skip_relocation, catalina:       "f95dd64c2cba1c267843c7c9c3d690aae855fd8c3c3330829e2d89899747317c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f3490243036ef4ba6022800e9de25ecaef822bfb63e9d65f7d7de06ad954b1a1"
   end
 
   depends_on "atomicparsley"
@@ -120,7 +121,6 @@ class GetIplayer < Formula
 
     inreplace ["get_iplayer", "get_iplayer.cgi"] do |s|
       s.gsub!(/^(my \$version_text);/i, "\\1 = \"#{pkg_version}-homebrew\";")
-      s.gsub! "#!/usr/bin/env perl", "#!/usr/bin/perl"
     end
 
     bin.install "get_iplayer", "get_iplayer.cgi"

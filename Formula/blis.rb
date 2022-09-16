@@ -1,19 +1,40 @@
 class Blis < Formula
   desc "BLAS-like Library Instantiation Software Framework"
   homepage "https://github.com/flame/blis"
-  url "https://github.com/flame/blis/archive/0.8.0.tar.gz"
-  sha256 "5e05868c4a6cf5032a7492f8861653e939a8f907a4fa524bbb6e14394e170a3d"
+  url "https://github.com/flame/blis/archive/0.9.0.tar.gz"
+  sha256 "1135f664be7355427b91025075562805cdc6cc730d3173f83533b2c5dcc2f308"
   license "BSD-3-Clause"
-  head "https://github.com/flame/blis.git"
+  head "https://github.com/flame/blis.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any, big_sur:  "2e70e19be54e6996848fdce52de417d9b657e8b1c73786d716e77aa2f55e31f8"
-    sha256 cellar: :any, catalina: "8cf27cca34ada36f300cfea6abc844a01644930b4a416edee439dd58ef04b36d"
-    sha256 cellar: :any, mojave:   "d5e0edecffeaff6b7ffb80d3e3657e68518d420e7b9f1517cf98539f297ec096"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "b00ba6ef35a226e90b0bfdf30d7a89ba81d00305fa8d960ccb6fd0aac63d3925"
+    sha256 cellar: :any,                 arm64_big_sur:  "b7bf20b1149ef17db68e5e5626f258e8369f00dbbb22be6c752c298138177aef"
+    sha256 cellar: :any,                 monterey:       "08dc73c2cbce4359b51c2a4c4f78df6350aa24df087b0c1613bb9995717edd68"
+    sha256 cellar: :any,                 big_sur:        "0c21276af8ad03e16deaed43bc146f57aec908e6e4bc95f748cedf2af8c1d3c0"
+    sha256 cellar: :any,                 catalina:       "1feac3394dab398ede9e1540b84c4782ee6e7b916e93327ec68324d1d451db17"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "caf7db98c4ec255521ef31d28156bac9f2149ff02be40ad978b6be0c32ac2ba8"
   end
 
+  uses_from_macos "python" => :build
+
+  fails_with gcc: "5"
+
   def install
-    system "./configure", "--prefix=#{prefix}", "--enable-cblas", "auto"
+    # https://github.com/flame/blis/blob/master/docs/ConfigurationHowTo.md
+    ENV.runtime_cpu_detection
+    config = if !build.bottle?
+      "auto"
+    elsif OS.mac?
+      # For Apple Silicon, we can optimize using the dedicated "firestorm" config.
+      # For Intel Macs, we build multiple Intel x86_64 to allow runtime optimization.
+      Hardware::CPU.arm? ? "firestorm" : "intel64"
+    else
+      # For x86_64 Linux, we build full "x86_64" family with Intel and AMD processors.
+      Hardware::CPU.arch
+    end
+
+    system "./configure", "--prefix=#{prefix}", "--enable-cblas", config
     system "make"
     system "make", "install"
   end

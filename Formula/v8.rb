@@ -2,8 +2,8 @@ class V8 < Formula
   desc "Google's JavaScript engine"
   homepage "https://github.com/v8/v8/wiki"
   # Track V8 version from Chrome stable: https://omahaproxy.appspot.com
-  url "https://github.com/v8/v8/archive/8.8.278.14.tar.gz"
-  sha256 "3540d27967ea92847035219e20ea065096457d04120d6a6a591f6b2466e158e2"
+  url "https://github.com/v8/v8/archive/10.2.154.4.tar.gz"
+  sha256 "6f4865ffe499f51da3e422cf7e4d85d3dab1b0a99b2d5bf204910ce423505597"
   license "BSD-3-Clause"
 
   livecheck do
@@ -12,58 +12,71 @@ class V8 < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "aca338538a55767ec4e238bdcaf7839195582d2d66624c43c2b3adcf894a1997"
-    sha256 cellar: :any, big_sur:       "6a93c0cdde990b8ccc81dcac74d936d4f8abbcb785d42cce47329e2b1edc27e5"
-    sha256 cellar: :any, catalina:      "d5dc46eda52a3cbc4e08a1328fddac87adb78699b75651009a906784b3c12f6c"
-    sha256 cellar: :any, mojave:        "d3c63e6c7a43fca28fbbcdcf6d4d4822026ef48e1a272cf951493863a6b218cd"
+    rebuild 2
+    sha256 cellar: :any,                 arm64_monterey: "1f2b215c6c1d833d565442cdd3457ce424ce0b21e63206c9a3c2e29d9a55fbb9"
+    sha256 cellar: :any,                 arm64_big_sur:  "3e5b770c937d9465e4400f90cb0f612846da01dfbe76a65bba6c969e5060aeaa"
+    sha256 cellar: :any,                 monterey:       "a640103e1fccdd55c4783a879be96dec047bb094b051cb2c3c87691c6ca03319"
+    sha256 cellar: :any,                 big_sur:        "d1887d0f4eabc74edba7efacbfc251634e0fd02b03b1bc625cbb1d94b1a21e1d"
+    sha256 cellar: :any,                 catalina:       "45386ebed871d7939c95305d8f7e22e3af69f7be9df55d7a20fb3c619b4814a8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "677fbecdbc7b67206a5c6b1578457bed9fed035ef73fdb89f97e8274722b98d8"
   end
 
-  depends_on "llvm" => :build if DevelopmentTools.clang_build_version < 1200 || Hardware::CPU.arm?
   depends_on "ninja" => :build
+  depends_on "python@3.10" => :build
 
-  depends_on xcode: ["10.0", :build] # required by v8
+  on_macos do
+    depends_on "llvm" => :build
+    depends_on xcode: ["10.0", :build] # required by v8
+  end
+
+  on_linux do
+    depends_on "pkg-config" => :build
+    depends_on "glib"
+  end
+
+  fails_with gcc: "5"
 
   # Look up the correct resource revisions in the DEP file of the specific releases tag
-  # e.g. for CIPD dependency gn: https://github.com/v8/v8/blob/8.7.220.29/DEPS#L44
+  # e.g. for CIPD dependency gn: https://chromium.googlesource.com/v8/v8.git/+/refs/tags/10.2.154.4/DEPS#43
   resource "gn" do
     url "https://gn.googlesource.com/gn.git",
-        revision: "53d92014bf94c3893886470a1c7c1289f8818db0"
+        revision: "ae110f8b525009255ba1f9ae96982176d3bfad3d"
   end
 
-  # e.g.: https://github.com/v8/v8/blob/8.7.220.29/DEPS#L85 for the revision of build for v8 8.7.220.29
-  resource "v8/build" do
-    url "https://chromium.googlesource.com/chromium/src/build.git",
-        revision: "2101eff1ac4bfd25f2dfa71ad632a600a38c1ed9"
-  end
-
-  resource "v8/third_party/icu" do
-    url "https://chromium.googlesource.com/chromium/deps/icu.git",
-        revision: "c2a4cae149aae7fd30c4cbe3cf1b30df03b386f1"
-  end
-
+  # e.g.: https://chromium.googlesource.com/v8/v8.git/+/refs/tags/10.2.154.4/DEPS#84
   resource "v8/base/trace_event/common" do
     url "https://chromium.googlesource.com/chromium/src/base/trace_event/common.git",
-        revision: "eb94f1c7aa96207f469008f29989a43feb2718f8"
+        revision: "d115b033c4e53666b535cbd1985ffe60badad082"
+  end
+
+  resource "v8/build" do
+    url "https://chromium.googlesource.com/chromium/src/build.git",
+        revision: "b37c340767cf9e7777d4ca5a588c34c5744df9b2"
   end
 
   resource "v8/third_party/googletest/src" do
     url "https://chromium.googlesource.com/external/github.com/google/googletest.git",
-        revision: "4fe018038f87675c083d0cfb6a6b57c274fb1753"
+        revision: "af29db7ec28d6df1c7f0f745186884091e602e07"
+  end
+
+  resource "v8/third_party/icu" do
+    url "https://chromium.googlesource.com/chromium/deps/icu.git",
+        revision: "1fd0dbea04448c3f73fe5cb7599f9472f0f107f1"
   end
 
   resource "v8/third_party/jinja2" do
     url "https://chromium.googlesource.com/chromium/src/third_party/jinja2.git",
-        revision: "a82a4944a7f2496639f34a89c9923be5908b80aa"
+        revision: "ee69aa00ee8536f61db6a451f3858745cf587de6"
   end
 
   resource "v8/third_party/markupsafe" do
     url "https://chromium.googlesource.com/chromium/src/third_party/markupsafe.git",
-        revision: "0944e71f4b2cb9a871bcbe353f95e889b64a611a"
+        revision: "1b882ef6372b58bfd55a3285f37ed801be9137cd"
   end
 
   resource "v8/third_party/zlib" do
     url "https://chromium.googlesource.com/chromium/src/third_party/zlib.git",
-        revision: "e84c9a3fd75fdc39055b7ae27d6ec508e50bd39e"
+        revision: "a6d209ab932df0f1c9d5b7dc67cfa74e8a3272c0"
   end
 
   def install
@@ -78,7 +91,7 @@ class V8 < Formula
     # Build gn from source and add it to the PATH
     (buildpath/"gn").install resource("gn")
     cd "gn" do
-      system "python", "build/gen.py"
+      system "python3.10", "build/gen.py"
       system "ninja", "-C", "out/", "gn"
     end
     ENV.prepend_path "PATH", buildpath/"gn/out"
@@ -96,17 +109,27 @@ class V8 < Formula
       is_component_build:           true,
       v8_use_external_startup_data: false,
       v8_enable_i18n_support:       true, # enables i18n support with icu
-      clang_base_path:              "\"/usr/\"", # uses system clang instead of Google clang
+      clang_base_path:              "\"#{Formula["llvm"].opt_prefix}\"", # uses Homebrew clang instead of Google clang
       clang_use_chrome_plugins:     false, # disable the usage of Google's custom clang plugins
       use_custom_libcxx:            false, # uses system libc++ instead of Google's custom one
       treat_warnings_as_errors:     false, # ignore not yet supported clang argument warnings
+      use_lld:                      false, # upstream use LLD but this leads to build failure on ARM
     }
 
-    # use clang from homebrew llvm formula for XCode 11- , because the system clang is too old for V8
-    if DevelopmentTools.clang_build_version < 1200 || Hardware::CPU.arm?
-      ENV.remove "HOMEBREW_LIBRARY_PATHS", Formula["llvm"].opt_lib # but link against system libc++
-      gn_args[:clang_base_path] = "\"#{Formula["llvm"].prefix}\""
+    if OS.linux?
+      gn_args[:is_clang] = false # use GCC on Linux
+      gn_args[:use_sysroot] = false # don't use sysroot
+      gn_args[:custom_toolchain] = "\"//build/toolchain/linux/unbundle:default\"" # uses system toolchain
+      gn_args[:host_toolchain] = "\"//build/toolchain/linux/unbundle:default\"" # to respect passed LDFLAGS
+      ENV["AR"] = DevelopmentTools.locate("ar")
+      ENV["NM"] = DevelopmentTools.locate("nm")
+      gn_args[:use_rbe] = false
     end
+
+    # use clang from homebrew llvm formula, because the system clang is unreliable
+    ENV.remove "HOMEBREW_LIBRARY_PATHS", Formula["llvm"].opt_lib # but link against system libc++
+    # Make sure private libraries can be found from lib
+    ENV.prepend "LDFLAGS", "-Wl,-rpath,#{rpath(target: libexec)}"
 
     # Transform to args string
     gn_args_string = gn_args.map { |k, v| "#{k}=#{v}" }.join(" ")
@@ -115,10 +138,22 @@ class V8 < Formula
     system "gn", "gen", "--args=#{gn_args_string}", "out.gn"
     system "ninja", "-j", ENV.make_jobs, "-C", "out.gn", "-v", "d8"
 
-    # Install all the things
-    (libexec/"include").install Dir["include/*"]
-    libexec.install Dir["out.gn/lib*.dylib", "out.gn/d8", "out.gn/icudtl.dat"]
+    # Install libraries and headers into libexec so d8 can find them, and into standard directories
+    # so other packages can find them and they are linked into HOMEBREW_PREFIX
+    libexec.install "include"
+
+    # Make sure we don't symlink non-headers into `include`.
+    header_files_and_directories = (libexec/"include").children.select do |child|
+      (child.extname == ".h") || child.directory?
+    end
+    include.install_symlink header_files_and_directories
+
+    libexec.install "out.gn/d8", "out.gn/icudtl.dat"
     bin.write_exec_script libexec/"d8"
+
+    libexec.install Pathname.glob("out.gn/#{shared_library("*")}")
+    lib.install_symlink libexec.glob(shared_library("libv8*"))
+    lib.glob("*.TOC").map(&:unlink) if OS.linux? # Remove symlinks to .so.TOC text files
   end
 
   test do
@@ -139,7 +174,8 @@ class V8 < Formula
 
     # link against installed libc++
     system ENV.cxx, "-std=c++14", "test.cpp",
-      "-I#{libexec}/include",
-      "-L#{libexec}", "-lv8", "-lv8_libplatform"
+                    "-I#{include}", "-L#{lib}",
+                    "-Wl,-rpath,#{libexec}",
+                    "-lv8", "-lv8_libplatform"
   end
 end

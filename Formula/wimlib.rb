@@ -1,10 +1,9 @@
 class Wimlib < Formula
   desc "Library to create, extract, and modify Windows Imaging files"
   homepage "https://wimlib.net/"
-  url "https://wimlib.net/downloads/wimlib-1.13.3.tar.gz"
-  sha256 "8a0741d07d9314735b040cea6168f6daf1ac1c72d350d703f286b118135dfa7e"
+  url "https://wimlib.net/downloads/wimlib-1.13.6.tar.gz"
+  sha256 "0a0f9c1c0d3a2a76645535aeb0f62e03fc55914ca65f3a4d5599bb8b0260dbd9"
   license "GPL-3.0-or-later"
-  revision 1
 
   livecheck do
     url "https://wimlib.net/downloads/"
@@ -12,15 +11,16 @@ class Wimlib < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256               arm64_big_sur: "a2ff0fc910f2cd3925474e7f7ea700d1f4dd9df724df1c634a47e733752393cf"
-    sha256 cellar: :any, big_sur:       "2e0597a2e987116627df9c6d3a7cb7aed0bd8ed507f5f13b530df685a9e0fe9b"
-    sha256 cellar: :any, catalina:      "51512426e7836eb9a204f036993ef023bf260129fadde73761c1ff487cfa2518"
-    sha256 cellar: :any, mojave:        "479dd4c3bb4eade0c59f92c776aab3bcceba107f6ed7e65ab1ba6006dce1823e"
+    sha256                               arm64_monterey: "511b7f7dd4a2f604c79b77e4730df771a72c0d42ff9a0d75016aadef18bfea02"
+    sha256                               arm64_big_sur:  "8987877ff4c56d34096c3cb7b34447b55296ee443205b535edbb1e304642acd3"
+    sha256 cellar: :any,                 monterey:       "2eaa7b1ad62ecee16880f8e12bbce465b2ffaaa43e446758f19390daf00d1450"
+    sha256 cellar: :any,                 big_sur:        "da2511a595e4c203f2f2ea20f543011acbe7a95cbdc5372206616d7589ea17d8"
+    sha256 cellar: :any,                 catalina:       "a59ad26171c1affffdc53d90a63802ffe973d74b593ae85c582f10c940767b6e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "befcc8cb24bcb7b41af8e8d85cb0e0f14b23abc713ca5004c8a5c9d52da14dca"
   end
 
   depends_on "pkg-config" => :build
-  depends_on "openssl@1.1"
+  depends_on "openssl@3"
 
   uses_from_macos "libxml2"
 
@@ -42,12 +42,10 @@ class Wimlib < Formula
   test do
     # make a directory containing a dummy 1M file
     mkdir("foo")
-    size = nil
-    on_macos do
-      size = "1m"
-    end
-    on_linux do
-      size = "1M"
+    size = if OS.mac?
+      "1m"
+    else
+      "1M"
     end
     system "dd", "if=/dev/random", "of=foo/bar", "bs=#{size}", "count=1"
     # capture an image

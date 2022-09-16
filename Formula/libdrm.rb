@@ -1,8 +1,8 @@
 class Libdrm < Formula
   desc "Library for accessing the direct rendering manager"
   homepage "https://dri.freedesktop.org"
-  url "https://dri.freedesktop.org/libdrm/libdrm-2.4.103.tar.xz"
-  sha256 "3fe0affdba6460166a7323290c18cf68e9b59edcb520722826cb244e9cb50222"
+  url "https://dri.freedesktop.org/libdrm/libdrm-2.4.113.tar.xz"
+  sha256 "7fd7eb2967f63beb4606f22d50e277d993480d05ef75dd88a9bd8e677323e5e1"
   license "MIT"
 
   livecheck do
@@ -10,9 +10,11 @@ class Libdrm < Formula
     regex(/href=.*?libdrm[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-  depends_on "docbook" => :build
-  depends_on "docbook-xsl" => :build
-  depends_on "libxslt" => :build
+  bottle do
+    sha256 x86_64_linux: "d4f9c979e3a78430d1679c592cf2641ce96851596fb119c36b3fe268d9812bb8"
+  end
+
+  depends_on "docutils" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkg-config" => :build
@@ -20,11 +22,9 @@ class Libdrm < Formula
   depends_on :linux
 
   def install
-    mkdir "build" do
-      system "meson", *std_meson_args, ".."
-      system "ninja"
-      system "ninja", "install"
-    end
+    system "meson", "setup", "build", "-Dcairo-tests=disabled", "-Dvalgrind=disabled", *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
+    system "meson", "install", "-C", "build"
   end
 
   test do

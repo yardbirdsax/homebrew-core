@@ -1,9 +1,12 @@
 class Gperftools < Formula
   desc "Multi-threaded malloc() and performance analysis tools"
   homepage "https://github.com/gperftools/gperftools"
-  url "https://github.com/gperftools/gperftools/releases/download/gperftools-2.8.1/gperftools-2.8.1.tar.gz"
-  sha256 "12f07a8ba447f12a3ae15e6e3a6ad74de35163b787c0c7b76288d7395f2f74e0"
   license "BSD-3-Clause"
+
+  stable do
+    url "https://github.com/gperftools/gperftools/releases/download/gperftools-2.10/gperftools-2.10.tar.gz"
+    sha256 "83e3bfdd28b8bcf53222c3798d4d395d52dadbbae59e8730c4a6d31a9c3732d8"
+  end
 
   livecheck do
     url :stable
@@ -12,9 +15,12 @@ class Gperftools < Formula
   end
 
   bottle do
-    sha256 cellar: :any, big_sur:  "2a1dbba19d4457f12fca0f37c107b65a3e04315c2b04cedade26a110a4bccf71"
-    sha256 cellar: :any, catalina: "8d2e97b68f27e722336896358c6d4d29dd4eaca935f48c52983d779638edd2d2"
-    sha256 cellar: :any, mojave:   "7a1d5e130ca76a6f2ba0f6743754a7ebf1ceda443cbc820588f3062d4ed9a64f"
+    sha256 cellar: :any,                 arm64_monterey: "b6083efd21e2ba10f38b8d8884bec70a5ad96b60e4f159d700b88a4f32626dcf"
+    sha256 cellar: :any,                 arm64_big_sur:  "53e182d8321912b58fa8a9e7989ac13d337323cea79c9a6865ca9aef8235fdad"
+    sha256 cellar: :any,                 monterey:       "119236efb407004d2d1c794d3fa97ac2d903f6271f03ba49ee905e23b8230320"
+    sha256 cellar: :any,                 big_sur:        "1e55694d046edcecc802b5ebb93529ba9515abc833c10f0612ac281174611643"
+    sha256 cellar: :any,                 catalina:       "425c644c9b7956e9e5d25153c3020d98b1ac2eaada5dcc497a87c4f142a1c1c4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "bab264991e8d70ad7bde43cc3ce05077fd5560a808e8ac1c939dd1764deba29f"
   end
 
   head do
@@ -25,15 +31,26 @@ class Gperftools < Formula
     depends_on "libtool" => :build
   end
 
-  def install
-    # Fix "error: unknown type name 'mach_port_t'"
-    ENV["SDKROOT"] = MacOS.sdk_path if MacOS.version == :sierra
+  uses_from_macos "xz"
 
-    ENV.append_to_cflags "-D_XOPEN_SOURCE"
+  on_linux do
+    # libunwind is strongly recommended for Linux x86_64
+    # https://github.com/gperftools/gperftools/blob/master/INSTALL
+    depends_on "libunwind"
+  end
+
+  def install
+    ENV.append_to_cflags "-D_XOPEN_SOURCE" if OS.mac?
 
     system "autoreconf", "-fiv" if build.head?
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+
+    args = [
+      "--disable-dependency-tracking",
+      "--prefix=#{prefix}",
+    ]
+    args << "--enable-libunwind" if OS.linux?
+
+    system "./configure", *args
     system "make"
     system "make", "install"
   end
@@ -55,5 +72,20 @@ class Gperftools < Formula
     EOS
     system ENV.cc, "test.c", "-L#{lib}", "-ltcmalloc", "-o", "test"
     system "./test"
+
+    (testpath/"segfault.c").write <<~EOS
+      #include <stdio.h>
+      #include <stdlib.h>
+
+      int main()
+      {
+        void *ptr = malloc(128);
+        if (ptr == NULL) return 1;
+        free(ptr);
+        return 0;
+      }
+    EOS
+    system ENV.cc, "segfault.c", "-L#{lib}", "-ltcmalloc", "-o", "segfault"
+    system "./segfault"
   end
 end

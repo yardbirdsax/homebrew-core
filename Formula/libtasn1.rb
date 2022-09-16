@@ -1,22 +1,24 @@
 class Libtasn1 < Formula
   desc "ASN.1 structure parser library"
   homepage "https://www.gnu.org/software/libtasn1/"
-  url "https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.16.0.tar.gz"
-  mirror "https://ftpmirror.gnu.org/libtasn1/libtasn1-4.16.0.tar.gz"
-  sha256 "0e0fb0903839117cb6e3b56e68222771bebf22ad7fc2295a0ed7d576e8d4329d"
-  license "LGPL-2.1"
+  url "https://ftp.gnu.org/gnu/libtasn1/libtasn1-4.19.0.tar.gz"
+  mirror "https://ftpmirror.gnu.org/libtasn1/libtasn1-4.19.0.tar.gz"
+  sha256 "1613f0ac1cf484d6ec0ce3b8c06d56263cc7242f1c23b30d82d23de345a63f7a"
+  license "LGPL-2.1-or-later"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "e5ff2498ab8bcc108dd6797fede68929ae3fd2796c39e349ff3f8e0a87abb7a0"
-    sha256 cellar: :any, big_sur:       "9a69770cae180c61ada4bb4701f5402b35b828d2baa7c5135196cf1df35965cb"
-    sha256 cellar: :any, catalina:      "00bd968b6a110c5cb497cf0e3b14800ed5e67a2476d0d544aeb1c0c2c1f3f332"
-    sha256 cellar: :any, mojave:        "3c2e9cdfec0ccec899847a3ab69b88967b6cbc0b3e406fa1938a4ca6f277b674"
-    sha256 cellar: :any, high_sierra:   "c3cf713b5bb29fcac1381b7242e557b7920cb327c77170a6dd038a477d6021cd"
+    sha256 cellar: :any,                 arm64_monterey: "cf95a18e2fabf1675d77ec8a1abb41fdb091cef689dec3318a420ad2f25beb76"
+    sha256 cellar: :any,                 arm64_big_sur:  "19c6df6badb6b13631670b917595f63a49a06cadd73e2484e5546129cadcf04c"
+    sha256 cellar: :any,                 monterey:       "2aa4f8396ba40b05b237d503eb4de02c37175903d3e0f26d7a48a031707a71b5"
+    sha256 cellar: :any,                 big_sur:        "45a9352536560b5a69bef3e85ca615bad19d44eab23c6ad797c4305a27bd15d8"
+    sha256 cellar: :any,                 catalina:       "7bf11a4603037c490e83caaddc03fba59dfae11385e2f6bd4555b8ee9aaf1507"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e994c7b8c16afb59368d8d09a3f193451c9deab1e4a83f8a94650e27674d9278"
   end
 
   def install
     system "./configure", "--prefix=#{prefix}", "--disable-dependency-tracking",
                           "--disable-silent-rules"
+    system "make", "check"
     system "make", "install"
   end
 
@@ -37,6 +39,6 @@ class Libtasn1 < Formula
       s 47
     EOS
     system "#{bin}/asn1Coding", "pkix.asn", "assign.asn1"
-    assert_match /Decoding: SUCCESS/, shell_output("#{bin}/asn1Decoding pkix.asn assign.out PKIX1.Dss-Sig-Value 2>&1")
+    assert_match "Decoding: SUCCESS", shell_output("#{bin}/asn1Decoding pkix.asn assign.out PKIX1.Dss-Sig-Value 2>&1")
   end
 end

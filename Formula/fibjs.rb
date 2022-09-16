@@ -1,30 +1,46 @@
 class Fibjs < Formula
   desc "JavaScript on Fiber"
   homepage "https://fibjs.org/"
-  url "https://github.com/fibjs/fibjs/releases/download/v0.31.0/fullsrc.zip"
-  sha256 "e5111ece8e6350f5d530d4b17003c2019be27017c5dec75c488587e942c502a0"
-  license "GPL-3.0"
-  head "https://github.com/fibjs/fibjs.git"
+  url "https://github.com/fibjs/fibjs/releases/download/v0.35.0/fullsrc.zip"
+  sha256 "938e148064413c381d9e900e9160dc02a1d68376dfae681ba288fe2fbb8924de"
+  license "GPL-3.0-only"
+  head "https://github.com/fibjs/fibjs.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, big_sur:     "1d09edce8848d653f844e82001274a402eaab4ff16cad131753350d985a024ae"
-    sha256 cellar: :any_skip_relocation, catalina:    "804d64c9c1d99dc5f94e9219f9fccee72745ec25f96a47a297f869b5504e6682"
-    sha256 cellar: :any_skip_relocation, mojave:      "f833634da5af3a4596412cd06860b12d685b0e60ca2005ffb8968507d312feab"
-    sha256 cellar: :any_skip_relocation, high_sierra: "10b5be3c5be1f1cb3ef9a905755491a17d84fe7d4453169717aa0ee5bd19d45d"
+    sha256 cellar: :any_skip_relocation, monterey:     "01ae2f16b8a0aade5cc4fe5bdf332f736dc246978901b5e921b31a8f801ee248"
+    sha256 cellar: :any_skip_relocation, big_sur:      "722369e2f61203eaec7d43d2788443381c3335e976bb78f2d1665526914056d9"
+    sha256 cellar: :any_skip_relocation, catalina:     "b72ea1b966a3749f4dca1bebfa6bcaaa10ecd64c33f19b50e3f27990e387094e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "9899a7f2c1acf1b1cdfb4e744ddf5ea112e3016ca41e46e7b346bbdf9cb19664"
   end
 
   depends_on "cmake" => :build
 
+  # LLVM is added as a test dependency to work around limitation in Homebrew's
+  # test compiler selection when using fails_with. Can remove :test when fixed.
+  # Issue ref: https://github.com/Homebrew/brew/issues/11795
+  uses_from_macos "llvm" => [:build, :test]
+
+  on_linux do
+    depends_on "libx11"
+  end
+
+  # https://github.com/fibjs/fibjs/blob/master/BUILDING.md
+  fails_with :gcc do
+    cause "Upstream does not support gcc."
+  end
+
   def install
+    # help find X11 headers: fatal error: 'X11/Xlib.h' file not found
+    ENV.append "CXXFLAGS", "-I#{HOMEBREW_PREFIX}/include" if OS.linux?
+
     # the build script breaks when CI is set by Homebrew
-    begin
-      env_ci = ENV.delete "CI"
+    with_env(CI: nil) do
+      system "./build", "clean"
       system "./build", "release", "-j#{ENV.make_jobs}"
-    ensure
-      ENV["CI"] = env_ci
     end
 
-    bin.install "bin/Darwin_amd64_release/fibjs"
+    arch = Hardware::CPU.intel? ? "amd64" : Hardware::CPU.arch.to_s
+    bin.install "bin/#{OS.kernel_name}_#{arch}_release/fibjs"
   end
 
   test do

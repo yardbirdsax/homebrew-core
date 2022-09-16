@@ -1,30 +1,36 @@
 class Argocd < Formula
   desc "GitOps Continuous Delivery for Kubernetes"
-  homepage "https://argoproj.io"
+  homepage "https://argoproj.github.io/cd"
   url "https://github.com/argoproj/argo-cd.git",
-      tag:      "v1.8.4",
-      revision: "28aea3dfdede00443b52cc584814d80e8f896200"
+      tag:      "v2.4.11",
+      revision: "3d9e9f2f95b7801b90377ecfc4073e5f0f07205b"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "439249642d57325b6fc94f1a17b5b18aded0f589a6547d537382920c179eb94b"
-    sha256 cellar: :any_skip_relocation, big_sur:       "6115b5c5bb75d070e960f5880e6c308f917aab2b4286705af951e337c98a1a9a"
-    sha256 cellar: :any_skip_relocation, catalina:      "158999c9ebb8e01fd22fdc66de7fb021a51e6a4e416fa8d313ca1db7d5b0bb61"
-    sha256 cellar: :any_skip_relocation, mojave:        "9b13902f473aa2ad2d5599782e5bc02445c5ecc9ba7fb3732e80e6cb91289ea2"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "dfb16bd186e36bd835a95f6eadc66dde33283a3ae59776805b4364290ee0bd47"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d608714599637ec0f7b0b796dcf2b3ab59addc0012ed4ad9e81204024724d59f"
+    sha256 cellar: :any_skip_relocation, monterey:       "3727fb3137e86424d91e4c37df2f6880e3ffd9b1c3eace6c2f96a98427d807d4"
+    sha256 cellar: :any_skip_relocation, big_sur:        "cfcc427053a580f9e91644fc9f9338adc9fd7d535bad943b23978d64bd4d6716"
+    sha256 cellar: :any_skip_relocation, catalina:       "51cb01fd0888dcf37074b531493df2a156ffd6d08ee080767060b9d467b93f06"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d7f35d8ee05124d6f353556678da45c0dc8ee8ab49f2c213c7d531a3d88b162d"
   end
 
   depends_on "go" => :build
+  depends_on "node" => :build
+  depends_on "yarn" => :build
 
   def install
-    # this needs to be remove to prevent multiple 'operation not permitted' errors
-    inreplace "Makefile", "CGO_ENABLED=0", ""
+    system "make", "dep-ui-local"
+    with_env(
+      NODE_ENV:        "production",
+      NODE_ONLINE_ENV: "online",
+    ) do
+      system "yarn", "--cwd", "ui", "build"
+    end
     system "make", "cli-local"
     bin.install "dist/argocd"
 
-    output = Utils.safe_popen_read("#{bin}/argocd", "completion", "bash")
-    (bash_completion/"argocd").write output
-    output = Utils.safe_popen_read("#{bin}/argocd", "completion", "zsh")
-    (zsh_completion/"_argocd").write output
+    generate_completions_from_executable(bin/"argocd", "completion", shells: [:bash, :zsh])
   end
 
   test do
@@ -33,6 +39,7 @@ class Argocd < Formula
 
     # Providing argocd with an empty config file returns the contexts table header
     touch testpath/"argocd-config"
+    (testpath/"argocd-config").chmod 0600
     assert_match "CURRENT  NAME  SERVER\n",
       shell_output("#{bin}/argocd context --config ./argocd-config")
   end

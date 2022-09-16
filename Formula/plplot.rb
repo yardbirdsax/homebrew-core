@@ -3,14 +3,15 @@ class Plplot < Formula
   homepage "https://plplot.sourceforge.io"
   url "https://downloads.sourceforge.net/project/plplot/plplot/5.15.0%20Source/plplot-5.15.0.tar.gz"
   sha256 "b92de4d8f626a9b20c84fc94f4f6a9976edd76e33fb1eae44f6804bdcc628c7b"
-  revision 2
+  revision 4
 
   bottle do
-    rebuild 1
-    sha256 arm64_big_sur: "1f9f1b0eb13535a59cd938e43ad1b190e08bbe5ebab222673421d41fd442cedc"
-    sha256 big_sur:       "54b7f57eb347cd104a27d199b7a5bca36f01be5c0f5c837290c9efc19429d7bb"
-    sha256 catalina:      "57046a10346c01ff487b1da3623ad21daf5452be29b2adfef0845db9e5f4a185"
-    sha256 mojave:        "e89a7f7b82e127c5980077b96423c1a40f534bca789818ef4fc95f0b67dee34a"
+    sha256 arm64_monterey: "c9a7891722c17ce0ac1243e1400583ff61250a3ede6a1d232c2a6c9aa4a98178"
+    sha256 arm64_big_sur:  "148662ac1efb63325a193e069fb65bed3ccee4c0288613d819c4f821ec3d8ba8"
+    sha256 monterey:       "a2da58214519cf354a3e0e6d5e40b3d2b3e7e0fc654701e8d0fe0520b95f7c9d"
+    sha256 big_sur:        "840dc348629f2e2c23697475587ccc48822c4ad710b5497319340de6d3c6e401"
+    sha256 catalina:       "9edc31f3d0fccb7d70c782da8ebd425cca7e332d4adcd1550e5ff7ed4c67b4f1"
+    sha256 x86_64_linux:   "2bce940b801bd4cf968b7c7a3e220ce1f80ee3c29f6fac58d38de1151669b144"
   end
 
   depends_on "cmake" => :build

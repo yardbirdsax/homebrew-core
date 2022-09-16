@@ -1,7 +1,8 @@
 class Moc < Formula
   desc "Terminal-based music player"
   homepage "https://moc.daper.net/"
-  revision 5
+  license "GPL-2.0-or-later"
+  revision 7
 
   stable do
     url "http://ftp.daper.net/pub/soft/moc/stable/moc-2.5.2.tar.bz2"
@@ -37,17 +38,17 @@ class Moc < Formula
   end
 
   livecheck do
-    url "http://ftp.daper.net/pub/soft/moc/stable/"
+    url "https://moc.daper.net/download"
     regex(/href=.*?moc[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 big_sur:     "4910b2a48422741e1002b79d2bb985fc470da2e4322d31b862f994709376525a"
-    sha256 catalina:    "c2fce2f2fdc2d5eb7efddf393de7dc3d75ca4e387d84ae10029120eb5e2a4e53"
-    sha256 mojave:      "b15db412cd58492ce684fd50a6bec93e18cc42f5543bfd7f45fd6e5636c56291"
-    sha256 high_sierra: "8a570805d563e3ee3d4c374eb5a8e5d649b7364286e738f9d8bef864663073e1"
-    sha256 sierra:      "fe941dffd41e1485f85b3d9bb28a1a30cccfe27d3cac438cc5b71fb347122003"
-    sha256 el_capitan:  "9e39666cb49b6fd60c16b1b4535d0b39363fcc655e6495cc17d74923df13ff27"
+    sha256 arm64_monterey: "76a10d22e284b7082d386b7850b228ba8c7b8a39e0af5fe8dd3bfda8ee5e8504"
+    sha256 arm64_big_sur:  "748bce503189849012269695eaa9da403d63944d480b5f65912efd30abe75937"
+    sha256 monterey:       "3ef692dc6ca98b8613faab3346997a9bf908180569ef437404c1fe2183d8c414"
+    sha256 big_sur:        "38313bf01863d64276c647565074618b71e09cd3b4a7dc0121b606dd52b534ad"
+    sha256 catalina:       "15e7bfdbd9e0c3726962278c05ca09e646bf4fd748a5107f103f8133b7bfc3f9"
+    sha256 x86_64_linux:   "c5dcdab691336c5c529fca538c46a26874e7bb92da1d9a803265f89b83720336"
   end
 
   head do
@@ -62,10 +63,12 @@ class Moc < Formula
   depends_on "gettext" => :build
   depends_on "pkg-config" => :build
   depends_on "berkeley-db"
-  depends_on "ffmpeg"
+  depends_on "ffmpeg@4"
   depends_on "jack"
   depends_on "libtool"
   depends_on "ncurses"
+
+  fails_with gcc: "5" # ffmpeg is compiled with GCC
 
   def install
     # Not needed for > 2.5.2

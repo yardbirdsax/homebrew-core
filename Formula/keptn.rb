@@ -1,47 +1,49 @@
 class Keptn < Formula
   desc "Is the CLI for keptn.sh a message-driven control-plane for application delivery"
   homepage "https://keptn.sh"
-  url "https://github.com/keptn/keptn/archive/0.7.3.tar.gz"
-  sha256 "7c5ab4bce7f8c75371a6130ae7929a9c7a88d05f29b96604b3849a93d2177228"
+  url "https://github.com/keptn/keptn/archive/0.19.0.tar.gz"
+  sha256 "511e53a047f4e40bd2935564ed638ce0a23a83a1fd0bab4e10f7579bc3c22ee1"
   license "Apache-2.0"
 
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
+
   bottle do
-    sha256 cellar: :any_skip_relocation, big_sur:  "ab63fa9651a5c8fd6d038213c375ac235ac029ed96e6a5a6a5fa1bc4a603c079"
-    sha256 cellar: :any_skip_relocation, catalina: "5a33c7d846b600afcc7862a1577463393825f16ff1f2cd90e724b60200076f58"
-    sha256 cellar: :any_skip_relocation, mojave:   "c5db8c4f6047e856f95f0039223caa3779ed4fd69e14bc1709bb22dcacca4b23"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "5328db7ab91987ca43f31a5071f52952e2b0993e6e8dfa466d516e6f9f81993c"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "878df0741658f1bb600b70e34f3abc287632f7ec7e67a8e726e2b9319cf1a99f"
+    sha256 cellar: :any_skip_relocation, monterey:       "fd663c0c9c638a94cbeb1fdc2e7220fdc8db8ff4808e65681f033fce2a06065a"
+    sha256 cellar: :any_skip_relocation, big_sur:        "df24d20de9c1c441a0c723b5d1955fe9879c894173a9d63f51f05787503c3bc2"
+    sha256 cellar: :any_skip_relocation, catalina:       "04ae57a9f5a8401228813114486ffad5d430df699085c9a4af8774fc3c9bc455"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b0a7f6392ea70fca13ba5965bf24096786f56358e656941db513d2e578082dd8"
   end
 
   depends_on "go" => :build
 
   def install
-    ENV["GO111MODULE"] = "auto"
+    ldflags = %W[
+      -s -w
+      -X github.com/keptn/keptn/cli/cmd.Version=#{version}
+      -X main.KubeServerVersionConstraints=""
+    ]
+
     cd buildpath/"cli" do
-      system "go", "build", *std_go_args, "-ldflags", "-s -w -X main.Version=#{version} -X main.KubeServerVersionConstraints=\"\""
+      system "go", "build", *std_go_args(ldflags: ldflags)
     end
   end
 
   test do
-    run_output = shell_output("#{bin}/keptn version 2>&1")
-    assert_match "\nKeptn CLI version:", run_output
+    system bin/"keptn", "set", "config", "AutomaticVersionCheck", "false"
+    system bin/"keptn", "set", "config", "kubeContextCheck", "false"
 
-    version_output = shell_output("#{bin}/keptn version 2>&1")
-    assert_match version.to_s, version_output
+    assert_match "Keptn CLI version: #{version}", shell_output(bin/"keptn version 2>&1")
 
-    # As we can't bring up a Kubernetes cluster in this test, we simply
-    # run "keptn status" and check that it 1) errors out, and 2) complains
-    # about a missing keptn auth.
-    require "pty"
-    require "timeout"
-    r, _w, pid = PTY.spawn("#{bin}/keptn status", err: :out)
-    begin
-      Timeout.timeout(5) do
-        assert_match "CLI is not authenticated against any Keptn cluster.", r.gets.chomp
-        Process.wait pid
-        assert_equal 0, $CHILD_STATUS.exitstatus
-      end
-    rescue Timeout::Error
-      puts "process not finished in time, killing it"
-      Process.kill("TERM", pid)
+    output = shell_output(bin/"keptn status 2>&1", 1)
+    if OS.mac?
+      assert_match "Error: credentials not found in native keychain", output
+    else
+      assert_match ".keptn/.keptn____keptn: no such file or directory", output
     end
   end
 end

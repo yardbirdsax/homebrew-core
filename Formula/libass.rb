@@ -1,16 +1,17 @@
 class Libass < Formula
   desc "Subtitle renderer for the ASS/SSA subtitle format"
   homepage "https://github.com/libass/libass"
-  url "https://github.com/libass/libass/releases/download/0.15.0/libass-0.15.0.tar.xz"
-  sha256 "9f09230c9a0aa68ef7aa6a9e2ab709ca957020f842e52c5b2e52b801a7d9e833"
+  url "https://github.com/libass/libass/releases/download/0.16.0/libass-0.16.0.tar.xz"
+  sha256 "5dbde9e22339119cf8eed59eea6c623a0746ef5a90b689e68a090109078e3c08"
   license "ISC"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "7b5bbe38be42f70ee92bc06d2dc69680717c8f3bf33c3442f4cdd6bc328eb605"
-    sha256 cellar: :any, big_sur:       "e95df755d6236cb7a56140c4bc12faad1d87023d23412b9f245bbda60073bf00"
-    sha256 cellar: :any, catalina:      "427b18a8c9c8c5331553c0e814bf4e4c6f965cc53715d89a0ad3ba66b8e231c4"
-    sha256 cellar: :any, mojave:        "64f2a67f35510fe088f3e6e18075d5e08e93081d958fcee6b65ee29ab3b730ad"
-    sha256 cellar: :any, high_sierra:   "881db49f437027abdae60f4c849097b720216bcfa197589aea373b5f3451f9ef"
+    sha256 cellar: :any,                 arm64_monterey: "78b33a83599fa08d424552a3bfae77cd00adc2bc343006e86300a0236d144afe"
+    sha256 cellar: :any,                 arm64_big_sur:  "ca188b422309aa7962beeb2313be7d2976f4dfeff98a20de8ea5ad1522a7214e"
+    sha256 cellar: :any,                 monterey:       "bdef66960d51e5e05cf78aca163ab3a8067e7d0589a7ddfbaaf8d4ffb32c319a"
+    sha256 cellar: :any,                 big_sur:        "745323103a372dac6d5c81cb00cc02e9b51d2da99f8c0b08007c851977094e03"
+    sha256 cellar: :any,                 catalina:       "4031a10db6546e55d4f8c9b23ab2b82fd0b960791641cd12189363a6bc425b47"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "52049797d742af4527e561aaee7ba8fde6d9f155291d58f7a3b9f9d8c8cd8105"
   end
 
   head do
@@ -33,9 +34,13 @@ class Libass < Formula
 
   def install
     system "autoreconf", "-i" if build.head?
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--disable-fontconfig"
+    args = %W[
+      --disable-dependency-tracking
+      --prefix=#{prefix}
+    ]
+    # libass uses coretext on macOS, fontconfig on Linux
+    args << "--disable-fontconfig" if OS.mac?
+    system "./configure", *args
     system "make", "install"
   end
 

@@ -1,16 +1,12 @@
 class Xsimd < Formula
   desc "Modern, portable C++ wrappers for SIMD intrinsics"
   homepage "https://xsimd.readthedocs.io/en/latest/"
-  url "https://github.com/QuantStack/xsimd/archive/7.4.9.tar.gz"
-  sha256 "f6601ffb002864ec0dc6013efd9f7a72d756418857c2d893be0644a2f041874e"
+  url "https://github.com/xtensor-stack/xsimd/archive/9.0.1.tar.gz"
+  sha256 "b1bb5f92167fd3a4f25749db0be7e61ed37e0a5d943490f3accdcd2cd2918cc0"
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "5cbab32bef8f9b7d81da2d109e7a72fbc73657335ca26c3be423ef8fc1e518f2"
-    sha256 cellar: :any_skip_relocation, big_sur:       "9d648aebe105458dff109f168583737d4be1f60f00905c84961383ee1f3e5574"
-    sha256 cellar: :any_skip_relocation, catalina:      "683112b939a02c0a8bd76f8e9a2e623d50a24bc4775b9e8dcfa1a6f750ad904b"
-    sha256 cellar: :any_skip_relocation, mojave:        "3144366e8952b3c158eaec803eac46ad3dcf55ca7b5ba5dea3a3418922ef5f4e"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "355cbbb72b037b406eb9ca4600e446958368bd61b8cedb7abeea81f08b5c5c7b"
+    sha256 cellar: :any_skip_relocation, all: "7a6a2027f28660c81074bc690a52cecf4964d875de1e777d9995fd23ce1a8a74"
   end
 
   depends_on "cmake" => :build
@@ -36,7 +32,7 @@ class Xsimd < Formula
 
       int main(void) {
         using u_vector_type = std::vector<double>;
-        using a_vector_type = std::vector<double, aligned_allocator<double, XSIMD_DEFAULT_ALIGNMENT>>;
+        using a_vector_type = std::vector<double, xsimd::default_allocator<double>>;
 
         using u_vector_align = container_alignment_t<u_vector_type>;
         using a_vector_align = container_alignment_t<a_vector_type>;

@@ -1,15 +1,18 @@
 class Cryptol < Formula
   desc "Domain-specific language for specifying cryptographic algorithms"
   homepage "https://www.cryptol.net/"
-  url "https://hackage.haskell.org/package/cryptol-2.10.0/cryptol-2.10.0.tar.gz"
-  sha256 "0bfa21d4766b9ad21ba16ee43b83854f25a84e7ca2b68a14cbe0006b4173ef63"
+  url "https://hackage.haskell.org/package/cryptol-2.13.0/cryptol-2.13.0.tar.gz"
+  sha256 "5c5b7ad0b290c506836dbbad886ae43ce7d690dd86e2f2a9124564c2f5602b83"
   license "BSD-3-Clause"
-  head "https://github.com/GaloisInc/cryptol.git"
+  head "https://github.com/GaloisInc/cryptol.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, big_sur:  "3602fbe74d5bba84b2e36ea3e5860b4a8ca3be54a2c13b57dff69621673d1a26"
-    sha256 cellar: :any_skip_relocation, catalina: "42bbe475407645974fb9e90c6811ca103c2d7d92ec5d622428f753fd7f9077b0"
-    sha256 cellar: :any_skip_relocation, mojave:   "e2dc3e5f38a0bb0f0bd288d9847be8be769e97ab1385b775daa1b35249fd4bff"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "21bf30e80d822a11359a5edada042837a294a82e9a2375e39e19fb059957e1b8"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "091eca3d557fc8f34f9f08734731c70d4235c701238fec389e8746b0c9875a97"
+    sha256 cellar: :any_skip_relocation, monterey:       "2c2d695b1976a46096f711490a0fde3d036cee5eea965e0eaa431fe43764a77e"
+    sha256 cellar: :any_skip_relocation, big_sur:        "649566c85d028a8affea145c1c4236f9462f8fd17daf7d649e894d4d54d191ae"
+    sha256 cellar: :any_skip_relocation, catalina:       "45e33fc7108b2f070b587b040fb16e0bb6dbd107871cbff0a1dc92d49c190c94"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "336e42866d31ad32f2e965623aec255851d42cdf926435d00ce06992fa058bb1"
   end
 
   depends_on "cabal-install" => :build

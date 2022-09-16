@@ -1,21 +1,29 @@
 class Graphicsmagick < Formula
   desc "Image processing tools collection"
   homepage "http://www.graphicsmagick.org/"
-  url "https://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick/1.3.36/GraphicsMagick-1.3.36.tar.xz"
-  sha256 "5d5b3fde759cdfc307aaf21df9ebd8c752e3f088bb051dd5df8aac7ba7338f46"
+  url "https://downloads.sourceforge.net/project/graphicsmagick/graphicsmagick/1.3.38/GraphicsMagick-1.3.38.tar.xz"
+  sha256 "d60cd9db59351d2b9cb19beb443170acaa28f073d13d258f67b3627635e32675"
+  license "MIT"
+  revision 1
   head "http://hg.code.sf.net/p/graphicsmagick/code", using: :hg
 
+  livecheck do
+    url "https://sourceforge.net/projects/graphicsmagick/rss?path=/graphicsmagick"
+  end
+
   bottle do
-    sha256 arm64_big_sur: "baae9073b2475351eb1d53d23fa0c2fcf75a1611649b3be229a71b693881436e"
-    sha256 big_sur:       "e8423e130f6dcdf83c501db944a341257e5b774cd007e1300f8b3cd3d32cafcb"
-    sha256 catalina:      "a09639dfb381b06df090e595f6f1bc343c3619c9643de26c6cfea4073c9527cd"
-    sha256 mojave:        "40b04368925d79d6e6fbe76014e5db18c7378eda414beb1b41de9bb8db6a69a0"
+    sha256 arm64_monterey: "69c5aa5a28c4b5675addde198e3779134128ee132354dae82b9be85c5fab4817"
+    sha256 arm64_big_sur:  "7e1ad64d06e3e1e310879361dabe3e8c66d4a8f4c645c6a9fc5b69d8168d2c6a"
+    sha256 monterey:       "04b039ead7edb17e0da005dd679dfe51d886dc34e481aec4d3df0f5951d0836a"
+    sha256 big_sur:        "b9bf139790e2854a0d1c510af638fa31acacf6e809dcd1b71b940a5a3eb8bb2d"
+    sha256 catalina:       "1696c632ecb433129619bf445cf5dd9e227389484c5ddd87dd1ce744257dcfcd"
+    sha256 x86_64_linux:   "ff6447deef369947c767bfbad348e28f882e753ebbea58ad9e59dbea0446cb2e"
   end
 
   depends_on "pkg-config" => :build
   depends_on "freetype"
   depends_on "jasper"
-  depends_on "jpeg"
+  depends_on "jpeg-turbo"
   depends_on "libpng"
   depends_on "libtiff"
   depends_on "libtool"
@@ -42,6 +50,7 @@ class Graphicsmagick < Formula
       --without-gslib
       --with-gs-font-dir=#{HOMEBREW_PREFIX}/share/ghostscript/fonts
       --without-wmf
+      --without-jxl
     ]
 
     # versioned stuff in main tree is pointless for us

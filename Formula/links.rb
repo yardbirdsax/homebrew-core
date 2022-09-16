@@ -1,9 +1,10 @@
 class Links < Formula
   desc "Lynx-like WWW browser that supports tables, menus, etc."
   homepage "http://links.twibright.com/"
-  url "http://links.twibright.com/download/links-2.21.tar.bz2"
-  sha256 "285eed8591c7781ec26213df82786665aaa1b9286782e8a7a1a7e2a6e1630d63"
-  license "GPL-2.0"
+  url "http://links.twibright.com/download/links-2.27.tar.bz2"
+  sha256 "d8ddcbfcede7cdde80abeb0a236358f57fa6beb2bcf92e109624e9b896f9ebb4"
+  license "GPL-2.0-or-later"
+  revision 1
 
   livecheck do
     url "http://links.twibright.com/download.php"
@@ -11,30 +12,25 @@ class Links < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "4f1d1a7db600814dc6ba06ba8d146d1449ea34a706bc651e44a5205739bd07f7"
-    sha256 cellar: :any, big_sur:       "4e8063e73e66dc0650d28ea07dea15e4a05659664185e96c26c716263e29cf2b"
-    sha256 cellar: :any, catalina:      "c43cf180508872a2e5461af4c3c80a58d2d8824d1bb8b0c1a7d0f890aa12ef49"
-    sha256 cellar: :any, mojave:        "aef8fa60ec4bdc8adca1cab129a2a8fd0a44888d867e7b468a1ed7672f7c7550"
-    sha256 cellar: :any, high_sierra:   "6660756b8d9ac4a433212c44067fd1627e96c3bcf7996f4a51da1affe39e29e5"
+    sha256 cellar: :any,                 arm64_monterey: "9134a7e5e486104e6ef5fe33c99626fb76808a2489fb27ca3551f8156e8af4d5"
+    sha256 cellar: :any,                 arm64_big_sur:  "cb3dfd4ac4f8a77497165549502b43df2f536404ca7ac7156a04a243a85ba81e"
+    sha256 cellar: :any,                 monterey:       "da28f8a6a32397f1a1c94a8e1bb3b24fb1b6cc65ca7d812b8691ffd578ceea5f"
+    sha256 cellar: :any,                 big_sur:        "ab0b2649920041bce1e11a68043fff87bd65c02e19f80515282086cc4ef63bf9"
+    sha256 cellar: :any,                 catalina:       "702d2d5103b0665285e5d55e2052360e23809de7d16f07842ddb4031e9a219af"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0c4ae58d62709d6ec257b13c6b43c57066c03ec6b5422d13afd16779d4a008d1"
   end
 
   depends_on "pkg-config" => :build
-  depends_on "jpeg"
-  depends_on "librsvg"
-  depends_on "libtiff"
   depends_on "openssl@1.1"
 
-  def install
-    args = %W[
-      --disable-debug
-      --disable-dependency-tracking
-      --prefix=#{prefix}
-      --mandir=#{man}
-      --with-ssl=#{Formula["openssl@1.1"].opt_prefix}
-      --without-lzma
-    ]
+  uses_from_macos "bzip2"
+  uses_from_macos "zlib"
 
-    system "./configure", *args
+  def install
+    system "./configure", *std_configure_args,
+                          "--mandir=#{man}",
+                          "--with-ssl=#{Formula["openssl@1.1"].opt_prefix}",
+                          "--without-lzma"
     system "make", "install"
     doc.install Dir["doc/*"]
   end

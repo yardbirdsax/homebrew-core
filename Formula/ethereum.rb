@@ -1,10 +1,10 @@
 class Ethereum < Formula
   desc "Official Go implementation of the Ethereum protocol"
-  homepage "https://ethereum.github.io/go-ethereum/"
-  url "https://github.com/ethereum/go-ethereum/archive/v1.9.25.tar.gz"
-  sha256 "d7b733aeef4eba97f5351ba435001fa7365f55adabffdfdda909700335e98b0e"
+  homepage "https://geth.ethereum.org/"
+  url "https://github.com/ethereum/go-ethereum/archive/v1.10.25.tar.gz"
+  sha256 "29975104c408cea71f40911e804d7bb629770734205d0f147f2993603a10204c"
   license "LGPL-3.0-or-later"
-  head "https://github.com/ethereum/go-ethereum.git"
+  head "https://github.com/ethereum/go-ethereum.git", branch: "master"
 
   livecheck do
     url :stable
@@ -12,15 +12,20 @@ class Ethereum < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "cb6c2c4ef5992fcd944887052099d846e865b29486152f3eaaaeae7b64a97770"
-    sha256 cellar: :any_skip_relocation, big_sur:       "236e8976bd37896135951f14345d2c431aa30c35c06a8f564ee0d1890dde6e36"
-    sha256 cellar: :any_skip_relocation, catalina:      "c94e46a6bea15393eb22e15bd4bbbb63cb08db493989b2008aa16c5b9106d3f1"
-    sha256 cellar: :any_skip_relocation, mojave:        "0f1a9478c1873537097fa246ed25956d606df2b91939bf2d98102a95fcca2b96"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "57e5bd90c20df26de1da09649fbdd19136e5bc76f4bca38cfd39cbcc258556e6"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "057e204d0353319d95e814dc7a1612dd8af2680716c2a9fd24979f20be2b4c63"
+    sha256 cellar: :any_skip_relocation, monterey:       "c746f33f583add1ed450bcfaca57813ee3ae53c321673c882d84bd2a841bdc80"
+    sha256 cellar: :any_skip_relocation, big_sur:        "d6462305eef149c1d739dcf95f4c3cc5c33864b6e4c59ec3802ef062d6196608"
+    sha256 cellar: :any_skip_relocation, catalina:       "9317bdc5547350e9f7b90b5a9d88529d8966e774eb07125d6a1ba348a122a8f5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a84691e5d8f6bdcbf7f674e68f2f361b5b186c6b30fbb608a3fe5cc7fc973363"
   end
 
   depends_on "go" => :build
 
   def install
+    # See https://github.com/golang/go/issues/26487
+    ENV.O0 if OS.linux?
+
     system "make", "all"
     bin.install Dir["build/bin/*"]
   end

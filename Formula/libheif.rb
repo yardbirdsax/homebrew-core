@@ -1,29 +1,29 @@
 class Libheif < Formula
   desc "ISO/IEC 23008-12:2017 HEIF file format decoder and encoder"
   homepage "https://www.libde265.org/"
-  url "https://github.com/strukturag/libheif/releases/download/v1.11.0/libheif-1.11.0.tar.gz"
-  sha256 "c550938f56ff6dac83702251a143f87cb3a6c71a50d8723955290832d9960913"
+  url "https://github.com/strukturag/libheif/releases/download/v1.13.0/libheif-1.13.0.tar.gz"
+  sha256 "c20ae01bace39e89298f6352f1ff4a54b415b33b9743902da798e8a1e51d7ca1"
   license "LGPL-3.0-only"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "6d4a4ac2d0947af84d7987c706fb6598bd87296b3c170bb9eb50270d2f2b3bed"
-    sha256 cellar: :any, big_sur:       "daa9f993f1a04242f7786f141544fbb24a2c2d02e11f0253b6d72b6a8d6d3fe1"
-    sha256 cellar: :any, catalina:      "0b269433daa8aca16395d3ddc75fc8b63e15750c7c8a3af4a3769af09081f326"
-    sha256 cellar: :any, mojave:        "3ae3d4575f77c80b65ba04db875293422530d98ec80a61a6076316958fab6688"
+    sha256 cellar: :any,                 arm64_monterey: "56393746a6a2b778fea34efd0f54bb021cbbd3037e5331e7bd43692c7197afc0"
+    sha256 cellar: :any,                 arm64_big_sur:  "90e4cd50afc636c2c5a4c65ef24e69dd8b4e8882972835f674827974bf31829b"
+    sha256 cellar: :any,                 monterey:       "c430a3ac250cac7589d3d5a1b49e646bddc8ad612a9539967e407448209c38c0"
+    sha256 cellar: :any,                 big_sur:        "645812fa238861a35d8969c8a024b21cec7d196c243215dc851915602d840ceb"
+    sha256 cellar: :any,                 catalina:       "903dd8b70663ea86f9be75da09b3fe721d484a2075ed4dd9cabd539c736ea772"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c8430376a3c220ee03cae6abfd71fca61fd47d581bb2bea011d02c29f28fafbc"
   end
 
   depends_on "pkg-config" => :build
   depends_on "aom"
-  depends_on "jpeg"
+  depends_on "jpeg-turbo"
   depends_on "libde265"
   depends_on "libpng"
   depends_on "shared-mime-info"
   depends_on "x265"
 
   def install
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+    system "./configure", *std_configure_args, "--disable-silent-rules"
     system "make", "install"
     pkgshare.install "examples/example.heic"
     pkgshare.install "examples/example.avif"
@@ -42,7 +42,7 @@ class Libheif < Formula
     assert_predicate testpath/"exampleheic-1.jpg", :exist?
     assert_predicate testpath/"exampleheic-2.jpg", :exist?
 
-    output = "File contains 1 images"
+    output = "File contains 1 image"
     example = pkgshare/"example.avif"
     exout = testpath/"exampleavif.jpg"
 

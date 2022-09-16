@@ -1,11 +1,10 @@
 class ManDb < Formula
   desc "Unix documentation system"
   homepage "https://www.nongnu.org/man-db/"
-  url "https://download.savannah.gnu.org/releases/man-db/man-db-2.9.3.tar.xz"
-  mirror "https://download-mirror.savannah.gnu.org/releases/man-db/man-db-2.9.3.tar.xz"
-  sha256 "fa5aa11ab0692daf737e76947f45669225db310b2801a5911bceb7551c5597b8"
+  url "https://download.savannah.gnu.org/releases/man-db/man-db-2.10.2.tar.xz"
+  mirror "https://download-mirror.savannah.gnu.org/releases/man-db/man-db-2.10.2.tar.xz"
+  sha256 "ee97954d492a13731903c9d0727b9b01e5089edbd695f0cdb58d405a5af5514d"
   license "GPL-2.0-or-later"
-  revision 1
 
   livecheck do
     url "https://download.savannah.gnu.org/releases/man-db/"
@@ -13,14 +12,18 @@ class ManDb < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "5ab9263c8026e1565fc943a7e2afca3005743d3708d98e791fe85e85db55c6c4"
-    sha256 big_sur:       "e2b44b53a592dd2730f9d16426c61311f59d75b7a552f52a4d97a70cf07a9d5b"
-    sha256 catalina:      "e16a1b87b4b431ff7013bda369abe3acdd3aa17323f5b1461f43e878c5f851a4"
-    sha256 mojave:        "1524da7565dc4ac2dea212276b7524dbb34a20415bed7ef3f1603bed8850de45"
+    rebuild 1
+    sha256 arm64_monterey: "883f4fd5751b69d951ebdb4e2de9e76f0149b573720ed9affb3bd088c24cb303"
+    sha256 arm64_big_sur:  "90ebf9877c5aa6d1a2b70685da43dfdb0431644fc108ec878dc33010d137d79c"
+    sha256 monterey:       "ccde90f81fad87af2496c6cda537ad5ce2afcbb104f705ef88959de565e2ae4f"
+    sha256 big_sur:        "f0f874894907bcf1c9bd2cfbfbe70e45758c55475468841a438f81c48fe2792c"
+    sha256 catalina:       "afee12759ff8f4b1eea2fa4356297bcd53af776d11305111a949baacce1c6f12"
+    sha256 x86_64_linux:   "2921653b3a7b781564dc65f0cea507c6c37d46bc80b4a6509056e03c4fcdbf5e"
   end
 
   depends_on "pkg-config" => :build
   depends_on "groff"
+  depends_on "libpipeline"
 
   uses_from_macos "zlib"
 
@@ -28,39 +31,25 @@ class ManDb < Formula
     depends_on "gdbm"
   end
 
-  resource "libpipeline" do
-    url "https://download.savannah.gnu.org/releases/libpipeline/libpipeline-1.5.2.tar.gz"
-    sha256 "fd59c649c1ae9d67604d1644f116ad4d297eaa66f838e3dfab96b41e85b059fb"
-  end
-
   def install
-    resource("libpipeline").stage do
-      system "./configure",
-        "--disable-dependency-tracking",
-        "--disable-silent-rules",
-        "--prefix=#{buildpath}/libpipeline",
-        "--enable-static",
-        "--disable-shared"
-      system "make"
-      system "make", "install"
-    end
-
-    ENV["libpipeline_CFLAGS"] = "-I#{buildpath}/libpipeline/include"
-    ENV["libpipeline_LIBS"] = "-L#{buildpath}/libpipeline/lib -lpipeline"
-
+    man_db_conf = etc/"man_db.conf"
     args = %W[
-      --disable-dependency-tracking
       --disable-silent-rules
-      --prefix=#{prefix}
       --disable-cache-owner
       --disable-setuid
+      --disable-nls
       --program-prefix=g
+      --localstatedir=#{var}
+      --with-config-file=#{man_db_conf}
+      --with-systemdtmpfilesdir=#{etc}/tmpfiles.d
+      --with-systemdsystemunitdir=#{etc}/systemd/system
     ]
 
-    system "./configure", *args
-
-    system "make", "CFLAGS=#{ENV.cflags}"
+    system "./configure", *args, *std_configure_args
     system "make", "install"
+
+    # Use Homebrew's `var` directory instead of `/var`.
+    inreplace man_db_conf, "/var", var
 
     # Symlink commands without 'g' prefix into libexec/bin and
     # man pages into libexec/man
@@ -100,7 +89,12 @@ class ManDb < Formula
   test do
     ENV["PAGER"] = "cat"
     output = shell_output("#{bin}/gman true")
-    assert_match "BSD General Commands Manual", output
-    assert_match "The true utility always returns with exit code zero", output
+    if OS.mac?
+      assert_match "BSD General Commands Manual", output
+      assert_match(/The true utility always returns with (an )?exit code (of )?zero/, output)
+    else
+      assert_match "true - do nothing, successfully", output
+      assert_match "GNU coreutils online help: <http://www.gnu.org/software/coreutils/", output
+    end
   end
 end

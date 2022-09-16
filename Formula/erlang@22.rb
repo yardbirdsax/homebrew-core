@@ -2,8 +2,8 @@ class ErlangAT22 < Formula
   desc "Programming language for highly scalable real-time systems"
   homepage "https://www.erlang.org/"
   # Download tarball from GitHub; it is served faster than the official tarball.
-  url "https://github.com/erlang/otp/archive/OTP-22.3.4.14.tar.gz"
-  sha256 "0d1e1f1acf542a98248e388b877d34eba92f367fdcc5ee3ebde557dee60ef551"
+  url "https://github.com/erlang/otp/releases/download/OTP-22.3.4.26/otp_src_22.3.4.26.tar.gz"
+  sha256 "ee281e4638c8d671dd99459a11381345ee9d70f1f8338f5db31fc082349a370e"
   license "Apache-2.0"
 
   livecheck do
@@ -12,37 +12,27 @@ class ErlangAT22 < Formula
   end
 
   bottle do
-    sha256 cellar: :any, catalina: "0a0f9f41d9d4b545788f4e1381e9931bbf309efcb6257159886746208f51666c"
-    sha256 cellar: :any, mojave:   "d3cdb633119399d67b8637284e5647bf0ac13c873cae657c14b840fbc118159b"
+    sha256 cellar: :any,                 arm64_monterey: "2ba527cab790a8626160c04d7de0cf7278c2cf1e5aac1b21e50e174dc4a32e04"
+    sha256 cellar: :any,                 arm64_big_sur:  "b28d77105c4f07dd1f56d186d5b0936b2285571d45ffdb996db374bc79b7d752"
+    sha256 cellar: :any,                 monterey:       "e5ce1a93dca9e9d852c706668c195a47e563b24c463a4b0dc56d39e2190958f2"
+    sha256 cellar: :any,                 big_sur:        "d57077a6791cdf18075a3754a6417e05f510f6ab2496ea08cbdb62a4fbdca093"
+    sha256 cellar: :any,                 catalina:       "e78a4e2340c647879851eb98fd8dda806a4ccded8f1f4b1ec735e29f7c7ce6a8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5ecd6df4191c020f807aa9f8e928cf469ac20d94db8ee6b248c647a36a460f8d"
   end
 
   keg_only :versioned_formula
 
-  depends_on "autoconf" => :build
-  depends_on "automake" => :build
-  depends_on "libtool" => :build
-  depends_on arch: :x86_64
   depends_on "openssl@1.1"
-  depends_on "wxmac" # for GUI apps like observer
-
-  uses_from_macos "m4" => :build
+  depends_on "wxwidgets" # for GUI apps like observer
 
   resource "man" do
-    url "https://www.erlang.org/download/otp_doc_man_22.3.tar.gz"
-    mirror "https://fossies.org/linux/misc/otp_doc_man_22.3.tar.gz"
-    sha256 "43b6d62d9595e1dc51946d55c9528c706c5ae753876b9bf29303b7d11a7ccb16"
+    url "https://github.com/erlang/otp/releases/download/OTP-22.3.4.25/otp_doc_man_22.3.4.25.tar.gz"
+    sha256 "b715aada5a3abf0699d1c05ed55bd57f2110fb8fc58a9a67b6519d8ff8195fa8"
   end
 
   resource "html" do
-    url "https://www.erlang.org/download/otp_doc_html_22.3.tar.gz"
-    mirror "https://fossies.org/linux/misc/otp_doc_html_22.3.tar.gz"
-    sha256 "9b01c61f2898235e7f6643c66215d6419f8706c8fdd7c3e0123e68960a388c34"
-  end
-
-  # Fix build on Xcode 12
-  patch do
-    url "https://github.com/erlang/otp/commit/388622e9b626039c1e403b4952c2c905af364a96.patch?full_index=1"
-    sha256 "85d3611fc071f06d421b9c7fae00b656fde054586bf69551aec38930d4086780"
+    url "https://github.com/erlang/otp/releases/download/OTP-22.3.4.25/otp_doc_html_22.3.4.25.tar.gz"
+    sha256 "90bfd716b2189b858a62cf09503ab02eba211753e44025d39e800490642e0fa7"
   end
 
   def install
@@ -50,16 +40,12 @@ class ErlangAT22 < Formula
     # other modules doesn't fail with an unintelligible error.
     %w[LIBS FLAGS AFLAGS ZFLAGS].each { |k| ENV.delete("ERL_#{k}") }
 
-    # Do this if building from a checkout to generate configure
-    system "./otp_build", "autoconf" if File.exist? "otp_build"
-
     args = %W[
       --disable-debug
       --disable-silent-rules
       --prefix=#{prefix}
       --enable-dynamic-ssl-lib
       --enable-hipe
-      --enable-sctp
       --enable-shared-zlib
       --enable-smp-support
       --enable-threads
@@ -68,7 +54,7 @@ class ErlangAT22 < Formula
       --without-javac
     ]
 
-    on_macos do
+    if OS.mac?
       args << "--enable-darwin-64bit"
       args << "--enable-kernel-poll" if MacOS.version > :el_capitan
       args << "--with-dynamic-trace=dtrace" if MacOS::CLT.installed?
@@ -78,7 +64,7 @@ class ErlangAT22 < Formula
     system "make"
     system "make", "install"
 
-    (lib/"erlang").install resource("man").files("man")
+    (lib/"erlang/man").install resource("man")
     doc.install resource("html")
   end
 

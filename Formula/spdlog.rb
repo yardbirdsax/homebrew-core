@@ -1,25 +1,36 @@
 class Spdlog < Formula
   desc "Super fast C++ logging library"
   homepage "https://github.com/gabime/spdlog"
-  url "https://github.com/gabime/spdlog/archive/v1.8.2.tar.gz"
-  sha256 "e20e6bd8f57e866eaf25a5417f0a38a116e537f1a77ac7b5409ca2b180cec0d5"
+  url "https://github.com/gabime/spdlog/archive/v1.10.0.tar.gz"
+  sha256 "697f91700237dbae2326b90469be32b876b2b44888302afbc7aceb68bcfe8224"
   license "MIT"
+  revision 1
   head "https://github.com/gabime/spdlog.git", branch: "v1.x"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "642108455663ea0eb7bb0d430c82b1dc359b6411f966cafbb0092af775468322"
-    sha256 cellar: :any, big_sur:       "e3a306a9e37b2fa5d35857daed33e4ebbf0fdb503d0061a1e8ec443521abcf1f"
-    sha256 cellar: :any, catalina:      "0da73847d24190c8f51d017abab07176f6d609a409c58c0df27d1dcfd1bbd375"
-    sha256 cellar: :any, mojave:        "40496533a239969ce9da48a76b5db57721eb7fe594e5ab129c9bb6f34281778c"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "326a1cec2e046ff0d9e7648f503be5b31b287e6fea68bc7c3d75e47504eef351"
+    sha256 cellar: :any,                 arm64_big_sur:  "118df7717927021e813cbf6d084bc386c3a44a0b0641c062333f2bb204697eb3"
+    sha256 cellar: :any,                 monterey:       "1d5f317ee2168fee8b91402fb4c5d3f6a8613780256b929fabd112532bb115e9"
+    sha256 cellar: :any,                 big_sur:        "5597ce08bfbb2d6602a885131e2b55aed49e24a6edef51640ddab24d7f0ed7bc"
+    sha256 cellar: :any,                 catalina:       "218aa5f6d88c3df0671e38dd5bb5c3e61b52807ba11593dfdd73ee53b3bfeb9a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5f2f10b826d54cdb6a3e8a40081cd705bfaea8ed66573c0d590f75d1f9bea009"
   end
 
   depends_on "cmake" => :build
   depends_on "fmt"
 
+  # error: specialization of 'template<class T, ...> struct fmt::v8::formatter' in different namespace
+  fails_with gcc: "5"
+
   def install
     ENV.cxx11
 
-    inreplace "include/spdlog/tweakme.h", "// #define SPDLOG_FMT_EXTERNAL", "#define SPDLOG_FMT_EXTERNAL"
+    inreplace "include/spdlog/tweakme.h", "// #define SPDLOG_FMT_EXTERNAL", <<~EOS
+      #ifndef SPDLOG_FMT_EXTERNAL
+      #define SPDLOG_FMT_EXTERNAL
+      #endif
+    EOS
 
     mkdir "spdlog-build" do
       args = std_cmake_args + %W[

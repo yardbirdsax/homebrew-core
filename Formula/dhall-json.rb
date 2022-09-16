@@ -1,15 +1,18 @@
 class DhallJson < Formula
   desc "Dhall to JSON compiler and a Dhall to YAML compiler"
   homepage "https://github.com/dhall-lang/dhall-haskell/tree/master/dhall-json"
-  url "https://hackage.haskell.org/package/dhall-json-1.7.5/dhall-json-1.7.5.tar.gz"
-  sha256 "3e1aeed7d3cd58ee3c220e724ca1f6128464a204d45fff225b4a70363bbaf3ba"
+  url "https://hackage.haskell.org/package/dhall-json-1.7.11/dhall-json-1.7.11.tar.gz"
+  sha256 "26c2acf33bfc597f4d2ac333a431180c9929d7a9b4ef7cf70c4bd45eba65ef28"
   license "BSD-3-Clause"
-  head "https://github.com/dhall-lang/dhall-haskell.git"
+  head "https://github.com/dhall-lang/dhall-haskell.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, big_sur:  "a1e0cb4f7e4a7e0994b43ecd783240356631d36655cfbf59a903cc3f6a799242"
-    sha256 cellar: :any_skip_relocation, catalina: "050f219d8050cf46a54487e0cad414374a5d2b4a6422d1e2e2c7a682149c3afb"
-    sha256 cellar: :any_skip_relocation, mojave:   "56007f50e5a52a3062973574ddc1e888d74698e3ac9310ed223ce5c131834cb9"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "c7ab866ec47813ed157b45eb104a1066a9fb8ff331bdbf1f8064b508d0477f58"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "3a7b56e38dbedd7640bf311a0fc9f3f7c45b669e7ce1e82d39c0d2bf54919d7e"
+    sha256 cellar: :any_skip_relocation, monterey:       "1739d1d88b428e459c12382334f46368e7f56a576559c2723ea68d241d20390e"
+    sha256 cellar: :any_skip_relocation, big_sur:        "eeb1ac02605a19ecd05545d31e9626c001abc6e22be1f929e4c9016162690595"
+    sha256 cellar: :any_skip_relocation, catalina:       "bb726a70ad686bb99274a509edcd4744f4c04cef7f77a78c73594381f88eb443"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0fdbf404ad8248fbc394b6dba1342ea550b89edede9cedac49336ac3636dc3ca"
   end
 
   depends_on "cabal-install" => :build

@@ -1,8 +1,10 @@
 class NanopbGenerator < Formula
+  include Language::Python::Shebang
+
   desc "C library for encoding and decoding Protocol Buffer messages"
   homepage "https://jpa.kapsi.fi/nanopb/docs/index.html"
-  url "https://jpa.kapsi.fi/nanopb/download/nanopb-0.4.4.tar.gz"
-  sha256 "56fb6efb17824f09fd64c509cc6bbe0f44919137f8143a8613e1194cd4782374"
+  url "https://jpa.kapsi.fi/nanopb/download/nanopb-0.4.6.tar.gz"
+  sha256 "e379d9babd86b9cfd8f8900fd0da8705cbd9bea4491178fb2b8be5e217bf02ab"
   license "Zlib"
 
   livecheck do
@@ -11,14 +13,11 @@ class NanopbGenerator < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "2bf71e3731cd20856320911e2f93faeb1e08f4dc833c9d24af1ac7f0a7b30f43"
-    sha256 cellar: :any_skip_relocation, big_sur:       "e21886b97c90e974ad0703192f26ebd46b434dd0c5628d2c212a2281bc10b093"
-    sha256 cellar: :any_skip_relocation, catalina:      "6e8adb5331cae1497b14da6367cfbfc4b2231d06738c58402ab978f76834cbd9"
-    sha256 cellar: :any_skip_relocation, mojave:        "e64b44fbf7a8dc521871cc366962195eaa9d73db5da8d138ff1b71f4a6d92ccd"
+    sha256 cellar: :any_skip_relocation, all: "07bb3eaaff21602786aba8175fa1b4e76ef6c736114f53eee63045affc5535bc"
   end
 
   depends_on "protobuf"
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   conflicts_with "mesos",
     because: "they depend on an incompatible version of protobuf"
@@ -26,8 +25,7 @@ class NanopbGenerator < Formula
   def install
     cd "generator" do
       system "make", "-C", "proto"
-      inreplace "nanopb_generator.py", %r{^#!/usr/bin/env python3$},
-                                       "#!/usr/bin/env #{Formula["python@3.9"].opt_bin}/python3"
+      rewrite_shebang detected_python_shebang, "nanopb_generator.py"
       libexec.install "nanopb_generator.py", "protoc-gen-nanopb", "proto"
       bin.install_symlink libexec/"protoc-gen-nanopb", libexec/"nanopb_generator.py"
     end

@@ -1,11 +1,11 @@
 class Logstash < Formula
   desc "Tool for managing events and logs"
   homepage "https://www.elastic.co/products/logstash"
-  url "https://github.com/elastic/logstash/archive/v7.10.2.tar.gz"
-  sha256 "52288699c9e14453e8655ac940c1d0ee51c8956f4b6356502b67c62abf228429"
+  url "https://github.com/elastic/logstash/archive/v8.4.1.tar.gz"
+  sha256 "0ef0a8853a93fa92374b1efd754699702e57305ec824e3e83807362b5ed5d10d"
   license "Apache-2.0"
   version_scheme 1
-  head "https://github.com/elastic/logstash.git"
+  head "https://github.com/elastic/logstash.git", branch: "main"
 
   livecheck do
     url :stable
@@ -13,12 +13,15 @@ class Logstash < Formula
   end
 
   bottle do
-    sha256 cellar: :any, big_sur:  "d12f264267e3f89f5b73550e2eed5f44d0dbb8bc287bb5e34eac244045068f43"
-    sha256 cellar: :any, catalina: "37e9b894679f19a3faf930ca6af7a547365c16e28642d52497ba9d8c73f73001"
-    sha256 cellar: :any, mojave:   "3689011a5a36b58492d7f1bf9fd904fc80452cca25e60fc43c5c8142a4cc1b11"
+    sha256 cellar: :any,                 arm64_monterey: "0ea89c50c840769931bf05cef2be95169bcaea201e907f04a2c9b1d8691fddf3"
+    sha256 cellar: :any,                 arm64_big_sur:  "ca9fddab6133c067dec4dde3ee4fb7e5c1fc9937e584f0bcb52512bcb21bc4b5"
+    sha256 cellar: :any,                 monterey:       "c8a13779ae00b526f07202198cfbd4a84f757fe694fc3ecd6dd045097ca2b2d0"
+    sha256 cellar: :any,                 big_sur:        "464a5340446d0645ec837de1fb9e89411cdf1b79514ef8064c84229b382e36df"
+    sha256 cellar: :any,                 catalina:       "88773440b00e72173f9b9d4d92b7652b518156b3f198db0a7f693991c85234ec"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b4a56cd12c5c4f67515a201c3f843278dacdbd442cd79206ca636242a4a87d0b"
   end
 
-  depends_on "openjdk@8"
+  depends_on "openjdk@17"
 
   uses_from_macos "ruby" => :build
 
@@ -44,6 +47,13 @@ class Logstash < Formula
               /^LOGSTASH_HOME=.*$/,
               "LOGSTASH_HOME=#{libexec}"
 
+    # Delete Windows and other Arch/OS files
+    paths_to_keep = OS.linux? ? "#{Hardware::CPU.arch}-#{OS.kernel_name}" : OS.kernel_name
+    rm Dir["bin/*.bat"]
+    Dir["vendor/jruby/lib/jni/*"].each do |path|
+      rm_r path unless path.include? paths_to_keep
+    end
+
     libexec.install Dir["*"]
 
     # Move config files into etc
@@ -51,7 +61,7 @@ class Logstash < Formula
     (libexec/"config").rmtree
 
     bin.install libexec/"bin/logstash", libexec/"bin/logstash-plugin"
-    bin.env_script_all_files(libexec/"bin", Language::Java.overridable_java_home_env("1.8"))
+    bin.env_script_all_files libexec/"bin", LS_JAVA_HOME: "${LS_JAVA_HOME:-#{Language::Java.java_home("17")}}"
   end
 
   def post_install
@@ -64,36 +74,12 @@ class Logstash < Formula
     EOS
   end
 
-  plist_options manual: "logstash"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>KeepAlive</key>
-          <false/>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_bin}/logstash</string>
-          </array>
-          <key>EnvironmentVariables</key>
-          <dict>
-          </dict>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>WorkingDirectory</key>
-          <string>#{var}</string>
-          <key>StandardErrorPath</key>
-          <string>#{var}/log/logstash.log</string>
-          <key>StandardOutPath</key>
-          <string>#{var}/log/logstash.log</string>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run opt_bin/"logstash"
+    keep_alive false
+    working_dir var
+    log_path var/"log/logstash.log"
+    error_log_path var/"log/logstash.log"
   end
 
   test do

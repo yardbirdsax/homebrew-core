@@ -2,32 +2,26 @@ class DockerMachineDriverVmware < Formula
   desc "VMware Fusion & Workstation docker-machine driver"
   homepage "https://www.vmware.com/products/personal-desktop-virtualization.html"
   url "https://github.com/machine-drivers/docker-machine-driver-vmware.git",
-      tag:      "v0.1.1",
-      revision: "cd992887ede19ae63e030c63dda5593f19ed569c"
+      tag:      "v0.1.5",
+      revision: "faa4b93573820340d44333ffab35e2beee3f984a"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, big_sur:     "06e7a06267df68d8200ff678cd9aeb4b214e839f6e8a59dad4617c8cf1d23696"
-    sha256 cellar: :any_skip_relocation, catalina:    "d73c0be19fba7a7166c65202133b18c63367b5758d04ec19e23d3fd9406a8a7a"
-    sha256 cellar: :any_skip_relocation, mojave:      "df81e5c14ec3961d53f6490a165a17b8ceda29beba747ee659b57d82a9468e26"
-    sha256 cellar: :any_skip_relocation, high_sierra: "e65553889741f8c077de12706314e9f95805d673b186d1d545617515d7ab4a03"
-    sha256 cellar: :any_skip_relocation, sierra:      "4901f8daf5bc087b0b4bb64a2798696604e618b8d11433b6fa851dd90fd1b77f"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "8435fdd294f5ada321d652dec3eba0a01811576074e9d169b96d4bedcb31c630"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "51441771e510e3263cfddbefe03c1306bd971624e35d5a44a3a8acb37be141c6"
+    sha256 cellar: :any_skip_relocation, monterey:       "ffa978d59f3f647229527029ab3a3a88fdd3bed7d7000214969acf218fc1d084"
+    sha256 cellar: :any_skip_relocation, big_sur:        "a4cc3a076070538c9bacec55e70ed2fd454f860c5c3c9a5f3f1986abb8c7be88"
+    sha256 cellar: :any_skip_relocation, catalina:       "29427b8c6e0c23160406ffbd642c5838cf6e2d2e73de30c688630ae60f57f47d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c2699119a539f3b9b7c86f900d5510d5b4cdb952ebdc60b7f5c12bf80f5d4932"
   end
 
-  depends_on "go" => :build
+  # Bump to 1.18 on the next release, if possible.
+  depends_on "go@1.17" => :build
   depends_on "docker-machine"
 
   def install
-    ENV["GOPATH"] = buildpath
-
-    dir = buildpath/"src/github.com/machine-drivers/docker-machine-driver-vmware"
-    dir.install buildpath.children
-
-    cd dir do
-      system "go", "build", "-o", "#{bin}/docker-machine-driver-vmware",
-            "-ldflags", "-X main.version=#{version}"
-      prefix.install_metafiles
-    end
+    system "go", "build", *std_go_args(ldflags: "-X main.version=#{version}")
   end
 
   test do

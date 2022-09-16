@@ -1,10 +1,14 @@
 class OsrmBackend < Formula
   desc "High performance routing engine"
   homepage "http://project-osrm.org/"
-  url "https://github.com/Project-OSRM/osrm-backend/archive/v5.24.0.tar.gz"
-  sha256 "a66b20e7ffe83e5e5fe12324980320e12a6ec2b05f2befd157de5c60c665613c"
   license "BSD-2-Clause"
-  head "https://github.com/Project-OSRM/osrm-backend.git"
+  revision 2
+
+  stable do
+    url "https://github.com/Project-OSRM/osrm-backend/archive/v5.26.0.tar.gz"
+    sha256 "45e986db540324bd0fc881b746e96477b054186698e8d14610ff7c095e906dcd"
+    depends_on "tbb@2020"
+  end
 
   livecheck do
     url :stable
@@ -12,10 +16,17 @@ class OsrmBackend < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "fe1d2680e22150a35b6d5c76157c867e3faed556bb127fe2b57eff79858ac668"
-    sha256 cellar: :any, big_sur:       "e6dfd1fc4adacbf0b54be1b1c10218fa18b6ea186ea802df3791a023b95f5705"
-    sha256 cellar: :any, catalina:      "fd6cad0c66a91a963006b7f961d3fbdce9d4ecf47acb4c578f23602f8025512e"
-    sha256 cellar: :any, mojave:        "b4dd6eb3f99a2caf3f733beb93046bb69813a3b3b32cb73410527b03e20a5c93"
+    sha256 cellar: :any,                 arm64_monterey: "30e473b97a8b623eec3d602e45e7e21c4e44b761ca4e2c4ef724c87614498b75"
+    sha256 cellar: :any,                 arm64_big_sur:  "4d13b51a5e03c17cb60de48d738ab1ec08946114baa298a24482f76f784ec226"
+    sha256 cellar: :any,                 monterey:       "b98e83beb4c841c9289b6efb8d1b058ea97c5b6411c6132903001d0fe84ba834"
+    sha256 cellar: :any,                 big_sur:        "f0943390ad90826d2def7a9c7fc27f214a20cc9dc6886d47ec309b852916c4d8"
+    sha256 cellar: :any,                 catalina:       "74825bed2c07fd6e5a5862c4dd66e9eff13818ae83ab3d8f62034db38bd9fb20"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1e78299d0601d9aefce6ba8d0597e256ae57dfc7890b88a9f03701e10155d08a"
+  end
+
+  head do
+    url "https://github.com/Project-OSRM/osrm-backend.git", branch: "master"
+    depends_on "tbb"
   end
 
   depends_on "cmake" => :build
@@ -24,19 +35,19 @@ class OsrmBackend < Formula
   depends_on "libxml2"
   depends_on "libzip"
   depends_on "lua"
-  depends_on "tbb"
+
+  conflicts_with "flatbuffers", because: "both install flatbuffers headers"
 
   def install
     lua = Formula["lua"]
     luaversion = lua.version.major_minor
-    mkdir "build" do
-      system "cmake", "..", "-DENABLE_CCACHE:BOOL=OFF",
-                            "-DLUA_INCLUDE_DIR=#{lua.opt_include}/lua#{luaversion}",
-                            "-DLUA_LIBRARY=#{lua.opt_lib}/liblua.#{luaversion}.dylib",
-                            *std_cmake_args
-      system "make"
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build",
+                    "-DENABLE_CCACHE:BOOL=OFF",
+                    "-DLUA_INCLUDE_DIR=#{lua.opt_include}/lua#{luaversion}",
+                    "-DLUA_LIBRARY=#{lua.opt_lib/shared_library("liblua", luaversion)}",
+                    *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
     pkgshare.install "profiles"
   end
 

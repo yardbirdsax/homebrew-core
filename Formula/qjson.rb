@@ -4,21 +4,22 @@ class Qjson < Formula
   url "https://github.com/flavio/qjson/archive/0.9.0.tar.gz"
   sha256 "e812617477f3c2bb990561767a4cd8b1d3803a52018d4878da302529552610d4"
   license "LGPL-2.1"
-  revision 1
+  revision 2
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "c1801c1ef5510834f151d8fb998153c6b1c3e66cb169f007884e8086ba5b62d4"
-    sha256 cellar: :any, big_sur:       "00af1b725eb93d0c9bba5bf78842a612981d9e30d8ac44c168db579eed019df5"
-    sha256 cellar: :any, catalina:      "909c5b1e45b05d7bba5c67e116c8b9c1a734f6df155e7792e8fe0fd7a2fd4c84"
-    sha256 cellar: :any, mojave:        "02abebab98b79dd60197c0e2d5f7a468e96cb738e5c2065a3664db0bf59cf59e"
-    sha256 cellar: :any, high_sierra:   "1bd2a1a0fcabf72acedd8a7c9d68bae090d31cc6a673515461ce487f15b88772"
-    sha256 cellar: :any, sierra:        "bd50e784f99285df8e70448f041c67fe1f8c79f5d6b17f130a2e3a11bc19227d"
-    sha256 cellar: :any, el_capitan:    "befe6eeb2426c2f698dd54999398fa569d91246d239aef3e877680902a20f945"
-    sha256 cellar: :any, yosemite:      "f17d608977669101c13d3f57136d8d8121a0f87e26a0d7a55ee5a21659294355"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "f9bf3676c0e2b53c3820eb8b9fc6b8a3b3222c86836a925531c4a1ec902bb346"
+    sha256 cellar: :any,                 arm64_big_sur:  "073b41a1515c6da30255c50957567eed6f70243aa6845c919fc4d525516fed61"
+    sha256 cellar: :any,                 monterey:       "49c80dc061c008fb20ebc722596d17845973ee735236be19b8b26cb5293cd043"
+    sha256 cellar: :any,                 big_sur:        "282f4fa0cccf91b2f993e6742c295e57016a5a25dc89acd1d5c0f19fdf661734"
+    sha256 cellar: :any,                 catalina:       "23138020da1a1d5fc965e242d40ee73838cd233498c1f6aa06fa0146aa895b94"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b64e82e4791c3dc66f6304add6ac44a993b82a9d88d02704af280daa080f5d64"
   end
 
   depends_on "cmake" => :build
-  depends_on "qt"
+  depends_on "qt@5"
+
+  fails_with gcc: "5"
 
   def install
     system "cmake", ".", *std_cmake_args
@@ -33,10 +34,22 @@ class Qjson < Formula
         return 0;
       }
     EOS
+    flags = ["-I#{Formula["qt@5"].opt_include}"]
+    flags += if OS.mac?
+      [
+        "-F#{Formula["qt@5"].opt_lib}",
+        "-framework", "QtCore"
+      ]
+    else
+      [
+        "-fPIC",
+        "-L#{Formula["qt@5"].opt_lib}", "-lQt5Core",
+        "-Wl,-rpath,#{Formula["qt@5"].opt_lib}",
+        "-Wl,-rpath,#{lib}"
+      ]
+    end
     system ENV.cxx, "test.cpp", "-o", "test", "-std=c++11", "-I#{include}",
-                    "-L#{lib}", "-lqjson-qt5",
-                    "-I#{Formula["qt"].opt_include}",
-                    "-F#{Formula["qt"].opt_lib}", "-framework", "QtCore"
+                    "-L#{lib}", "-lqjson-qt5", *flags
     system "./test"
   end
 end

@@ -1,26 +1,27 @@
 class Pazpar2 < Formula
   desc "Metasearching middleware webservice"
-  homepage "https://www.indexdata.com/pazpar2"
-  url "http://ftp.indexdata.dk/pub/pazpar2/pazpar2-1.14.0.tar.gz"
-  sha256 "3b0012450c66d6932009ac0decb72436690cc939af33e2ad96c0fec85863d13d"
-  license "GPL-2.0"
+  homepage "https://www.indexdata.com/resources/software/pazpar2/"
+  url "https://ftp.indexdata.com/pub/pazpar2/pazpar2-1.14.1.tar.gz"
+  sha256 "9baf590adb52cd796eccf01144eeaaf7353db1fd05ae436bdb174fe24362db53"
+  license "GPL-2.0-or-later"
   revision 2
 
   livecheck do
-    url "http://ftp.indexdata.dk/pub/pazpar2/"
+    url "https://ftp.indexdata.com/pub/pazpar2/"
     regex(/href=.*?pazpar2[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "db30d87db45b5e54488f4438929c68fa6a60ad9d8249ce188803c77ba08d3637"
-    sha256 cellar: :any, big_sur:       "17618f15fd88ee0512684d6844fa04abf01b9f6491ebe943ab6a38f6750949c5"
-    sha256 cellar: :any, catalina:      "6341978a6229069f3078497aa242dfacfb265fdd54c22a8864a516906c83921d"
-    sha256 cellar: :any, mojave:        "1921d7b34876024b8c0145df01e1c88a385c2851752fb30b2dc918f9ed8ee6d8"
-    sha256 cellar: :any, high_sierra:   "bde0d429ddb8f2012ea87a66a0ea1928ef491d414eec5efe231dec219f4d4675"
+    sha256 cellar: :any,                 arm64_monterey: "f954229ad517eb90444c024211db05b8b728d422d7d09e34c6aa47f62df81133"
+    sha256 cellar: :any,                 arm64_big_sur:  "922579df346fa8302138d14084cbb13392b8f42330200928b71104e6c7a99145"
+    sha256 cellar: :any,                 monterey:       "53379506327169055b22ba82838572aa68a7be807ade89dff6f3c7a1762ca458"
+    sha256 cellar: :any,                 big_sur:        "4a46c092f50afbba241f1e6eefdb3bab092df96558176618d4f2059bc2a97461"
+    sha256 cellar: :any,                 catalina:       "0724f00c4d28966fee1f5fe026d51632c5efab65210462fc50cc05f0daf03a9a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "bf885e581d8def9796a668b8f47add7c133313cda9a00f51921c0f47c0d85c2a"
   end
 
   head do
-    url "https://github.com/indexdata/pazpar2.git"
+    url "https://github.com/indexdata/pazpar2.git", branch: "master"
     depends_on "autoconf" => :build
     depends_on "automake" => :build
     depends_on "libtool" => :build

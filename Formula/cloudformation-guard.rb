@@ -1,24 +1,27 @@
 class CloudformationGuard < Formula
   desc "Checks CloudFormation templates for compliance using a declarative syntax"
   homepage "https://github.com/aws-cloudformation/cloudformation-guard"
-  url "https://github.com/aws-cloudformation/cloudformation-guard/archive/1.0.0.tar.gz"
-  sha256 "1d4c057a9c076f0311409603291dadad0063159a8bed6b5576accec2dc3a4e7b"
+  url "https://github.com/aws-cloudformation/cloudformation-guard/archive/2.1.0.tar.gz"
+  sha256 "8e7075e436a05d72e5c244def9765f475c07b97b432c6ed9b4cc9888a389f460"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "905e22dfbbb1c0fcf956b68537c46f0d4efe8b9007baa671d12d15e1434fb628"
-    sha256 cellar: :any_skip_relocation, big_sur:       "ce6a72cad49aa61d9afd07b020b2cab1f958e3c9735a8fdafba440d6719302dd"
-    sha256 cellar: :any_skip_relocation, catalina:      "bc7dfce2654ad8ac46e0f7e60e5b9a79ec08e0c60e63ba02b4ad5131035764a7"
-    sha256 cellar: :any_skip_relocation, mojave:        "6e62019f3ef472d09b52a322628d964787de3be3059d54e2879c3d7e166f673f"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "b738a55d9ced11569203dcce689e808c8573f00c61c0cbeabf0aa4745c3f8144"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "e679636e6f6dfb96f827f0859eca3e2482de67ac499322fbdef1b11d8c4a8c32"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "64582c694ac3f8f621a4bbb11c63873d5a17c807d59cbe4fc2a5804d534ac218"
+    sha256 cellar: :any_skip_relocation, monterey:       "54c9a9abda8ba5b06f41cf21698cc68c7dad8f0ea6f4810439186b3067a6c6a0"
+    sha256 cellar: :any_skip_relocation, big_sur:        "edefb6434aec409b1192861be0ef1d3f29c63a559ca6130ed2d2b9c5f49bd169"
+    sha256 cellar: :any_skip_relocation, catalina:       "9313f1eb7e774214cccbf541b72d050f4102d2e1cec9981b02d33e4068d2ba65"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a0ec1413420eabab58c7881b1204bc49976c797789b60bd93415bf16cbeb40e5"
   end
 
   depends_on "rust" => :build
 
   def install
-    cd "cfn-guard" do
+    cd "guard" do
       system "cargo", "install", *std_cargo_args
     end
+    doc.install "docs"
+    doc.install "guard-examples"
   end
 
   test do
@@ -36,8 +39,11 @@ class CloudformationGuard < Formula
     EOS
 
     (testpath/"test-ruleset").write <<~EOS
-      AWS::EC2::Volume Size == 99
+      rule migrated_rules {
+        let aws_ec2_volume = Resources.*[ Type == "AWS::EC2::Volume" ]
+        %aws_ec2_volume.Properties.Size == 99
+      }
     EOS
-    system "#{bin}/cfn-guard", "check", "-r", "test-ruleset", "-t", "test-template.yml"
+    system bin/"cfn-guard", "validate", "-r", "test-ruleset", "-d", "test-template.yml"
   end
 end

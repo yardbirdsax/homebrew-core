@@ -1,21 +1,22 @@
 class Nspr < Formula
   desc "Platform-neutral API for system-level and libc-like functions"
-  homepage "https://developer.mozilla.org/docs/Mozilla/Projects/NSPR"
-  url "https://archive.mozilla.org/pub/nspr/releases/v4.29/src/nspr-4.29.tar.gz"
-  sha256 "22286bdb8059d74632cc7c2865c139e63953ecfb33bf4362ab58827e86e92582"
+  homepage "https://hg.mozilla.org/projects/nspr"
+  url "https://archive.mozilla.org/pub/nspr/releases/v4.35/src/nspr-4.35.tar.gz"
+  sha256 "7ea3297ea5969b5d25a5dd8d47f2443cda88e9ee746301f6e1e1426f8a6abc8f"
   license "MPL-2.0"
 
   livecheck do
     url "https://ftp.mozilla.org/pub/nspr/releases/"
-    regex(/v(\d+(?:\.\d+)*)/i)
+    regex(%r{href=.*?v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "c02e2a44ebd1f681e356062d94af3a7682c212156ec99b7d193f5ff0cd77735b"
-    sha256 cellar: :any, big_sur:       "853f1762fc3372f776f66ead09a8f45b7d03de583b5d70a2c11140eafb899897"
-    sha256 cellar: :any, catalina:      "c47dc31bf73d954e1d4629a92cff5f2e5801573fa9cc1caab7c9ea3b0fb68566"
-    sha256 cellar: :any, mojave:        "5b87579476cdbb34be47c9579125183f9ff29373e9b25e94d419b02995e6ae29"
-    sha256 cellar: :any, high_sierra:   "1b3e41e52e1dc0131ca2ae486d099fb91e7e983355d8dd4ae18ff47a8547fe1e"
+    sha256 cellar: :any,                 arm64_monterey: "466fd0ffb45153ddc9ce8d882440bc3f2c9c2e1e5ff1caf00ea3e5a7f2dbff0c"
+    sha256 cellar: :any,                 arm64_big_sur:  "2e3a32904cb5f089c1dba35df40a81513b2519c1e33b5b29af0c06a639cc554f"
+    sha256 cellar: :any,                 monterey:       "7b4bd4b9800bad2ae7322c125defee4da9a94a2cc6abeb6c3897af64a8f023a3"
+    sha256 cellar: :any,                 big_sur:        "9c50db49ddcd26100b885dc4054ac7c2fd4559012eedc1fdaf4b4d03145ce10f"
+    sha256 cellar: :any,                 catalina:       "4310f8360717b354f2e29eb205d7de77a34d83a7d9c08addaa85c7fba397ed6a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "592605a1cac69bf9728b59f9deb9b4fcdcc77461d44cabcd6f59669f77278b08"
   end
 
   def install
@@ -31,8 +32,11 @@ class Nspr < Formula
         --enable-64bit
       ]
       system "./configure", *args
-      # Remove the broken (for anyone but Firefox) install_name
-      inreplace "config/autoconf.mk", "-install_name @executable_path/$@ ", "-install_name #{lib}/$@ "
+
+      if OS.mac?
+        # Remove the broken (for anyone but Firefox) install_name
+        inreplace "config/autoconf.mk", "-install_name @executable_path/$@ ", "-install_name #{lib}/$@ "
+      end
 
       system "make"
       system "make", "install"

@@ -1,32 +1,29 @@
 class Pgweb < Formula
   desc "Web-based PostgreSQL database browser"
   homepage "https://sosedoff.github.io/pgweb/"
-  url "https://github.com/sosedoff/pgweb/archive/v0.11.7.tar.gz"
-  sha256 "d35f74a6d80093764aece7b0a0ad6869799d04316efab077e0f7603835a9f159"
+  url "https://github.com/sosedoff/pgweb/archive/v0.11.12.tar.gz"
+  sha256 "f35d1bdef96c82b417e321856b08168e3aebc39d132548926251599d7ac79226"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, big_sur:     "e078e2a62bdd3c7d203895cae1c0fcaacf8b26a9dcd40d1f88b760667adc9d1d"
-    sha256 cellar: :any_skip_relocation, catalina:    "38ad603da0bc035e5a905f44e22e70335d965a4ca62a2019d08a03cde3fe7f8c"
-    sha256 cellar: :any_skip_relocation, mojave:      "7230e2f2ef476b2768a25796c3f20d45654eb8fa33ff171e70d91188df7e6527"
-    sha256 cellar: :any_skip_relocation, high_sierra: "536cc0ae5680a2c6316c569e2989868108f4b6626e496ec99c93e1ea823a7ba5"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "469869de47ac0c2ee4693bc6cac59845ec26c2946b95fb04094205cbe8d5ea69"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "4e23d33b4ad286ac2900d12083682d4416dffca3edfd051ed74db027b33cc35f"
+    sha256 cellar: :any_skip_relocation, monterey:       "31952522ec9bcb9e927c468c5707b1c4a86902bb22291302b82a192ad62eacfc"
+    sha256 cellar: :any_skip_relocation, big_sur:        "d1341993aa9c33b45664ebcaf12a2a94e26b64489910342f7deb728cfb775f41"
+    sha256 cellar: :any_skip_relocation, catalina:       "de33b7ed61feaae3a414c33a60d559f5b6ce94e50597fe3ede7ece6d60a8718d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d1c5b6983a4fdce18360610f371c3d609aa4ff3b56b9399ea2b8b0ea78304a92"
   end
 
   depends_on "go" => :build
-  depends_on "go-bindata" => :build
 
   def install
-    ENV["GOPATH"] = buildpath
-    (buildpath/"src/github.com/sosedoff/pgweb").install buildpath.children
+    ldflags = %W[
+      -s -w
+      -X github.com/sosedoff/pgweb/pkg/command.BuildTime=#{time.iso8601}
+      -X github.com/sosedoff/pgweb/pkg/command.GoVersion=#{Formula["go"].version}
+    ].join(" ")
 
-    cd "src/github.com/sosedoff/pgweb" do
-      # Avoid running `go get`
-      inreplace "Makefile", "go get", ""
-
-      system "make", "build"
-      bin.install "pgweb"
-      prefix.install_metafiles
-    end
+    system "go", "build", *std_go_args(ldflags: ldflags)
   end
 
   test do

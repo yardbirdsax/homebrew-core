@@ -3,17 +3,19 @@ class Alot < Formula
 
   desc "Text mode MUA using notmuch mail"
   homepage "https://github.com/pazz/alot"
-  url "https://github.com/pazz/alot/archive/0.9.1.tar.gz"
-  sha256 "ee2c1ab1b43d022a8fe2078820ed57d8d72aec260a7d750776dac4ee841d1de4"
-  license "GPL-3.0"
+  url "https://github.com/pazz/alot/archive/0.10.tar.gz"
+  sha256 "71f382aa751fb90fde1a06a0a4ba43628ee6aa6d41b5cd53c8701fd7c5ab6e6e"
+  license "GPL-3.0-only"
   revision 1
-  head "https://github.com/pazz/alot.git"
+  head "https://github.com/pazz/alot.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, big_sur:     "dd103cfc441ae5b5b4d7897d5cbf9f7e25b54e300a8fa4c7dda89f9c2018bd2d"
-    sha256 cellar: :any_skip_relocation, catalina:    "0520e61b1690100b7d07128228a5b3fb134e9376a41062e9dd1f09ee75fac0cf"
-    sha256 cellar: :any_skip_relocation, mojave:      "3398a81c4ac4e39b95c2fcec3a856eac4a815f134fd580c762a58cc9e3ee761f"
-    sha256 cellar: :any_skip_relocation, high_sierra: "b12fe26e7ba15d224db24d07b06b8655f9d9fb856200c27fb74981a8eed938a8"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "115aee284ea01e8462a02340af7bb58ca14b8f527a8d793268de0ad13cbb1cb1"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a4648afdc1e2671aea2d676dae926f7c9509e97e9b8143202300c69c0f1312af"
+    sha256 cellar: :any_skip_relocation, monterey:       "68d35035900b279084ecf85c55939c69631bc1fa5f3d869f0bf1e89df7437b1e"
+    sha256 cellar: :any_skip_relocation, big_sur:        "470bbd0cf9524ea9473979b0f166471eb8823c5b699067b72200595e003b04b5"
+    sha256 cellar: :any_skip_relocation, catalina:       "c2e93fdeb0845404de1e5e031ed532047006748d9b784b1e8a2604de6d859ddf"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "02a1334724c43f1aa939afc7adcd6733e9b23dca0803073887efe8674a63533c"
   end
 
   depends_on "sphinx-doc" => :build
@@ -21,16 +23,22 @@ class Alot < Formula
   depends_on "gpgme"
   depends_on "libmagic"
   depends_on "notmuch"
-  depends_on "python@3.9"
-
-  resource "attrs" do
-    url "https://files.pythonhosted.org/packages/98/c3/2c227e66b5e896e15ccdae2e00bbc69aa46e9a8ce8869cc5fa96310bf612/attrs-19.3.0.tar.gz"
-    sha256 "f7b7ce16570fe9965acd6d30101a28f62fb4a7f9e926b3bbc9b61f8b04247e72"
-  end
+  depends_on "python@3.10"
+  depends_on "six"
 
   resource "Automat" do
     url "https://files.pythonhosted.org/packages/80/c5/82c63bad570f4ef745cc5c2f0713c8eddcd07153b4bee7f72a8dc9f9384b/Automat-20.2.0.tar.gz"
     sha256 "7979803c74610e11ef0c0d68a2942b152df52da55336e0c9d58daf1831cbdf33"
+  end
+
+  resource "Twisted" do
+    url "https://files.pythonhosted.org/packages/fb/1e/fffa0d45da0ed2998e4d7f121621f2de68c51153fbbab23e63901cf859f4/Twisted-22.4.0.tar.gz"
+    sha256 "a047990f57dfae1e0bd2b7df2526d4f16dcdc843774dc108b78c52f2a5f13680"
+  end
+
+  resource "attrs" do
+    url "https://files.pythonhosted.org/packages/d7/77/ebb15fc26d0f815839ecd897b919ed6d85c050feeb83e100e020df9153d2/attrs-21.4.0.tar.gz"
+    sha256 "626ba8234211db98e869df76230a137c4c40a12d72445c45d5f5b716f076e2fd"
   end
 
   resource "configobj" do
@@ -44,58 +52,60 @@ class Alot < Formula
   end
 
   resource "hyperlink" do
-    url "https://files.pythonhosted.org/packages/e0/46/1451027b513a75edf676d25a47f601ca00b06a6a7a109e5644d921e7462d/hyperlink-19.0.0.tar.gz"
-    sha256 "4288e34705da077fada1111a24a0aa08bb1e76699c9ce49876af722441845654"
+    url "https://files.pythonhosted.org/packages/3a/51/1947bd81d75af87e3bb9e34593a4cf118115a8feb451ce7a69044ef1412e/hyperlink-21.0.0.tar.gz"
+    sha256 "427af957daa58bc909471c6c40f74c5450fa123dd093fc53efd2e91d2705a56b"
   end
 
   resource "idna" do
-    url "https://files.pythonhosted.org/packages/cb/19/57503b5de719ee45e83472f339f617b0c01ad75cba44aba1e4c97c2b0abd/idna-2.9.tar.gz"
-    sha256 "7588d1c14ae4c77d74036e8c22ff447b26d0fde8f007354fd48a7814db15b7cb"
+    url "https://files.pythonhosted.org/packages/62/08/e3fc7c8161090f742f504f40b1bccbfc544d4a4e09eb774bf40aafce5436/idna-3.3.tar.gz"
+    sha256 "9d643ff0a55b762d5cdb124b8eaa99c66322e2157b69160bc32796e824360e6d"
   end
 
   resource "incremental" do
-    url "https://files.pythonhosted.org/packages/8f/26/02c4016aa95f45479eea37c90c34f8fab6775732ae62587a874b619ca097/incremental-17.5.0.tar.gz"
-    sha256 "7b751696aaf36eebfab537e458929e194460051ccad279c72b755a167eebd4b3"
+    url "https://files.pythonhosted.org/packages/4f/c5/430765c697afc217c8491785de321a21fa4d983dda14bcd82feb965b0593/incremental-21.3.0.tar.gz"
+    sha256 "02f5de5aff48f6b9f665d99d48bfc7ec03b6e3943210de7cfc88856d755d6f57"
   end
 
-  resource "PyHamcrest" do
-    url "https://files.pythonhosted.org/packages/58/05/7b993fabb44ff0b52a90916d96bfd91a65ecf90b8248e72bba325ba8e438/PyHamcrest-2.0.2.tar.gz"
-    sha256 "412e00137858f04bde0729913874a48485665f2d36fe9ee449f26be864af9316"
+  resource "mock" do
+    url "https://files.pythonhosted.org/packages/e2/be/3ea39a8fd4ed3f9a25aae18a1bff2df7a610bca93c8ede7475e32d8b73a0/mock-4.0.3.tar.gz"
+    sha256 "7d3fbbde18228f4ff2f1f119a45cdffa458b4c0dee32eb4d2bb2f82554bac7bc"
   end
 
   resource "python-magic" do
-    url "https://files.pythonhosted.org/packages/84/30/80932401906eaf787f2e9bd86dc458f1d2e75b064b4c187341f29516945c/python-magic-0.4.15.tar.gz"
-    sha256 "f3765c0f582d2dfc72c15f3b5a82aecfae9498bd29ca840d72f37d7bd38bfcd5"
+    url "https://files.pythonhosted.org/packages/f7/46/fecfd32c126d26c8dd5287095cad01356ec0a761205f0b9255998bff96d1/python-magic-0.4.25.tar.gz"
+    sha256 "21f5f542aa0330f5c8a64442528542f6215c8e18d2466b399b0d9d39356d83fc"
   end
 
-  resource "six" do
-    url "https://files.pythonhosted.org/packages/21/9f/b251f7f8a76dec1d6651be194dfba8fb8d7781d10ab3987190de8391d08e/six-1.14.0.tar.gz"
-    sha256 "236bdbdce46e6e6a3d61a337c0f8b763ca1e8717c03b369e87a7ec7ce1319c0a"
-  end
-
-  resource "Twisted" do
-    url "https://files.pythonhosted.org/packages/4a/b4/4973c7ccb5be2ec0abc779b7d5f9d5f24b17b0349e23240cfc9dc3bd83cc/Twisted-20.3.0.tar.bz2"
-    sha256 "d72c55b5d56e176563b91d11952d13b01af8725c623e498db5507b6614fc1e10"
+  resource "typing-extensions" do
+    url "https://files.pythonhosted.org/packages/fe/71/1df93bd59163c8084d812d166c907639646e8aac72886d563851b966bf18/typing_extensions-4.2.0.tar.gz"
+    sha256 "f1c24655a0da0d1b67f07e17a5e6b2a105894e6824b92096378bb3668ef02376"
   end
 
   resource "urwid" do
-    url "https://files.pythonhosted.org/packages/45/dd/d57924f77b0914f8a61c81222647888fbb583f89168a376ffeb5613b02a6/urwid-2.1.0.tar.gz"
-    sha256 "0896f36060beb6bf3801cb554303fef336a79661401797551ba106d23ab4cd86"
+    url "https://files.pythonhosted.org/packages/94/3f/e3010f4a11c08a5690540f7ebd0b0d251cc8a456895b7e49be201f73540c/urwid-2.1.2.tar.gz"
+    sha256 "588bee9c1cb208d0906a9f73c613d2bd32c3ed3702012f51efe318a3f2127eae"
   end
 
   resource "urwidtrees" do
-    url "https://files.pythonhosted.org/packages/88/9d/981617fa083a75cf0b5ebb0ae47c3af6fb69183be1c74cc3ac6d9a0c5964/urwidtrees-1.0.1.1.tar.gz"
-    sha256 "08a66d0e76e94bc32bc590e35ed283e8a6b0c93adeb431dc576ec0a345f09bfd"
+    url "https://files.pythonhosted.org/packages/43/e1/ca5cf122cf1121b55acb39a1fb7e9fb1283c2eb0dc75fca751eb8c16b2f9/urwidtrees-1.0.3.tar.gz"
+    sha256 "50b19c06b03a5a73e561757a26d449cfe0c08afabe5c0f3cd4435596bdddaae9"
   end
 
   resource "zope.interface" do
-    url "https://files.pythonhosted.org/packages/af/d2/9675302d7ced7ec721481f4bbecd28a390a8db4ff753d28c64057b975396/zope.interface-5.1.0.tar.gz"
-    sha256 "40e4c42bd27ed3c11b2c983fecfb03356fae1209de10686d03c02c8696a1d90e"
+    url "https://files.pythonhosted.org/packages/ae/58/e0877f58daa69126a5fb325d6df92b20b77431cd281e189c5ec42b722f58/zope.interface-5.4.0.tar.gz"
+    sha256 "5dba5f530fec3f0988d83b78cc591b58c0b6eb8431a85edd1569a0539a8a5a0e"
   end
 
   def install
     virtualenv_install_with_resources
-    pkgshare.install Dir["extra/*"] - %w[extra/completion]
+
+    python = "python3.10"
+    # Add path configuration file to use notmuch CFFI bindings
+    site_packages = Language::Python.site_packages(python)
+    pth_contents = "import site; site.addsitedir('#{Formula["notmuch"].opt_libexec/site_packages}')\n"
+    (libexec/site_packages/"homebrew-notmuch2.pth").write pth_contents
+
+    pkgshare.install Pathname("extra").children - [Pathname("extra/completion")]
     zsh_completion.install "extra/completion/alot-completion.zsh" => "_alot"
 
     ENV["LC_ALL"] = "en_US.UTF-8"
@@ -104,27 +114,25 @@ class Alot < Formula
       system "make", "pickle"
       system "make", "man", "html"
       man1.install "build/man/alot.1"
-      doc.install Dir["build/html/*"]
+      doc.install Pathname("build/html").children
     end
   end
 
   test do
-    (testpath/".notmuch-config").write "[database]\npath=#{testpath}/Mail"
+    (testpath/".notmuch-config").write <<~EOS
+      [database]
+      path=#{testpath}/Mail
+    EOS
     (testpath/"Mail").mkpath
     system Formula["notmuch"].bin/"notmuch", "new"
 
-    begin
-      pid = fork do
-        $stdout.reopen("/dev/null")
-        $stdin.reopen("/dev/null")
-        exec "script", "-q", "/dev/null", bin/"alot", "--logfile", testpath/"out.log"
-      end
+    require "pty"
+    PTY.spawn(bin/"alot", "--logfile", testpath/"out.log") do |_r, _w, pid|
       sleep 10
-    ensure
       Process.kill 9, pid
     end
 
     assert_predicate testpath/"out.log", :exist?, "out.log file should exist"
-    assert_match "setup gui", File.read(testpath/"out.log")
+    assert_match "setup gui", (testpath/"out.log").read
   end
 end

@@ -1,25 +1,30 @@
 class Libtcod < Formula
   desc "API for roguelike developers"
   homepage "https://github.com/libtcod/libtcod"
-  url "https://github.com/libtcod/libtcod/archive/1.15.1.tar.gz"
-  sha256 "2713d8719be53db7a529cbf53064e5bc9f3adf009db339d3a81b50d471bc306f"
+  url "https://github.com/libtcod/libtcod/archive/1.22.3.tar.gz"
+  sha256 "a6f05f009db1f468338cf4cf984245a869ebb197b6d2524a8369c22ff9f1b9f5"
   license "BSD-3-Clause"
-  revision 2
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any, arm64_big_sur: "2307306cad3fe74920216768953f8b2ba6721a49d1738870f7b2ccbab8a2691e"
-    sha256 cellar: :any, big_sur:       "464855bc6a479110433503a085c22f0bd8c2389875334595f9e525528982c1c3"
-    sha256 cellar: :any, catalina:      "0ac1dde6fa975c1504880848ba2ec66dd0d044c5cfeccb92d3afe4f6ebb8231a"
-    sha256 cellar: :any, mojave:        "e076b9fe253e60fc065493cab467d30c4db178d9364e410a3c7cf71293df7cf0"
+    sha256 cellar: :any,                 arm64_monterey: "c67d0c383ddd1d295868fb89e0151efe480288adde3e6524421b52f84e903cd6"
+    sha256 cellar: :any,                 arm64_big_sur:  "2f13f66cb9f9db4f46e44fdf2c39c45fa9a4430d87f4e2d1b18cf72b9f2c4284"
+    sha256 cellar: :any,                 monterey:       "068f20ec5903fb688f08f58269de93731df9e274009abaa6b95f585c46f59acf"
+    sha256 cellar: :any,                 big_sur:        "00dd7c29d120ed771a0a2fac7fdec86c950cbfb4414c6510f1f9752456d5d65e"
+    sha256 cellar: :any,                 catalina:       "569ab7f045b21bffefda4b751b0f7cbb1c7b3dcb230a4f076880e2e4ab982c82"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8d2b12d79d8429e87c6140f71abfedca5f6cdbc379927f945954dae5e70367e4"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
   depends_on "pkg-config" => :build
-  depends_on "python@3.9" => :build
+  depends_on "python@3.10" => :build
+  depends_on macos: :catalina
   depends_on "sdl2"
+
+  conflicts_with "libzip", "minizip-ng", because: "libtcod, libzip and minizip-ng install a `zip.h` header"
+
+  fails_with gcc: "5"
 
   def install
     cd "buildsys/autotools" do
@@ -48,16 +53,17 @@ class Libtcod < Formula
       }
     EOS
     system ENV.cc, "-I#{include}", "-L#{lib}", "-ltcod", "version-c.c", "-o", "version-c"
-    assert_equal "#{version}\n", `./version-c`
+    assert_equal version.to_s, shell_output("./version-c").strip
     (testpath/"version-cc.cc").write <<~EOS
       #include <libtcod/libtcod.hpp>
+      #include <iostream>
       int main()
       {
         std::cout << TCOD_STRVERSION << std::endl;
         return 0;
       }
     EOS
-    system ENV.cxx, "-std=c++14", "-I#{include}", "-L#{lib}", "-ltcod", "version-cc.cc", "-o", "version-cc"
-    assert_equal "#{version}\n", `./version-cc`
+    system ENV.cxx, "-std=c++17", "-I#{include}", "-L#{lib}", "-ltcod", "version-cc.cc", "-o", "version-cc"
+    assert_equal version.to_s, shell_output("./version-cc").strip
   end
 end

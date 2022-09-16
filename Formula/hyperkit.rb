@@ -15,11 +15,11 @@ class Hyperkit < Formula
   depends_on "ocaml" => :build
   depends_on "opam" => :build
   depends_on xcode: ["9.0", :build]
-
   depends_on "libev"
+  depends_on :macos # Uses Hypervisor.framework, a component of macOS.
 
   resource "tinycorelinux" do
-    url "https://dl.bintray.com/markeissler/homebrew/hyperkit-kernel/tinycorelinux_8.x.tar.gz"
+    url "https://github.com/Homebrew/homebrew-core/files/6405545/tinycorelinux_8.x.tar.gz"
     sha256 "560c1d2d3a0f12f9b1200eec57ca5c1d107cf4823d3880e09505fcd9cd39141a"
   end
 

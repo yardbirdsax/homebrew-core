@@ -2,16 +2,18 @@ class Gojq < Formula
   desc "Pure Go implementation of jq"
   homepage "https://github.com/itchyny/gojq"
   url "https://github.com/itchyny/gojq.git",
-      tag:      "v0.12.1",
-      revision: "db66c6e5588ff5fe10894c308742227d83d53d90"
+      tag:      "v0.12.9",
+      revision: "f2e333c56832b92658add0f4712994427ba70919"
   license "MIT"
-  head "https://github.com/itchyny/gojq.git"
+  head "https://github.com/itchyny/gojq.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "b2752d8c63d2d28a97f60569a5a326b7dca63dc9f8e61976bb2a8b0a704483bc"
-    sha256 cellar: :any_skip_relocation, big_sur:       "4ef10859a41f744d081ba26f4467593c57f1dac524d553841b74a482358a9147"
-    sha256 cellar: :any_skip_relocation, catalina:      "8e8bedd294840b9cecdecc9c4627847900cc125ca5431e10171b20ba98a04874"
-    sha256 cellar: :any_skip_relocation, mojave:        "53772d25fd054b3999ee1eee79f5ce905203f4eba240d99cafd6dfa747aa7f87"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "89452cdc6c06c0a03a6a6b2c888795df2727f3751e1874aa0c3a4c17d26d46a6"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "89452cdc6c06c0a03a6a6b2c888795df2727f3751e1874aa0c3a4c17d26d46a6"
+    sha256 cellar: :any_skip_relocation, monterey:       "df62983ad243d969a7f893a8259cf26ebbc5ae6f9c369aeca0c07cccb8243c88"
+    sha256 cellar: :any_skip_relocation, big_sur:        "df62983ad243d969a7f893a8259cf26ebbc5ae6f9c369aeca0c07cccb8243c88"
+    sha256 cellar: :any_skip_relocation, catalina:       "df62983ad243d969a7f893a8259cf26ebbc5ae6f9c369aeca0c07cccb8243c88"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ba1b202fb288dc5c050c400a784abe0ffa70f8f681d064b562fc446895180764"
   end
 
   depends_on "go" => :build
@@ -22,7 +24,7 @@ class Gojq < Formula
       -s -w
       -X github.com/itchyny/gojq/cli.revision=#{revision}
     ]
-    system "go", "build", "-ldflags", ldflags.join(" "), *std_go_args, "./cmd/gojq"
+    system "go", "build", *std_go_args(ldflags: ldflags), "./cmd/gojq"
     zsh_completion.install "_gojq"
   end
 

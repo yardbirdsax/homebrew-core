@@ -1,22 +1,26 @@
 class Openfst < Formula
   desc "Library for weighted finite-state transducers"
-  homepage "http://www.openfst.org/twiki/bin/view/FST/WebHome"
-  url "http://openfst.org/twiki/pub/FST/FstDownload/openfst-1.8.0.tar.gz"
-  sha256 "9730f1934f60f1320e46af44826e954bc6f7a695946548005ac33c1821745440"
+  homepage "https://www.openfst.org/twiki/bin/view/FST/WebHome"
+  url "https://openfst.org/twiki/pub/FST/FstDownload/openfst-1.8.2.tar.gz"
+  sha256 "de987bf3624721c5d5ba321af95751898e4f4bb41c8a36e2d64f0627656d8b42"
   license "Apache-2.0"
 
   livecheck do
-    url "http://www.openfst.org/twiki/bin/view/FST/FstDownload"
+    url "https://www.openfst.org/twiki/bin/view/FST/FstDownload"
     regex(/href=.*?openfst[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
     rebuild 1
-    sha256 cellar: :any, arm64_big_sur: "683c64892ce67d682098c5f4fd6969c15f98af009ccd61331489b3c9c040d8a4"
-    sha256 cellar: :any, big_sur:       "44287522a924816ee4c94f9b2e5e2c88caf0033e1b939ec6f21bd597fc8abfdb"
-    sha256 cellar: :any, catalina:      "b49da4e3ff869f532bb920a61523f65f131e5fbfe4de034a4422664ca10bb92e"
-    sha256 cellar: :any, mojave:        "06cd8774b212aca225964d495f1627dd8e4bc4b58b7d527f9b32bc3a974c69e6"
+    sha256 cellar: :any,                 arm64_monterey: "ec9cdf817cbee846c502f05800db8d5106d558cd16afa935df22877ef71f98a5"
+    sha256 cellar: :any,                 arm64_big_sur:  "277c268e760b1ea193494379b4e33e2c6d1ea0692be304f80363570dbf04aebf"
+    sha256 cellar: :any,                 monterey:       "1f8a3f063ceef921bd4517956b4706897374f71b4a179bd118704688bd90e572"
+    sha256 cellar: :any,                 big_sur:        "5d66b6cee648a6b9e29bf32b341fa57b0605d331e3a4acebb1f03fc3aa0373b3"
+    sha256 cellar: :any,                 catalina:       "0cfbe1901bd76a5e5ec5fc5a30e9d902b91e70b7305dbc0ee3945ff5e23dde27"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f4eb7f68ee3bf2995d4ad13203bc4de0fc4b0c7b29a4e2ff5d884d73f969613b"
   end
+
+  fails_with gcc: "5" # for C++17
 
   def install
     system "./configure", "--disable-dependency-tracking",

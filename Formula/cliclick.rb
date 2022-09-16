@@ -1,20 +1,20 @@
 class Cliclick < Formula
   desc "Tool for emulating mouse and keyboard events"
   homepage "https://www.bluem.net/jump/cliclick/"
-  url "https://github.com/BlueM/cliclick/archive/4.0.1.tar.gz"
-  sha256 "78f9584524b2cb4710a964f4d8e23667479f1dab37240d1ffbc8dfa9841ff1c2"
+  url "https://github.com/BlueM/cliclick/archive/5.1.tar.gz"
+  sha256 "58bb36bca90fdb91b620290ba9cc0f885b80716cb7309b9ff4ad18edc96ce639"
   license "BSD-3-Clause"
-  head "https://github.com/BlueM/cliclick.git"
+  head "https://github.com/BlueM/cliclick.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "0e97f9a134eea73034dc32929f85e4206976925ee75a8e9f07dff74c86d1b16f"
-    sha256 cellar: :any_skip_relocation, big_sur:       "bb164e96e155204666a83d0731f2115a13ecabc4ba07f8885a1194418ecd2068"
-    sha256 cellar: :any_skip_relocation, catalina:      "9ffcef6839fb396f022e415925f0e5f2cd1434d0eb723694d950d84fbaa3fcda"
-    sha256 cellar: :any_skip_relocation, mojave:        "bc373ee9ec978d416491fd82b3c25d02755b004b0abc1f5a73ff0b39e57b6b33"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "c371cb5b700e4a5f6495545b5f83e5414fc0e0cb98be05231a7abdf6c6607ff4"
-    sha256 cellar: :any_skip_relocation, sierra:        "bb47d1d8f4c81f31dc9372b5c06d3f74ecb25026805936f62e08744d1b888ecb"
-    sha256 cellar: :any_skip_relocation, el_capitan:    "e8eca6037032ad2b68b9e8c4faa40adb770b10f868448e47852571f1829aa462"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "f06719b325bfd00c2aa4af5d8f4017c1d84b85228b191955d63a0d064ffd219a"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c7a5cbf3668f3cc8ef45be0f90d2de0bb5803abaf750d0ca77d1f19464e81e22"
+    sha256 cellar: :any_skip_relocation, monterey:       "021849385e2be5067946b18bb27d5fdad68d82d40d776f4e6ef98abe45379d68"
+    sha256 cellar: :any_skip_relocation, big_sur:        "2a52d08ab8c32e39912191316022fbc11e264b41cebe15ce6276e1a73d801011"
+    sha256 cellar: :any_skip_relocation, catalina:       "65b6fcb0620720f8cc572bd3cc7ab260664e39629b9ff4fdf26e5fa24f81e6ea"
   end
+
+  depends_on :macos
 
   def install
     system "make"

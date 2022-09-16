@@ -2,29 +2,32 @@ class Agda < Formula
   desc "Dependently typed functional programming language"
   homepage "https://wiki.portal.chalmers.se/agda/"
   license "BSD-3-Clause"
+  revision 1
 
   stable do
-    url "https://hackage.haskell.org/package/Agda-2.6.1.2/Agda-2.6.1.2.tar.gz"
-    sha256 "08703073c4a5bce89ea64931ac891245dc42dea44b59bed837614811a213072d"
+    url "https://hackage.haskell.org/package/Agda-2.6.2.2/Agda-2.6.2.2.tar.gz"
+    sha256 "e5be3761717b144f64e760d8589ec6fdc0dda60d40125c49cdd48f54185c527a"
 
     resource "stdlib" do
-      url "https://github.com/agda/agda-stdlib/archive/v1.4.tar.gz"
-      sha256 "ccc8666405c0f46aa3fd01565e762774518c8d1717667f728eae0cf3c33f1c63"
+      url "https://github.com/agda/agda-stdlib/archive/v1.7.1.tar.gz"
+      sha256 "6f92ae14664e5d1217e8366c647eb23ca88bc3724278f22dc6b80c23cace01df"
     end
   end
 
   bottle do
-    rebuild 1
-    sha256 big_sur:  "23ff8d4cfc8b39f2059a3c92b999a48548d8efb0546494438a337f716017c2f6"
-    sha256 catalina: "656972ecb09c1fea73920f0d4c8a3666581d2e347036d0b0df398063062aad20"
-    sha256 mojave:   "1059ee247f77d6175f182e8fe96ee1b8ffa7000efa9385583c9a041516592292"
+    sha256 arm64_monterey: "075fb9d1c1d3bb2ce9786958aad1c166c207e042c257422fed60fb7b56f6cd48"
+    sha256 arm64_big_sur:  "2db89fc4cfb9bc3b3676c042ca42dff4c7991b70ae42a5e370cd323487fed5d0"
+    sha256 monterey:       "e1d3778a1e0293edba2759e000fc7ee8cc2bda1042255c0a02d176b15c6653ce"
+    sha256 big_sur:        "c40f2ab5942348b945ca36cba679f0d55dfcdf14fa3d048e4712d450687ab9e5"
+    sha256 catalina:       "66e344fc29367ea27a055218f1cedb66019849c58110711409fdd52f38a839e2"
+    sha256 x86_64_linux:   "4742399788dd43bb888c31f95e176be233c2569d8999191f69902179509fac8a"
   end
 
   head do
-    url "https://github.com/agda/agda.git"
+    url "https://github.com/agda/agda.git", branch: "master"
 
     resource "stdlib" do
-      url "https://github.com/agda/agda-stdlib.git"
+      url "https://github.com/agda/agda-stdlib.git", branch: "master"
     end
   end
 
@@ -32,52 +35,18 @@ class Agda < Formula
   depends_on "emacs"
   depends_on "ghc"
 
+  uses_from_macos "ncurses"
   uses_from_macos "zlib"
 
-  resource "alex" do
-    url "https://hackage.haskell.org/package/alex-3.2.6/alex-3.2.6.tar.gz"
-    sha256 "91aa08c1d3312125fbf4284815189299bbb0be34421ab963b1f2ae06eccc5410"
-  end
-
-  resource "cpphs" do
-    url "https://hackage.haskell.org/package/cpphs-1.20.9.1/cpphs-1.20.9.1.tar.gz"
-    sha256 "7f59b10bc3374004cee3c04fa4ee4a1b90d0dca84a3d0e436d5861a1aa3b919f"
-  end
-
-  resource "happy" do
-    url "https://hackage.haskell.org/package/happy-1.20.0/happy-1.20.0.tar.gz"
-    sha256 "3b1d3a8f93a2723b554d9f07b2cd136be1a7b2fcab1855b12b7aab5cbac8868c"
-  end
-
-  # Enable build with ghc 8.10.3. Remove at version bump, but verify that it includes:
-  # https://github.com/agda/agda/commit/76278c23d447b49f59fac581ca4ac605792aabbc
-  patch do
-    url "https://github.com/agda/agda/commit/76278c23d447b49f59fac581ca4ac605792aabbc.patch?full_index=1"
-    sha256 "c045c0426b867db1dedcee9c1b7a8514967226acf33e4be3ceba98d1d876aabb"
-  end
-
   def install
-    ENV["CABAL_DIR"] = prefix/"cabal"
     system "cabal", "v2-update"
-    cabal_args = std_cabal_v2_args.reject { |s| s["installdir"] }
-
-    # happy must be installed before alex
-    %w[happy alex cpphs].each do |r|
-      r_installdir = libexec/r/"bin"
-      ENV.prepend_path "PATH", r_installdir
-
-      resource(r).stage do
-        mkdir r_installdir
-        system "cabal", "v2-install", *cabal_args, "--installdir=#{r_installdir}"
-      end
-    end
-
-    system "cabal", "v2-install", "-f", "cpphs", *std_cabal_v2_args
+    system "cabal", "--store-dir=#{libexec}", "v2-install", *std_cabal_v2_args
 
     # generate the standard library's documentation and vim highlighting files
     resource("stdlib").stage lib/"agda"
     cd lib/"agda" do
-      system "cabal", "v2-install", *cabal_args, "--installdir=#{lib}/agda"
+      cabal_args = std_cabal_v2_args.reject { |s| s["installdir"] }
+      system "cabal", "--store-dir=#{libexec}", "v2-install", *cabal_args, "--installdir=#{lib}/agda"
       system "./GenerateEverything"
       system bin/"agda", "-i", ".", "-i", "src", "--html", "--vim", "README.agda"
     end

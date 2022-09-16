@@ -1,19 +1,22 @@
 class Nghttp2 < Formula
   desc "HTTP/2 C Library"
   homepage "https://nghttp2.org/"
-  url "https://github.com/nghttp2/nghttp2/releases/download/v1.43.0/nghttp2-1.43.0.tar.xz"
-  sha256 "f7d54fa6f8aed29f695ca44612136fa2359013547394d5dffeffca9e01a26b0f"
+  url "https://github.com/nghttp2/nghttp2/releases/download/v1.49.0/nghttp2-1.49.0.tar.gz"
+  mirror "http://fresh-center.net/linux/www/nghttp2-1.49.0.tar.gz"
+  sha256 "14dd5654e369227afebfba5198793a1788a0af9d30cddb19af3ec275d110a7a6"
   license "MIT"
 
   bottle do
-    sha256 arm64_big_sur: "e927b6ac25987d073b7d65d87bf27b30a95cd1196ffff4b5b82bf955da42b1c7"
-    sha256 big_sur:       "e6112c4ce4b08b60edbb3d7fca3e22498bbe1881bd6ca95df52b9f2726b0c62a"
-    sha256 catalina:      "5db5819e321f04b2301165cc267913ceacb161faa0504f4e067e074a101871b8"
-    sha256 mojave:        "cbcac00ca57c0c71e148124ed31cf37abcd28f5adc11565fa51f9f277b401a09"
+    sha256 arm64_monterey: "f6d8130a9f5625f68f6da8b1fd128b8560c410662177dd1eafd0e0887cb45377"
+    sha256 arm64_big_sur:  "4d409aa9554e5e0cade07c4d2dec42b77ae992dc2b33af6aaa60788ea3200b32"
+    sha256 monterey:       "f47eebd19f84268259673d7469835a4850e3168d1c9b3aaade7f4245c7c376d4"
+    sha256 big_sur:        "c74c2c8f5f93b2ebf0ccb60a16501bbc91f387d1f2debd1faf440fb9416efafc"
+    sha256 catalina:       "eedbc417e89dba315bc6e854b8d315967aaf7d509b5060d21f039c9c8d5a068f"
+    sha256 x86_64_linux:   "576e2e477778c8c60a30c0a66d0decf3d79446af450693244f22ea1400534c8e"
   end
 
   head do
-    url "https://github.com/nghttp2/nghttp2.git"
+    url "https://github.com/nghttp2/nghttp2.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -24,16 +27,17 @@ class Nghttp2 < Formula
   depends_on "c-ares"
   depends_on "jemalloc"
   depends_on "libev"
+  depends_on "libnghttp2"
   depends_on "openssl@1.1"
 
   uses_from_macos "libxml2"
   uses_from_macos "zlib"
 
-  on_linux do
-    # Fix: shrpx_api_downstream_connection.cc:57:3: error:
-    # array must be initialized with a brace-enclosed initializer
-    # https://github.com/nghttp2/nghttp2/pull/1269
-    patch do
+  # Fix: shrpx_api_downstream_connection.cc:57:3: error:
+  # array must be initialized with a brace-enclosed initializer
+  # https://github.com/nghttp2/nghttp2/pull/1269
+  patch do
+    on_linux do
       url "https://github.com/nghttp2/nghttp2/commit/829258e7038fe7eff849677f1ccaeca3e704eb67.patch?full_index=1"
       sha256 "c4bcf5cf73d5305fc479206676027533bb06d4ff2840eb672f6265ba3239031e"
     end
@@ -43,6 +47,14 @@ class Nghttp2 < Formula
     # fix for clang not following C++14 behaviour
     # https://github.com/macports/macports-ports/commit/54d83cca9fc0f2ed6d3f873282b6dd3198635891
     inreplace "src/shrpx_client_handler.cc", "return dconn;", "return std::move(dconn);"
+
+    # Don't build nghttp2 library - use the previously built one.
+    inreplace "Makefile.in", /(SUBDIRS =) lib/, "\\1"
+    inreplace Dir["**/Makefile.in"] do |s|
+      # These don't exist in all files, hence audit_result being false.
+      s.gsub!(%r{^(LDADD = )\$[({]top_builddir[)}]/lib/libnghttp2\.la}, "\\1-lnghttp2", false)
+      s.gsub!(%r{\$[({]top_builddir[)}]/lib/libnghttp2\.la}, "", false)
+    end
 
     args = %W[
       --prefix=#{prefix}
@@ -62,5 +74,6 @@ class Nghttp2 < Formula
 
   test do
     system bin/"nghttp", "-nv", "https://nghttp2.org"
+    refute_path_exists lib
   end
 end

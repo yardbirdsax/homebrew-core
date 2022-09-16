@@ -1,23 +1,24 @@
 class SwiftProtobuf < Formula
   desc "Plugin and runtime library for using protobuf with Swift"
   homepage "https://github.com/apple/swift-protobuf"
-  url "https://github.com/apple/swift-protobuf/archive/1.15.0.tar.gz"
-  sha256 "e9b4d467e67692708f6a2cfc78372156f3945ba5fdd21a3c799fa2c29b150563"
+  url "https://github.com/apple/swift-protobuf/archive/1.20.1.tar.gz"
+  sha256 "66d2cbffed3a5c289405630f39c4a80d696f762558872b3a27e9b33e409bcbf0"
   license "Apache-2.0"
-  head "https://github.com/apple/swift-protobuf.git"
+  head "https://github.com/apple/swift-protobuf.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "b9877fe48cd75939960232fa8fdb0a2c6a993c6e39c9d50ca9f6276dc7dada81"
-    sha256 cellar: :any_skip_relocation, big_sur:       "40ef8fa7b41ef8d444118486c2561dce57c696f6632c8ff6c881d97b9c78767f"
-    sha256 cellar: :any_skip_relocation, catalina:      "0bc9ae01fe8a2c6603f2a0613ee461df63d889dd416c8b8e59ea46677b6ffc39"
-    sha256 cellar: :any_skip_relocation, mojave:        "f538eda859a0f4398126678566eb5b6c8321bb12d81d2b8663cc045053796415"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "36e84496c7f16bf9f318f899fa2ed3423ca4a302450d1e68d476a03d175099f2"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b790680a423626fe077f0f8bc8d24601a07edec2947a4343ff0586493dd1e661"
+    sha256 cellar: :any_skip_relocation, monterey:       "362254db2dfe04119a6d32d1a80e22633af98f36fe1d5184afd3a38ac15e7bcc"
+    sha256 cellar: :any_skip_relocation, big_sur:        "37265f340278ef0cb6f9ee90f2dfd4f74e6e6f4caa0f16950c50330fb376759a"
+    sha256 cellar: :any_skip_relocation, catalina:       "34c6d2be247e52e95a0add0bc40346332b31f666819be89c6a3d269422614eef"
+    sha256                               x86_64_linux:   "5d48da7672dfa9401ad037cc5a3b4bbe4434b830c33d0ec7ceadb91c63f0ffff"
   end
 
   depends_on xcode: ["8.3", :build]
   depends_on "protobuf"
 
-  conflicts_with "protobuf-swift",
-    because: "both install `protoc-gen-swift` binaries"
+  uses_from_macos "swift"
 
   def install
     system "swift", "build", "--disable-sandbox", "-c", "release"

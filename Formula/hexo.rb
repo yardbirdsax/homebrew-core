@@ -3,16 +3,18 @@ require "language/node"
 class Hexo < Formula
   desc "Fast, simple & powerful blog framework"
   homepage "https://hexo.io/"
-  url "https://registry.npmjs.org/hexo/-/hexo-5.3.0.tgz"
-  sha256 "fe9f025d1f0d51e27a9a66cc691748c730f126b50bcc0c99bee239a582fd1ed8"
+  url "https://registry.npmjs.org/hexo/-/hexo-6.3.0.tgz"
+  sha256 "133c1b7ce9a9b0f703da7bd0201d0ec4ad49f5f610c9b008da6df2ec30f3f4ba"
   license "MIT"
-  head "https://github.com/hexojs/hexo.git"
+  head "https://github.com/hexojs/hexo.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "f5d1af98229cb54b69a8f256c45b20fecac6100c4663d38874c213cb7fe52936"
-    sha256 cellar: :any_skip_relocation, big_sur:       "bc3cc137fef9e6bc0351f4438ae7a51c8ec9187fc2334c9ff5be74e7d118f9e6"
-    sha256 cellar: :any_skip_relocation, catalina:      "99db3ced545c108730dc565eacfbf91f39fd4235760c52ec55efc7731f7bc947"
-    sha256 cellar: :any_skip_relocation, mojave:        "2a523c0293434b8b687eca111680d3044bbd1f6d4f4eaa0ca301ee2a22f0ba92"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "e8c8eb3ef1a60934230d70b1195c6bf1d708be8ae1fb7f1922f31d3e8796cf35"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e8c8eb3ef1a60934230d70b1195c6bf1d708be8ae1fb7f1922f31d3e8796cf35"
+    sha256 cellar: :any_skip_relocation, monterey:       "a5daf9b48cf25528279debdd2b1ad37baaa6d08cfd6e18e212a60a68dc3f35ef"
+    sha256 cellar: :any_skip_relocation, big_sur:        "a5daf9b48cf25528279debdd2b1ad37baaa6d08cfd6e18e212a60a68dc3f35ef"
+    sha256 cellar: :any_skip_relocation, catalina:       "a5daf9b48cf25528279debdd2b1ad37baaa6d08cfd6e18e212a60a68dc3f35ef"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "95e726055fa242838fa081dce26d2ff0441d1aeef2ddd6b5065b04961441d625"
   end
 
   depends_on "node"
@@ -21,6 +23,9 @@ class Hexo < Formula
     mkdir_p libexec/"lib"
     system "npm", "install", *Language::Node.std_npm_install_args(libexec)
     bin.install_symlink Dir["#{libexec}/bin/*"]
+
+    # Replace universal binaries with their native slices.
+    deuniversalize_machos
   end
 
   test do

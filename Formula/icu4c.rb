@@ -1,9 +1,9 @@
 class Icu4c < Formula
   desc "C/C++ and Java libraries for Unicode and globalization"
-  homepage "http://site.icu-project.org/home"
-  url "https://github.com/unicode-org/icu/releases/download/release-67-1/icu4c-67_1-src.tgz"
-  version "67.1"
-  sha256 "94a80cd6f251a53bd2a997f6f1b5ac6653fe791dfab66e1eb0227740fb86d5dc"
+  homepage "https://icu.unicode.org/home"
+  url "https://github.com/unicode-org/icu/releases/download/release-71-1/icu4c-71_1-src.tgz"
+  version "71.1"
+  sha256 "67a7e6e51f61faf1306b6935333e13b2c48abd8da6d2f46ce6adca24b1e21ebf"
   license "ICU"
 
   livecheck do
@@ -15,21 +15,15 @@ class Icu4c < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "28603c8d1cc113f70ad4042548f8f6585606025b48d315958236531e8f8d8550"
-    sha256 cellar: :any, big_sur:       "114cce72e22c5eb713f56b9f91a076b2f2d5930152d3638a95c6decee511aa3e"
-    sha256 cellar: :any, catalina:      "2d1e91b5127f66e7941790c004817c94c892725c88f84f1e4c37297fcbc0c72f"
-    sha256 cellar: :any, mojave:        "b6069459c78f18045ee922ce5cb5b235d4b479597d79c3c298d09e0de3d70794"
-    sha256 cellar: :any, high_sierra:   "0720bd47f020d5ca895ae79eb61623ed3c7de0d4c4f221613105f47147aec01f"
+    sha256 cellar: :any,                 arm64_monterey: "0bf3c66f005e2d7662375b4baadd3022d57294947f421f9f8628799008a987f4"
+    sha256 cellar: :any,                 arm64_big_sur:  "5cbb7c32192790d114f179ca9456df9a5cbd0094a9e2383c9ae8e4ec5e5cd568"
+    sha256 cellar: :any,                 monterey:       "87617a04333c53236f5174f5a3fa70458d61d735024ed477c0484adf2c3f80d3"
+    sha256 cellar: :any,                 big_sur:        "4c2904b4e7af60796e202d9f5ced39443ffd657b61a007b67bd109534b00c03f"
+    sha256 cellar: :any,                 catalina:       "0182e3999a76593888bc2b5d54c275b6d7f0eb75db354a3a37925179a9e91d84"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "89bcfb2f075f7ea40053a09804479bef4457b1f7f606617fb15116edef53c2e9"
   end
 
   keg_only :provided_by_macos, "macOS provides libicucore.dylib (but nothing else)"
-
-  # fix C++14 compatibility of U_ASSERT macro.
-  # Remove with next release (ICU 68).
-  patch :p2 do
-    url "https://github.com/unicode-org/icu/commit/715d254a02b0b22681cb6f861b0921ae668fa7d6.patch?full_index=1"
-    sha256 "a87e1b9626ec5803b1220489c0d6cc544a5f293f1c5280e3b27871780c4ecde8"
-  end
 
   def install
     args = %W[
@@ -48,6 +42,11 @@ class Icu4c < Formula
   end
 
   test do
-    system "#{bin}/gendict", "--uchars", "/usr/share/dict/words", "dict"
+    if File.exist? "/usr/share/dict/words"
+      system "#{bin}/gendict", "--uchars", "/usr/share/dict/words", "dict"
+    else
+      (testpath/"hello").write "hello\nworld\n"
+      system "#{bin}/gendict", "--uchars", "hello", "dict"
+    end
   end
 end

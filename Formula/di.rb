@@ -1,8 +1,8 @@
 class Di < Formula
   desc "Advanced df-like disk information utility"
   homepage "https://gentoo.com/di/"
-  url "https://downloads.sourceforge.net/project/diskinfo-di/di-4.48.0.1.tar.gz"
-  sha256 "60508544319eab687f5172a67bf3679c2b8576dc365629ba63749bcad688b467"
+  url "https://downloads.sourceforge.net/project/diskinfo-di/di-4.51.tar.gz"
+  sha256 "79b2129c4aff27428695441175940a1717fa0fe2ec2f46d1b886ebb4921461bb"
   license "Zlib"
 
   livecheck do
@@ -11,10 +11,12 @@ class Di < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "f73ef475c2e9c76a19cb31c8554d5bcfa2f3160e5d16b90c05c7623263c490d2"
-    sha256 cellar: :any_skip_relocation, big_sur:       "e3be4bfb7fcbde3a31b282323e46ad7c7fedb057dd0bc60504c60863dc9f14f8"
-    sha256 cellar: :any_skip_relocation, catalina:      "3fec602b01937a696deb147c5a0a22f9ea2bfc535980a9f10b5ec89d230d9999"
-    sha256 cellar: :any_skip_relocation, mojave:        "6e8b6d40cf8cdbc8b73524d01c87dcf1adf4039155d5370436aac3923aad402e"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "2f0155678e6e44db1dbfbc24fff96aaee23c22a69d553457dd8ac1f9de13b527"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "4fc57febb3e9e00603674540b9c90fff49df3f9b376149fd3ed37ed72d3c29b8"
+    sha256 cellar: :any_skip_relocation, monterey:       "0ec56fe7507f200c983d2bbc2ade6465b8bf26c7714bf2626513312afa2b6568"
+    sha256 cellar: :any_skip_relocation, big_sur:        "388ffea5e8416c1703aa07e2594ace704424987b1d99ee31718ef3cf6e9819d8"
+    sha256 cellar: :any_skip_relocation, catalina:       "73122a618e0a2f834311d93ba4f8d11be103ea2bd8e8616af8690c34607104e3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "58af16241c8439553918521e731d4164a6e570487179d65d50897f66ce932a61"
   end
 
   def install

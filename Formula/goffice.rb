@@ -1,16 +1,26 @@
 class Goffice < Formula
   desc "Gnumeric spreadsheet program"
-  homepage "https://developer.gnome.org/goffice/"
-  url "https://download.gnome.org/sources/goffice/0.10/goffice-0.10.48.tar.xz"
-  sha256 "a439162fa26a0e58117e07b82b37000a7f421088ad379eb1f6a1cdee101ecefc"
+  homepage "https://gitlab.gnome.org/GNOME/goffice"
   license any_of: ["GPL-3.0-only", "GPL-2.0-only"]
 
+  stable do
+    url "https://download.gnome.org/sources/goffice/0.10/goffice-0.10.52.tar.xz"
+    sha256 "60b9efd94370f0969b394f0aac8c6eb91e15ebc0ce1236b44aa735eb1c98840c"
+
+    # Fix -flat_namespace being used on Big Sur and later.
+    patch do
+      url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+      sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+    end
+  end
+
   bottle do
-    sha256 arm64_big_sur: "b29f128d789d1399cb06fc284981d690a039ddeaa709bb15ac5f93483e3609f4"
-    sha256 big_sur:       "314d34ff359e1d6eb5d5935ac6e2778b47e360e6e13a6c3b98f99b7071e4c961"
-    sha256 catalina:      "3e05167a37c42bfa01acf4be7055a52e3c2a03c990536ae5562b2c0aa4812e42"
-    sha256 mojave:        "9edf36fd2ffb0a116e4e5f69cd00a04dd29eda04c1a3069b0e4da8950573c0a4"
-    sha256 high_sierra:   "7043808e39862444e7aaae796137b30fadefb142dea291f9d8ce23228d635264"
+    sha256 arm64_monterey: "822a9b41a614f5c29c665d3f89baf9a0fd35f202f882bc8ba310bca314ba5040"
+    sha256 arm64_big_sur:  "f19ff9d2176f8559fa2c2adcd962cd1d4825922584cdc542ecaec3b0f4f6dabb"
+    sha256 monterey:       "45a0a3a6b8d1dcf201123cd7e2ca3d4d9b73f041cfc8b37613e70d789b255e7d"
+    sha256 big_sur:        "ad365fedda8bde06db2383ea8ec8e7b2eb8a73f144119c039d757f7ae17a8729"
+    sha256 catalina:       "1a2355d6299eb4a1e23927e24f2fedc891b105a6d3401b49a43c48ffc035122d"
+    sha256 x86_64_linux:   "92f81d59a2b32d40cfd3c850a23ccd930c28989520672f326bd25a9478acc66f"
   end
 
   head do
@@ -36,6 +46,12 @@ class Goffice < Formula
   uses_from_macos "libxslt"
 
   def install
+    if OS.linux?
+      # Needed to find intltool (xml::parser)
+      ENV.prepend_path "PERL5LIB", Formula["intltool"].libexec/"lib/perl5"
+      ENV["INTLTOOL_PERL"] = Formula["perl"].bin/"perl"
+    end
+
     args = %W[--disable-dependency-tracking --prefix=#{prefix}]
     if build.head?
       system "./autogen.sh", *args
@@ -57,12 +73,17 @@ class Goffice < Formula
           return 0;
       }
     EOS
+    libxml2 = if OS.mac?
+      "#{MacOS.sdk_path}/usr/include/libxml2"
+    else
+      Formula["libxml2"].opt_include/"libxml2"
+    end
     system ENV.cc, "-I#{include}/libgoffice-0.10",
            "-I#{Formula["glib"].opt_include}/glib-2.0",
            "-I#{Formula["glib"].opt_lib}/glib-2.0/include",
            "-I#{Formula["harfbuzz"].opt_include}/harfbuzz",
            "-I#{Formula["libgsf"].opt_include}/libgsf-1",
-           "-I#{MacOS.sdk_path}/usr/include/libxml2",
+           "-I#{libxml2}",
            "-I#{Formula["gtk+3"].opt_include}/gtk-3.0",
            "-I#{Formula["pango"].opt_include}/pango-1.0",
            "-I#{Formula["cairo"].opt_include}/cairo",

@@ -1,8 +1,8 @@
 class Chafa < Formula
   desc "Versatile and fast Unicode/ASCII/ANSI graphics renderer"
   homepage "https://hpjansson.org/chafa/"
-  url "https://hpjansson.org/chafa/releases/chafa-1.6.0.tar.xz"
-  sha256 "0706e101a6e0e806335aeb57445e2f6beffe0be29a761f561979e81691c2c681"
+  url "https://hpjansson.org/chafa/releases/chafa-1.12.3.tar.xz"
+  sha256 "2456a0b6c1150e25b64cd6a92810d59bed3f061f8b86f91aba5a77bc7cc76cfa"
   license "LGPL-3.0-or-later"
   revision 1
 
@@ -12,26 +12,34 @@ class Chafa < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "5bf09f7be13771c9e22b9e35db7837d6ba236ec92af1a95917f4c0610c805088"
-    sha256 cellar: :any, big_sur:       "42420443f24f392f4b8f9318942ca4ee9838a516df05b6449c7cf9737e4a3c40"
-    sha256 cellar: :any, catalina:      "6aa83c7ff29421d202351ebfc8f311d1e298ea7cded16609d0e07a52f0f76694"
-    sha256 cellar: :any, mojave:        "1d8600db4b8fd0245678e831fb97ef592f1a5d5031a1b1a1dff4f0f910df846d"
+    sha256 cellar: :any,                 arm64_monterey: "662ec93df5f776536f7ae038ab4e9b5e7b42fc2dfb697d9f271f0a0cbc2e913e"
+    sha256 cellar: :any,                 arm64_big_sur:  "a414cb89b09c05ae6049dbfd2ead73c48afa09e629e74e3a026b7b598adfbc86"
+    sha256 cellar: :any,                 monterey:       "5de514b36b5ca3e73d742b9d9a80188d5469f5cf6c1b427ab079f08504052df9"
+    sha256 cellar: :any,                 big_sur:        "3010b72f0b60642e49daf7c4ab1a0e9acff843938444f18c6da753001b5fe7c8"
+    sha256 cellar: :any,                 catalina:       "c7dff97197a4bbaaf1a279b2b23c7fe7098d64096e2cdaee2b4c44dc7ddcea0b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d31620cdaed205fe14af6a67f0454304e870af8ca99d912950a84a37dda2c062"
   end
 
   depends_on "pkg-config" => :build
+  depends_on "freetype"
   depends_on "glib"
-  depends_on "imagemagick"
+  depends_on "jpeg-turbo"
+  depends_on "librsvg"
+  depends_on "libtiff"
+  depends_on "webp"
 
   def install
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
+    system "./configure", *std_configure_args,
                           "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+                          "--without-imagemagick" # deprecated in 1.12.0 and planned for removal
     system "make", "install"
+    man1.install "docs/chafa.1"
   end
 
   test do
     output = shell_output("#{bin}/chafa #{test_fixtures("test.png")}")
-    assert_equal 4, output.lines.count
+    assert_equal 2, output.lines.count
+    output = shell_output("#{bin}/chafa --version")
+    assert_match(/Loaders:.* JPEG.* SVG.* TIFF.* WebP/, output)
   end
 end

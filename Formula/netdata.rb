@@ -1,8 +1,8 @@
 class Netdata < Formula
   desc "Diagnose infrastructure problems with metrics, visualizations & alarms"
   homepage "https://netdata.cloud/"
-  url "https://github.com/netdata/netdata/releases/download/v1.29.0/netdata-v1.29.0.tar.gz"
-  sha256 "d898995faa3c269e6fbbf5456f237e25323213e6ec8c0a2b28007499b22e9f5d"
+  url "https://github.com/netdata/netdata/releases/download/v1.36.1/netdata-v1.36.1.tar.gz"
+  sha256 "f4a1233112b55e07e2862ffda0416255f0aa4c8e2b16929b76fa7ad6b69fd931"
   license "GPL-3.0-or-later"
 
   livecheck do
@@ -11,10 +11,12 @@ class Netdata < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "6032e528e1625e8d2f48a713320b2b6318991ee2e2e07686e5c776cafe9f8388"
-    sha256 big_sur:       "526912548bae57dde2e130690fd0c23e0ec0c928e97c4b257eeff3fd011154e6"
-    sha256 catalina:      "47e3b1bf864d3f77b00404afa10a0a030e4c47531af5aa46f9437712ff1ea2c7"
-    sha256 mojave:        "13332a3158fd4a453db649a4cfc6d18f778d6129fd59a20ab21a05ba80a90909"
+    sha256 arm64_monterey: "d512dabe93ee951a8952636e2e006da4570ddc6c8bd496613f23f4779e43d31e"
+    sha256 arm64_big_sur:  "b0eb5533886dfc014f02b8015fdbeca1b3b8143e4911129870ae08fba11d020c"
+    sha256 monterey:       "4eb1331def7402540fbbbc9b7a5591f7ca13f2e1211afecf02cdaabbf0d2b646"
+    sha256 big_sur:        "f901b0389f560f986a9466e261782312bc90f91649e5f31804a6729b4272b202"
+    sha256 catalina:       "408ef315509af5d834b522de314d6f7f1075a569acf0ea2155a9caeeb7d8d5a6"
+    sha256 x86_64_linux:   "6dde898bd4c5e0b43ef50ba8968f97adadc4bb7fb2092da28934b050655e2b9c"
   end
 
   depends_on "autoconf" => :build
@@ -23,7 +25,14 @@ class Netdata < Formula
   depends_on "json-c"
   depends_on "libuv"
   depends_on "lz4"
-  depends_on "openssl@1.1"
+  depends_on "openssl@3"
+  depends_on "protobuf-c"
+
+  uses_from_macos "zlib"
+
+  on_linux do
+    depends_on "util-linux"
+  end
 
   resource "judy" do
     url "https://downloads.sourceforge.net/project/judy/judy/Judy-1.0.5/Judy-1.0.5.tar.gz"
@@ -31,6 +40,9 @@ class Netdata < Formula
   end
 
   def install
+    # https://github.com/protocolbuffers/protobuf/issues/9947
+    ENV.append_to_cflags "-DNDEBUG"
+
     # We build judy as static library, so we don't need to install it
     # into the real prefix
     judyprefix = "#{buildpath}/resources/judy"
@@ -50,18 +62,26 @@ class Netdata < Formula
     ENV.append "LDFLAGS", "-L#{judyprefix}/lib"
 
     system "autoreconf", "-ivf"
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}",
-                          "--sysconfdir=#{etc}",
-                          "--localstatedir=#{var}",
-                          "--libexecdir=#{libexec}",
-                          "--with-math",
-                          "--with-zlib",
-                          "--enable-dbengine",
-                          "--with-user=netdata",
-                          "UUID_CFLAGS=-I/usr/include",
-                          "UUID_LIBS=-lc"
+    args = %W[
+      --disable-dependency-tracking
+      --disable-silent-rules
+      --prefix=#{prefix}
+      --sysconfdir=#{etc}
+      --localstatedir=#{var}
+      --libexecdir=#{libexec}
+      --with-math
+      --with-zlib
+      --enable-dbengine
+      --with-user=netdata
+    ]
+    if OS.mac?
+      args << "UUID_LIBS=-lc"
+      args << "UUID_CFLAGS=-I/usr/include"
+    else
+      args << "UUID_LIBS=-luuid"
+      args << "UUID_CFLAGS=-I#{Formula["util-linux"].opt_include}"
+    end
+    system "./configure", *args
     system "make", "clean"
     system "make", "install"
 
@@ -69,39 +89,15 @@ class Netdata < Formula
   end
 
   def post_install
-    config = etc/"netdata/netdata.conf"
-    inreplace config do |s|
-      s.gsub!(/web files owner = .*/, "web files owner = #{ENV["USER"]}")
-      s.gsub!(/web files group = .*/, "web files group = #{Etc.getgrgid(prefix.stat.gid).name}")
-    end
     (var/"cache/netdata/unittest-dbengine/dbengine").mkpath
     (var/"lib/netdata/registry").mkpath
     (var/"log/netdata").mkpath
     (var/"netdata").mkpath
   end
 
-  plist_options manual: "#{HOMEBREW_PREFIX}/sbin/netdata -D"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>ProgramArguments</key>
-          <array>
-              <string>#{opt_sbin}/netdata</string>
-              <string>-D</string>
-          </array>
-          <key>WorkingDirectory</key>
-          <string>#{var}</string>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_sbin/"netdata", "-D"]
+    working_dir var
   end
 
   test do

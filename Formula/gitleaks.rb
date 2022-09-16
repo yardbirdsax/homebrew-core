@@ -1,29 +1,34 @@
 class Gitleaks < Formula
   desc "Audit git repos for secrets"
   homepage "https://github.com/zricethezav/gitleaks"
-  url "https://github.com/zricethezav/gitleaks/archive/v7.2.2.tar.gz"
-  sha256 "9eaf24ce758903b30c3ebf840ba35020b8dbb3733df9f975dae0bafc650f3fcf"
+  url "https://github.com/zricethezav/gitleaks/archive/v8.12.0.tar.gz"
+  sha256 "8e4df138f39951b0de70fe062d6f7c58232b692b52893a40da388a39cd77eaa0"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "92f4ea25d97089e136f0ed5fd5d6e696f2da6e6d90f35cae30cf0047a11daac3"
-    sha256 cellar: :any_skip_relocation, big_sur:       "12b782a67f02fdf5544fa5b4fc8ab40243848e40f2254da0f12c9e473aebce7b"
-    sha256 cellar: :any_skip_relocation, catalina:      "54f4dcacd3943a063711db03610063b21301122ef57b096a31a4147e547b0f29"
-    sha256 cellar: :any_skip_relocation, mojave:        "49f130b583e05eebbf6f980ec606f40360451b38d4f10c1cb98f1f1252d66fbc"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "19018d38052fcd358e7b3a6adf687d376652a2334dbbe2653fe56af7418df2f6"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "20c2e0048fa0c6b5528874bbbfac1100336dbaa29530f681d2701cba826de3c3"
+    sha256 cellar: :any_skip_relocation, monterey:       "f88b5cf7092417b2fe01cdb648f382b79d154c6c3f7496738d720fa69ac366ce"
+    sha256 cellar: :any_skip_relocation, big_sur:        "e072c80cd89de2cb73a6ed8794ce0502f00b15da7ce43c61717a4e0bab4f4561"
+    sha256 cellar: :any_skip_relocation, catalina:       "e3889469e2a52f42aab2922818dc4c763cdd8099bff4ac8381ff4dcae61eb3d3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "708e7a8cdcd889307d7e998a3fdbc085af52e08586ea999f0cbcc3c392276286"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", "-ldflags", "-X github.com/zricethezav/gitleaks/v#{version.major}/version.Version=#{version}",
-                 *std_go_args
+    ldflags = "-X github.com/zricethezav/gitleaks/v#{version.major}/cmd.Version=#{version}"
+    system "go", "build", *std_go_args(ldflags: ldflags)
+
+    generate_completions_from_executable(bin/"gitleaks", "completion")
   end
 
   test do
-    output = shell_output("#{bin}/gitleaks -r https://github.com/gitleakstest/emptyrepo.git 2>&1", 1)
-    assert_match "level=info msg=\"cloning... https://github.com/gitleakstest/emptyrepo.git\"", output
-    assert_match "level=error msg=\"remote repository is empty\"", output
-
-    assert_equal version, shell_output("#{bin}/gitleaks --version")
+    (testpath/"README").write "ghp_deadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
+    system "git", "init"
+    system "git", "add", "README"
+    system "git", "commit", "-m", "Initial commit"
+    assert_match(/WRN\S* leaks found: [1-9]/, shell_output("#{bin}/gitleaks detect 2>&1", 1))
+    assert_equal version.to_s, shell_output("#{bin}/gitleaks version").strip
   end
 end

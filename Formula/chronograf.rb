@@ -3,16 +3,18 @@ require "language/node"
 class Chronograf < Formula
   desc "Open source monitoring and visualization UI for the TICK stack"
   homepage "https://docs.influxdata.com/chronograf/latest/"
-  url "https://github.com/influxdata/chronograf/archive/1.8.9.1.tar.gz"
-  sha256 "edf5038b301bc0cf49b2f74f1fcdc0a2d66fe5e4b69f753fd879972b7e04a7ee"
+  url "https://github.com/influxdata/chronograf/archive/1.10.0.tar.gz"
+  sha256 "4c9ec541a77314b11f23f2eff1394568ea9180f1f3cc3f098cb3e7977dbfd7a5"
   license "AGPL-3.0-or-later"
-  head "https://github.com/influxdata/chronograf.git"
+  head "https://github.com/influxdata/chronograf.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "8688a32e5306ca3f821e58d5c751a2ba3d79ea17d0b5c69a5548989097b9024b"
-    sha256 cellar: :any_skip_relocation, big_sur:       "9c3ca12cf1f5694468d1b38f5306467e5720feab4e6d99f3c9fd4f26a623bea3"
-    sha256 cellar: :any_skip_relocation, catalina:      "0dc8c14ac9fe9d682d7459a69f4208e36471e2f7f791b3719c872294b068ad4e"
-    sha256 cellar: :any_skip_relocation, mojave:        "23e175b2e6c9d10af4e8a67e2bb53eee074facf82299336a9d5869731d161e44"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "e60c6cbad7cf26be81a3ecf4e67d76860cd0dc51e313ec7b0a84a9f0cca1866e"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f36ad1c8bccee48018a89ba866c95e82c6924a7ddd65b625c0e815bfc9add575"
+    sha256 cellar: :any_skip_relocation, monterey:       "c7cb92de2c6cfa35963ba9b236f9770be2f3e7c7c34217ed66410a01ce4321d6"
+    sha256 cellar: :any_skip_relocation, big_sur:        "67f7d0341b169a14d77ed62616bb6b933772637a891a2eeac370cf5944f634a1"
+    sha256 cellar: :any_skip_relocation, catalina:       "6f13cf0d008d4d2b395e19a85aa419c1a7e4c46d624db2ec3776abb2d201506d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "fadc331abb4ddfacc2e23c46f9e74782cd31e52019fe9d606c814fe430794473"
   end
 
   depends_on "go" => :build
@@ -22,48 +24,27 @@ class Chronograf < Formula
   depends_on "influxdb"
   depends_on "kapacitor"
 
-  def install
-    Language::Node.setup_npm_environment
+  on_monterey :or_newer do
+    depends_on "python@3.10" => :build
+  end
 
-    cd "ui" do # fix compatibility with the latest node
-      system "yarn", "upgrade", "parcel@1.11.0"
-    end
+  def install
+    # Work around older version of gyp-mac-tool: env: python: No such file or directory
+    ENV.prepend_path "PATH", Formula["python@3.10"].opt_libexec/"bin" if MacOS.version >= :monterey
+
+    Language::Node.setup_npm_environment
     system "make", "dep"
     system "make", ".jssrc"
     system "make", "chronograf"
     bin.install "chronograf"
   end
 
-  plist_options manual: "chronograf"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>KeepAlive</key>
-          <dict>
-            <key>SuccessfulExit</key>
-            <false/>
-          </dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_bin}/chronograf</string>
-          </array>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>WorkingDirectory</key>
-          <string>#{var}</string>
-          <key>StandardErrorPath</key>
-          <string>#{var}/log/chronograf.log</string>
-          <key>StandardOutPath</key>
-          <string>#{var}/log/chronograf.log</string>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run opt_bin/"chronograf"
+    keep_alive true
+    error_log_path var/"log/chronograf.log"
+    log_path var/"log/chronograf.log"
+    working_dir var
   end
 
   test do

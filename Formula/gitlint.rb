@@ -2,44 +2,42 @@ class Gitlint < Formula
   include Language::Python::Virtualenv
 
   desc "Linting for your git commit messages"
-  homepage "https://jorisroovers.github.io/gitlint"
-  url "https://files.pythonhosted.org/packages/df/b5/04355d3abe6b372e6bae36864ec7b659012343da437b595895637713f90f/gitlint-0.15.0.tar.gz"
-  sha256 "aae7e966d765a818d941398f2d3aff6ec7f30a7251dd5c915846b7e82f4f7776"
+  homepage "https://jorisroovers.com/gitlint/"
+  url "https://files.pythonhosted.org/packages/91/77/2fc5418edff33060dd7a51aa323ee7d3df11503952b8e4e46ee65d18d815/gitlint-core-0.17.0.tar.gz"
+  sha256 "772dfd33effaa8515ca73e901466aa938c19ced894bec6783d19691f57429691"
   license "MIT"
-  head "https://github.com/jorisroovers/gitlint.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "8131d633d12e717a5cffd63fcd8717d1f7de4660c0ecea17e39a35cee982d9ca"
-    sha256 cellar: :any_skip_relocation, big_sur:       "52ac0738eaf1ee717e838a7a2d2c2e8c4745f281bafc846a054be2526567c411"
-    sha256 cellar: :any_skip_relocation, catalina:      "79dacaaf2f45dedcca1fb05efbf8c84d37f85996db920a4a675ceff724a8110f"
-    sha256 cellar: :any_skip_relocation, mojave:        "dbb9d4e5bbabaa3a75ea7d38df6cb46ad51f95e5378591068f397884cee9ceb6"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "d9ad929082af6a7d59dc9f7916fb11bbbe1b6d73d65ec18f4daf1f4c85610125"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "aa744d7a0efdb919426cc246447817ca12c41f4fd971099d0a30331c232c14b4"
+    sha256 cellar: :any_skip_relocation, monterey:       "f06c6dcf8980745fd7cae9c0f4bc7af1748290d83d707dc8161571f6aa8c669d"
+    sha256 cellar: :any_skip_relocation, big_sur:        "29177c2fcddbadf9cdba116e956f91c9ce5d3199c405f5933a2ea07bd28585c3"
+    sha256 cellar: :any_skip_relocation, catalina:       "60bb922ea7278aa56b3e2b4e17c3629ed206229b6aa0f9941ff947462215be90"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2df1ea0e66d8a6c02557a1f08cd0d6c15077ad4ee3e6a337788857128c11ea10"
   end
 
-  depends_on "python@3.9"
+  depends_on "python@3.10"
+  depends_on "six"
 
   resource "arrow" do
-    url "https://files.pythonhosted.org/packages/ec/74/1cf2d9912921cebdba3fa954949206c8aa159c9cc803b88140fb227f8a0e/arrow-0.17.0.tar.gz"
-    sha256 "ff08d10cda1d36c68657d6ad20d74fbea493d980f8b2d45344e00d6ed2bf6ed4"
+    url "https://files.pythonhosted.org/packages/48/28/30a5748af715b0ab9c2b81cf08bd9e261e47a6261e247553afb7f6421b24/arrow-1.2.2.tar.gz"
+    sha256 "05caf1fd3d9a11a1135b2b6f09887421153b94558e5ef4d090b567b47173ac2b"
   end
 
   resource "click" do
-    url "https://files.pythonhosted.org/packages/27/6f/be940c8b1f1d69daceeb0032fee6c34d7bd70e3e649ccac0951500b4720e/click-7.1.2.tar.gz"
-    sha256 "d2b5255c7c6349bc1bd1e59e08cd12acbbd63ce649f2588755783aa94dfb6b1a"
+    url "https://files.pythonhosted.org/packages/59/87/84326af34517fca8c58418d148f2403df25303e02736832403587318e9e8/click-8.1.3.tar.gz"
+    sha256 "7682dc8afb30297001674575ea00d1814d808d6a36af415a82bd481d37ba7b8e"
   end
 
   resource "python-dateutil" do
-    url "https://files.pythonhosted.org/packages/be/ed/5bbc91f03fa4c839c4c7360375da77f9659af5f7086b7a7bdda65771c8e0/python-dateutil-2.8.1.tar.gz"
-    sha256 "73ebfe9dbf22e832286dafa60473e4cd239f8592f699aa5adaf10050e6e1823c"
+    url "https://files.pythonhosted.org/packages/4c/c4/13b4776ea2d76c115c1d1b84579f3764ee6d57204f6be27119f13a61d0a9/python-dateutil-2.8.2.tar.gz"
+    sha256 "0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"
   end
 
   resource "sh" do
-    url "https://files.pythonhosted.org/packages/f6/d4/e80280b1eba9597d16144f71d12cdf62d0e66170d289880f307cf905d327/sh-1.14.1.tar.gz"
-    sha256 "39aa9af22f6558a0c5d132881cf43e34828ca03e4ae11114852ca6a55c7c1d8e"
-  end
-
-  resource "six" do
-    url "https://files.pythonhosted.org/packages/6b/34/415834bfdafca3c5f451532e8a8d9ba89a21c9743a0c59fbd0205c7f9426/six-1.15.0.tar.gz"
-    sha256 "30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259"
+    url "https://files.pythonhosted.org/packages/80/39/ed280d183c322453e276a518605b2435f682342f2c3bcf63228404d36375/sh-1.14.2.tar.gz"
+    sha256 "9d7bd0334d494b2a4609fe521b2107438cdb21c0e469ffeeb191489883d6fe0d"
   end
 
   def install

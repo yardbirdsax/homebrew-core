@@ -1,17 +1,18 @@
 class Sops < Formula
   desc "Editor of encrypted files"
   homepage "https://github.com/mozilla/sops"
-  url "https://github.com/mozilla/sops/archive/v3.6.1.tar.gz"
-  sha256 "bb6611eb70580ff74a258aa8b9713fdcb9a28de5a20ee716fe6b516608a60237"
+  url "https://github.com/mozilla/sops/archive/v3.7.3.tar.gz"
+  sha256 "0e563f0c01c011ba52dd38602ac3ab0d4378f01edfa83063a00102587410ac38"
   license "MPL-2.0"
-  head "https://github.com/mozilla/sops.git", branch: "develop"
+  head "https://github.com/mozilla/sops.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "4b51a918bae8e96513a5f9c871f8b6ae7b46b87c11c14ef453a0990124b142b5"
-    sha256 cellar: :any_skip_relocation, big_sur:       "802a7f9f44753e14258c9fba558d573230fb0b8ae78b217a54ac216ce8582f83"
-    sha256 cellar: :any_skip_relocation, catalina:      "7b883bcead58c088e16a32310a29f4146066329f7f8b203bf69ec5f1fecec950"
-    sha256 cellar: :any_skip_relocation, mojave:        "1c0ef6707dee2088bb816d827f6cfd2d7a26ef530b5177b3ae5652aa2a0591eb"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "b6e72dd038ae5c28786423aa9b5eb31c92b9533feee1b927d72cb697e3c1ddd7"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "70f27c015b2ef19765f5b05bdc46294aad6e6a9702bf60379646b2d482fa66cb"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "9901d633289cbcad89857d975830a6e06f05287ab4f63cc23a6f3eb684d3a4a2"
+    sha256 cellar: :any_skip_relocation, monterey:       "db10b3c2e7d8601404f5781710a594290db30e21bf7f0c9a2ed39548a8d062af"
+    sha256 cellar: :any_skip_relocation, big_sur:        "c6fc0f83d3b83a4c8b278f8344e0f17f3c96146ee61afdb2959ef36029141d57"
+    sha256 cellar: :any_skip_relocation, catalina:       "8bbc4dcac66038e6fbaf4c4b21f513e06f7a229268ba9ebbfd636a442bca3d30"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "204d35174833b00da78eb1dc6f0191761d91e23d638a6c4cc660cb7a64835322"
   end
 
   depends_on "go" => :build

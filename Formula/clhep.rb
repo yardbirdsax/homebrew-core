@@ -1,9 +1,10 @@
 class Clhep < Formula
   desc "Class Library for High Energy Physics"
   homepage "https://proj-clhep.web.cern.ch/proj-clhep/"
-  url "https://proj-clhep.web.cern.ch/proj-clhep/dist1/clhep-2.4.4.1.tgz"
-  sha256 "4b73da8414ab1eea67d0236c930c318ca90e6e0b27049bcb8899893bfb3efc21"
-  license "GPL-3.0"
+  url "https://proj-clhep.web.cern.ch/proj-clhep/dist1/clhep-2.4.5.3.tgz"
+  sha256 "45f63eeb097f02fe67b86a7dadbf10d409b401c28a1a3e172db36252c3097c13"
+  license "GPL-3.0-only"
+  head "https://gitlab.cern.ch/CLHEP/CLHEP.git", branch: "develop"
 
   livecheck do
     url :homepage
@@ -11,27 +12,21 @@ class Clhep < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "24c6facf14eefac92963f4b425c5f6dfad87a842800bebe498e667a1937785c8"
-    sha256 cellar: :any, big_sur:       "3c59064e70ce4f773eca8b61700172d792015c6810a2215482a5e23bfae61dc1"
-    sha256 cellar: :any, catalina:      "30f5e03723c8a244f9e1472f2b284d0b5f59f212051818d4432b1095c0d31daa"
-    sha256 cellar: :any, mojave:        "0203c0953444969756f5465e98f1d5e98bc8975b35b786f2f551cec3a0915b10"
-  end
-
-  head do
-    url "https://gitlab.cern.ch/CLHEP/CLHEP.git"
-
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
+    sha256 cellar: :any,                 arm64_monterey: "6cae06785c1274a80e3a67ee01784a920b200c97a46a1f12cc981d216e5e2259"
+    sha256 cellar: :any,                 arm64_big_sur:  "928f2d70813ed53d112ff37a70a70ebf85d865902c57a176a8feb9b442c88590"
+    sha256 cellar: :any,                 monterey:       "527987f8be76209050ace31c189f25fc6d7485ab93bdd6e7b17d21a615fdea80"
+    sha256 cellar: :any,                 big_sur:        "98eeb5b83cb8d59d92ca1ca2e9cb845f4da6c60066148455477d7e2dfb3ebbc3"
+    sha256 cellar: :any,                 catalina:       "020d3f58a54b878bb97d6e63caebc6730026d92db70340f0d4b57b65130be3b0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "eb033d846c14583302e1975e38af849da27b8bd5a702719c356a88d9dcd4d1b2"
   end
 
   depends_on "cmake" => :build
 
   def install
-    mv (buildpath/"CLHEP").children, buildpath if build.stable?
-    mkdir "build" do
-      system "cmake", "..", *std_cmake_args
-      system "make", "install"
-    end
+    (buildpath/"CLHEP").install buildpath.children if build.head?
+    system "cmake", "-S", "CLHEP", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do

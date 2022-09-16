@@ -1,20 +1,23 @@
 class Dnsmasq < Formula
   desc "Lightweight DNS forwarder and DHCP server"
-  homepage "https://www.thekelleys.org.uk/dnsmasq/doc.html"
-  url "https://www.thekelleys.org.uk/dnsmasq/dnsmasq-2.84.tar.gz"
-  sha256 "4caf385376f34fae5c55244a1f870dcf6f90e037bb7c4487210933dc497f9c36"
+  homepage "https://thekelleys.org.uk/dnsmasq/doc.html"
+  url "https://thekelleys.org.uk/dnsmasq/dnsmasq-2.86.tar.gz"
+  sha256 "ef15f608a83ee2b1d1d2c1f11d089a7e0ac401ffb0991de73fc01ce5f290e512"
   license any_of: ["GPL-2.0-only", "GPL-3.0-only"]
 
   livecheck do
-    url "http://www.thekelleys.org.uk/dnsmasq/"
+    url "https://thekelleys.org.uk/dnsmasq/"
     regex(/href=.*?dnsmasq[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 arm64_big_sur: "bc3658b1513c04ceb65465f739efab9b4607df16d5019ac4868b58f3faf3b489"
-    sha256 big_sur:       "a4479c0bef111c09b0501624e009cd5b923007c7bd36193da63b22462b0f0bf9"
-    sha256 catalina:      "72c66278024f906a82de40d85a270067303cb3f118fe9bdd62522d819364cfac"
-    sha256 mojave:        "9c0d15c06f40e148e28c5ffd795e69634e897f5569b3a75a112d5209385d1ff5"
+    sha256 arm64_monterey: "9f25c2cfab3902767464a11a49151503c8532a554ee9f8452f536bbbec4c7b04"
+    sha256 arm64_big_sur:  "958b73b470c3fad28aa5144afd18cbc423448d70bb74ecd45ee296384f97b37e"
+    sha256 monterey:       "d4e2c92c41d0a580868a2bc68c3b1caa5257bd241b89c1b88c5e74c73d59f78b"
+    sha256 big_sur:        "ebcab796c2876217e0bcaa2db862ce407a784c81f8d5d2c2b625122945e13944"
+    sha256 catalina:       "fb1bbf13dd64a0fd3e4d75773795cd7edc4345bbdf3290399ebaca6f08d645ad"
+    sha256 mojave:         "4ea6a7c2ab644ee388a5489307c3c4bb2b358f7eafeb32676fd1cdcc89aeb33d"
+    sha256 x86_64_linux:   "b5ae5a7152ef11bbcdc2a8444d3c4f830da1228b484eb98b1e2db8e0ce6e19f5"
   end
 
   depends_on "pkg-config" => :build
@@ -59,30 +62,9 @@ class Dnsmasq < Formula
 
   plist_options startup: true
 
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_sbin}/dnsmasq</string>
-            <string>--keep-in-foreground</string>
-            <string>-C</string>
-            <string>#{etc}/dnsmasq.conf</string>
-            <string>-7</string>
-            <string>#{etc}/dnsmasq.d,*.conf</string>
-          </array>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>KeepAlive</key>
-          <true/>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_sbin/"dnsmasq", "--keep-in-foreground", "-C", etc/"dnsmasq.conf", "-7", etc/"dnsmasq.d,*.conf"]
+    keep_alive true
   end
 
   test do

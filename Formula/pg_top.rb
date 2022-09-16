@@ -4,7 +4,7 @@ class PgTop < Formula
   url "https://ftp.postgresql.org/pub/projects/pgFoundry/ptop/pg_top/3.7.0/pg_top-3.7.0.tar.bz2"
   mirror "https://mirrorservice.org/sites/ftp.postgresql.org/projects/pgFoundry/ptop/pg_top/3.7.0/pg_top-3.7.0.tar.bz2"
   sha256 "c48d726e8cd778712e712373a428086d95e2b29932e545ff2a948d043de5a6a2"
-  revision 3
+  revision 4
 
   # 4.0.0 is out, but unfortunatley no longer supports OS/X.  Therefore
   # we only look for the latest 3.x release until upstream adds OS/X support back.
@@ -14,20 +14,26 @@ class PgTop < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any, big_sur:  "770ec08d04f5f88d91f99855fb5ac13466734b7b396a0bf499387a02490cc8b8"
-    sha256 cellar: :any, catalina: "00231ec96d368d18286b69104979b2d35307f02e2f5acf54293f97b7619803ff"
-    sha256 cellar: :any, mojave:   "1110da076403c8f3030421ce4fbb5acb51d61c71102564aa00db9611d08b50c8"
+    sha256 cellar: :any,                 arm64_monterey: "a157f605a85907c0d04410199dfcc4d7de515844f0ad41bcbcde1b8b771431c8"
+    sha256 cellar: :any,                 arm64_big_sur:  "506d2459e302e37bac0f38f99cd2cc2d3c3f5fd39631ee540a6f54d59af07f4a"
+    sha256 cellar: :any,                 monterey:       "6252dc42f3d6e6570b0371f2f10cd146a06bd52b492636bbb35f62ff07239b7a"
+    sha256 cellar: :any,                 big_sur:        "7980c5af9dec1de3a76a74fbd4b359ec1a90bdd7223fa7ffc8f4294642042fc8"
+    sha256 cellar: :any,                 catalina:       "edf54d452403cf5be9b63a0a744560a00bb9e83ace3885ae33d36d96b0a8c2a4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "65fe3861c5e90a4c9403f4b551892cd8ac85fbbea1cc23f551ee0eda3c9de01d"
   end
 
-  depends_on "postgresql"
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "libtool" => :build
+  depends_on "libpq"
 
   uses_from_macos "ncurses"
 
   def install
+    system "autoreconf", "-fvi"
     system "./configure", "--disable-debug", "--disable-dependency-tracking",
                           "--prefix=#{prefix}",
-                          "--with-postgresql=#{Formula["postgresql"].opt_prefix}"
+                          "--with-postgresql=#{Formula["libpq"].opt_prefix}"
     (buildpath/"config.h").append_lines "#define HAVE_DECL_STRLCPY 1"
     # On modern OS/X [v]snprinf() are macros that optionally add some security checks
     # In c.h this package provides their own declaration of these assuming they're

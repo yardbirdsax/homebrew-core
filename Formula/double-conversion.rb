@@ -1,32 +1,30 @@
 class DoubleConversion < Formula
   desc "Binary-decimal and decimal-binary routines for IEEE doubles"
   homepage "https://github.com/google/double-conversion"
-  url "https://github.com/google/double-conversion/archive/v3.1.5.tar.gz"
-  sha256 "a63ecb93182134ba4293fd5f22d6e08ca417caafa244afaa751cbfddf6415b13"
+  url "https://github.com/google/double-conversion/archive/v3.2.1.tar.gz"
+  sha256 "e40d236343cad807e83d192265f139481c51fc83a1c49e406ac6ce0a0ba7cd35"
   license "BSD-3-Clause"
-  revision 1
-  head "https://github.com/google/double-conversion.git"
+  head "https://github.com/google/double-conversion.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "928fbd4a31967ec090b4b292b1a212fec7eb75f27443493d0c175ca8bb56a9dc"
-    sha256 cellar: :any, big_sur:       "0f7c08daace9fc854f8526a7699102f40de9898fa1e6b05a0199b5da3c9e1a7d"
-    sha256 cellar: :any, catalina:      "20b93e20891d48912ffbfbdf3ef470f7305684df2381ef93056a11cedd95c65f"
-    sha256 cellar: :any, mojave:        "ec700c89a4f1794170b4466f5a0a100b6eafee7cb0a794e55ea53de18114a1d3"
-    sha256 cellar: :any, high_sierra:   "9b54153b09683b8fa40160588792385e04f6be56ba355c5a530a2209b9f0526d"
+    sha256 cellar: :any,                 arm64_monterey: "dcd8a50bf98490fae00d73325210c5f9f65f1b20a59a1979afdb28e9c91d3ba9"
+    sha256 cellar: :any,                 arm64_big_sur:  "7996dcb8fafcc3aee6fee04da51533a15f297cb34de699a7ec0cfede53f4447a"
+    sha256 cellar: :any,                 monterey:       "ab33e3194744d91e611c402d1f5ed5243ffa7bb9a776abec12b05d674b210880"
+    sha256 cellar: :any,                 big_sur:        "f20cd36d2cb176b5ea9e5bbc15241f7a2f57bbea16196adfaa0ee51918541992"
+    sha256 cellar: :any,                 catalina:       "2299213ea5c53ce8c80818d0256911227e7dd9f3c444eff84993d7b266180a36"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ad1dbba4e56ae238b08b842855f8ca8ca1c929644a09a9f91c24d4c7fafc2e9f"
   end
 
   depends_on "cmake" => :build
 
   def install
-    mkdir "dc-build" do
-      system "cmake", "..", "-DBUILD_SHARED_LIBS=ON", *std_cmake_args
-      system "make", "install"
-      system "make", "clean"
+    system "cmake", "-S", ".", "-B", "shared", "-DBUILD_SHARED_LIBS=ON", *std_cmake_args
+    system "cmake", "--build", "shared"
+    system "cmake", "--install", "shared"
 
-      system "cmake", "..", "-DBUILD_SHARED_LIBS=OFF", *std_cmake_args
-      system "make"
-      lib.install "libdouble-conversion.a"
-    end
+    system "cmake", "-S", ".", "-B", "static", "-DBUILD_SHARED_LIBS=OFF", *std_cmake_args
+    system "cmake", "--build", "static"
+    lib.install "static/libdouble-conversion.a"
   end
 
   test do

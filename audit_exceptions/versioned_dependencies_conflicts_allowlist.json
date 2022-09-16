@@ -1,8 +1,10 @@
 [
-  "anjuta",
-  "fdroidserver",
+  "emscripten",
   "hive",
+  "libgaiagraphics",
+  "librasterlite",
   "predictionio",
   "sqoop",
-  "visp"
+  "swtpm",
+  "synergy-core"
 ]

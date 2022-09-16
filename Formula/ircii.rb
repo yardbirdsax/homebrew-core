@@ -1,10 +1,16 @@
 class Ircii < Formula
   desc "IRC and ICB client"
   homepage "http://www.eterna.com.au/ircii/"
-  url "https://ircii.warped.com/ircii-20190117.tar.bz2"
-  mirror "https://deb.debian.org/debian/pool/main/i/ircii/ircii_20190117.orig.tar.bz2"
-  sha256 "10316f0a3723e4ce3d67fd5a7df10e6bcf30dd0750fb96d5437cacb16b0e9617"
-  revision 1
+  url "https://ircii.warped.com/ircii-20210314.tar.bz2"
+  mirror "https://deb.debian.org/debian/pool/main/i/ircii/ircii_20210314.orig.tar.bz2"
+  sha256 "866f2b847daed3d70859f208f7cb0f20b58c0933b2159f7ff92a68c518d393a9"
+  license all_of: [
+    "BSD-3-Clause",
+    "BSD-2-Clause",
+    "GPL-2.0-or-later",
+    "MIT",
+    :public_domain,
+  ]
 
   livecheck do
     url "https://ircii.warped.com/"
@@ -12,20 +18,23 @@ class Ircii < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "a2cd8fdd4ad9a08296a510e61772422d95ef1e047405c79d613a4e46ce4e68e3"
-    sha256 big_sur:       "5fa9235fe1b9f86202dabe7b7a62a0e5fc0007e7f211d50ce04c5574dba30af0"
-    sha256 catalina:      "fea5e21aa100bda1104f1d4947376e9af68be118caf89d8b9468b51cbd2059b4"
-    sha256 mojave:        "95424df7e321088386df0d493fdc9a29c0f1955201ce0ce6ba9640a6c9678a9e"
-    sha256 high_sierra:   "ff375e444386f89ee0ae5f3aa3b6f38bfaa8818c3cd2db8065669f8a0f7d0165"
-    sha256 sierra:        "d0739ce549eb581ca3bb13de8c3aa164657235814e3c1edb2a050fde5dbf24f2"
+    rebuild 1
+    sha256 arm64_monterey: "06575e2e48874d7f5650fea61b689028f6b7854ba77cd58fe982a3c0b1c66bfa"
+    sha256 arm64_big_sur:  "5c643f15576e03070991659ede28ea7bce710f091e79bb99bcd315d3bdf4672f"
+    sha256 monterey:       "83e421aa74c85552075cda2c66c98df71e6e6c831eb178ff1557611932054d22"
+    sha256 big_sur:        "45c5ac2c7a6ed25595750c5513d11c1c0bec9797680a37b6245d8140ffd1637d"
+    sha256 catalina:       "d261b8a30b2430dcd089356e56e4165073d0f6f76b13262220ebae0ccb599fce"
+    sha256 x86_64_linux:   "94729a716fd12dbf1b984e8d87c746876dd46e3a5e77ee7ef5513965c78c3d0f"
   end
 
   depends_on "openssl@1.1"
 
+  uses_from_macos "ncurses"
+
   def install
-    ENV.append "LIBS", "-liconv"
+    ENV.append "LIBS", "-liconv" if OS.mac?
     system "./configure", "--prefix=#{prefix}",
-                          "--with-default-server=irc.freenode.net",
+                          "--with-default-server=irc.libera.chat",
                           "--enable-ipv6"
     system "make"
     ENV.deparallelize
@@ -34,7 +43,7 @@ class Ircii < Formula
 
   test do
     IO.popen("#{bin}/irc -d", "r+") do |pipe|
-      assert_match "Connecting to port 6667 of server irc.freenode.net", pipe.gets
+      assert_match "Connecting to port 6667 of server irc.libera.chat", pipe.gets
       pipe.puts "/quit"
       pipe.close_write
       pipe.close

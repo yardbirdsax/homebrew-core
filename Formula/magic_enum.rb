@@ -1,17 +1,18 @@
 class MagicEnum < Formula
   desc "Static reflection for enums (to string, from string, iteration) for modern C++"
   homepage "https://github.com/Neargye/magic_enum"
-  url "https://github.com/Neargye/magic_enum/archive/v0.7.2.tar.gz"
-  sha256 "a77895ebc684f7a4dd2e4e06529b22e9ae694037f6dee0753d3ce0bbcd5b3e38"
+  url "https://github.com/Neargye/magic_enum/archive/v0.8.1.tar.gz"
+  sha256 "6b948d1680f02542d651fc82154a9e136b341ce55c5bf300736b157e23f9df11"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, big_sur:  "02d5aca1f1f02b8a7623289189fbebbe349db98f551b80afdf31371f37499472"
-    sha256 cellar: :any_skip_relocation, catalina: "c9861f04884832a1b13f27ccc7eef8d96ad10d7b3637acbb077b7ff72e91e804"
-    sha256 cellar: :any_skip_relocation, mojave:   "e858d99e9766b58afee79c9eabfed3145dd89afc06e786de4db87582878fefca"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "b6f522d37fbd96ef7ddff60d8ab46a72843dd9757e858c641f6637b34689cbd3"
   end
 
   depends_on "cmake" => :build
+
+  fails_with gcc: "5" # C++17
 
   def install
     system "cmake", ".", *std_cmake_args
@@ -35,7 +36,7 @@ class MagicEnum < Formula
       }
     EOS
 
-    system ENV.cxx, "test.cpp", "-I#{include}", "-Wall", "-Wextra", "-pedantic-errors", "-Werror", "-std=c++17"
-    system "./a.out"
+    system ENV.cxx, "test.cpp", "-I#{include}", "-std=c++17", "-o", "test"
+    assert_equal "RED\n", shell_output(testpath/"test")
   end
 end

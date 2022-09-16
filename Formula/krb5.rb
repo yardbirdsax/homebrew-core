@@ -1,8 +1,8 @@
 class Krb5 < Formula
   desc "Network authentication protocol"
   homepage "https://web.mit.edu/kerberos/"
-  url "https://kerberos.org/dist/krb5/1.19/krb5-1.19.tar.gz"
-  sha256 "bc7862dd1342c04e1c17c984a268d50f29c0a658a59a22bd308ffa007d532a2e"
+  url "https://kerberos.org/dist/krb5/1.20/krb5-1.20.tar.gz"
+  sha256 "7e022bdd3c851830173f9faaa006a230a0e0fdad4c953e85bff4bf0da036e12f"
   license :cannot_represent
 
   livecheck do
@@ -11,10 +11,12 @@ class Krb5 < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "4dadb532e9c17eed0771ff3e53c50f51015f9ca65a29167282cd8fc28fe68092"
-    sha256 big_sur:       "1dc799a415f88381e989d293afe85a5b888bc3b459ab8b51e39e7be684d8d7d4"
-    sha256 catalina:      "ef229251840e4af08dedd2129ece37a18a25a5fefb7e139926aa22029a18716f"
-    sha256 mojave:        "81ac0c47b76361155093ad5dfd58256c7a1f9d1b97f2b231a408659fb4bb7fec"
+    sha256 arm64_monterey: "ad559a03cc8661b668d51d71d3dc44b84eb853b35415aa0cc0a75fefc15bfeb6"
+    sha256 arm64_big_sur:  "8f6f51da9bf8693e7976954aee19d444d483070cf33ad6453219f032b1bcd1ec"
+    sha256 monterey:       "99e8f567b0f70cc50309acf37f5e4b792dcd8fbd034e869e58e3e0f38ad73ec9"
+    sha256 big_sur:        "8e6be25060a0223ec6e8935e575d4b07ff9235f3b5c7e273bd8c79b401a0abfc"
+    sha256 catalina:       "6e8e5a00dff92c729f276ba9d287689e0222a4293f7c8c502ee2781c2a1d4a2e"
+    sha256 x86_64_linux:   "17c3f6518fc7f836cd1bcc8ae0f2d8a8cc9d8ca063fa78d2faaf67158bf3318d"
   end
 
   keg_only :provided_by_macos
@@ -23,23 +25,11 @@ class Krb5 < Formula
 
   uses_from_macos "bison"
 
-  on_linux do
-    depends_on "gettext"
-  end
-
   def install
     cd "src" do
-      # Newer versions of clang are very picky about missing includes.
-      # One configure test fails because it doesn't #include the header needed
-      # for some functions used in the rest. The test isn't actually testing
-      # those functions, just using them for the feature they're
-      # actually testing. Adding the include fixes this.
-      # https://krbdev.mit.edu/rt/Ticket/Display.html?id=8928
-      inreplace "configure", "void foo1() __attribute__((constructor));",
-                             "#include <unistd.h>\nvoid foo1() __attribute__((constructor));"
-
       system "./configure", "--disable-debug",
                             "--disable-dependency-tracking",
+                            "--disable-nls",
                             "--disable-silent-rules",
                             "--prefix=#{prefix}",
                             "--without-system-verto",

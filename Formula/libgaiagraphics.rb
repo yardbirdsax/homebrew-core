@@ -3,31 +3,28 @@ class Libgaiagraphics < Formula
   homepage "https://www.gaia-gis.it/fossil/libgaiagraphics/index"
   url "https://www.gaia-gis.it/gaia-sins/gaiagraphics-sources/libgaiagraphics-0.5.tar.gz"
   sha256 "ccab293319eef1e77d18c41ba75bc0b6328d0fc3c045bb1d1c4f9d403676ca1c"
-  revision 7
-
-  livecheck do
-    url "https://www.gaia-gis.it/gaia-sins/gaiagraphics-sources/"
-    regex(/href=.*?libgaiagraphics[._-]v?(\d+(?:\.\d+)+[a-z]?)\.t/i)
-  end
+  revision 9
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "735b5cc5e33f5b3bd886ba97093edc71a4ad2dd02703870f4a8d1b309b2dbf45"
-    sha256 cellar: :any, big_sur:       "71019ebb245fbf75794ffc377be75d4a9731a7cc842a458d630ef7fb9d824741"
-    sha256 cellar: :any, catalina:      "05b3806c31a6e084eeeec2e44c83b8fb728cd0de4cc22dae14888ff52e290cca"
-    sha256 cellar: :any, mojave:        "bfaf50e26b9312c1ef7d9b62677e92099339d14393ce855b870fe9288503c5df"
-    sha256 cellar: :any, high_sierra:   "20a230ae5fccd2d5114e8ab7a128dd57834104461e5a7cbc2f7c7e63075214d9"
+    sha256 cellar: :any,                 arm64_monterey: "42eff6244781ddd1d413987ca9f129c9f741e108d98a42dc23e3fe05cfe895a8"
+    sha256 cellar: :any,                 arm64_big_sur:  "f83975606bf2054bef66c6f8c131d395e2b6dd1dc8f6b7e19063393cf176bf95"
+    sha256 cellar: :any,                 monterey:       "b24aeea6a6fe6843982d28ac44ecc6219ff7432d6f88e74c0e28eac09b353055"
+    sha256 cellar: :any,                 big_sur:        "ee41f28f60ac786ed7fadd63a40cdd44c4b798b9376e3202967f3109dfe76626"
+    sha256 cellar: :any,                 catalina:       "52f249e8450b7d9c54db47c1002e0c72858b075e0ab393e8aa5f53ec90a2338e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9b71c3137ca5d17cf2e9196d8d5d08dd3ff0b991efcde56426e81eef48cb954a"
   end
+
+  deprecate! date: "2022-03-05", because: :deprecated_upstream
 
   depends_on "pkg-config" => :build
   depends_on "cairo"
-  depends_on "jpeg"
+  depends_on "jpeg-turbo"
   depends_on "libgeotiff"
   depends_on "libpng"
-  depends_on "proj"
+  depends_on "proj@7"
 
   def install
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 end

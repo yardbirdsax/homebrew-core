@@ -1,8 +1,8 @@
 class Libtrace < Formula
   desc "Library for trace processing supporting multiple inputs"
   homepage "https://research.wand.net.nz/software/libtrace.php"
-  url "https://research.wand.net.nz/software/libtrace/libtrace-4.0.15.tar.bz2"
-  sha256 "1f0352200171fa4adcef0a2df22714186e2585ebc7e6f7ca5fdc90e1af2e18c8"
+  url "https://research.wand.net.nz/software/libtrace/libtrace-4.0.19.tar.bz2"
+  sha256 "d1a2d756d744c4ffad480f6d4b0bdaca05a9966c87e491992c42007a22317e5a"
   license "GPL-3.0-or-later"
 
   livecheck do
@@ -11,23 +11,33 @@ class Libtrace < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "32c9993b534ff20808cac15d19c009fc3af56d6bb8828babf43e9d4b64bc61e0"
-    sha256 cellar: :any, big_sur:       "7f0ac81acc44dc40358023b349d3d7fc6a9b973270a250561d6f7d797d6d14f5"
-    sha256 cellar: :any, catalina:      "3bb611b3ca108fa85d4945111e2da2843be58b96090b6d54ffc3143db0353992"
-    sha256 cellar: :any, mojave:        "1657d836b2cf3c5571b7b8606d448f977307b7b922f0abe58598d5b867633459"
-    sha256 cellar: :any, high_sierra:   "7332a34eae708cfa8b297a71affc48e88044258bf11602a17824745c452da435"
+    sha256 cellar: :any,                 arm64_monterey: "f9edccc796e56af2f95bbbcffa1e791f7a17192e010ca4034b45ffa2427a0ae1"
+    sha256 cellar: :any,                 arm64_big_sur:  "1726bfafd1b98709f408d17495827e1884f5e0bdc3a1933c80da04116dfd9bca"
+    sha256 cellar: :any,                 monterey:       "a7a4f93a72e61b050f64ba94ca1074c4e0da466914755abe87c9d66894ec9fcb"
+    sha256 cellar: :any,                 big_sur:        "beba5d290b00bd42eafec29d80b05460da03da8f00e1c4e1ef58c47e602c1312"
+    sha256 cellar: :any,                 catalina:       "9aa10a0c52d0f1e3929cd8c4fffd0a1c65f12c4527d95d8854c1139cffb1dcc4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3dde6596eb8e6501379c201dd115de9e1f106dbc39e5705a56f07055249ed8c2"
   end
 
   depends_on "openssl@1.1"
   depends_on "wandio"
 
-  resource "8021x.pcap" do
+  uses_from_macos "flex" => :build
+  uses_from_macos "libpcap"
+
+  resource "homebrew-8021x.pcap" do
     url "https://github.com/LibtraceTeam/libtrace/raw/9e82eabc39bc491c74cc4215d7eda5f07b85a8f5/test/traces/8021x.pcap"
     sha256 "aa036e997d7bec2fa3d387e3ad669eba461036b9a89b79dcf63017a2c4dac725"
   end
 
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+  end
+
   def install
-    system "./configure", "--disable-dependency-tracking", "--prefix=#{prefix}"
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 
@@ -241,7 +251,7 @@ class Libtrace < Formula
       }
     EOS
     system ENV.cc, "test.c", "-I#{include}", "-L#{lib}", "-ltrace", "-o", "test"
-    resource("8021x.pcap").stage testpath
+    resource("homebrew-8021x.pcap").stage testpath
     system "./test", testpath/"8021x.pcap"
   end
 end

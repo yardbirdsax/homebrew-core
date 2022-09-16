@@ -3,21 +3,26 @@ class Reprepro < Formula
   homepage "https://salsa.debian.org/brlink/reprepro"
   url "https://deb.debian.org/debian/pool/main/r/reprepro/reprepro_5.3.0.orig.tar.gz"
   sha256 "5a5404114b43a2d4ca1f8960228b1db32c41fb55de1996f62bc1b36001f3fab4"
-  revision 2
+  license "GPL-2.0-only"
+  revision 5
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any, arm64_big_sur: "37ecc6897dce6d44e6a0b5965f3a7cc622a8e506d31482ade2a4f4f211c90a0b"
-    sha256 cellar: :any, big_sur:       "9f87049de8d9c70a38429e5fc56173cf41e598621a6de661fdc1465bf28b8819"
-    sha256 cellar: :any, catalina:      "ce81080f227223229a9cc85126c5189d7bb8a0b12f928e5a1b71c48a0f0e4f88"
-    sha256 cellar: :any, mojave:        "4c69c6b440e77633069009ec48bb72739402052e4b4fff03504ab09bfcb88a56"
+    sha256 cellar: :any,                 arm64_monterey: "e915fdd76e80343ba05cad6f9a914f9b60f4542f3e7960c670356b7fd0d98b5d"
+    sha256 cellar: :any,                 arm64_big_sur:  "23db5bfd409b0976b8ef34417dcf9c1978180d691a7cd2700022dcd5dfed5967"
+    sha256 cellar: :any,                 monterey:       "58dd7d17fb51befa9c6631a2da3db17ba8b78036d6e465bc41b9823359a8e9f4"
+    sha256 cellar: :any,                 big_sur:        "3dbf660c420d129cdf9dcbc4ec8b53ede30beabb269c4dcc320ee3dbee77158b"
+    sha256 cellar: :any,                 catalina:       "f52c6ba27a0f1f0d979ba890cd8a11b916afeed5b581cad08fa788d2d5d10a43"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "083ddcc7baec64baff8ebe0ebabdfe14debf27f38f8ee86b588d52d9b3bbed39"
   end
 
-  depends_on "berkeley-db@4"
-  depends_on "gcc"
+  depends_on "berkeley-db@5"
   depends_on "gpgme"
   depends_on "libarchive"
   depends_on "xz"
+
+  on_macos do
+    depends_on "gcc"
+  end
 
   fails_with :clang do
     cause "No support for GNU C nested functions"

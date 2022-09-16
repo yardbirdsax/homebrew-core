@@ -1,14 +1,17 @@
 class Openfast < Formula
   desc "NREL-supported OpenFAST whole-turbine simulation code"
   homepage "https://openfast.readthedocs.io"
-  url "https://github.com/openfast/openfast/archive/v2.5.0.tar.gz"
-  sha256 "b3d9cfcdd87a8fa0e8e62d08bf65a9a9ee69e16a5221e6fb0d3b7f4226971d0e"
+  url "https://github.com/openfast/openfast/archive/v3.2.1.tar.gz"
+  sha256 "29beab5eba93ab94b411a62eaad38b19b0fba1e04c1fc8e6d79c898d37c6f81e"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any, big_sur:  "59580daa33a07c7e6e82457b95c1c29f9a0c7771e3660f05a540055f61d4de84"
-    sha256 cellar: :any, catalina: "65291fb3a065b7f618be694e47e97acaf676a6e791577f32166c8097cfb897a3"
-    sha256 cellar: :any, mojave:   "8c7af9c78eb329aa2e6804080862c8996693ee35fb076aef1142cbdc4e09766a"
+    sha256 cellar: :any,                 arm64_monterey: "5cf35500bf62908a08a97e25a2a30d9276f29e202732bf59cacd1a32b6bd6654"
+    sha256 cellar: :any,                 arm64_big_sur:  "6ff0d72f935941ccf391c368bc6f62fa10176e316b0249940e5776279871f9e1"
+    sha256 cellar: :any,                 monterey:       "dab5842e1cc5a52ab99f9e786d2f518c3370c0f0e5915ff9298f1cb96047c8ac"
+    sha256 cellar: :any,                 big_sur:        "1889601fec4353a90aabb60f28fba9f144da2fdc428e526808471d7707edc70a"
+    sha256 cellar: :any,                 catalina:       "f6ef48ad549a6cd3050cd0548ace68c83abee2502e45ec3ecf0e628f3aa61b8f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a4b13d88203a6af1be1c2bd4589c331f9f818e3abe54667a20407ea81fa3ceed"
   end
 
   depends_on "cmake" => :build
@@ -18,7 +21,6 @@ class Openfast < Formula
   def install
     args = std_cmake_args + %w[
       -DDOUBLE_PRECISION=OFF
-      -DCMAKE_BUILD_TYPE=RelWithDebInfo
       -DBLA_VENDOR=OpenBLAS
     ]
 
@@ -51,6 +53,17 @@ class Openfast < Formula
                 0   CompSub         - Compute sub-structural dynamics (switch) {0=None; 1=SubDyn; 2=External Platform MCKF}
                 0   CompMooring     - Compute mooring system (switch) {0=None; 1=MAP++; 2=FEAMooring; 3=MoorDyn; 4=OrcaFlex}
                 0   CompIce         - Compute ice loads (switch) {0=None; 1=IceFloe; 2=IceDyn}
+                0   MHK             - MHK turbine type (switch) {0: not an MHK turbine, 1: fixed MHK turbine, 2: floating MHK turbine}
+      ---------------------- ENVIRONMENTAL CONDITIONS -------------------------------------------------
+           9.8066   Gravity         - Gravity (m/s^2).
+            1.225   AirDens         - AirDens - Air density (kg/m^3)
+             1025   WtrDens         - Water density (kg/m^3)
+       1.4639E-05   KinVisc         - Kinematic air viscosity, m^2/sec
+              335   SpdSound        - Speed of sound in working fluid (m/s)
+        1.035e+05   Patm            - Atmospheric pressure (Pa) [used only for an MHK turbine cavitation check]
+          1.7e+03   Pvap            - Vapour pressure of working fluid (Pa) [used only for an MHK turbine cavitation check]
+               50   WtrDpth         - Water Depth (m) positive value.
+                0   MSL2SWL         - Offset between still-water level and mean sea level (m) [positive upward]
       ---------------------- INPUT FILES ---------------------------------------------
       "elastodyn.dat"    EDFile          - Name of file containing ElastoDyn input parameters (quoted string)
       "unused"      BDBldFile(1)    - Name of file containing BeamDyn input parameters for blade 1 (quoted string)
@@ -201,8 +214,6 @@ class Openfast < Formula
       False         Echo        - Echo input data to "<RootName>.ech" (flag)
                 3   Method      - Integration method: {1: RK4, 2: AB4, or 3: ABM4} (-)
             0.005   DT          - Integration time step (s)
-      ---------------------- ENVIRONMENTAL CONDITION ---------------------------------
-          9.80665   Gravity     - Gravitational acceleration (m/s^2)
       ---------------------- DEGREES OF FREEDOM --------------------------------------
       True          FlapDOF1    - First flapwise blade mode DOF (flag)
       True          FlapDOF2    - Second flapwise blade mode DOF (flag)

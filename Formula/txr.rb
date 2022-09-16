@@ -1,25 +1,27 @@
 class Txr < Formula
-  desc "Original, new programming language for convenient data munging"
+  desc "Lisp-like programming language for convenient data munging"
   homepage "https://www.nongnu.org/txr/"
-  url "http://www.kylheku.com/cgit/txr/snapshot/txr-250.tar.bz2"
-  sha256 "1e744da753e93aeae00d2dfefc858af4babb43e2ddd4e64c16de6bfca743b398"
+  url "http://www.kylheku.com/cgit/txr/snapshot/txr-281.tar.bz2"
+  sha256 "a251c7c05f6e598a01e6130293c8e960f047277e87c6c1d7d8ce520c5ea5e2b3"
   license "BSD-2-Clause"
 
   livecheck do
     url "http://www.kylheku.com/cgit/txr"
-    regex(/href=.*?txr[._-]v?(\d+)\.t/i)
+    regex(/href=.*?txr[._-]v?(\d+(?:\.\d+)*)\.t/i)
   end
 
   bottle do
-    sha256 cellar: :any, big_sur:  "8cb9ae1076900705ee3eddbb50b5646fbd1affc67ebc606fc4bd28132ea4fea3"
-    sha256 cellar: :any, catalina: "2b79be2d9c59a225c5107fccf350b51c3f2fe976726c852f480406d352fb694c"
-    sha256 cellar: :any, mojave:   "1bbecb5fc244f6051334e23b9777d67657debd026ffb6d5aa3132b87f0c7841c"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "3770324c3c26ca4c2f487d208e0e73beeca8d32cce8f329b962df0d87c2c9331"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5dbce6d648a73417efd9d0212316f0b8c3f5d1140f93f69df6acc5c5adc39180"
+    sha256 cellar: :any_skip_relocation, monterey:       "bc7b985bc3a2d51fd7afcfc85264659ff181afcc95ef4851b948cc79253c392d"
+    sha256 cellar: :any_skip_relocation, big_sur:        "bf0443268662f009d7d81db2e86e9281deb369f99c033b77847efd1320552a28"
+    sha256 cellar: :any_skip_relocation, catalina:       "87399c2bdb2f7231d2a7ad9e39374f980eeff9955481578cce1e6ddf93764cf7"
   end
 
-  depends_on "libffi"
-
+  depends_on "pkg-config" => :build
   uses_from_macos "bison" => :build
   uses_from_macos "flex" => :build
+  uses_from_macos "libffi", since: :catalina
 
   def install
     system "./configure", "--prefix=#{prefix}", "--inline=static inline"
@@ -28,6 +30,6 @@ class Txr < Formula
   end
 
   test do
-    assert_equal "3", shell_output(bin/"txr -p '(+ 1 2)'").chomp
+    assert_equal "3", shell_output("#{bin}/txr -p '(+ 1 2)'").chomp
   end
 end

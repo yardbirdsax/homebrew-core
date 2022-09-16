@@ -1,20 +1,26 @@
 class Lmod < Formula
   desc "Lua-based environment modules system to modify PATH variable"
   homepage "https://lmod.readthedocs.io"
-  url "https://github.com/TACC/Lmod/archive/8.4.20.tar.gz"
-  sha256 "bf42fb6b84eb3efc8cb0acaa39729393ed0aafa7661f3e981da0a2cdc2349c74"
+  url "https://github.com/TACC/Lmod/archive/8.7.13.tar.gz"
+  sha256 "716ff21262c2eff239ccc1dddb7d0907a32d3e9d4bf6724f146bc5ec32c8fc9d"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "6d109bc86bf6cb902e79ce0be8fe7ab3d4fb13a89a3af1cb6a8fe9f7fcf193a7"
-    sha256 cellar: :any_skip_relocation, big_sur:       "b552ae4405aab5de0b4dbd44589752557f282d5d50836fb50f5a4694e6c423e4"
-    sha256 cellar: :any_skip_relocation, catalina:      "7a8fba2dc37efa6a20c94622a43141336124bed4b1c323d42ab1419ab1679af0"
-    sha256 cellar: :any_skip_relocation, mojave:        "446b3bd52786032dc40d438bc0450729678c0c52b515ee1cee841f104ff79ce6"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "ae155e0e13c0242559115cbe4ce1cc760537ea20eecee7d437b74bbd9bbc3038"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "6fd367e3b87b682858d8a2168ffd27f4ade7a13cbbc62bca7bc4b76fc21a14ca"
+    sha256 cellar: :any_skip_relocation, monterey:       "feba2f434633431f480cf38692fd2434c455674e463f2adc1dcb2f84edb0570a"
+    sha256 cellar: :any_skip_relocation, big_sur:        "9641b1abe6a3f6fa04e395a0dedbb996b34f7f595d17d18c2f8cd3f9afd5a74f"
+    sha256 cellar: :any_skip_relocation, catalina:       "1b75cd7ebd22029dba3c75c4ab76780b448ab4d32358a7579818fb5478358059"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "13b8e86af119d85e6f4963ee0dfe64731ab27c56a72150e8606df57cbb27f077"
   end
 
   depends_on "luarocks" => :build
   depends_on "pkg-config" => :build
   depends_on "lua"
+
+  uses_from_macos "bc" => :build
+  uses_from_macos "libxcrypt"
+  uses_from_macos "tcl-tk"
 
   resource "luafilesystem" do
     url "https://github.com/keplerproject/luafilesystem/archive/v1_8_0.tar.gz"
@@ -22,8 +28,8 @@ class Lmod < Formula
   end
 
   resource "luaposix" do
-    url "https://github.com/luaposix/luaposix/archive/v35.0.tar.gz"
-    sha256 "a4edf2f715feff65acb009e8d1689e57ec665eb79bc36a6649fae55eafd56809"
+    url "https://github.com/luaposix/luaposix/archive/refs/tags/v35.1.tar.gz"
+    sha256 "1b5c48d2abd59de0738d1fc1e6204e44979ad2a1a26e8e22a2d6215dd502c797"
   end
 
   def install
@@ -61,7 +67,7 @@ class Lmod < Formula
 
     (testpath/"lmodtest.sh").write <<~EOS
       #!/bin/sh
-      source #{sh_init}
+      . #{sh_init}
       module list
     EOS
 

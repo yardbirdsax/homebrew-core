@@ -1,10 +1,11 @@
 class Libtiff < Formula
   desc "TIFF library and utilities"
   homepage "https://libtiff.gitlab.io/libtiff/"
-  url "https://download.osgeo.org/libtiff/tiff-4.2.0.tar.gz"
-  mirror "https://fossies.org/linux/misc/tiff-4.2.0.tar.gz"
-  sha256 "eb0484e568ead8fa23b513e9b0041df7e327f4ee2d22db5a533929dfc19633cb"
+  url "https://download.osgeo.org/libtiff/tiff-4.4.0.tar.gz"
+  mirror "https://fossies.org/linux/misc/tiff-4.4.0.tar.gz"
+  sha256 "917223b37538959aca3b790d2d73aa6e626b688e02dcda272aec24c2f498abed"
   license "libtiff"
+  revision 1
 
   livecheck do
     url "https://download.osgeo.org/libtiff/"
@@ -12,13 +13,15 @@ class Libtiff < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "50c09c0a4328c2625147ea78376523e11510ef26e4286953465e922e12d7e045"
-    sha256 cellar: :any, big_sur:       "31dc53e161b68394309dfe7743f9b7f37995b441d66b1637b9424696973b3d40"
-    sha256 cellar: :any, catalina:      "208176ae2c5642eb0dff7c97d7b011d6b1d6317be4242db1e54bbb92609f758b"
-    sha256 cellar: :any, mojave:        "706a61c81bd7a17f266f315339ff63e9bc965c962cd6d9a6a03167cd620d07a1"
+    sha256 cellar: :any,                 arm64_monterey: "15921731edaae9d13ca572f3e2b58e07ca6f90429cc5f1bdff56aaf061abe2e2"
+    sha256 cellar: :any,                 arm64_big_sur:  "cda70e066b4b649d7b41654abfc46e8ed1c3740c54f3cf58f4e750a551dc94f7"
+    sha256 cellar: :any,                 monterey:       "87bb203517b2d8a982cd2bcd96d8247d367a8de36c91faa8209371ddc27479b3"
+    sha256 cellar: :any,                 big_sur:        "a56a4f0a3ad9a75a70a9458fd098ec7da793eb39fcd4877515b5163b6ece21b0"
+    sha256 cellar: :any,                 catalina:       "e760184399d1f7c529dd921df16e9262ebcf2a56eba4c1bcccf248c23592239a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b0f7f37d60e465f801e13052f7e5177eac772f079ec3706ede00f8804c9d7ab3"
   end
 
-  depends_on "jpeg"
+  depends_on "jpeg-turbo"
 
   uses_from_macos "zlib"
 
@@ -29,8 +32,8 @@ class Libtiff < Formula
       --disable-lzma
       --disable-webp
       --disable-zstd
-      --with-jpeg-include-dir=#{Formula["jpeg"].opt_include}
-      --with-jpeg-lib-dir=#{Formula["jpeg"].opt_lib}
+      --with-jpeg-include-dir=#{Formula["jpeg-turbo"].opt_include}
+      --with-jpeg-lib-dir=#{Formula["jpeg-turbo"].opt_lib}
       --without-x
     ]
     system "./configure", *args

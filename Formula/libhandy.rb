@@ -1,23 +1,18 @@
 class Libhandy < Formula
   desc "Building blocks for modern adaptive GNOME apps"
   homepage "https://gitlab.gnome.org/GNOME/libhandy"
-  url "https://gitlab.gnome.org/GNOME/libhandy/-/archive/1.0.3/libhandy-1.0.3.tar.gz"
-  sha256 "80c7f015b8ed0888f0f6a5cb15015d120cdf0dfcacf9dddb06d4e93bd8ffef1f"
+  url "https://gitlab.gnome.org/GNOME/libhandy/-/archive/1.7.0/libhandy-1.7.0.tar.gz"
+  sha256 "4a20ec0d3ba7c4743fee65d8421f2500bf627f73df5ee99699cdb4c54ccce3f0"
   license "LGPL-2.1-or-later"
 
   bottle do
-    rebuild 1
-    sha256 arm64_big_sur: "0e681a1a839b0f6f0fc1225b1de04ff42dd4df7348f909a4988e7361ecfe7696"
-    sha256 big_sur:       "345f63e90c49fe053004aa1c021f64870a32ce5f4135216a79ffb73316507ac4"
-    sha256 catalina:      "2a66bed54e09fe13040e883ee14c71e1525b07ff8877e4464373c92d724609bd"
-    sha256 mojave:        "830f6473abcf0fd5465e0306d47a69442d3a8b6ec5c5db80c279395bf7b01038"
+    sha256 arm64_monterey: "2e2205fcb369590d99bf1244dd7dda9030b45089a910abf47b6c1a04db09c7f0"
+    sha256 arm64_big_sur:  "89a7fa9f2395dff4d99c67eaf9bfb032724179d7971fbe4e31e813b1ba865f32"
+    sha256 monterey:       "2b166e8d56b1c339b9646d58a1155342fa9ecda16c6a364e7abc5d8c4e6df446"
+    sha256 big_sur:        "5e664307f41f5e7bcfe076770b93736cd6f6e1a78fb7c3a501c9889b1f0cb166"
+    sha256 catalina:       "32f2f6643c7ab5648997a2f2d43f017d72d53abf42afad5db5acb1a33c75249a"
+    sha256 x86_64_linux:   "73032904b4bb9d851aca2081de2bf18603089c8c34c6e033ca7f7ea623762b60"
   end
-
-  # NOTE: The glade catalog is disabled due to a bug that has been fixed but
-  # not landed in a stable libhandy version yet (as of September 2020).
-  # See https://gitlab.gnome.org/GNOME/libhandy/-/merge_requests/614
-  # When it lands, -Dglade_catalog=enabled should work (make sure to add
-  # glade to the dependencies)
 
   depends_on "gettext" => :build
   depends_on "gobject-introspection" => :build
@@ -90,13 +85,14 @@ class Libhandy < Formula
       -lgio-2.0
       -lglib-2.0
       -lgobject-2.0
-      -lgtk-3.0
+      -lgtk-3
       -lhandy-1
-      -lintl
       -lpango-1.0
       -lpangocairo-1.0
     ]
+    flags << "-lintl" if OS.mac?
     system ENV.cc, "test.c", "-o", "test", *flags
-    system "./test"
+    # Don't have X/Wayland in Docker
+    system "./test" if OS.mac?
   end
 end

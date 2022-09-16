@@ -1,10 +1,9 @@
 class Gdal < Formula
   desc "Geospatial Data Abstraction Library"
   homepage "https://www.gdal.org/"
-  url "https://download.osgeo.org/gdal/3.2.1/gdal-3.2.1.tar.xz"
-  sha256 "6c588b58fcb63ff3f288eb9f02d76791c0955ba9210d98c3abd879c770ae28ea"
+  url "http://download.osgeo.org/gdal/3.5.2/gdal-3.5.2.tar.xz"
+  sha256 "0874dfdeb9ac42e53c37be4184b19350be76f0530e1f4fa8004361635b9030c2"
   license "MIT"
-  revision 1
 
   livecheck do
     url "https://download.osgeo.org/gdal/CURRENT/"
@@ -12,30 +11,28 @@ class Gdal < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "4954a4641c9414fd59eb60523cdae01253efd64660b73acd021136952cdd6d02"
-    sha256 big_sur:       "0ab3f42f64da787ece5b02e3716cd847e5df0ea92c894e2519fee15dce4a56e5"
-    sha256 catalina:      "79d91b0ca31f81f293ad07759a47a7a40f945e98b63381ae306dadf2f1d06f3d"
-    sha256 mojave:        "7c1d3145f826d3fdf31ca88789d5ab9931971ac24261b72728894ba9b08dced5"
+    sha256 arm64_monterey: "4b31af5bfb44a3a64d6bc04a4cd6650bd4e9e4993997c54f11a49d9094fc5d85"
+    sha256 arm64_big_sur:  "441f7390ab812fcfe17ead6020e08fd6b76e60d8484b5cbfa3fcfac5da7c3a4b"
+    sha256 monterey:       "fa73f2ce395854b62a662453ab783c38e296df47005f0fd2955a522177a3eb30"
+    sha256 big_sur:        "8ff12e2b1438b193410d46d08aaf0aa083162cbc1ade3d46da547d3d8c3f9e2e"
+    sha256 catalina:       "8cf46e405bd9f54823532e5abf58ccab529d430cc64d0e8bcba7b8fc7bed96a4"
+    sha256 x86_64_linux:   "b7df41973128eca2d3f11696ee6909f785f2214114a59134bcf6a69a0f9c6307"
   end
 
   head do
-    url "https://github.com/OSGeo/gdal.git"
+    url "https://github.com/OSGeo/gdal.git", branch: "master"
     depends_on "doxygen" => :build
   end
 
   depends_on "pkg-config" => :build
-
   depends_on "cfitsio"
-  # Work around "Symbol not found: _curl_mime_addpart"
-  # due to mismatched SDK version in Mojave.
-  depends_on "curl" if MacOS.version == :mojave
   depends_on "epsilon"
   depends_on "expat"
   depends_on "freexl"
   depends_on "geos"
   depends_on "giflib"
   depends_on "hdf5"
-  depends_on "jpeg"
+  depends_on "jpeg-turbo"
   depends_on "json-c"
   depends_on "libdap"
   depends_on "libgeotiff"
@@ -47,22 +44,31 @@ class Gdal < Formula
   depends_on "netcdf"
   depends_on "numpy"
   depends_on "openjpeg"
-  depends_on "pcre"
+  depends_on "pcre2"
   depends_on "poppler"
   depends_on "proj"
-  depends_on "python@3.9"
-  depends_on "sqlite" # To ensure compatibility with SpatiaLite
-  depends_on "unixodbc" # macOS version is not complete enough
+  depends_on "python@3.10"
+  depends_on "sqlite"
+  depends_on "unixodbc"
   depends_on "webp"
   depends_on "xerces-c"
-  depends_on "xz" # get liblzma compression algorithm library from XZutils
+  depends_on "xz"
   depends_on "zstd"
 
+  uses_from_macos "curl"
+
   on_linux do
-    depends_on "bash-completion"
+    depends_on "util-linux"
   end
 
+  conflicts_with "avce00", because: "both install a cpl_conv.h header"
   conflicts_with "cpl", because: "both install cpl_error.h"
+
+  fails_with gcc: "5"
+
+  def python3
+    "python3.10"
+  end
 
   def install
     args = [
@@ -72,7 +78,6 @@ class Gdal < Formula
       "--disable-debug",
       "--with-libtool",
       "--with-local=#{prefix}",
-      "--with-opencl",
       "--with-threads",
 
       # GDAL native backends
@@ -86,12 +91,13 @@ class Gdal < Formula
       "--with-geos=#{Formula["geos"].opt_prefix}/bin/geos-config",
       "--with-geotiff=#{Formula["libgeotiff"].opt_prefix}",
       "--with-gif=#{Formula["giflib"].opt_prefix}",
-      "--with-jpeg=#{Formula["jpeg"].opt_prefix}",
+      "--with-jpeg=#{Formula["jpeg-turbo"].opt_prefix}",
       "--with-libjson-c=#{Formula["json-c"].opt_prefix}",
       "--with-libtiff=#{Formula["libtiff"].opt_prefix}",
       "--with-pg=yes",
       "--with-png=#{Formula["libpng"].opt_prefix}",
       "--with-spatialite=#{Formula["libspatialite"].opt_prefix}",
+      "--with-pcre2=yes",
       "--with-sqlite3=#{Formula["sqlite"].opt_prefix}",
       "--with-proj=#{Formula["proj"].opt_prefix}",
       "--with-zstd=#{Formula["zstd"].opt_prefix}",
@@ -142,12 +148,16 @@ class Gdal < Formula
       "--without-sosi",
     ]
 
-    # Work around "Symbol not found: _curl_mime_addpart"
-    # due to mismatched SDK version in Mojave.
-    args << if MacOS.version == :mojave
-      "--with-curl=#{Formula["curl"].opt_prefix}/bin/curl-config"
+    if OS.mac?
+      args << "--with-curl=/usr/bin/curl-config"
+      args << "--with-opencl"
     else
-      "--with-curl=/usr/bin/curl-config"
+      args << "--with-curl=#{Formula["curl"].opt_bin}/curl-config"
+
+      # The python build needs libgdal.so, which is located in .libs
+      ENV.append "LDFLAGS", "-L#{buildpath}/.libs"
+      # The python build needs gnm headers, which are located in the gnm folder
+      ENV.append "CFLAGS", "-I#{buildpath}/gnm"
     end
 
     system "./configure", *args
@@ -156,22 +166,22 @@ class Gdal < Formula
 
     # Build Python bindings
     cd "swig/python" do
-      system Formula["python@3.9"].opt_bin/"python3", *Language::Python.setup_install_args(prefix)
+      system python3, *Language::Python.setup_install_args(prefix, python3)
     end
-    bin.install Dir["swig/python/scripts/*.py"]
+    bin.install buildpath.glob("swig/python/scripts/*.py")
 
     system "make", "man" if build.head?
     # Force man installation dir: https://trac.osgeo.org/gdal/ticket/5092
     system "make", "install-man", "INST_MAN=#{man}"
     # Clean up any stray doxygen files
-    Dir.glob("#{bin}/*.dox") { |p| rm p }
+    bin.glob("*.dox").map(&:unlink)
   end
 
   test do
     # basic tests to see if third-party dylibs are loading OK
-    system "#{bin}/gdalinfo", "--formats"
-    system "#{bin}/ogrinfo", "--formats"
+    system bin/"gdalinfo", "--formats"
+    system bin/"ogrinfo", "--formats"
     # Changed Python package name from "gdal" to "osgeo.gdal" in 3.2.0.
-    system Formula["python@3.9"].opt_bin/"python3", "-c", "import osgeo.gdal"
+    system python3, "-c", "import osgeo.gdal"
   end
 end

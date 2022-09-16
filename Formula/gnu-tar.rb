@@ -1,53 +1,54 @@
 class GnuTar < Formula
   desc "GNU version of the tar archiving utility"
   homepage "https://www.gnu.org/software/tar/"
-  url "https://ftp.gnu.org/gnu/tar/tar-1.33.tar.gz"
-  mirror "https://ftpmirror.gnu.org/tar/tar-1.33.tar.gz"
-  sha256 "7c77c427e8cce274d46a6325d45a55b08e13e2d2d0c9e6c0860a6d2b9589ff0e"
+  url "https://ftp.gnu.org/gnu/tar/tar-1.34.tar.gz"
+  mirror "https://ftpmirror.gnu.org/tar/tar-1.34.tar.gz"
+  sha256 "03d908cf5768cfe6b7ad588c921c6ed21acabfb2b79b788d1330453507647aed"
   license "GPL-3.0-or-later"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "992da32921e3033679cc2323a34f21e0c847661aedf0d8c59e04c2d6a47fed45"
-    sha256 cellar: :any_skip_relocation, big_sur:       "14c85bf6742a4055f0a6d3444993af7866d4963cd264eb2f2419bfe07cafda74"
-    sha256 cellar: :any_skip_relocation, catalina:      "f99e9b8b33b9fd07a04bf6661cbc3e56267f2b682f2ffd12d3775c7838795381"
-    sha256 cellar: :any_skip_relocation, mojave:        "0320a427ff60c2665ee85898f45a96df4e0824d7ef0d985a8434d6fd4c1e0c74"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "d30acbafc1fafafd0e20b926fae992e246c8eb7f833ef349b9af330ca1c104f6"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "984b478a4567b7435d3e5ccda4adecea05b076f7d906a5e38a2941b125cf9182"
+    sha256 cellar: :any_skip_relocation, monterey:       "50e95002e10bc01900248602282baf407d2984ee0037bce5ae7aa179c052e393"
+    sha256 cellar: :any_skip_relocation, big_sur:        "2c70eed37ee410279978ea44a4444e8116ddb303626c592545ebf50fd65ae423"
+    sha256 cellar: :any_skip_relocation, catalina:       "1db42ebdaa7724d0fb55e861a4e2ac59b0736f9c4d183bd628c658b70c395e92"
+    sha256                               x86_64_linux:   "f23b93a35c0a48f57fd6e2f8eb6edb7688b6e13ab7d8124d6053422738a16229"
   end
 
   head do
-    url "https://git.savannah.gnu.org/git/tar.git"
+    url "https://git.savannah.gnu.org/git/tar.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
     depends_on "gettext" => :build
   end
 
-  def install
-    # Work around unremovable, nested dirs bug that affects lots of
-    # GNU projects. See:
-    # https://github.com/Homebrew/homebrew/issues/45273
-    # https://github.com/Homebrew/homebrew/issues/44993
-    # This is thought to be an el_capitan bug:
-    # https://lists.gnu.org/archive/html/bug-tar/2015-10/msg00017.html
-    ENV["gl_cv_func_getcwd_abort_bug"] = "no" if MacOS.version == :el_capitan
+  on_linux do
+    depends_on "acl"
+  end
 
+  def install
     args = %W[
       --prefix=#{prefix}
       --mandir=#{man}
     ]
 
-    on_macos do
-      args << "--program-prefix=g"
+    args << if OS.mac?
+      "--program-prefix=g"
+    else
+      "--without-selinux"
     end
     system "./bootstrap" if build.head?
     system "./configure", *args
     system "make", "install"
 
-    on_macos do
-      # Symlink the executable into libexec/gnubin as "tar"
-      (libexec/"gnubin").install_symlink bin/"gtar" =>"tar"
-      (libexec/"gnuman/man1").install_symlink man1/"gtar.1" => "tar.1"
-    end
+    return unless OS.mac?
 
+    # Symlink the executable into libexec/gnubin as "tar"
+    (libexec/"gnubin").install_symlink bin/"gtar" => "tar"
+    (libexec/"gnuman/man1").install_symlink man1/"gtar.1" => "tar.1"
     libexec.install_symlink "gnuman" => "man"
   end
 
@@ -65,15 +66,13 @@ class GnuTar < Formula
 
   test do
     (testpath/"test").write("test")
-    on_macos do
+    if OS.mac?
       system bin/"gtar", "-czvf", "test.tar.gz", "test"
-      assert_match /test/, shell_output("#{bin}/gtar -xOzf test.tar.gz")
-      assert_match /test/, shell_output("#{opt_libexec}/gnubin/tar -xOzf test.tar.gz")
-    end
-
-    on_linux do
+      assert_match "test", shell_output("#{bin}/gtar -xOzf test.tar.gz")
+      assert_match "test", shell_output("#{opt_libexec}/gnubin/tar -xOzf test.tar.gz")
+    else
       system bin/"tar", "-czvf", "test.tar.gz", "test"
-      assert_match /test/, shell_output("#{bin}/tar -xOzf test.tar.gz")
+      assert_match "test", shell_output("#{bin}/tar -xOzf test.tar.gz")
     end
   end
 end

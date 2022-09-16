@@ -1,10 +1,10 @@
 class KitchenSync < Formula
   desc "Fast efficiently sync database without dumping & reloading"
   homepage "https://github.com/willbryant/kitchen_sync"
-  url "https://github.com/willbryant/kitchen_sync/archive/v2.10.tar.gz"
-  sha256 "98d2024df192571b7a5b4c21f0522d7d7187ac2a1411051e4594f3a66ebfa1af"
+  url "https://github.com/willbryant/kitchen_sync/archive/v2.14.tar.gz"
+  sha256 "bcdcb1ea70ed29b6a298782513edd29b5f804b19c6a4c26defdaeaabc249165a"
   license "MIT"
-  head "https://github.com/willbryant/kitchen_sync.git"
+  head "https://github.com/willbryant/kitchen_sync.git", branch: "master"
 
   livecheck do
     url :stable
@@ -12,15 +12,20 @@ class KitchenSync < Formula
   end
 
   bottle do
-    sha256 cellar: :any, big_sur:     "4d319227763ecb2d8b01adafa821a806c91963e366ea4341a92a850429fb6115"
-    sha256 cellar: :any, catalina:    "6b5366aa8413f25ff8985cb7d195723a78c9c42bc4af1eb50b9980e1694e605e"
-    sha256 cellar: :any, mojave:      "900f81a4a99ad8b1aef571d8c1d20de1edf102dbd9d202832c6f96a09b6f4454"
-    sha256 cellar: :any, high_sierra: "80e91aab20f98adb5265fe24d39cbc4b8a10d66d2ec6663ad7ec294206554eb2"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "04a1641dfb0b1188987f5bbb49c7708d1d165d1e2179ed07c37e2f0199203287"
+    sha256 cellar: :any,                 arm64_big_sur:  "00a906e98f06b9577ccae18a4152d89801417710402a6eec10e0996a4cb8c0e1"
+    sha256 cellar: :any,                 monterey:       "9699999584d43aeb1cdcc4b9ae0fe69998cb582ba07e26a6db38883fa7842b16"
+    sha256 cellar: :any,                 big_sur:        "1c3eaed8e93dc06f9b540d5fe7bb4aabdde1dd277ea6cb36fbe147fff1e6d254"
+    sha256 cellar: :any,                 catalina:       "9a35f320b636b7e49d27e0d41a348cbb648da45c60f74eae9cd96c13199f4e86"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8cff3e9089058f7db2fb7ddfa55fd97358fa9b207265091ba73a756ea0baa5e3"
   end
 
   depends_on "cmake" => :build
   depends_on "libpq"
   depends_on "mysql-client"
+
+  fails_with gcc: "5"
 
   def install
     system "cmake", ".",

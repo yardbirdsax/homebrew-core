@@ -1,9 +1,10 @@
 class Wal2json < Formula
   desc "Convert PostgreSQL changesets to JSON format"
   homepage "https://github.com/eulerto/wal2json"
-  url "https://github.com/eulerto/wal2json/archive/wal2json_2_3.tar.gz"
-  sha256 "2ebf71ace3c9f4b66703bcf6e3fa6ef7b6b026f9e31db4cf864eb3deb4e1a5b3"
+  url "https://github.com/eulerto/wal2json/archive/wal2json_2_4.tar.gz"
+  sha256 "87e627cac2d86f7203b1580a78b51e1da8aa61bb0af9ebfa14435370f3878237"
   license "BSD-3-Clause"
+  revision 1
 
   livecheck do
     url :stable
@@ -12,130 +13,41 @@ class Wal2json < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "9f3ff6d1b451198b891c384e197701cab3f1ee1c1b439d7413855bebb338776b"
-    sha256 cellar: :any_skip_relocation, big_sur:       "42d07ec8236e2e24a592524d32a2b1b2df6e43683f5a98b2f2a25a29ccef0b1a"
-    sha256 cellar: :any_skip_relocation, catalina:      "ec25d4dffbb7b4205565f2ec5ad6c17fa62a965d841a75b475b11bd7ff759c51"
-    sha256 cellar: :any_skip_relocation, mojave:        "fbe884982b54b6d4c17a608f8f861368322cc7f74024b20516632f83ccc7fbe4"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "f382e783fbba2a97a79f0bda4db61211e3fbc4b5d2d859daa777ffa6845dc8ac"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "3d6e1da3ff100ef985fcfd0ce5b9ad4095209c9625447a33764f73383e0174f6"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "14407a5bc84e8db3b3a73555b31e7a27f229376bc449b51a62d936020f7c525d"
+    sha256 cellar: :any_skip_relocation, monterey:       "257d8f5d6803fe88f3c0635aea44c1d67ea1c77a45ce064ba2e3f361e7c98642"
+    sha256 cellar: :any_skip_relocation, big_sur:        "ec66adbf5d0932d50f6a3e75bb44ae8c051e49d14e312c9b171614b252297e3e"
+    sha256 cellar: :any_skip_relocation, catalina:       "22010d68d3ae9e7c2f021666e9b245fd6d61e237d37ffe0152dbf6d61eceb7cc"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a2e6b41d55bf757d3554f9c199c8be44d2edc422864aa224395fbe0573f6c817"
   end
 
-  depends_on "postgresql"
+  depends_on "postgresql@14"
+
+  def postgresql
+    Formula["postgresql@14"]
+  end
 
   def install
+    ENV["PG_CONFIG"] = postgresql.opt_bin/"pg_config"
+
     mkdir "stage"
     system "make", "install", "USE_PGXS=1", "DESTDIR=#{buildpath}/stage"
-    lib.install Dir["stage/#{HOMEBREW_PREFIX}/lib/*"]
+
+    stage_path = File.join("stage", HOMEBREW_PREFIX)
+    lib.install (buildpath/stage_path/"lib").children
   end
 
   test do
-    return if ENV["CI"]
+    pg_ctl = postgresql.opt_bin/"pg_ctl"
+    port = free_port
 
-    system "initdb", testpath/"datadir"
-    mkdir testpath/"socket"
-    File.open(testpath/"datadir"/"postgresql.conf", "a") do |f|
-      f << "wal_level = logical\n"
-      f << "listen_addresses = ''\n"
-      f << "unix_socket_directories = '#{testpath}/socket'\n"
-      f << "dynamic_library_path = '$libdir:#{lib}/postgresql'\n"
-    end
-    pid = Process.fork { exec "postgres", "-D", testpath/"datadir" }
-    sleep 2
-    begin
-      system "createdb", "-h", testpath/"socket", "test"
+    system pg_ctl, "initdb", "-D", testpath/"test"
+    (testpath/"test/postgresql.conf").write <<~EOS, mode: "a+"
 
-      input_sql = <<~EOS
-        CREATE TABLE table2_with_pk (a SERIAL, b VARCHAR(30), c TIMESTAMP NOT NULL, PRIMARY KEY(a, c));
-        CREATE TABLE table2_without_pk (a SERIAL, b NUMERIC(5,2), c TEXT);
-
-        SELECT 'init' FROM pg_create_logical_replication_slot('test_slot', 'wal2json');
-
-        BEGIN;
-        INSERT INTO table2_with_pk (b, c) VALUES('Backup and Restore', '2019-10-08 12:00:00');
-        INSERT INTO table2_with_pk (b, c) VALUES('Tuning', '2019-10-08 12:00:00');
-        INSERT INTO table2_with_pk (b, c) VALUES('Replication', '2019-10-08 12:00:00');
-        DELETE FROM table2_with_pk WHERE a < 3;
-
-        INSERT INTO table2_without_pk (b, c) VALUES(2.34, 'Tapir');
-        -- it is not added to stream because there isn't a pk or a replica identity
-        UPDATE table2_without_pk SET c = 'Anta' WHERE c = 'Tapir';
-        COMMIT;
-
-        SELECT data FROM pg_logical_slot_get_changes('test_slot', NULL, NULL, 'pretty-print', '1');
-        SELECT 'stop' FROM pg_drop_replication_slot('test_slot');
-      EOS
-
-      File.open(testpath/"input.sql", "w") do |f|
-        f.write(input_sql)
-      end
-
-      system "psql", "-h", testpath/"socket", "-f", testpath/"input.sql", "-o", testpath/"output.txt", "-Atq", "test"
-      actual_output = File.read(testpath/"output.txt")
-
-      expected_output = <<~EOS
-        init
-        {
-          "change": [
-            {
-              "kind": "insert",
-              "schema": "public",
-              "table": "table2_with_pk",
-              "columnnames": ["a", "b", "c"],
-              "columntypes": ["integer", "character varying(30)", "timestamp without time zone"],
-              "columnvalues": [1, "Backup and Restore", "2019-10-08 12:00:00"]
-            }
-            ,{
-              "kind": "insert",
-              "schema": "public",
-              "table": "table2_with_pk",
-              "columnnames": ["a", "b", "c"],
-              "columntypes": ["integer", "character varying(30)", "timestamp without time zone"],
-              "columnvalues": [2, "Tuning", "2019-10-08 12:00:00"]
-            }
-            ,{
-              "kind": "insert",
-              "schema": "public",
-              "table": "table2_with_pk",
-              "columnnames": ["a", "b", "c"],
-              "columntypes": ["integer", "character varying(30)", "timestamp without time zone"],
-              "columnvalues": [3, "Replication", "2019-10-08 12:00:00"]
-            }
-            ,{
-              "kind": "delete",
-              "schema": "public",
-              "table": "table2_with_pk",
-              "oldkeys": {
-                "keynames": ["a", "c"],
-                "keytypes": ["integer", "timestamp without time zone"],
-                "keyvalues": [1, "2019-10-08 12:00:00"]
-              }
-            }
-            ,{
-              "kind": "delete",
-              "schema": "public",
-              "table": "table2_with_pk",
-              "oldkeys": {
-                "keynames": ["a", "c"],
-                "keytypes": ["integer", "timestamp without time zone"],
-                "keyvalues": [2, "2019-10-08 12:00:00"]
-              }
-            }
-            ,{
-              "kind": "insert",
-              "schema": "public",
-              "table": "table2_without_pk",
-              "columnnames": ["a", "b", "c"],
-              "columntypes": ["integer", "numeric(5,2)", "text"],
-              "columnvalues": [1, 2.34, "Tapir"]
-            }
-          ]
-        }
-        stop
-      EOS
-
-      assert_equal(expected_output.gsub(/\s+/, ""), actual_output.gsub(/\s+/, ""))
-    ensure
-      Process.kill 9, pid
-      Process.wait pid
-    end
+      shared_preload_libraries = 'wal2json'
+      port = #{port}
+    EOS
+    system pg_ctl, "start", "-D", testpath/"test", "-l", testpath/"log"
+    system pg_ctl, "stop", "-D", testpath/"test"
   end
 end

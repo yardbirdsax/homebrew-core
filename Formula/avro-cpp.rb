@@ -1,17 +1,19 @@
 class AvroCpp < Formula
   desc "Data serialization system"
   homepage "https://avro.apache.org/"
-  url "https://www.apache.org/dyn/closer.lua?path=avro/avro-1.10.1/cpp/avro-cpp-1.10.1.tar.gz"
-  mirror "https://archive.apache.org/dist/avro/avro-1.10.1/cpp/avro-cpp-1.10.1.tar.gz"
-  sha256 "6e9e8820325cdaffcc1981958ed86b484c33dcf0277a164b2a58357fdd046cc8"
+  url "https://www.apache.org/dyn/closer.lua?path=avro/avro-1.11.0/cpp/avro-cpp-1.11.0.tar.gz"
+  mirror "https://archive.apache.org/dist/avro/avro-1.11.0/cpp/avro-cpp-1.11.0.tar.gz"
+  sha256 "ef70ca8a1cfeed7017dcb2c0ed591374deab161b86be6ca4b312bc24cada9c56"
   license "Apache-2.0"
-  revision 1
+  revision 2
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "ea71e8ee1e1274fed73fc1c748a2952104ddd2bcc9b06ae01bc7ca21caa7a637"
-    sha256 cellar: :any, big_sur:       "6f51a239801589187903594eae05312d66b0e75c9aa1ff2eb35676656c8a5e71"
-    sha256 cellar: :any, catalina:      "1c1ae120fb6ed8cb52d4ed74bc7ec80fb75c91f8963c4f6a71963d2bbd32c8e6"
-    sha256 cellar: :any, mojave:        "a64e584250028e59dc419d9a65a0f34b0bf74f24077b469531320bc3d95fa039"
+    sha256 cellar: :any,                 arm64_monterey: "d145604463d480ee07b3794aff978506e8b6b9416e6026fcfd535b8ed4e6d04e"
+    sha256 cellar: :any,                 arm64_big_sur:  "e3593bbb6bee2823fb7579f905811185a8ba2e8210adcd4638c35a658e625aca"
+    sha256 cellar: :any,                 monterey:       "4e7669cb5ad4b716ea291d0d6ae21a81f9f1788c214fbf3d4c29b00f4ee0d39a"
+    sha256 cellar: :any,                 big_sur:        "a402156606df45a62409bd79abf55fb5758e17458a02085aafc8ae2d9717a126"
+    sha256 cellar: :any,                 catalina:       "d99a75d903f5f4e39b13b553d087f0ac6c538dc367f3c89c36baca6945714ccb"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d487876c7a03a2c2fce379cb73105b33b19adbfcd1ea38f67dd9da76e1442506"
   end
 
   depends_on "cmake" => :build
@@ -43,7 +45,7 @@ class AvroCpp < Formula
       }
     EOS
     system "#{bin}/avrogencpp", "-i", "cpx.json", "-o", "cpx.hh", "-n", "cpx"
-    system ENV.cxx, "test.cpp", "-o", "test"
+    system ENV.cxx, "test.cpp", "-std=c++11", "-o", "test"
     system "./test"
   end
 end

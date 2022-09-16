@@ -1,31 +1,38 @@
 class Wiredtiger < Formula
   desc "High performance NoSQL extensible platform for data management"
-  homepage "http://www.wiredtiger.com"
-  url "https://github.com/wiredtiger/wiredtiger/releases/download/3.2.0/wiredtiger-3.2.0.tar.bz2"
-  sha256 "c812d34ac542fdd2f5dc16e2f47ebc1eba09487f45e34fbae5a052a668931968"
+  homepage "https://source.wiredtiger.com/"
+  url "https://github.com/wiredtiger/wiredtiger/archive/refs/tags/11.0.0.tar.gz"
+  sha256 "1dad4afb604fa0dbebfa8024739226d6faec1ffd9f36b1ea00de86a7ac832168"
+  license any_of: ["GPL-2.0-only", "GPL-3.0-only"]
 
   livecheck do
-    url "https://github.com/wiredtiger/wiredtiger.git"
+    url :stable
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    sha256 cellar: :any, big_sur:     "24076b53baf3e50cb523ab04d5caad5d9c155b834bc951e9a9576af3a0789c7f"
-    sha256 cellar: :any, catalina:    "9b0799ed632b6b053c1f208a3a91c4eb97bfab817542267b32cc42ad0da11da0"
-    sha256 cellar: :any, mojave:      "6346862c90443a6fc72cb214e2b657fcd69980dcd3d622b9017c150b955d4891"
-    sha256 cellar: :any, high_sierra: "c831e84a17cc41fbb4a4571aad5460fc989fd865c0e770b9bf65399bfeb46f4b"
-    sha256 cellar: :any, sierra:      "27744de01928c6f529028861fb5b443885f8fc320deb0c61ac2a7bd754d44d7e"
+    sha256 cellar: :any,                 arm64_monterey: "54ae003509c8488b6dbf019a88fad8215198e3e10ad120b4fb79fa87b33d2051"
+    sha256 cellar: :any,                 arm64_big_sur:  "04f9b121ef62be4f365d36bc1e2c901bfafe37bf62580b701898c01a9b58d359"
+    sha256 cellar: :any,                 monterey:       "bcf4fa0509021ae516a154281108eef2575616dcd0c16f1bc1937f0dc09e6f5a"
+    sha256 cellar: :any,                 big_sur:        "ebaab842d86b6088ef042da0b73d23e7da494128916e5b16f17daa16e8cfc028"
+    sha256 cellar: :any,                 catalina:       "ab75e49599d73c0537853750e440137ee2c07c8b027f6cf21c19dd8a3fb7644b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f9b01253492207235ce85d2e72773bfff7fb5a054978c11cdb00b428e921f5bd"
   end
 
+  depends_on "ccache" => :build
+  depends_on "cmake" => :build
   depends_on "snappy"
 
   uses_from_macos "zlib"
 
   def install
-    system "./configure", "--with-builtins=snappy,zlib",
-                          "--with-python",
-                          "--prefix=#{prefix}"
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build",
+      "-DHAVE_BUILTIN_EXTENSION_SNAPPY=1",
+      "-DHAVE_BUILTIN_EXTENSION_ZLIB=1",
+      "-DCMAKE_INSTALL_RPATH=#{rpath}",
+      *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do

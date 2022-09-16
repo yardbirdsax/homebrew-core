@@ -5,20 +5,24 @@ class Ctemplate < Formula
   sha256 "ccc4105b3dc51c82b0f194499979be22d5a14504f741115be155bd991ee93cfa"
   license "BSD-3-Clause"
   revision 1
-  head "https://github.com/olafvdspek/ctemplate.git"
+  head "https://github.com/olafvdspek/ctemplate.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "3ef5f869569f3f4034fb55f1d15ceca68da21a01ff5c9e30d5b941addecf91db"
-    sha256 cellar: :any, big_sur:       "4211a546bfa2216bee5c09548525a01682be861a5ed98d64fa414b743a706863"
-    sha256 cellar: :any, catalina:      "450518a03eec232531f67655c372b5be4cdb9d35d532d7a8941863f74a45bca2"
-    sha256 cellar: :any, mojave:        "37f5073fec13f28f3869c6e80d89c9a8659e9fad4fecc30721abe964f927ddff"
-    sha256 cellar: :any, high_sierra:   "6f0e5b78eab78861361f4a4e27cb264ce33d641c71c5981950bb28209205cb1d"
+    rebuild 2
+    sha256 cellar: :any,                 arm64_monterey: "fc6f772b98ecb4ac32af2525fb14e00e78d3869965b0b2cef4e9052ae7920f15"
+    sha256 cellar: :any,                 arm64_big_sur:  "4857a36c04ea358a584ccc4bf814cf14ea132f719044982bba4295ca3bee54ce"
+    sha256 cellar: :any,                 monterey:       "1186d9da15756058d715022d75e654ddf8c30573f79490a6d945ba3501e651d9"
+    sha256 cellar: :any,                 big_sur:        "5e2edf873c559dbe6fee25404fb5f73dd0237358d553384c65284db99c1e1aeb"
+    sha256 cellar: :any,                 catalina:       "03716a690ca0715b4832e3cbc95441a3e9765c36b277a33f85ac7806469d9928"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0782447bd58da47c13e2c3fc367e616addbe434c4fef762daea8bf6ea0b85626"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
-  depends_on "python@3.9" => :build
+  depends_on "python@3.10" => :build
+
+  fails_with gcc: "5"
 
   def install
     system "./autogen.sh"
@@ -38,8 +42,8 @@ class Ctemplate < Formula
       }
     EOS
 
-    system ENV.cxx, "-std=c++11", "-I#{include}", "-L#{lib}",
-                    "-lctemplate_nothreads", "test.cpp", "-o", "test"
+    system ENV.cxx, "test.cpp", "-std=c++11", "-I#{include}", "-L#{lib}",
+                    "-lctemplate_nothreads", "-o", "test"
     system "./test"
   end
 end

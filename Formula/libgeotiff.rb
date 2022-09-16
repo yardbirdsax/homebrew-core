@@ -1,36 +1,49 @@
 class Libgeotiff < Formula
   desc "Library and tools for dealing with GeoTIFF"
   homepage "https://github.com/OSGeo/libgeotiff"
-  url "https://github.com/OSGeo/libgeotiff/releases/download/1.6.0/libgeotiff-1.6.0.tar.gz"
-  sha256 "9311017e5284cffb86f2c7b7a9df1fb5ebcdc61c30468fb2e6bca36e4272ebca"
   license "MIT"
+  revision 2
+
+  stable do
+    url "https://github.com/OSGeo/libgeotiff/releases/download/1.7.1/libgeotiff-1.7.1.tar.gz"
+    sha256 "05ab1347aaa471fc97347d8d4269ff0c00f30fa666d956baba37948ec87e55d6"
+
+    # Fix -flat_namespace being used on Big Sur and later.
+    patch do
+      url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+      sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+    end
+  end
+
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "a670b1daf400c747f5993a97888a8910a126a6e4668ddf3aa78e4f259db9246b"
-    sha256 cellar: :any, big_sur:       "06ba6dd5e945ac1491a2838df004efdfbe5bf8d1c5e1a1d0df4084689c08002f"
-    sha256 cellar: :any, catalina:      "181da2f2a3860b23ee95eded5a9f5600f34e2ee016e76a7fbede959e565d0ca8"
-    sha256 cellar: :any, mojave:        "7311abe41270eb90f91b69e84eab0528be0b76a11cc43ce0e2aca1529da585fe"
-    sha256 cellar: :any, high_sierra:   "b52ce34a76c3510314e840753610d5d423cd0689d5b93d3d41e7c119ba67d09b"
+    sha256 cellar: :any,                 arm64_monterey: "f7ba75c48d134bac69f1521df8ce1ee07b7f7bb5c383819d6864d444f9306503"
+    sha256 cellar: :any,                 arm64_big_sur:  "f66e3548fd5092b3b1cdd90ce0a9dbc9749b368a9d350dcf6e4b4435f6e81fad"
+    sha256 cellar: :any,                 monterey:       "8a49a864a5bbc5b5a2f42e62ad8111b7ca9c1e8f00fd2c44f2dcd9a4468224b0"
+    sha256 cellar: :any,                 big_sur:        "f98f8f3d3b5286a238a30449b3ac2f6efed1830d78a346463e56c611a63f3747"
+    sha256 cellar: :any,                 catalina:       "eaae52303ca7865b5b0d69e6c243fb7d8a13663b0f07c290bd33648cf587f53a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "af8b839b1cbc82e1ae8f800c04d603e75bf43ed40cf516b11abb9ff08155286a"
   end
 
   head do
-    url "https://github.com/OSGeo/libgeotiff.git"
+    url "https://github.com/OSGeo/libgeotiff.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
     depends_on "libtool" => :build
   end
 
-  depends_on "jpeg"
+  depends_on "jpeg-turbo"
   depends_on "libtiff"
   depends_on "proj"
 
   def install
     system "./autogen.sh" if build.head?
-
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--with-jpeg"
+    system "./configure", *std_configure_args, "--with-jpeg"
     system "make" # Separate steps or install fails
     system "make", "install"
   end
@@ -68,6 +81,6 @@ class Libgeotiff < Formula
                    "-L#{Formula["libtiff"].opt_lib}", "-ltiff", "-o", "test"
     system "./test", "test.tif"
     output = shell_output("#{bin}/listgeo test.tif")
-    assert_match /GeogInvFlatteningGeoKey.*123.456/, output
+    assert_match(/GeogInvFlatteningGeoKey.*123\.456/, output)
   end
 end

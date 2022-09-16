@@ -1,21 +1,48 @@
 class Neovim < Formula
   desc "Ambitious Vim-fork focused on extensibility and agility"
   homepage "https://neovim.io/"
-  url "https://github.com/neovim/neovim/archive/v0.4.4.tar.gz"
-  sha256 "2f76aac59363677f37592e853ab2c06151cca8830d4b3fe4675b4a52d41fc42c"
   license "Apache-2.0"
+  revision 1
+
+  # Remove `stable` block when `gperf` is no longer needed.
+  stable do
+    url "https://github.com/neovim/neovim/archive/v0.7.2.tar.gz"
+    sha256 "ccab8ca02a0c292de9ea14b39f84f90b635a69282de38a6b4ccc8565bc65d096"
+
+    # Libtool is needed to build `libvterm`.
+    # Remove this dependency when we use the formula.
+    depends_on "libtool" => :build
+    # GPerf was removed in https://github.com/neovim/neovim/pull/18544.
+    # Remove dependency when relevant commits are in a stable release.
+    uses_from_macos "gperf" => :build
+
+    # TODO: Use `libvterm` formula when the following is released:
+    # https://github.com/neovim/neovim/pull/17329
+    resource "libvterm" do
+      url "https://www.leonerd.org.uk/code/libvterm/libvterm-0.1.4.tar.gz"
+      sha256 "bc70349e95559c667672fc8c55b9527d9db9ada0fb80a3beda533418d782d3dd"
+    end
+  end
+
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
 
   bottle do
     rebuild 1
-    sha256 big_sur:     "83957460b7c664b65f7339c6e37a6b468274ca747ba8f8746616c4cebf97caa9"
-    sha256 catalina:    "736260e14d50d9a42562fb0fe2215d5154a9cef3e3227469a961d030b45358fd"
-    sha256 mojave:      "9f8a7cb52a0060c524d4d4f96b2590d034257cc4f255a8f05dfbf464bef29cf1"
-    sha256 high_sierra: "7286d497b92cf31f5839af325a1fc7760fb3006fa4a0dad7e547ab9c966cb491"
+    sha256 arm64_monterey: "94d4c819d426aad050bfcf17fabc3debc053911fcbed214a04a4dbbce0d1bece"
+    sha256 arm64_big_sur:  "82daa8d3738bd331a6f9afa52989b12b98d8038ca03f83ddcbb0be6f3e033fbf"
+    sha256 monterey:       "fedc9b9ffdaaf160d4f91ed88a9532c696d1b3226b347e96afe9e54089d4832e"
+    sha256 big_sur:        "463dc2636ebd9ce5d0f44369dddbd3d5715dc00466a4869e282d0c8dc2f565ee"
+    sha256 catalina:       "b9f6078ef504308896213a3e979733ccb93dca8c4873a8c686b6d3f607fcd8d8"
+    sha256 x86_64_linux:   "be762f679f83c41fb982d32f067229ca3480f991fdcbc7b15147fdef932312a1"
   end
 
+  # Remove `head` block when `stable` depends on `libvterm`.
   head do
-    url "https://github.com/neovim/neovim.git"
-    depends_on "tree-sitter"
+    url "https://github.com/neovim/neovim.git", branch: "master"
+    depends_on "libvterm"
   end
 
   depends_on "cmake" => :build
@@ -24,12 +51,12 @@ class Neovim < Formula
   depends_on "gettext"
   depends_on "libtermkey"
   depends_on "libuv"
-  depends_on "libvterm"
   depends_on "luajit"
+  depends_on "luv"
   depends_on "msgpack"
+  depends_on "tree-sitter"
   depends_on "unibilium"
 
-  uses_from_macos "gperf" => :build
   uses_from_macos "unzip" => :build
 
   on_linux do
@@ -49,44 +76,26 @@ class Neovim < Formula
     sha256 "e0d0d687897f06588558168eeb1902ac41a11edd1b58f1aa61b99d0ea0abbfbc"
   end
 
-  resource "inspect" do
-    url "https://luarocks.org/manifests/kikito/inspect-3.1.1-0.src.rock"
-    sha256 "ea1f347663cebb523e88622b1d6fe38126c79436da4dbf442674208aa14a8f4c"
-  end
-
-  resource "lua-compat-5.3" do
-    url "https://github.com/keplerproject/lua-compat-5.3/archive/v0.7.tar.gz"
-    sha256 "bec3a23114a3d9b3218038309657f0f506ad10dfbc03bb54e91da7e5ffdba0a2"
-  end
-
-  resource "luv" do
-    url "https://github.com/luvit/luv/releases/download/1.30.0-0/luv-1.30.0-0.tar.gz"
-    sha256 "5cc75a012bfa9a5a1543d0167952676474f31c2d7fd8d450b56d8929dbebb5ef"
-  end
-
   def install
     resources.each do |r|
-      r.stage(buildpath/"deps-build/build/src/#{r.name}")
+      r.stage(buildpath/"deps-build/build/src"/r.name)
     end
 
-    ENV.prepend_path "LUA_PATH", "#{buildpath}/deps-build/share/lua/5.1/?.lua"
-    ENV.prepend_path "LUA_CPATH", "#{buildpath}/deps-build/lib/lua/5.1/?.so"
+    # The path separator for `LUA_PATH` and `LUA_CPATH` is `;`.
+    ENV.prepend "LUA_PATH", buildpath/"deps-build/share/lua/5.1/?.lua", ";"
+    ENV.prepend "LUA_CPATH", buildpath/"deps-build/lib/lua/5.1/?.so", ";"
+    # Don't clobber the default search path
+    ENV.append "LUA_PATH", ";", ";"
+    ENV.append "LUA_CPATH", ";", ";"
     lua_path = "--lua-dir=#{Formula["luajit"].opt_prefix}"
 
-    cmake_compiler_args = []
-    on_macos do
-      cmake_compiler_args << "-DCMAKE_C_COMPILER=/usr/bin/clang"
-      cmake_compiler_args << "-DCMAKE_CXX_COMPILER=/usr/bin/clang++"
-    end
-
-    cd "deps-build" do
+    cd "deps-build/build/src" do
       %w[
         mpack/mpack-1.0.8-0.rockspec
         lpeg/lpeg-1.0.2-1.src.rock
-        inspect/inspect-3.1.1-0.src.rock
       ].each do |rock|
         dir, rock = rock.split("/")
-        cd "build/src/#{dir}" do
+        cd dir do
           output = Utils.safe_popen_read("luarocks", "unpack", lua_path, rock, "--tree=#{buildpath}/deps-build")
           unpack_dir = output.split("\n")[-2]
           cd unpack_dir do
@@ -95,32 +104,46 @@ class Neovim < Formula
         end
       end
 
-      cd "build/src/luv" do
-        cmake_args = std_cmake_args.reject { |s| s["CMAKE_INSTALL_PREFIX"] }
-        cmake_args += cmake_compiler_args
-        cmake_args += %W[
-          -DCMAKE_INSTALL_PREFIX=#{buildpath}/deps-build
-          -DLUA_BUILD_TYPE=System
-          -DWITH_SHARED_LIBUV=ON
-          -DBUILD_SHARED_LIBS=OFF
-          -DBUILD_MODULE=OFF
-          -DLUA_COMPAT53_DIR=#{buildpath}/deps-build/build/src/lua-compat-5.3
-        ]
-        system "cmake", ".", *cmake_args
-        system "make", "install"
+      if build.stable?
+        # Build libvterm. Remove when we use the formula.
+        cd "libvterm" do
+          system "make", "install", "PREFIX=#{buildpath}/deps-build", "LDFLAGS=-static #{ENV.ldflags}"
+          ENV.prepend_path "PKG_CONFIG_PATH", buildpath/"deps-build/lib/pkgconfig"
+        end
       end
     end
 
-    mkdir "build" do
-      cmake_args = std_cmake_args
-      cmake_args += cmake_compiler_args
-      cmake_args += %W[
-        -DLIBLUV_INCLUDE_DIR=#{buildpath}/deps-build/include
-        -DLIBLUV_LIBRARY=#{buildpath}/deps-build/lib/libluv.a
-      ]
-      system "cmake", "..", *cmake_args
-      system "make", "install"
+    # Point system locations inside `HOMEBREW_PREFIX`.
+    inreplace "src/nvim/os/stdpaths.c" do |s|
+      s.gsub! "/etc/xdg/", "#{etc}/xdg/:\\0"
+
+      unless HOMEBREW_PREFIX.to_s == HOMEBREW_DEFAULT_PREFIX
+        s.gsub! "/usr/local/share/:/usr/share/", "#{HOMEBREW_PREFIX}/share/:\\0"
+      end
     end
+
+    system "cmake", "-S", ".", "-B", "build",
+                    "-DLIBLUV_LIBRARY=#{Formula["luv"].opt_lib/shared_library("libluv")}",
+                    "-DLIBUV_LIBRARY=#{Formula["libuv"].opt_lib/shared_library("libuv")}",
+                    *std_cmake_args
+
+    # Patch out references to Homebrew shims
+    # TODO: Remove conditional when the following PR is included in a release.
+    # https://github.com/neovim/neovim/pull/19120
+    config_dir_prefix = build.head? ? "cmake." : ""
+    inreplace "build/#{config_dir_prefix}config/auto/versiondef.h", Superenv.shims_path/ENV.cc, ENV.cc
+
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
+  end
+
+  def caveats
+    return if latest_head_version.blank?
+
+    <<~EOS
+      HEAD installs of Neovim do not include any tree-sitter parsers.
+      You can use the `nvim-treesitter` plugin to install them.
+    EOS
   end
 
   test do

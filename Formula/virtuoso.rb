@@ -1,52 +1,45 @@
 class Virtuoso < Formula
   desc "High-performance object-relational SQL database"
   homepage "https://virtuoso.openlinksw.com/wiki/main/"
-  url "https://github.com/openlink/virtuoso-opensource/releases/download/v7.2.5.1/virtuoso-opensource-7.2.5.tar.gz"
-  # Upstream pushed a hot-fix retag of 7.2.5 as 7.2.5.1.
-  # This explicit version should be safe to remove next release.
-  version "7.2.5.1"
-  sha256 "826477d25a8493a68064919873fb4da4823ebe09537c04ff4d26ba49d9543d64"
-  revision 1
-  # HEAD is disabled as the below, required patches are not compatible.
+  url "https://github.com/openlink/virtuoso-opensource/releases/download/v7.2.7/virtuoso-opensource-7.2.7.tar.gz"
+  sha256 "02480b930d5fb414cb328f10cfd200faa658adc10f9c68ef7034c6aa81a5a3a0"
+  license "GPL-2.0-only"
 
   bottle do
-    sha256 cellar: :any, big_sur:     "7f6b30ca0a581875e7efede66e4d57c6415b8ae1148a7294eb24cc89f556f2d6"
-    sha256 cellar: :any, catalina:    "c4904ae739141d51638c3f33064c85498c20d32169053daa61203ff6706c1fa8"
-    sha256 cellar: :any, mojave:      "3a2375ce75d34e6fa2568aeb4bc3ac0239a4052c811eb3afeb7536166b05e67b"
-    sha256 cellar: :any, high_sierra: "3abcc2f1444324d675af9014ac20555124c875d7e9a4ba9b021fd1ad7c570845"
+    sha256 cellar: :any,                 arm64_monterey: "c30c0e74ff6eabda834e2df9c46df1b201f759b94969c811a893a78549500383"
+    sha256 cellar: :any,                 arm64_big_sur:  "4dca442e00b50e886d6fb23d6d58824a4d215611b9396c5816e30e335ef046ad"
+    sha256 cellar: :any,                 monterey:       "b64f134ad74f950684c3ecc47ad1aaf7a29f2a9e8b93c32f662c809ffc16e86c"
+    sha256 cellar: :any,                 big_sur:        "1dfdebfe41f249a57d48db33ba0a5f96a1c11671f720f0f33dbb20eb641f0a31"
+    sha256 cellar: :any,                 catalina:       "7259a7caa010744dc03e8945fd05e6f96066206a5ff54f3471a67d31b5c4357f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "383edea95dbe7e7343f9ecea389d73f864ef13d978dd05dc1f9f9db06d485f7b"
   end
 
-  depends_on "autoconf" => :build
-  depends_on "automake" => :build
+  head do
+    url "https://github.com/openlink/virtuoso-opensource.git", branch: "develop/7"
+
+    depends_on "autoconf" => :build
+    depends_on "automake" => :build
+    depends_on "libtool" => :build
+  end
+
   # If gawk isn't found, make fails deep into the process.
   depends_on "gawk" => :build
-  depends_on "libtool" => :build
   depends_on "openssl@1.1"
 
   uses_from_macos "bison" => :build
   uses_from_macos "flex" => :build
   uses_from_macos "gperf" => :build
 
+  on_linux do
+    depends_on "net-tools" => :build
+  end
+
   conflicts_with "unixodbc", because: "both install `isql` binaries"
 
   skip_clean :la
 
-  # Support OpenSSL 1.1
-  patch do
-    url "https://sources.debian.org/data/main/v/virtuoso-opensource/7.2.5.1+dfsg-2/debian/patches/ssl1.1.patch"
-    sha256 "9fcaaff5394706fcc448e35e30f89c20fe83f5eb0fbe1411d4b2550d1ec37bf3"
-  end
-
-  # TLS 1.3 compile error patch.
-  # This also updates the default TLS protocols to allow TLS 1.3.
-  patch do
-    url "https://github.com/openlink/virtuoso-opensource/commit/67e09939cf62dc753feca8381396346f6d3d4a06.patch?full_index=1"
-    sha256 "485f54e4c79d4e1e8b30c4900e5c10ae77bded3928f187e7e2e960d345ca5378"
-  end
-
   def install
-    # We patched configure.ac on stable so need to rerun the autogen.
-    system "./autogen.sh"
+    system "./autogen.sh" if build.head?
     system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}"
     system "make", "install"

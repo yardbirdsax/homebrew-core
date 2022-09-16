@@ -1,20 +1,22 @@
 class Pdns < Formula
   desc "Authoritative nameserver"
   homepage "https://www.powerdns.com"
-  url "https://downloads.powerdns.com/releases/pdns-4.4.0.tar.bz2"
-  sha256 "40cb81d9e0d34edcc7c95435a06125bde0bd1a51692e1db52413e31d7ede0b39"
+  url "https://downloads.powerdns.com/releases/pdns-4.6.3.tar.bz2"
+  sha256 "acd06b89ca01d1adf61b906604614f0e1d77a1e94eeecade8ff5d53a16db7389"
   license "GPL-2.0-or-later"
 
   livecheck do
     url "https://downloads.powerdns.com/releases/"
-    regex(/href=.*?pdns[._-]v?(\d+(?:\.\d+)*)\.t/i)
+    regex(/href=.*?pdns[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 arm64_big_sur: "f3fe8ff82dcfb910ceee21d2a58a93c34c8e8b2b4dcdb626a3c3a126d0fbf33f"
-    sha256 big_sur:       "3bcdd4ecf99f973dfc4f228e429eb0aa61f51b1d237383709d8224528f4c8c6b"
-    sha256 catalina:      "7e011f3e8ef5765023f9c9a2f37e623d793879a68289f7efd19f044b9067a9ff"
-    sha256 mojave:        "bc758310a198a7339455d1727270283019189a9c3e08db9d76d00734c8f79bf5"
+    sha256 arm64_monterey: "d89a331fc94f766564241fa2ea69af52ef1eb435ae72d2cceb4e2f86b58c8465"
+    sha256 arm64_big_sur:  "72f70dd315d1f34fa08812de1553be73b40f7d3d973ee59e546c404e8bb13cdc"
+    sha256 monterey:       "d1987783f1a072bacaff49f5b949ceaf9d3b679420bcc6f7aa071b4b00298e97"
+    sha256 big_sur:        "30fea789a78aa1dfafc4a0668d17555744356e179fe860357434a2baf3de1b48"
+    sha256 catalina:       "f26aa1bb33df99cb16a62106f537e57eb6fc6a2743ab0ea2ca1e15236fc541d2"
+    sha256 x86_64_linux:   "4cae4548c14ac6bb2b9226280c552f51b63ce5da3b469dca02ec9f6f6e4a6a25"
   end
 
   head do
@@ -34,6 +36,12 @@ class Pdns < Formula
 
   uses_from_macos "curl"
 
+  on_linux do
+    depends_on "gcc" # for C++17
+  end
+
+  fails_with gcc: "5"
+
   def install
     args = %W[
       --prefix=#{prefix}
@@ -49,30 +57,9 @@ class Pdns < Formula
     system "make", "install"
   end
 
-  plist_options manual: "pdns_server start"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-      <dict>
-        <key>KeepAlive</key>
-        <true/>
-        <key>Label</key>
-        <string>#{plist_name}</string>
-        <key>ProgramArguments</key>
-        <array>
-          <string>#{sbin}/pdns_server</string>
-        </array>
-        <key>EnvironmentVariables</key>
-        <key>KeepAlive</key>
-        <true/>
-        <key>SHAuthorizationRight</key>
-        <string>system.preferences</string>
-      </dict>
-      </plist>
-    EOS
+  service do
+    run opt_sbin/"pdns_server"
+    keep_alive true
   end
 
   test do

@@ -5,21 +5,25 @@ class Po4a < Formula
 
   desc "Documentation translation maintenance tool"
   homepage "https://po4a.org"
-  url "https://github.com/mquinson/po4a/releases/download/v0.62/po4a-0.62.tar.gz"
-  sha256 "0eb510a66f59de68cf7a205342036cc9fc08b39334b91f1456421a5f3359e68b"
+  url "https://github.com/mquinson/po4a/releases/download/v0.68/po4a-0.68.tar.gz"
+  sha256 "af6124e68c04a0f02a3316cd5610e5d9b923bc2ede77bb7f9b1537717f44b110"
   license "GPL-2.0-or-later"
-  head "https://github.com/mquinson/po4a.git"
+  head "https://github.com/mquinson/po4a.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any, big_sur:  "be07a4aa6a8aa9a7af23395b0147145bd6657d35d9893aa721fd147b95894812"
-    sha256 cellar: :any, catalina: "8a72e398989f8092295c86e17cf6b83bc7c17b59db65dd3f1c7c1da735cd4e9a"
-    sha256 cellar: :any, mojave:   "789846cb0a70c89373554db39fb5bc710e0c2d5207becf96edde186e2e8ba606"
+    sha256 cellar: :any,                 arm64_monterey: "66022b2512a10306cdff37880d6a201412eda8b2c8f02193dad40d779a6dab5e"
+    sha256 cellar: :any,                 arm64_big_sur:  "edd97007e48390d779e8dfe074885e1c5d4a712213c11578d01b2fab8a3596e7"
+    sha256 cellar: :any,                 monterey:       "af381c9b3dbeea85dbc4e83e7a7e9295bd9cc1f81f45f10b06d311671bd5ee10"
+    sha256 cellar: :any,                 big_sur:        "4a739c23713eefcf2dae9e2a0150a7d118419d2ff0ba60abaa91f60a58eba431"
+    sha256 cellar: :any,                 catalina:       "6c1e3934110aecb5eb8ab86222a0c6c70ce090979debf53aa923bbc43a8aafb5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "826c4c2e026dc8caf9244de600c4c222f2885e730fa3d052a923ee56223454a8"
   end
 
   depends_on "docbook-xsl" => :build
   depends_on "gettext"
+  depends_on "perl"
 
-  uses_from_macos "perl"
+  uses_from_macos "libxslt"
 
   resource "Locale::gettext" do
     url "https://cpan.metacpan.org/authors/id/P/PV/PVANDRY/gettext-1.07.tar.gz"
@@ -27,15 +31,13 @@ class Po4a < Formula
   end
 
   resource "Module::Build" do
-    # po4a requires Module::Build v0.4200 and above, while standard
-    # MacOS Perl installation has 0.4003
     url "https://cpan.metacpan.org/authors/id/L/LE/LEONT/Module-Build-0.4231.tar.gz"
     sha256 "7e0f4c692c1740c1ac84ea14d7ea3d8bc798b2fb26c09877229e04f430b2b717"
   end
 
   resource "Pod::Parser" do
-    url "https://cpan.metacpan.org/authors/id/M/MA/MAREKR/Pod-Parser-1.63.tar.gz"
-    sha256 "dbe0b56129975b2f83a02841e8e0ed47be80f060686c66ea37e529d97aa70ccd"
+    url "https://cpan.metacpan.org/authors/id/M/MA/MAREKR/Pod-Parser-1.65.tar.gz"
+    sha256 "3ba7bdec659416a51fe2a7e59f0883e9c6a3b21bc9d001042c1d6a32d401b28a"
   end
 
   resource "SGMLS" do
@@ -63,21 +65,35 @@ class Po4a < Formula
     sha256 "bc315fa12e8f1e3ee5e2f430d90b708a5dc7e47c867dba8dce3a6b8fbe257744"
   end
 
+  resource "ExtUtils::CChecker" do
+    url "https://cpan.metacpan.org/authors/id/P/PE/PEVANS/ExtUtils-CChecker-0.11.tar.gz"
+    sha256 "117736677e37fc611f5b76374d7f952e1970eb80e1f6ad5150d516e7ae531bf5"
+  end
+
+  resource "XS::Parse::Keyword::Builder" do
+    url "https://cpan.metacpan.org/authors/id/P/PE/PEVANS/XS-Parse-Keyword-0.25.tar.gz"
+    sha256 "f5edb30cf7c7f220d0c6c31dc1eb554032840a99c7c298314f5cc3fef66c72c7"
+  end
+
+  resource "Syntax::Keyword::Try" do
+    url "https://cpan.metacpan.org/authors/id/P/PE/PEVANS/Syntax-Keyword-Try-0.27.tar.gz"
+    sha256 "246e1b033e3ff22fd5420550d4b6e0d56b438cdcbb9d35cbe8b1b5ba1574de23"
+  end
+
   def install
     ENV.prepend_create_path "PERL5LIB", libexec/"lib/perl5"
     ENV.prepend_path "PERL5LIB", libexec/"lib"
 
     resources.each do |r|
       r.stage do
-        system "perl", "Makefile.PL", "INSTALL_BASE=#{libexec}", "NO_MYMETA=1"
-
-        # Work around restriction on 10.15+ where .bundle files cannot be loaded
-        # from a relative path -- while in the middle of our build we need to
-        # refer to them by their full path.  Workaround adapted from:
-        #   https://github.com/fink/fink-distributions/issues/461#issuecomment-563331868
-        inreplace "Makefile", "blib/", "$(shell pwd)/blib/" if r.name == "TermReadKey"
-
-        system "make", "install"
+        if File.exist?("Makefile.PL")
+          system "perl", "Makefile.PL", "INSTALL_BASE=#{libexec}", "NO_MYMETA=1"
+          system "make", "install"
+        else
+          system "perl", "Build.PL", "--install_base", libexec
+          system "./Build"
+          system "./Build", "install"
+        end
       end
     end
 
@@ -102,6 +118,8 @@ class Po4a < Formula
   end
 
   test do
+    # LaTeX
+
     (testpath/"en.tex").write <<~EOS
       \\documentclass[a4paper]{article}
       \\begin{document}
@@ -109,7 +127,13 @@ class Po4a < Formula
       \\end{document}
     EOS
 
-    system bin/"po4a-gettextize", "-f", "asciidoc", "-m", "en.tex", "-p", "out.pot"
-    assert_match "Hello from Homebrew!", (testpath/"out.pot").read
+    system bin/"po4a-updatepo", "-f", "latex", "-m", "en.tex", "-p", "latex.pot"
+    assert_match "Hello from Homebrew!", (testpath/"latex.pot").read
+
+    # Markdown
+
+    (testpath/"en.md").write("Hello from Homebrew!")
+    system bin/"po4a-updatepo", "-f", "text", "-m", "en.md", "-p", "text.pot"
+    assert_match "Hello from Homebrew!", (testpath/"text.pot").read
   end
 end

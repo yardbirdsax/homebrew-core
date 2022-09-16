@@ -1,34 +1,47 @@
 class Exim < Formula
   desc "Complete replacement for sendmail"
   homepage "https://exim.org"
-  url "https://ftp.exim.org/pub/exim/exim4/exim-4.94.tar.xz"
-  mirror "https://dl.bintray.com/homebrew/mirror/exim-4.94.tar.xz"
-  sha256 "f77ee8faf04f5db793243c3ae81c1f4e452cd6ad7dd515a80edf755c4b144bdb"
-  license "GPL-2.0"
+  url "https://ftp.exim.org/pub/exim/exim4/exim-4.96.tar.xz"
+  sha256 "299a56927b2eb3477daafd3c5bda02bc67e5c4e5898a7aeaf2740875278cf1a3"
+  license "GPL-2.0-or-later"
+  revision 1
 
-  # The upstream download page at https://ftp.exim.org/pub/exim/exim4/ places
-  # maintenance releases (e.g., 4.93.0.4) in a separate "fixes" subdirectory.
-  # As a result, we can't create a check that finds both the main releases
-  # (e.g., 4.93) and the aforementioned maintenance releases. The Git repo tags
-  # seem to be the best solution currently and we're using the GitHub mirror
-  # below since the upstream repo (git://git.exim.org/exim.git) doesn't work
-  # over https.
+  # Maintenance releases are kept in a `fixes` subdirectory, so it's necessary
+  # to check both the main `exim4` directory and the `fixes` subdirectory to
+  # identify the latest version.
   livecheck do
-    url "https://github.com/Exim/exim.git"
-    regex(/^exim[._-]v?(\d+(?:\.\d+)+)$/i)
+    url "https://ftp.exim.org/pub/exim/exim4/"
+    regex(/href=.*?exim[._-]v?(\d+(?:\.\d+)+)\.t/i)
+    strategy :page_match do |page, regex|
+      # Match versions from files in the `exim4` directory
+      versions = page.scan(regex).flatten.uniq
+
+      # Return versions if a `fixes` subdirectory isn't present
+      next versions if page.match(%r{href=["']?fixes/?["' >]}i).blank?
+
+      # Fetch the page for the `fixes` directory
+      fixes_page = Homebrew::Livecheck::Strategy.page_content(URI.join(@url, "fixes").to_s)
+      next versions if fixes_page[:content].blank?
+
+      # Match maintenance releases and add them to the versions array
+      versions += fixes_page[:content].scan(regex).flatten
+      versions
+    end
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_big_sur: "bf56cde1d89c867b6449952cad6cafa0e84ea8d1a44e3321c01d6f8a754a8481"
-    sha256 big_sur:       "e6dd0ac8d655c88f4a774c3ec49852d7502f56c585f83a0edf247b048344eba3"
-    sha256 catalina:      "831aed4b806adb75d3b510531d47f17ae0c38ea9539c608e68e5013c4508bc9f"
-    sha256 mojave:        "a2341adeb6989c905c6f3cdcb3152bba15c76a9d2678e70c7738dd7e8fbc9c9c"
+    sha256 arm64_monterey: "bfcc18b3b112229974b9f9839b96058b874f63a7bbfc21ac4bef043eeb5850ca"
+    sha256 arm64_big_sur:  "41890d699c864032ea29741455a7617eab29c7bd89b2fe467fd7caeff9287c87"
+    sha256 monterey:       "b0fa89cb8c9dc1366d979062e5826b291dfffde56f51ff46104bb06ebafb117c"
+    sha256 big_sur:        "2364baa048a883702e87bf86a00c6f3d8e66907e9d6d58c057ab4af55adf5997"
+    sha256 catalina:       "44335942f74790d3af88bbaf4052cf625ef9a7890dadfa85fd9e1c9f277442b1"
+    sha256 x86_64_linux:   "4cc61804dd1275dc4091d762ff3aa95c545852089a2b0eefafe597f5e778ed01"
   end
 
-  depends_on "berkeley-db@4"
+  depends_on "berkeley-db@5"
   depends_on "openssl@1.1"
-  depends_on "pcre"
+  depends_on "pcre2"
+  uses_from_macos "libxcrypt"
 
   def install
     cp "src/EDITME", "Local/Makefile"
@@ -53,13 +66,15 @@ class Exim < Formula
       s << "LOOKUP_LIBS=-L#{HOMEBREW_PREFIX}/lib\n"
     end
 
-    bdb4 = Formula["berkeley-db@4"]
+    bdb5 = Formula["berkeley-db@5"]
 
+    cp "OS/unsupported/Makefile-Darwin", "OS/Makefile-Darwin"
+    cp "OS/unsupported/os.h-Darwin", "OS/os.h-Darwin"
     inreplace "OS/Makefile-Darwin" do |s|
       s.remove_make_var! %w[CC CFLAGS]
-      # Add include and lib paths for BDB 4
-      s.gsub! "# Exim: OS-specific make file for Darwin (Mac OS X).", "INCLUDE=-I#{bdb4.include}"
-      s.gsub! "DBMLIB =", "DBMLIB=#{bdb4.lib}/libdb-4.dylib"
+      # Add include and lib paths for BDB 5
+      s.gsub! "# Exim: OS-specific make file for Darwin (Mac OS X).", "INCLUDE=-I#{bdb5.include}"
+      s.gsub! "DBMLIB =", "DBMLIB=#{bdb5.lib}/libdb-5.dylib"
     end
 
     # The compile script ignores CPPFLAGS

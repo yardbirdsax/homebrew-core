@@ -3,15 +3,17 @@ require "language/node"
 class FaunaShell < Formula
   desc "Interactive shell for FaunaDB"
   homepage "https://fauna.com/"
-  url "https://registry.npmjs.org/fauna-shell/-/fauna-shell-0.12.2.tgz"
-  sha256 "25211083523ff83e89b71f2b9f571bc07fa607ee036a570e7db0b5d3c2543a0b"
+  url "https://registry.npmjs.org/fauna-shell/-/fauna-shell-0.15.0.tgz"
+  sha256 "ac7339ae28b4815958e19079221c18af0704825243b6cbdd23c5e1120df955c6"
   license "MPL-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "e83784816f9eb9e73f027b25d9afd6dedc3b4f5eb7556c26a7bbe056c71c7b41"
-    sha256 cellar: :any_skip_relocation, big_sur:       "18a734b293027c6659dadb8ceeced83da51122b3102d02cf2bb6e7e61b4b1681"
-    sha256 cellar: :any_skip_relocation, catalina:      "d3f4ac9c423ba0eb2f7cb35fa3c577574982b6a6fcd1d4edb93b7156ff4c4e2d"
-    sha256 cellar: :any_skip_relocation, mojave:        "af37d55323c798456afc7ad9ed936c057d143d23c266a2459e4717fae026965a"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "d33aaad33a615822bba12c72a579c4864e07e6445909495c2e80221440055b7e"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d33aaad33a615822bba12c72a579c4864e07e6445909495c2e80221440055b7e"
+    sha256 cellar: :any_skip_relocation, monterey:       "21eb180f13feb537c213825d3882642e0ede1ab87b3940fc278fc693569adf2e"
+    sha256 cellar: :any_skip_relocation, big_sur:        "21eb180f13feb537c213825d3882642e0ede1ab87b3940fc278fc693569adf2e"
+    sha256 cellar: :any_skip_relocation, catalina:       "21eb180f13feb537c213825d3882642e0ede1ab87b3940fc278fc693569adf2e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d33aaad33a615822bba12c72a579c4864e07e6445909495c2e80221440055b7e"
   end
 
   depends_on "node"
@@ -25,9 +27,13 @@ class FaunaShell < Formula
     output = shell_output("#{bin}/fauna list-endpoints 2>&1", 1)
     assert_match "No endpoints defined", output
 
+    # FIXME: This test seems to stall indefinitely on Linux.
+    # https://github.com/jdxcode/password-prompt/issues/12
+    return if OS.linux? && ENV["HOMEBREW_GITHUB_ACTIONS"].present?
+
     pipe_output("#{bin}/fauna add-endpoint https://db.fauna.com:443", "your_fauna_secret\nfauna_endpoint\n")
 
     output = shell_output("#{bin}/fauna list-endpoints")
-    assert_equal "fauna_endpoint *\n", output
+    assert_match "fauna_endpoint *\n", output
   end
 end

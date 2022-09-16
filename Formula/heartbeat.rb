@@ -2,44 +2,30 @@ class Heartbeat < Formula
   desc "Lightweight Shipper for Uptime Monitoring"
   homepage "https://www.elastic.co/beats/heartbeat"
   url "https://github.com/elastic/beats.git",
-      tag:      "v7.10.2",
-      revision: "aacf9ecd9c494aa0908f61fbca82c906b16562a8"
+      tag:      "v8.4.1",
+      revision: "fe210d46ebc339459e363ac313b07d4a9ba78fc7"
   license "Apache-2.0"
-  head "https://github.com/elastic/beats.git"
+  head "https://github.com/elastic/beats.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, big_sur:  "62ae8169293cb892d457f7336cb2fae8f7fc5688190c99a1fa235ef6eb170495"
-    sha256 cellar: :any_skip_relocation, catalina: "6bb13ad64d9e8bf318776d8c569104b80e1a0b0618b80c7761438c5823b290c3"
-    sha256 cellar: :any_skip_relocation, mojave:   "c4616f19c93d9833b7f862b661fa7c0c4f1708c81efed6ab161a00a68d5e4a09"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "cfda1dab24ecad47e7a9606e2ce6d1cefe6da09f53429f9f394ac67c7926425c"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "45d23b5a771b29f05a0d4a2fb96d1fdf74a7ba65f89e6d5667ea483a9bb86e4b"
+    sha256 cellar: :any_skip_relocation, monterey:       "130f4659dcc2224410f59e95ce7df453a0cd140b760f02cdf9eaed1a8bbb05aa"
+    sha256 cellar: :any_skip_relocation, big_sur:        "317bf0f311f3282f26c3bbf13eaa17ad75b4e77eca12f9f2536b16cb671bff7e"
+    sha256 cellar: :any_skip_relocation, catalina:       "32b18e23b3c07c6a178bab978df17cf7638fe0b4647d80168a94a8bf783d7ed9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "48b5458051ea09a7c959ad69fdbf51bb2315390e30e80035879d2c2319f4397f"
   end
 
   depends_on "go" => :build
-  depends_on "python@3.8" => :build
-
-  resource "virtualenv" do
-    url "https://files.pythonhosted.org/packages/b1/72/2d70c5a1de409ceb3a27ff2ec007ecdd5cc52239e7c74990e32af57affe9/virtualenv-15.2.0.tar.gz"
-    sha256 "1d7e241b431e7afce47e77f8843a276f652699d1fa4f93b9d8ce0076fd7b0b54"
-  end
+  depends_on "mage" => :build
+  depends_on "python@3.10" => :build
+  uses_from_macos "netcat" => :test
 
   def install
     # remove non open source files
     rm_rf "x-pack"
 
-    ENV["GOPATH"] = buildpath
-    (buildpath/"src/github.com/elastic/beats").install buildpath.children
-
-    xy = Language::Python.major_minor_version "python3"
-    ENV.prepend_create_path "PYTHONPATH", buildpath/"vendor/lib/python#{xy}/site-packages"
-
-    resource("virtualenv").stage do
-      system Formula["python@3.8"].opt_bin/"python3", *Language::Python.setup_install_args(buildpath/"vendor")
-    end
-
-    ENV.prepend_path "PATH", buildpath/"vendor/bin" # for virtualenv
-    ENV.prepend_path "PATH", buildpath/"bin" # for mage (build tool)
-
-    cd "src/github.com/elastic/beats/heartbeat" do
-      system "make", "mage"
+    cd "heartbeat" do
       # prevent downloading binary wheels during python setup
       system "make", "PIP_INSTALL_PARAMS=--no-binary :all", "python-env"
       system "mage", "-v", "build"
@@ -49,8 +35,6 @@ class Heartbeat < Formula
       (etc/"heartbeat").install Dir["heartbeat.*", "fields.yml"]
       (libexec/"bin").install "heartbeat"
     end
-
-    prefix.install_metafiles buildpath/"src/github.com/elastic/beats"
 
     (bin/"heartbeat").write <<~EOS
       #!/bin/sh
@@ -68,27 +52,15 @@ class Heartbeat < Formula
     (var/"log/heartbeat").mkpath
   end
 
-  plist_options manual: "heartbeat"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN"
-      "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>Program</key>
-          <string>#{opt_bin}/heartbeat</string>
-          <key>RunAtLoad</key>
-          <true/>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run opt_bin/"heartbeat"
   end
 
   test do
+    # FIXME: This keeps stalling CI when tested as a dependent. See, for example,
+    # https://github.com/Homebrew/homebrew-core/pull/91712
+    return if OS.linux? && ENV["HOMEBREW_GITHUB_ACTIONS"].present?
+
     port = free_port
 
     (testpath/"config/heartbeat.yml").write <<~EOS
@@ -110,7 +82,14 @@ class Heartbeat < Formula
     end
     sleep 5
     assert_match "hello", pipe_output("nc -l #{port}", "goodbye\n", 0)
+
     sleep 5
-    assert_match "\"status\":\"up\"", (testpath/"heartbeat/heartbeat").read
+    output = JSON.parse((testpath/"data/meta.json").read)
+    assert_includes output, "first_start"
+
+    (testpath/"data").glob("heartbeat-*.ndjson") do |file|
+      s = JSON.parse(file.read)
+      assert_match "up", s["status"]
+    end
   end
 end

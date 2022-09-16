@@ -1,16 +1,17 @@
 class Fastmod < Formula
   desc "Fast partial replacement for the codemod tool"
   homepage "https://github.com/facebookincubator/fastmod"
-  url "https://github.com/facebookincubator/fastmod/archive/v0.4.1.tar.gz"
-  sha256 "0e0c2d50489c90cb8c8904772be2e9d31353fbed814d9088ee6013c27c2d111b"
+  url "https://github.com/facebookincubator/fastmod/archive/v0.4.3.tar.gz"
+  sha256 "0c00d7e839caf123c97822542d7f16e6f40267ea0c6b54ce2c868e3ae21de809"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "8c5ccf3c98e3738a67b978db815621d4d23be5d9f08d4db91e3a9ef480457470"
-    sha256 cellar: :any_skip_relocation, big_sur:       "b87d5d5cb5726da1f18a2ef57659640ff2edd5d9e2ec9a65ae01848a88c7c7de"
-    sha256 cellar: :any_skip_relocation, catalina:      "6416944d1320d2188e05fcb0c725a6aa06d73fd76015414d43a8e21d6efb848a"
-    sha256 cellar: :any_skip_relocation, mojave:        "fd06122965f7b06b05356363c0483c204c8f0053753324d1355720ad2d111249"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "90c4d5b4217b91c14fa4a7726192960ebf45fc04cd5699ffab9173eed6d6fc35"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "5f7102efe62e30ee88c4c0275f3db41d4156ff4e6f4dc78b7d852ba4600a994c"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "7b0504899573e920f09106daff5e391d40419bb56de623d18666f1d383e6b8c6"
+    sha256 cellar: :any_skip_relocation, monterey:       "a6b584a8fdf984cac4e2f850a900d0010193426402d8bcc51eacd888af101099"
+    sha256 cellar: :any_skip_relocation, big_sur:        "a476a2776cfbb639898cb7b70c3e5789d786c727d89b67af2e606916fd9b9d15"
+    sha256 cellar: :any_skip_relocation, catalina:       "950d5278ff21d3328e63428715ec925a9d444e997675e931e619f754b8608130"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "39207c32d3fddb1fe08b86b6c7312dcba2b59958b8b6d3c62654cbd4703b5a4b"
   end
 
   depends_on "rust" => :build

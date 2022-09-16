@@ -1,16 +1,23 @@
 class Pianod < Formula
   desc "Pandora client with multiple control interfaces"
   homepage "https://deviousfish.com/pianod/"
-  url "https://deviousfish.com/Downloads/pianod2/Devel/pianod2-301.tar.gz"
-  sha256 "d6fa01d786af65fe3b4e6f4f97fa048db6619b9443e23f655d3ea8ab4766caee"
-  revision 1
+  url "https://deviousfish.com/Downloads/pianod2/pianod2-392.tar.gz"
+  sha256 "d3e24ec34677bb17307e61e79f42ae2b22441228db7a31cf056d452a92447cec"
+  license "MIT"
+
+  livecheck do
+    url "https://deviousfish.com/Downloads/pianod2/"
+    regex(/href=.*?pianod2[._-]v?(\d+(?:\.\d+)*)\.t/i)
+  end
 
   bottle do
-    sha256 arm64_big_sur: "75ead4e63a967f75b1348d5f3edc024fb18b64298546ca6574aeba99c043237c"
-    sha256 big_sur:       "cf3e7d096f97341e9a24e30d9763869cfc5b94048aa918e117c7caa87ce2d16e"
-    sha256 catalina:      "891923360d9e05cc168e08373c41855f4700d84f9549ce6d86de2f7176a96992"
-    sha256 mojave:        "8d1b17ccc15dc42000b73a5f054791f3ec98c48b47df731f5343e35199406ea9"
-    sha256 high_sierra:   "37348131ed49c0cb261bb85f41b710fc791ca6aa423534063c3acb23596bfa27"
+    rebuild 1
+    sha256 arm64_monterey: "face4fa3d0b5350001bd9fab327e91b4c93e27b9838739543e51500e7f56f87e"
+    sha256 arm64_big_sur:  "be5cd3ad282889c61a990ad65d909a42f65d66df5cd3ee86629e6596e1e3961c"
+    sha256 monterey:       "c28a6af22280a294723b9ab645b12be7fea3dd7125a731019ea7e1640ec19a28"
+    sha256 big_sur:        "d3f6100a1d1ae88f96c78708ce9b54140a3827819460c8a829c49d08cc5c13bd"
+    sha256 catalina:       "f12927568166fb653d124f06a28728e96f0d2e443cb210cfb61f4860ab5935b2"
+    sha256 x86_64_linux:   "840ab04307092dacff3212e7822c64a4c03ba77e14ff5f9ad86da1d36b3501ae"
   end
 
   depends_on "pkg-config" => :build
@@ -18,12 +25,24 @@ class Pianod < Formula
   depends_on "libao"
   depends_on "libgcrypt"
 
+  uses_from_macos "libxcrypt"
+
+  on_macos do
+    depends_on "ncurses"
+  end
+
+  on_linux do
+    # pianod uses avfoundation on macOS, ffmpeg on Linux
+    depends_on "ffmpeg@4"
+    depends_on "gnutls"
+    depends_on "libbsd"
+  end
+
+  fails_with gcc: "5"
+
   def install
-    ENV["OBJCXXFLAGS"] = "-std=c++11"
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+    ENV["OBJCXXFLAGS"] = "-std=c++14"
+    system "./configure", *std_configure_args, "--disable-silent-rules"
     system "make", "install"
   end
 

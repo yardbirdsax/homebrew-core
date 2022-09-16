@@ -1,10 +1,10 @@
 class Coredns < Formula
   desc "DNS server that chains plugins"
   homepage "https://coredns.io/"
-  url "https://github.com/coredns/coredns/archive/v1.8.1.tar.gz"
-  sha256 "fc4902d746eeef5b954a9d3d546cd841766d24a6d4aa7ecf7e2ff832cf818876"
+  url "https://github.com/coredns/coredns/archive/v1.9.4.tar.gz"
+  sha256 "3356e1f795dddf067d69aff08cd3142763e8ead040c65d93994b6de3156f15a4"
   license "Apache-2.0"
-  head "https://github.com/coredns/coredns.git"
+  head "https://github.com/coredns/coredns.git", branch: "master"
 
   livecheck do
     url :stable
@@ -12,13 +12,19 @@ class Coredns < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "2b255a4515bc26a91ee5335ba0daba1b811fe29d3460af89445fac1306c641d7"
-    sha256 cellar: :any_skip_relocation, big_sur:       "098ef6db12d262111d1acf135408b3b9a5456ce09b4cd0e78e9c7a1d55a0f892"
-    sha256 cellar: :any_skip_relocation, catalina:      "1d1ad1e07e5ee741e6845850983556c325151f9db80944517889752119139f4c"
-    sha256 cellar: :any_skip_relocation, mojave:        "8303822b262d65660fb295870d52d270cfbc9c742b3d8cf8f2ea6481c08a30be"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "7eb5cfa1d240e0e27991dba202b660ccf239dce632ef4a8df5ffeed9222f361e"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f6721af0e2d9859d5490924744909223af0d932b63e3389d9f45068884bf757f"
+    sha256 cellar: :any_skip_relocation, monterey:       "b8831aff926507aa3416c2a9f489f0678182ac342d5cbbd1cc5dce5cce90886d"
+    sha256 cellar: :any_skip_relocation, big_sur:        "5622f39aec4eb485ff12212cee8d35ec11d9a3318a92429d2781a99cab0181eb"
+    sha256 cellar: :any_skip_relocation, catalina:       "8726bbbe72be8c2e16b699f29b87d51d91a4e9a64b80a51bdf4c58421c79c1dd"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5657bf337a31e383a5591c032d8ffb844b9bd9923a124ec5accee41a11dd9b1b"
   end
 
   depends_on "go" => :build
+
+  on_linux do
+    depends_on "bind" => :test # for `dig`
+  end
 
   def install
     system "make"
@@ -27,33 +33,12 @@ class Coredns < Formula
 
   plist_options startup: true
 
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_bin}/coredns</string>
-            <string>-conf</string>
-            <string>#{etc}/coredns/Corefile</string>
-          </array>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>KeepAlive</key>
-          <true/>
-          <key>StandardErrorPath</key>
-          <string>#{var}/log/coredns.log</string>
-          <key>StandardOutPath</key>
-          <string>#{var}/log/coredns.log</string>
-          <key>WorkingDirectory</key>
-          <string>#{HOMEBREW_PREFIX}</string>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_bin/"coredns", "-conf", etc/"coredns/Corefile"]
+    keep_alive true
+    working_dir HOMEBREW_PREFIX
+    log_path var/"log/coredns.log"
+    error_log_path var/"log/coredns.log"
   end
 
   test do

@@ -1,21 +1,22 @@
 class Libbluray < Formula
   desc "Blu-Ray disc playback library for media players like VLC"
   homepage "https://www.videolan.org/developers/libbluray.html"
-  url "https://download.videolan.org/videolan/libbluray/1.2.1/libbluray-1.2.1.tar.bz2"
-  sha256 "5223e83f7988ea2cc860b5cadcaf9cf971087b0c80ca7b60cc17c8300cae36ec"
+  url "https://download.videolan.org/videolan/libbluray/1.3.2/libbluray-1.3.2.tar.bz2"
+  sha256 "456814db9f07c1eecdef7e840fcbb20976ef814df875428bfb81ecf45851f170"
   license "LGPL-2.1-or-later"
 
   livecheck do
     url "https://download.videolan.org/pub/videolan/libbluray/"
-    regex(%r{>([\d.]+)/<}i)
+    regex(%r{href=["']?v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any, arm64_big_sur: "fecb563ca1eefe2b784bec27c64b8bbe65850a8b483d12cee8123b3f9ff940de"
-    sha256 cellar: :any, big_sur:       "ddc9740b0ec3c919e709f163b694c3c00ad36a5c6f7ed9db244e08c73d12f7a4"
-    sha256 cellar: :any, catalina:      "8d2dbe765f837608676970568fe081ba91c12af436c2812c2224e4a878692e86"
-    sha256 cellar: :any, mojave:        "cad2684af7571e916f43c0945324a2024de313f49e67829434f61ee413e02bb7"
+    sha256 cellar: :any,                 arm64_monterey: "ad906ee5fd5ef4913989acf3eec9a28fdaed7d1a64939e699f6490765522927a"
+    sha256 cellar: :any,                 arm64_big_sur:  "8a83ed6cd9d2dac0beb72f756b27850843d9cac1120b431b4a5cf4328c83ec9e"
+    sha256 cellar: :any,                 monterey:       "356b4b7982107b4945562a7ec635c23f70df5c9d7d639d9770413ff2b10354d2"
+    sha256 cellar: :any,                 big_sur:        "c98f79dc9aabdb616de7a5ee1ea8a0bc893d23c0af71369b65b093d215bc1d3e"
+    sha256 cellar: :any,                 catalina:       "432eaf039acf5b061fa49b290e136e510b78123af081d2d0ed68f3b834e7da1f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cdbbadffa598be6ad26e857531b15352a3fa1416926f4ff29cb0328eff5309af"
   end
 
   head do
@@ -46,6 +47,8 @@ class Libbluray < Formula
       #include <libbluray/bluray.h>
       int main(void) {
         BLURAY *bluray = bd_init();
+        bd_close(bluray);
+        return 0;
       }
     EOS
 

@@ -1,27 +1,29 @@
 class Libxml2 < Formula
   desc "GNOME XML library"
   homepage "http://xmlsoft.org/"
-  url "http://xmlsoft.org/sources/libxml2-2.9.10.tar.gz"
-  mirror "https://ftp.osuosl.org/pub/blfs/conglomeration/libxml2/libxml2-2.9.10.tar.gz"
-  sha256 "aafee193ffb8fe0c82d4afef6ef91972cbaf5feea100edc2f262750611b4be1f"
+  url "https://download.gnome.org/sources/libxml2/2.10/libxml2-2.10.2.tar.xz"
+  sha256 "d240abe6da9c65cb1900dd9bf3a3501ccf88b3c2a1cb98317d03f272dda5b265"
   license "MIT"
-  revision 2
+  revision 1
 
+  # We use a common regex because libxml2 doesn't use GNOME's "even-numbered
+  # minor is stable" version scheme.
   livecheck do
-    url "http://xmlsoft.org/sources"
-    regex(/href=.*?libxml2[._-]v?([\d.]+\.[\d.]+\.[\d.]+)\.t/i)
+    url :stable
+    regex(/libxml2[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "c2e1bb939465a54e70ac4a6a8c333d00bc01a3738037f77cfd2227e47053ff47"
-    sha256 cellar: :any, big_sur:       "0170a16da823ce77d1aad7db927b23a1adb12285a174f36a918275d7952eaaae"
-    sha256 cellar: :any, catalina:      "2983d5a448504389888720bf951713114ed7f010d96cde9289fdc5c4b539d303"
-    sha256 cellar: :any, mojave:        "7bcd780db5693475c7711eefbbcf703507865e06483e7338ab61027ec375c4bc"
-    sha256 cellar: :any, high_sierra:   "34d84eaef7f80632a6547903d640be06c6d92b9ca2b815b64b74943b4cf73e63"
+    sha256 cellar: :any,                 arm64_monterey: "7281512e642f45f7ce883de48ae32786a2942a0252b0133a23cc62633f2f2851"
+    sha256 cellar: :any,                 arm64_big_sur:  "a92b48bea7270ae1ad549225dc06a12b94b234121033a40b7f19886621b910e9"
+    sha256 cellar: :any,                 monterey:       "b153b19cd51d3e13f9fa3c21f546d1cfa3fb04afa866baf8507c71cec54e274b"
+    sha256 cellar: :any,                 big_sur:        "bfc635ea5b8428255183f1de146e8e83d6cb41cdfe6467874a4207ee3f96b985"
+    sha256 cellar: :any,                 catalina:       "eb853d351e63c98fa9fe05b1a53f801ba03e0dc9bcf0b67499bb5e53c86baa34"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7c53fce421547511201e757c2556a3fe53fc1ec2e98e3bb8db5d92b7ce3277dd"
   end
 
   head do
-    url "https://gitlab.gnome.org/GNOME/libxml2.git"
+    url "https://gitlab.gnome.org/GNOME/libxml2.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -31,7 +33,10 @@ class Libxml2 < Formula
 
   keg_only :provided_by_macos
 
-  depends_on "python@3.9"
+  depends_on "python@3.10" => [:build, :test]
+  depends_on "python@3.9" => [:build, :test]
+  depends_on "pkg-config" => :test
+  depends_on "icu4c"
   depends_on "readline"
 
   uses_from_macos "zlib"
@@ -45,47 +50,36 @@ class Libxml2 < Formula
     sha256 "37eb81a8ec6929eed1514e891bff2dd05b450bcf0c712153880c485b7366c17c"
   end
 
-  # Resolves CVE-2018-8048, CVE-2018-3740, CVE-2018-3741
-  # Upstream hasn't patched this bug, but Nokogiri distributes
-  # libxml2 with this patch to fix this issue
-  # https://bugzilla.gnome.org/show_bug.cgi?id=769760
-  # https://github.com/sparklemotion/nokogiri/pull/1746
-  patch do
-    url "https://raw.githubusercontent.com/sparklemotion/nokogiri/38721829c1df30e93bdfbc88095cc36838e497f3/patches/libxml2/0001-Revert-Do-not-URI-escape-in-server-side-includes.patch"
-    sha256 "c755e6e17c02584bfbfc8889ffc652384b010c0bd71879d7ff121ca60a218fcd"
-  end
-
-  # Fix compatibility with Python 3.9
-  # https://gitlab.gnome.org/GNOME/libxml2/-/issues/149
-  patch do
-    url "https://gitlab.gnome.org/nwellnhof/libxml2/-/commit/e4fb36841800038c289997432ca547c9bfef9db1.patch"
-    sha256 "c3fa874b78d76b8de8afbbca9f83dc94e9a0da285eaf6ee1f6976ed4cd41e367"
-  end
-
-  def sdk_include
-    on_macos do
-      return MacOS.sdk_path/"usr/include"
-    end
-    on_linux do
-      return HOMEBREW_PREFIX/"include"
-    end
-  end
-
   def install
     system "autoreconf", "-fiv" if build.head?
 
     system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}",
                           "--with-history",
+                          "--with-icu",
                           "--without-python",
                           "--without-lzma"
     system "make", "install"
 
     cd "python" do
+      sdk_include = if OS.mac?
+        sdk = MacOS.sdk_path_if_needed
+        sdk/"usr/include" if sdk
+      else
+        HOMEBREW_PREFIX/"include"
+      end
+
+      includes = [include, sdk_include].compact.map do |inc|
+        "'#{inc}',"
+      end.join(" ")
+
       # We need to insert our include dir first
       inreplace "setup.py", "includes_dir = [",
-                            "includes_dir = ['#{include}', '#{sdk_include}',"
-      system Formula["python@3.9"].opt_bin/"python3", "setup.py", "install", "--prefix=#{prefix}"
+                            "includes_dir = [#{includes}"
+
+      ["3.9", "3.10"].each do |xy|
+        system "python#{xy}", *Language::Python.setup_install_args(prefix, "python#{xy}")
+      end
     end
   end
 
@@ -102,13 +96,25 @@ class Libxml2 < Formula
         return 0;
       }
     EOS
+
+    # Test build with xml2-config
     args = %w[test.c -o test]
     args += shell_output("#{bin}/xml2-config --cflags --libs").split
     system ENV.cc, *args
     system "./test"
 
-    xy = Language::Python.major_minor_version Formula["python@3.9"].opt_bin/"python3"
-    ENV.prepend_path "PYTHONPATH", lib/"python#{xy}/site-packages"
-    system Formula["python@3.9"].opt_bin/"python3", "-c", "import libxml2"
+    # Test build with pkg-config
+    ENV.append "PKG_CONFIG_PATH", lib/"pkgconfig"
+    args = %w[test.c -o test]
+    args += shell_output("#{Formula["pkg-config"].opt_bin}/pkg-config --cflags --libs libxml-2.0").split
+    system ENV.cc, *args
+    system "./test"
+
+    orig_pypath = ENV["PYTHONPATH"]
+    ["3.9", "3.10"].each do |xy|
+      ENV.prepend_path "PYTHONPATH", lib/"python#{xy}/site-packages"
+      system Formula["python@#{xy}"].opt_bin/"python#{xy}", "-c", "import libxml2"
+      ENV["PYTHONPATH"] = orig_pypath
+    end
   end
 end

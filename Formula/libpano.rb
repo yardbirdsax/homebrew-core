@@ -1,10 +1,11 @@
 class Libpano < Formula
   desc "Build panoramic images from a set of overlapping images"
   homepage "https://panotools.sourceforge.io/"
-  url "https://downloads.sourceforge.net/project/panotools/libpano13/libpano13-2.9.19/libpano13-2.9.19.tar.gz"
-  version "13-2.9.19"
-  sha256 "037357383978341dea8f572a5d2a0876c5ab0a83dffda431bd393357e91d95a8"
-  revision 2
+  url "https://downloads.sourceforge.net/project/panotools/libpano13/libpano13-2.9.21/libpano13-2.9.21.tar.gz"
+  version "13-2.9.21"
+  sha256 "79e5a1452199305e2961462720ef5941152779c127c5b96fc340d2492e633590"
+  license "GPL-2.0-or-later"
+  revision 1
 
   livecheck do
     url :stable
@@ -12,22 +13,45 @@ class Libpano < Formula
   end
 
   bottle do
-    sha256 cellar: :any, catalina:    "446728639c2cdf06291df1ecd510da3dcb0550163d73560eec6d13b0e3b28351"
-    sha256 cellar: :any, mojave:      "0df8e9b94be82d01f9371286fa934b03ea957fc3d14fea8e2b71e5254c4077b4"
-    sha256 cellar: :any, high_sierra: "2f41d44eeb64fce3d6451e4010a90a088f2db1c0bc1fb61d90f869f5eb6dd247"
-    sha256 cellar: :any, sierra:      "ee3a892768cab28490d0c5719d503faec655ed274b42d21cd93413c269430bfa"
-    sha256 cellar: :any, el_capitan:  "cde19367882bcb0f1ef6aa389a56fad271dbe956055b8c3e7cafe9c27a559478"
-    sha256 cellar: :any, yosemite:    "d78f4a20ee2b3a55e91cb04f9655f719631fe8b3ac9ffed162e88a337a6e3a08"
+    sha256 cellar: :any,                 arm64_monterey: "70958ca67b42e1da36ad393b0243c7d182d5413f1c8e83e5d6c47b513b0f3ff6"
+    sha256 cellar: :any,                 arm64_big_sur:  "bcafb2c87069bcbc4072ad10e5d0e971761d55b66470f5020b9571b1fbd48c23"
+    sha256 cellar: :any,                 monterey:       "cc0ce40a573784a891039fa691945d6ccc357bfaf0cfee2ae030bd8f6fbf813f"
+    sha256 cellar: :any,                 big_sur:        "86d6ebc7e57157f40337083697758ad334cda89dd1b6f98eb470cae7bd8ffa01"
+    sha256 cellar: :any,                 catalina:       "23a591c1c9367006f7477e1dc8633f17452082d36197536bdf768e1e51692302"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "824c6d89f876646cf10dafe0db21c13fd7493495c923c1c0b9158cb5aa93d33a"
   end
 
-  depends_on "jpeg"
+  depends_on "cmake" => :build
+  depends_on "jpeg-turbo"
   depends_on "libpng"
   depends_on "libtiff"
 
+  uses_from_macos "zlib"
+
+  patch :DATA
+
   def install
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--mandir=#{man}"
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args, "-DCMAKE_INSTALL_RPATH=#{rpath}"
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 end
+
+__END__
+diff --git a/panorama.h b/panorama.h
+index 70a9fae..2942993 100644
+--- a/panorama.h
++++ b/panorama.h
+@@ -53,8 +53,12 @@
+ #define PT_BIGENDIAN 1
+ #endif
+ #else
++#if defined(__APPLE__)
++#include <machine/endian.h>
++#else
+ #include <endian.h>
+ #endif
++#endif
+ #if defined(__BYTE_ORDER) && (__BYTE_ORDER == __BIG_ENDIAN)
+ #define PT_BIGENDIAN 1
+ #endif

@@ -1,11 +1,11 @@
 class DosboxX < Formula
   desc "DOSBox with accurate emulation and wide testing"
   homepage "https://dosbox-x.com/"
-  url "https://github.com/joncampbell123/dosbox-x/archive/dosbox-x-v0.83.10.tar.gz"
-  sha256 "d8ce1a686c93d190bc228689450d50f956fe8064c9b72dbf5e5da566c2a347b2"
+  url "https://github.com/joncampbell123/dosbox-x/archive/dosbox-x-v0.84.0.tar.gz"
+  sha256 "564fbf8f0ab090c8b32bc38637c8204358c386b9cbffcb4f99a81bc82fddbad7"
   license "GPL-2.0-or-later"
   version_scheme 1
-  head "https://github.com/joncampbell123/dosbox-x.git"
+  head "https://github.com/joncampbell123/dosbox-x.git", branch: "master"
 
   livecheck do
     url :stable
@@ -13,10 +13,13 @@ class DosboxX < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "4fdfc73e14bf045974df0085cf8ede3bab05e6cce85bc753750ee7f59023c177"
-    sha256 cellar: :any, big_sur:       "b4ddfb4e394f8e5479ef6b4e276a41544cdf6d5fa66a2ed1daee82931dcad668"
-    sha256 cellar: :any, catalina:      "fda0754f2fb92654baa11d1f8fb20baed947d9770dbf5ef67e6211fd9a00cd7f"
-    sha256 cellar: :any, mojave:        "6be3fc4d92ccf797da1a59a9bfdb664c32d2f53a0cb1a6256b301ad86b123aea"
+    rebuild 1
+    sha256 cellar: :any, arm64_monterey: "954854b0a822a53dfa548e6b8ac8ccd38683bd49393b5b7daa07725934912c9c"
+    sha256 cellar: :any, arm64_big_sur:  "9eb877ad9475ab9ae064f2900fc70ba3155871791e7a207a830c9e0696c716ce"
+    sha256 cellar: :any, monterey:       "7f12623698d54585f85f6a2a3d72670f42de50e8bf69c9a095b831b43b00674b"
+    sha256 cellar: :any, big_sur:        "d8e790814fefd140a3dd9e7f16b4efe6e2f7dbafbf53e2071281e5cb3218f7d9"
+    sha256 cellar: :any, catalina:       "35036fdd6ec98ee64e45df685d299ea257089e03687583cb68b168b91880ccf5"
+    sha256               x86_64_linux:   "20d381a2330a34deefd3f31feb369f9859d0630dc16d9ce78d8743114b646951"
   end
 
   depends_on "autoconf" => :build
@@ -24,6 +27,13 @@ class DosboxX < Formula
   depends_on "pkg-config" => :build
   depends_on "fluid-synth"
   depends_on macos: :high_sierra # needs futimens
+
+  on_linux do
+    depends_on "linux-headers@5.15" => :build
+    depends_on "sdl2"
+  end
+
+  fails_with gcc: "5"
 
   def install
     ENV.cxx11
@@ -33,11 +43,12 @@ class DosboxX < Formula
       --disable-dependency-tracking
       --disable-sdltest
     ]
-    system "./build-macosx", *args
+    build_script = OS.mac? ? "./build-macosx" : "./build"
+    system build_script, *args
     system "make", "install"
   end
 
   test do
-    assert_match /DOSBox-X version #{version}/, shell_output("#{bin}/dosbox-x -version 2>&1", 1)
+    assert_match "DOSBox-X version #{version}", shell_output("#{bin}/dosbox-x -version 2>&1", 1)
   end
 end

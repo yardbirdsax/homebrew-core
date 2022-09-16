@@ -1,29 +1,32 @@
 class Libsoup < Formula
   desc "HTTP client/server library for GNOME"
   homepage "https://wiki.gnome.org/Projects/libsoup"
-  url "https://download.gnome.org/sources/libsoup/2.72/libsoup-2.72.0.tar.xz"
-  sha256 "170c3f8446b0f65f8e4b93603349172b1085fb8917c181d10962f02bb85f5387"
+  url "https://download.gnome.org/sources/libsoup/3.0/libsoup-3.0.8.tar.xz"
+  sha256 "c8739dc1c23c2b1e3b816d7598b3fa1764a3e1a2a2f5257b1bc4466d867caced"
   license "LGPL-2.0-or-later"
 
   bottle do
-    sha256 arm64_big_sur: "4ba31ecd333f8be6a5cb4eed23715fce9b478d79345bf51b88e172a2db0fb496"
-    sha256 big_sur:       "b135c1b3cf8a49f15afdb9d7c354b9175de2561c20a3e4ef8b91a8234f81fbe3"
-    sha256 catalina:      "b7f09cfabd4ef0210d181e54e74f2cff33518df0c81bc9e27764454e54cb6243"
-    sha256 mojave:        "14a5f08043cacb9f68a9f5d48e0175397c81184621fbcbec871aa764241509a6"
-    sha256 high_sierra:   "78a481740fc494934fdbafbd25f8c7141f57cd61d1ff713682fe3a5a4b91b840"
+    sha256 arm64_monterey: "a3921bec5cde8f68b4e18492337a5592379ee9be85ff0bfa8ecc45c725be92f2"
+    sha256 arm64_big_sur:  "fbbb6b0ba2c9f4c42d859d957c52bb6baadef1469132c544c537dbc3f829317a"
+    sha256 monterey:       "35f72679633da06f56ff80d31314be823478dc35a168eaaea54123cb7e04e9c9"
+    sha256 big_sur:        "74663f81f1ddabfeecd8bd0190a651c38cbe3b40864e93511c1889dc8e238fd6"
+    sha256 catalina:       "1fcb359924843a0937cd01064c6bbf5a47f817968a5f172f11ea97c026a832de"
+    sha256 x86_64_linux:   "19f1fe4e6fa9857b60f084801ff15a5caa3aba2c696130751783b8bd47bd6b84"
   end
 
   depends_on "gobject-introspection" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkg-config" => :build
+  depends_on "python@3.10" => :build
+  depends_on "vala" => :build
   depends_on "glib-networking"
   depends_on "gnutls"
   depends_on "libpsl"
-  depends_on "vala"
 
   uses_from_macos "krb5"
   uses_from_macos "libxml2"
+  uses_from_macos "sqlite"
 
   def install
     mkdir "build" do
@@ -39,10 +42,16 @@ class Libsoup < Formula
       #include <libsoup/soup.h>
 
       int main(int argc, char *argv[]) {
-        SoupMessage *msg = soup_message_new("GET", "https://brew.sh");
+        SoupMessage *msg = soup_message_new(SOUP_METHOD_GET, "https://brew.sh");
         SoupSession *session = soup_session_new();
-        soup_session_send_message(session, msg); // blocks
-        g_assert_true(SOUP_STATUS_IS_SUCCESSFUL(msg->status_code));
+        GError *error = NULL;
+        GBytes *bytes = soup_session_send_and_read(session, msg, NULL, &error); // blocks
+
+        if(error) {
+          g_error_free(error);
+          return 1;
+        }
+
         g_object_unref(msg);
         g_object_unref(session);
         return 0;
@@ -55,7 +64,7 @@ class Libsoup < Formula
       -I#{gettext.opt_include}
       -I#{glib.opt_include}/glib-2.0
       -I#{glib.opt_lib}/glib-2.0/include
-      -I#{include}/libsoup-2.4
+      -I#{include}/libsoup-3.0
       -D_REENTRANT
       -L#{gettext.opt_lib}
       -L#{glib.opt_lib}
@@ -63,7 +72,7 @@ class Libsoup < Formula
       -lgio-2.0
       -lglib-2.0
       -lgobject-2.0
-      -lsoup-2.4
+      -lsoup-3.0
     ]
     system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"

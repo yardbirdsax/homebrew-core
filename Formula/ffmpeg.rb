@@ -1,23 +1,12 @@
 class Ffmpeg < Formula
   desc "Play, record, convert, and stream audio and video"
   homepage "https://ffmpeg.org/"
+  url "https://ffmpeg.org/releases/ffmpeg-5.1.1.tar.xz"
+  sha256 "95bf3ff8c496511e71e958fb249e663c8c9c3de583c5bebc0f5a9745abbc0435"
   # None of these parts are used by default, you have to explicitly pass `--enable-gpl`
   # to configure to activate them. In this case, FFmpeg's license changes to GPL v2+.
   license "GPL-2.0-or-later"
-  revision 9
-  head "https://github.com/FFmpeg/FFmpeg.git"
-
-  stable do
-    url "https://ffmpeg.org/releases/ffmpeg-4.3.1.tar.xz"
-    sha256 "ad009240d46e307b4e03a213a0f49c11b650e445b1f8be0dda2a9212b34d2ffb"
-
-    # https://trac.ffmpeg.org/ticket/8760
-    # Remove in next release
-    patch do
-      url "https://github.com/FFmpeg/FFmpeg/commit/7c59e1b0f285cd7c7b35fcd71f49c5fd52cf9315.patch?full_index=1"
-      sha256 "1cbe1b68d70eadd49080a6e512a35f3e230de26b6e1b1c859d9119906417737f"
-    end
-  end
+  head "https://github.com/FFmpeg/FFmpeg.git", branch: "master"
 
   livecheck do
     url "https://ffmpeg.org/download.html"
@@ -25,10 +14,12 @@ class Ffmpeg < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "4b4eb78995b8554bd2e66d925f388833acb2f2175f27dacaa1b9734b7e44ed81"
-    sha256 big_sur:       "275c815b5f3f59b5e7cf6f1097907a3ee7d92fac30536cb406e4e1c1ea6bbc06"
-    sha256 catalina:      "89cd50ca4629382412ffe4efff3f80a2d4e608617259b11c439a0c3c842fe760"
-    sha256 mojave:        "cd9b400426143c2a974dcf9da869210bf771250bd1951fe84364b1766b2dfbf6"
+    sha256 arm64_monterey: "ab401c96929674d90003b3b75eee7280806ba913648c4ddd648d3f07b323dc66"
+    sha256 arm64_big_sur:  "967a8ac417964bdad509749a039d12d06461f2b8e52102b7c118f52fc634645e"
+    sha256 monterey:       "c3ad7a1c3da583707efd72553952a07ab3ba5cfb9383ad44119868517fba8401"
+    sha256 big_sur:        "b97a869d8da126cfa974266f4e62f095b50805f805f9c697186a16c750de8ee2"
+    sha256 catalina:       "fe4afaf2707d8483cd873c2eb5fdf713d31721693cbc3087d753c0449137d49b"
+    sha256 x86_64_linux:   "cc2a9eaf4c7dd8399f2b0fef593858a8ac290c1139328dd35fb55a7e862c7b09"
   end
 
   depends_on "nasm" => :build
@@ -42,15 +33,16 @@ class Ffmpeg < Formula
   depends_on "lame"
   depends_on "libass"
   depends_on "libbluray"
+  depends_on "librist"
   depends_on "libsoxr"
   depends_on "libvidstab"
+  depends_on "libvmaf"
   depends_on "libvorbis"
   depends_on "libvpx"
   depends_on "opencore-amr"
   depends_on "openjpeg"
   depends_on "opus"
   depends_on "rav1e"
-  depends_on "rtmpdump"
   depends_on "rubberband"
   depends_on "sdl2"
   depends_on "snappy"
@@ -70,13 +62,20 @@ class Ffmpeg < Formula
   uses_from_macos "libxml2"
   uses_from_macos "zlib"
 
+  on_linux do
+    depends_on "alsa-lib"
+    depends_on "gcc" # because rubberband is compiled with gcc
+    depends_on "libxv"
+  end
+
+  fails_with gcc: "5"
+
   def install
     args = %W[
       --prefix=#{prefix}
       --enable-shared
       --enable-pthreads
       --enable-version3
-      --enable-avresample
       --cc=#{ENV.cc}
       --host-cflags=#{ENV.cflags}
       --host-ldflags=#{ENV.ldflags}
@@ -89,12 +88,14 @@ class Ffmpeg < Formula
       --enable-libmp3lame
       --enable-libopus
       --enable-librav1e
+      --enable-librist
       --enable-librubberband
       --enable-libsnappy
       --enable-libsrt
       --enable-libtesseract
       --enable-libtheora
       --enable-libvidstab
+      --enable-libvmaf
       --enable-libvorbis
       --enable-libvpx
       --enable-libwebp
@@ -110,15 +111,17 @@ class Ffmpeg < Formula
       --enable-libopencore-amrnb
       --enable-libopencore-amrwb
       --enable-libopenjpeg
-      --enable-librtmp
       --enable-libspeex
       --enable-libsoxr
-      --enable-videotoolbox
       --enable-libzmq
       --enable-libzimg
       --disable-libjack
       --disable-indev=jack
     ]
+
+    # Needs corefoundation, coremedia, corevideo
+    args << "--enable-videotoolbox" if OS.mac?
+    args << "--enable-neon" if Hardware::CPU.arm?
 
     system "./configure", *args
     system "make", "install"

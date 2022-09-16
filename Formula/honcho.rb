@@ -1,34 +1,32 @@
 class Honcho < Formula
+  include Language::Python::Virtualenv
+
   desc "Python clone of Foreman, for managing Procfile-based applications"
   homepage "https://github.com/nickstenning/honcho"
-  url "https://files.pythonhosted.org/packages/a2/8b/c404bce050eba79a996f6901f35445a53c1133b0424b33e58a4ad225bc37/honcho-1.0.1.tar.gz"
-  sha256 "c189402ad2e337777283c6a12d0f4f61dc6dd20c254c9a3a4af5087fc66cea6e"
+  url "https://files.pythonhosted.org/packages/0e/7c/c0aa47711b5ada100273cbe190b33cc12297065ce559989699fd6c1ec0cb/honcho-1.1.0.tar.gz"
+  sha256 "c5eca0bded4bef6697a23aec0422fd4f6508ea3581979a3485fc4b89357eb2a9"
   license "MIT"
-  revision 3
-  head "https://github.com/nickstenning/honcho.git"
+  head "https://github.com/nickstenning/honcho.git", branch: "main"
 
   bottle do
     rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "45d84a15c2312ed91f5abe9ac993184bea7deb4a08ef3e51ba6271b268eee1f0"
-    sha256 cellar: :any_skip_relocation, big_sur:       "7cfd5e890b357ad7bb3a96687d1ec9bc97aff24d7aadf2b6df21e34e3901c78d"
-    sha256 cellar: :any_skip_relocation, catalina:      "3f509a6f7aced41359a42d1f1318693ccf5cbbe46fa46dbf0bae1059069ca53e"
-    sha256 cellar: :any_skip_relocation, mojave:        "f1f61f29fb6a6ce01843e7a484ae3e36e94b049d7f2da9ca1b2711887de046ce"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "ef2edcfde1a8c8409c2d0b33a27bf5f223d5d2932ef7824dfa1cbb6e8d4ead8a"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ef2edcfde1a8c8409c2d0b33a27bf5f223d5d2932ef7824dfa1cbb6e8d4ead8a"
+    sha256 cellar: :any_skip_relocation, monterey:       "bfc07f9982c7c909af7c40963280933cb47afe7c9ba83b9598832b1c25d8a3d3"
+    sha256 cellar: :any_skip_relocation, big_sur:        "bfc07f9982c7c909af7c40963280933cb47afe7c9ba83b9598832b1c25d8a3d3"
+    sha256 cellar: :any_skip_relocation, catalina:       "bfc07f9982c7c909af7c40963280933cb47afe7c9ba83b9598832b1c25d8a3d3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "502f8069959faf73d1d03318b681f89bf2dfe987139fd8b4913f52eb66b1d738"
   end
 
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   def install
-    xy = Language::Python.major_minor_version "python3"
-    ENV.prepend_create_path "PYTHONPATH", libexec/"lib/python#{xy}/site-packages"
-    system "python3", *Language::Python.setup_install_args(libexec)
-
-    bin.install Dir[libexec/"bin/*"]
-    bin.env_script_all_files(libexec/"bin", PYTHONPATH: ENV["PYTHONPATH"])
+    virtualenv_install_with_resources
   end
 
   test do
     (testpath/"Procfile").write("talk: echo $MY_VAR")
     (testpath/".env").write("MY_VAR=hi")
-    assert_match /talk\.\d+ \| hi/, shell_output("#{bin}/honcho start")
+    assert_match(/talk\.\d+ \| hi/, shell_output("#{bin}/honcho start"))
   end
 end

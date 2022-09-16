@@ -4,7 +4,8 @@ class Unzip < Formula
   url "https://downloads.sourceforge.net/project/infozip/UnZip%206.x%20%28latest%29/UnZip%206.0/unzip60.tar.gz"
   version "6.0"
   sha256 "036d96991646d0449ed0aa952e4fbe21b476ce994abc276e49d30e686708bd37"
-  revision 6
+  license "Info-ZIP"
+  revision 8
 
   livecheck do
     url :stable
@@ -12,12 +13,12 @@ class Unzip < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "f3dbb31f91250acb556aeb07b609decb690828cf1563ab6c63215217340c6fe9"
-    sha256 cellar: :any_skip_relocation, big_sur:       "2debed84387df5fd3430165b2e37046c73c141b2a7aedecfb3eb2ed06561556e"
-    sha256 cellar: :any_skip_relocation, catalina:      "1fac8de0e83c5a91feb1fa6e007397be17918761345f900c0244ade19fea806c"
-    sha256 cellar: :any_skip_relocation, mojave:        "908d05001d2692e21753508aae8cca95d588dcebc4f852f3a42e0b0b1e2df9d4"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "96e47f47a3c6b10d59d69f614b7c63ae0aeea1e553018ee398b1b5405d22a7f5"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "1df3fd1e9b3f5fd816f793355797818113e43378c81e6a0a6a8d1b3e52c0dd36"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a6cdeb65d1d235eb609cb7ae5b5df19f0c9b20d572661bb3501658f1d5b2d5ef"
+    sha256 cellar: :any_skip_relocation, monterey:       "86fbf9a289406fbe3fff052c0818431d757b6123e5776418c3e13370ee2d4af9"
+    sha256 cellar: :any_skip_relocation, big_sur:        "94f235026d1d96ebb52961dcfb6880701d11efdc9cd9869987f8e4712714f9a5"
+    sha256 cellar: :any_skip_relocation, catalina:       "b6cb709857bee04881acb626d24ddb1dcccf50b4508c16a9599625667b4b7617"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "baf15e19852a0f9756e3302fa6f3866eaeccc06730c9907bffc19f32861d64bf"
   end
 
   keg_only :provided_by_macos
@@ -25,11 +26,11 @@ class Unzip < Formula
   uses_from_macos "zip" => :test
   uses_from_macos "bzip2"
 
-  # Upstream is unmaintained so we use the Debian patchset:
-  # https://packages.debian.org/buster/unzip
+  # Upstream is unmaintained so we use the Ubuntu patchset:
+  # https://packages.ubuntu.com/kinetic/unzip
   patch do
-    url "https://deb.debian.org/debian/pool/main/u/unzip/unzip_6.0-25.debian.tar.xz"
-    sha256 "0783e4d11d755cb43904e3f59a60dbb92ee9c6b08ac54d86bc61f9848216f37b"
+    url "http://archive.ubuntu.com/ubuntu/pool/main/u/unzip/unzip_6.0-27ubuntu1.debian.tar.xz"
+    sha256 "9249780437220a5dc81518f2e4c5213b502bf56899c03992572cf9bb5caf724e"
     apply %w[
       patches/01-manpages-in-section-1-not-in-section-1l.patch
       patches/02-this-is-debian-unzip.patch
@@ -51,24 +52,37 @@ class Unzip < Formula
       patches/18-cve-2014-9913-unzip-buffer-overflow.patch
       patches/19-cve-2016-9844-zipinfo-buffer-overflow.patch
       patches/20-cve-2018-1000035-unzip-buffer-overflow.patch
+      patches/20-unzip60-alt-iconv-utf8.patch
       patches/21-fix-warning-messages-on-big-files.patch
       patches/22-cve-2019-13232-fix-bug-in-undefer-input.patch
       patches/23-cve-2019-13232-zip-bomb-with-overlapped-entries.patch
       patches/24-cve-2019-13232-do-not-raise-alert-for-misplaced-central-directory.patch
+      patches/25-cve-2019-13232-fix-bug-in-uzbunzip2.patch
+      patches/26-cve-2019-13232-fix-bug-in-uzinflate.patch
+      patches/27-zipgrep-avoid-test-errors.patch
+      patches/28-cve-2022-0529-and-cve-2022-0530.patch
     ]
   end
 
   def install
+    # These macros also follow Ubuntu, and are required:
+    # - to correctly handle large archives (> 4GB)
+    # - extract & print archive contents with non-latin characters
+    loc_macros = %w[
+      -DLARGE_FILE_SUPPORT
+      -DUNICODE_SUPPORT
+      -DUNICODE_WCHAR
+      -DUTF8_MAYBE_NATIVE
+      -DNO_WORKING_ISPRINT
+    ]
     args = %W[
       CC=#{ENV.cc}
-      LOC=-DLARGE_FILE_SUPPORT
+      LOC=#{loc_macros.join(" ")}
       D_USE_BZ2=-DUSE_BZIP2
       L_BZ2=-lbz2
       macosx
     ]
-    on_macos do
-      args << "LFLAGS1=-liconv"
-    end
+    args << "LFLAGS1=-liconv" if OS.mac?
     system "make", "-f", "unix/Makefile", *args
     system "make", "prefix=#{prefix}", "MANDIR=#{man1}", "install"
   end
@@ -78,10 +92,9 @@ class Unzip < Formula
     (testpath/"test2").write "Bonjour!"
     (testpath/"test3").write "Hej!"
 
-    on_macos do
+    if OS.mac?
       system "/usr/bin/zip", "test.zip", "test1", "test2", "test3"
-    end
-    on_linux do
+    else
       system Formula["zip"].bin/"zip", "test.zip", "test1", "test2", "test3"
     end
     %w[test1 test2 test3].each do |f|

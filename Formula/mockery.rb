@@ -1,29 +1,31 @@
 class Mockery < Formula
   desc "Mock code autogenerator for Golang"
   homepage "https://github.com/vektra/mockery"
-  url "https://github.com/vektra/mockery/archive/v2.6.0.tar.gz"
-  sha256 "ce5eea62e9d130e3557c11016c306485ccd77919cf85d706a2556bce28d085ed"
+  url "https://github.com/vektra/mockery/archive/v2.14.0.tar.gz"
+  sha256 "1a87d16b264d21c65eb7c18b0a55a206798017bb48672ef8bc403b420dc0d5e8"
   license "BSD-3-Clause"
-  head "https://github.com/vektra/mockery.git"
+  head "https://github.com/vektra/mockery.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "73af9616980727010bb370b90f195acdf7fae8fe8aed870afa7059b37cbd6cf0"
-    sha256 cellar: :any_skip_relocation, big_sur:       "9042c369628ba6ed7f01ed774114ed5194f2a06db3c91f6bd3baa958b387a52d"
-    sha256 cellar: :any_skip_relocation, catalina:      "1e9b569d40889982fc89ed2e6182e40c8d7151e4f696ea1d8ef8c49a7be9a71f"
-    sha256 cellar: :any_skip_relocation, mojave:        "21c9319ca3d75ca69883c1df8cbdb504ddc307577f6e5aebd10ac2970655e4fe"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "0cc45148a85352f94baaf806c0fc3c930fcf657c3b39793d263c5518fcdb8679"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "75c1fc12f85faaafdca9835a2430c180b6727aa8b6af51ac27468d39e7edafd2"
+    sha256 cellar: :any_skip_relocation, monterey:       "e1332a2baf65967832c436b122877b7f7b2cacbc433aa7a258ac127387bebef8"
+    sha256 cellar: :any_skip_relocation, big_sur:        "b71d2051a8315f6f40576e41ce6c94cbf2fcb22bfa066990dbba961bcb446d36"
+    sha256 cellar: :any_skip_relocation, catalina:       "9608ee70ae6fccb0c4a121401bbcbf11c27b55a6bb1cb9185055efafa544187f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ba19c5c3d33a405563365b3504bb2d66b72fba2a8e0f9489f73c73d690b2d8d4"
   end
 
-  depends_on "go"
+  depends_on "go" => :build
 
   def install
-    system "go", "build", *std_go_args, "-ldflags", "-s -w"
+    system "go", "build", *std_go_args(ldflags: "-s -w -X github.com/vektra/mockery/v2/pkg/config.SemVer=v#{version}")
   end
 
   test do
     output = shell_output("#{bin}/mockery --keeptree 2>&1", 1)
-    assert_match "Starting mockery dry-run=false version=0.0.0-dev", output
+    assert_match "Starting mockery dry-run=false version=v#{version}", output
 
     output = shell_output("#{bin}/mockery --all --dry-run 2>&1")
-    assert_match "INF Walking dry-run=true version=0.0.0-dev", output
+    assert_match "INF Walking dry-run=true version=v#{version}", output
   end
 end

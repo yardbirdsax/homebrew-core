@@ -1,8 +1,8 @@
 class UtilLinux < Formula
   desc "Collection of Linux utilities"
-  homepage "https://github.com/karelzak/util-linux"
-  url "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.36/util-linux-2.36.1.tar.xz"
-  sha256 "09fac242172cd8ec27f0739d8d192402c69417617091d8c6e974841568f37eed"
+  homepage "https://github.com/util-linux/util-linux"
+  url "https://mirrors.edge.kernel.org/pub/linux/utils/util-linux/v2.38/util-linux-2.38.1.tar.xz"
+  sha256 "60492a19b44e6cf9a3ddff68325b333b8b52b6c59ce3ebd6a0ecaa4c5117e84f"
   license all_of: [
     "BSD-3-Clause",
     "BSD-4-Clause-UC",
@@ -14,53 +14,73 @@ class UtilLinux < Formula
   ]
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any, arm64_big_sur: "91a76aecae9e1fcdbd44614439c6eb379dcaf1c2e388403eb33d698b986cc587"
-    sha256 cellar: :any, big_sur:       "fc3327a2f46d034d163710b29b6b04fb44cabcb31102a2b099d9dbd73e302bce"
-    sha256 cellar: :any, catalina:      "01b6c26311161daafc8cf521d994810397810dd35881b0c0bd6bea3a2f0487c8"
-    sha256 cellar: :any, mojave:        "81c514e31f486717eb9466b81c4f499558f7b8c5cc80b178228abe1b6e52e27d"
+    sha256 arm64_monterey: "b0b3c6d674a5ddc13707ac4af2ba34745b7dea8048b6b12034f3685cb017cadc"
+    sha256 arm64_big_sur:  "1b806803757b40e4ffed44f68364cb45386ff96d467fa94d6d776b1f41c1d5bc"
+    sha256 monterey:       "0c66175a5324b3a5a31bfbe2b6c2154666cbbddd1203182a661f6f6cb1095799"
+    sha256 big_sur:        "237a36c3eb5250d0b71d5cac628c364d2a753174ad8b891cdb1f548b60c182b7"
+    sha256 catalina:       "3d52e89f1e08a9d93462d2008289379784842ff8caa538eeaf653ea689500993"
+    sha256 x86_64_linux:   "27177c2a258f719de1236fc0eafa5e45021f7997e332dd9d345c28d0c4354c36"
   end
 
-  keg_only "macOS provides the uuid.h header"
+  keg_only :shadowed_by_macos, "macOS provides the uuid.h header"
 
+  depends_on "asciidoctor" => :build
+  depends_on "gettext"
+
+  uses_from_macos "libxcrypt"
   uses_from_macos "ncurses"
   uses_from_macos "zlib"
 
-  # These binaries are already available in macOS
-  def system_bins
-    %w[
-      cal col colcrt colrm
-      getopt
-      hexdump
-      logger look
-      mesg more
-      nologin
-      renice rev
-      ul
-      whereis
-    ]
+  # Everything in following macOS block is for temporary patches
+  # TODO: Remove in the next release.
+  on_macos do
+    depends_on "autoconf" => :build
+    depends_on "automake" => :build
+    depends_on "gtk-doc" => :build
+    depends_on "libtool" => :build
+    depends_on "pkg-config" => :build
+
+    # Fix lib/procfs.c:9:10: fatal error: 'sys/vfs.h' file not found
+    patch do
+      url "https://github.com/util-linux/util-linux/commit/3671d4a878fb58aa953810ecf9af41809317294f.patch?full_index=1"
+      sha256 "d38c9ae06c387da151492dd5862c58551559dd6d2b1877c74cc1e11754221fe4"
+    end
+  end
+
+  on_linux do
+    conflicts_with "bash-completion", because: "both install `mount`, `rfkill`, and `rtcwake` completions"
+    conflicts_with "rename", because: "both install `rename` binaries"
   end
 
   def install
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}",
-                          "--disable-ipcs",     # does not build on macOS
-                          "--disable-ipcrm",    # does not build on macOS
-                          "--disable-libmount", # does not build on macOS
-                          "--disable-wall",     # already comes with macOS
-                          "--enable-libuuid"    # conflicts with ossp-uuid
+    # Temporary work around for patches. Remove in the next release.
+    system "autoreconf", "--force", "--install", "--verbose" if OS.mac?
 
-    system "make", "install"
+    args = %w[--disable-silent-rules]
 
-    # Remove binaries already shipped by macOS
-    system_bins.each do |prog|
-      rm_f bin/prog
-      rm_f sbin/prog
-      rm_f man1/"#{prog}.1"
-      rm_f man8/"#{prog}.8"
-      rm_f share/"bash-completion/completions/#{prog}"
+    if OS.mac?
+      args << "--disable-ipcs" # does not build on macOS
+      args << "--disable-ipcrm" # does not build on macOS
+      args << "--disable-wall" # already comes with macOS
+      args << "--disable-libmount" # does not build on macOS
+      args << "--enable-libuuid" # conflicts with ossp-uuid
+    else
+      args << "--disable-use-tty-group" # Fix chgrp: changing group of 'wall': Operation not permitted
+      args << "--disable-kill" # Conflicts with coreutils.
+      args << "--disable-cal" # Conflicts with bsdmainutils
+      args << "--without-systemd" # Do not install systemd files
+      args << "--with-bashcompletiondir=#{bash_completion}"
+      args << "--disable-chfn-chsh"
+      args << "--disable-login"
+      args << "--disable-su"
+      args << "--disable-runuser"
+      args << "--disable-makeinstall-chown"
+      args << "--disable-makeinstall-setuid"
+      args << "--without-python"
     end
+
+    system "./configure", *std_configure_args, *args
+    system "make", "install"
 
     # install completions only for installed programs
     Pathname.glob("bash-completion/*") do |prog|
@@ -94,8 +114,6 @@ class UtilLinux < Formula
       <<~EOS
         The following tools are not supported for macOS, and are therefore not included:
         #{Formatter.columns(linux_only_bins)}
-        The following tools are shipped by macOS, and are therefore not included:
-        #{Formatter.columns(system_bins)}
       EOS
     end
   end

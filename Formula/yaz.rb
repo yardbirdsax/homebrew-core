@@ -1,41 +1,70 @@
 class Yaz < Formula
   desc "Toolkit for Z39.50/SRW/SRU clients/servers"
-  homepage "https://www.indexdata.com/yaz"
-  url "http://ftp.indexdata.dk/pub/yaz/yaz-5.30.3.tar.gz"
-  sha256 "f0497fd8420574efab4e5738ea3b70787a6e8042f585156baa30bdc1911ba552"
+  homepage "https://www.indexdata.com/resources/software/yaz/"
   license "BSD-3-Clause"
+  revision 3
+
+  stable do
+    url "https://ftp.indexdata.com/pub/yaz/yaz-5.32.0.tar.gz"
+    sha256 "04d08c799d5ee56a2670e6ac0b42398d2ff956bd9bf144bfe9c4c30e557140e0"
+  end
 
   livecheck do
-    url "http://ftp.indexdata.dk/pub/yaz/"
+    url :homepage
     regex(/href=.*?yaz[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "410d2e4b4dde8c3392375c3b37aedc1911fbd80c389c68d4eae5619c0593a555"
-    sha256 cellar: :any, big_sur:       "bae268483a7bf1bbf81bf4930cb34145b1c5172f1e1737f8b07cf220a3566711"
-    sha256 cellar: :any, catalina:      "3e99cfd562ae262f299752a7d92dbad3f9b67dd37726e90b1109684f0deac7d1"
-    sha256 cellar: :any, mojave:        "0fb86a32e27613df4ef17bc76556364a85d220c9d044f6f2c515ca0bb2e94c6a"
-    sha256 cellar: :any, high_sierra:   "a3dd5357b88bd5780a90dc1fb51c12943d3a8ba6ce69073fb262116c9b050b3e"
+    sha256 cellar: :any,                 arm64_monterey: "e557c8be8f4c335fac3cfa8f37d984bbd63c5716d98145c0d83ca0423fda4525"
+    sha256 cellar: :any,                 arm64_big_sur:  "2cdab667383b932b13aaaf8e9516b104f09afef4b45b1ca16888f9da54612afe"
+    sha256 cellar: :any,                 monterey:       "9e7b9b9bd1292324bd8fb4e28cd0e4010c29972e508626a0110adbe3908ac8ae"
+    sha256 cellar: :any,                 big_sur:        "ba154d92aa07f094933650506c59094cce717db404fe394afc35b8be6e852d73"
+    sha256 cellar: :any,                 catalina:       "c02b3f2c2b8a1f874d9a6d3269e4c35ff37fd2cc2c7aefc76c89e68015d20ba5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a19506f2dc9e63a3ad1f6e0493c1304b912c1d7e18374ea4662de91abfaaf33d"
   end
 
   head do
-    url "https://github.com/indexdata/yaz.git"
+    url "https://github.com/indexdata/yaz.git", branch: "master"
+
     depends_on "autoconf" => :build
     depends_on "automake" => :build
+    depends_on "docbook-xsl" => :build
     depends_on "libtool" => :build
+
+    uses_from_macos "bison" => :build
+    uses_from_macos "tcl-tk" => :build
   end
 
   depends_on "pkg-config" => :build
+  depends_on "gnutls"
   depends_on "icu4c"
 
   uses_from_macos "libxml2"
+  uses_from_macos "libxslt"
 
   def install
-    system "./buildconf.sh" if build.head?
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--with-xml2"
+    if build.head?
+      ENV["XML_CATALOG_FILES"] = etc/"xml/catalog"
+      system "./buildconf.sh"
+    end
+    system "./configure", *std_configure_args,
+                          "--with-gnutls",
+                          "--with-xml2",
+                          "--with-xslt"
     system "make", "install"
+
+    # Replace dependencies' cellar paths, which can break build for dependents
+    # (like `metaproxy` and `zebra`) after a dependency is version/revision bumped
+    inreplace bin/"yaz-config" do |s|
+      s.gsub! Formula["gnutls"].prefix.realpath, Formula["gnutls"].opt_prefix
+      s.gsub! Formula["icu4c"].prefix.realpath, Formula["icu4c"].opt_prefix
+    end
+    unless OS.mac?
+      inreplace [bin/"yaz-config", lib/"pkgconfig/yaz.pc"] do |s|
+        s.gsub! Formula["libxml2"].prefix.realpath, Formula["libxml2"].opt_prefix
+        s.gsub! Formula["libxslt"].prefix.realpath, Formula["libxslt"].opt_prefix
+      end
+    end
   end
 
   test do

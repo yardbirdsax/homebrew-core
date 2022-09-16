@@ -1,26 +1,35 @@
 class Kahip < Formula
   desc "Karlsruhe High Quality Partitioning"
   homepage "https://algo2.iti.kit.edu/documents/kahip/index.html"
-  url "https://algo2.iti.kit.edu/schulz/software_releases/KaHIP_2.12.tar.gz"
-  sha256 "b91abdbf9420e2691ed73cea999630e38dfaf0e03157c7a690a998564c652aac"
+  url "https://github.com/KaHIP/KaHIP/archive/v3.14.tar.gz"
+  sha256 "9da04f3b0ea53b50eae670d6014ff54c0df2cb40f6679b2f6a96840c1217f242"
+  license "MIT"
   revision 1
+  head "https://github.com/KaHIP/KaHIP.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "2a3a941d05e8ac41cec5522f11fd835159ffb370452cf788adbcfe0d8c68d654"
-    sha256 cellar: :any, big_sur:       "5e9b5722965b55d3cfe41c64138da7d508f3677948783d10fa8bdc6cb14fd899"
-    sha256 cellar: :any, catalina:      "a05c9bfbd38225e3730e10756f1515d833f09f61eccd7745c55dd8b78690b790"
-    sha256 cellar: :any, mojave:        "57e35f0a81e0d22f9d8d4438994efcc30295e54865525ba89236f58647f66174"
-    sha256 cellar: :any, high_sierra:   "78fda0b177b22dc65d0d9b5116dc842aa023cb027afccd4c2f968f42ac55fada"
+    sha256 cellar: :any,                 arm64_monterey: "caefdd4a209465343d4b986895d17278c811acd876f7ecce50388ab0c4e7b250"
+    sha256 cellar: :any,                 arm64_big_sur:  "a393a6470d7569acf1c2e1e0b402d5901cea07c9880a7d6f01423acdaad7262a"
+    sha256 cellar: :any,                 monterey:       "8f147b571794bbc87b050e84edaca1eb90be0b7c3ed6f0976f3f22c7a6a6ed96"
+    sha256 cellar: :any,                 big_sur:        "d6ef09d6bde208d85c59ea4d5748a0289a6eddec3e75315766a05e692b857c6d"
+    sha256 cellar: :any,                 catalina:       "f3c5fee2f01f5d4dce03a9f5c43ec8bdb6ba2199aa199c0bb09eefcffe1cb425"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6780ba35f379f397d06db1b6b6f5d1b4a236993959821400d94f5058b1686b83"
   end
 
   depends_on "cmake" => :build
-  depends_on "gcc"
   depends_on "open-mpi"
 
+  on_macos do
+    depends_on "gcc"
+  end
+
   def install
-    gcc_major_ver = Formula["gcc"].any_installed_version.major
-    ENV["CC"] = Formula["gcc"].opt_bin/"gcc-#{gcc_major_ver}"
-    ENV["CXX"] = Formula["gcc"].opt_bin/"g++-#{gcc_major_ver}"
+    if OS.mac?
+      gcc_major_ver = Formula["gcc"].any_installed_version.major
+      ENV["CC"] = Formula["gcc"].opt_bin/"gcc-#{gcc_major_ver}"
+      ENV["CXX"] = Formula["gcc"].opt_bin/"g++-#{gcc_major_ver}"
+    end
+
     mkdir "build" do
       system "cmake", *std_cmake_args, ".."
       system "make", "install"

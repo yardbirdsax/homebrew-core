@@ -1,11 +1,11 @@
 class Dub < Formula
   desc "Build tool for D projects"
   homepage "https://code.dlang.org/getting_started"
-  url "https://github.com/dlang/dub/archive/v1.24.0.tar.gz"
-  sha256 "4d14ba97748d89a2af9a3d62c1721c2f92bd393b010a9a4a39037449941e1312"
+  url "https://github.com/dlang/dub/archive/v1.29.2.tar.gz"
+  sha256 "1526f5a2073205eeaf3fbbb62933f0e04bc452de82c0968dd90abba7baceaeea"
   license "MIT"
   version_scheme 1
-  head "https://github.com/dlang/dub.git"
+  head "https://github.com/dlang/dub.git", branch: "master"
 
   livecheck do
     url :stable
@@ -13,19 +13,22 @@ class Dub < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, big_sur:  "3b754d2403322152227cc45a1525321f64c940143bde42220595dcee4d32361f"
-    sha256 cellar: :any_skip_relocation, catalina: "b71a9aa0abd4e9f25391ab6e25be4357c5a70801c4c2e86332bfc909c5253568"
-    sha256 cellar: :any_skip_relocation, mojave:   "acdd545896e27976e2178ea9bf12dba7d39e2118ba04dc762a444f639b51ce81"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "084b64b8299fc45a2466a7ce0cbc2dde2a2302097a5f7af058475f789cfca267"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "300d04b9cdaf03c410bfb29540af2e1df1f88705b120632e47b5796fb2d5f2d6"
+    sha256 cellar: :any_skip_relocation, monterey:       "3d2dd534cf44a3793809443aa003d17dc83f8370d3c0f9ffe8987da6ba70b82d"
+    sha256 cellar: :any_skip_relocation, big_sur:        "24fc05d36186fe08d103b62ba4145112c1c995360671cd406d76195844549656"
+    sha256 cellar: :any_skip_relocation, catalina:       "12420e7460ba50e22aeee6d2cacdf7bc0ac9057e86a99909b40979da142f84cf"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "67253c6642eab447d0cc34aef79be92b9bf5d6482de19b6ca0bcfb9e2a4a7b9c"
   end
 
-  depends_on "dmd" => :build
+  depends_on "ldc" => :build
   depends_on "pkg-config"
 
   uses_from_macos "curl"
 
   def install
     ENV["GITVER"] = version.to_s
-    system "./build.d"
+    system "ldc2", "-run", "./build.d"
     system "bin/dub", "scripts/man/gen_man.d"
     bin.install "bin/dub"
     man1.install Dir["scripts/man/*.1"]

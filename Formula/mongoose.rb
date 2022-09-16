@@ -1,15 +1,17 @@
 class Mongoose < Formula
   desc "Web server build on top of Libmongoose embedded library"
   homepage "https://github.com/cesanta/mongoose"
-  url "https://github.com/cesanta/mongoose/archive/7.1.tar.gz"
-  sha256 "f099bf7223c527e1a0b7fc8888136a3992e8b5c7123839639213b9483bb4f95b"
+  url "https://github.com/cesanta/mongoose/archive/7.8.tar.gz"
+  sha256 "72cb3b5273fa969788d105da53cd4414274b702e761766eebcac9df66cfca2b8"
   license "GPL-2.0-only"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "87374bf95a515e72a2dee8aeb0a9b4d60c42397e7bcd1bb12ed527165f992cfc"
-    sha256 cellar: :any, big_sur:       "8a91713981f4927eb9723d2b5a6b4262185c8e4cf4fe9c02bf7c6f49d7fcab80"
-    sha256 cellar: :any, catalina:      "4f7959dac7c0258f3de40d371b166dca99b077e2856a16bbd4baab7b34527990"
-    sha256 cellar: :any, mojave:        "b6613ccdbe10010e0ddc4bc9a2b0edc169ac7a6f7e9bda4b5f471ccc4efa8fe2"
+    sha256 cellar: :any,                 arm64_monterey: "992bf212139719563761c18ea86cc61339e6430ea5fdcf761f060e48cf638299"
+    sha256 cellar: :any,                 arm64_big_sur:  "c092c739a7b3b414f1075c44feb15eb586a2bdd6016557a2bd64b48c611bad20"
+    sha256 cellar: :any,                 monterey:       "5c0645061675cfc9456f526440970a56b0da2effb92aa1f25f2027269256226f"
+    sha256 cellar: :any,                 big_sur:        "8af167d5c4661a8718e48e4c14dcecd9c0b6b18b154667f76e6ad0bb12ae4e17"
+    sha256 cellar: :any,                 catalina:       "8b5423fb4baa91153431a4fcd01623004444c4e202aa51a7c0b9922213cb53f5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "df63b1647338abd665c74e5d73ddf56bd8304b199aa9963ceac77b63f1bd764c"
   end
 
   depends_on "openssl@1.1"
@@ -24,9 +26,13 @@ class Mongoose < Formula
       bin.install "mongoose_mac" => "mongoose"
     end
 
-    system ENV.cc, "-dynamiclib", "mongoose.c", "-o", "libmongoose.dylib"
+    system ENV.cc, "-dynamiclib", "mongoose.c", "-o", "libmongoose.dylib" if OS.mac?
+    if OS.linux?
+      system ENV.cc, "-fPIC", "-c", "mongoose.c"
+      system ENV.cc, "-shared", "-Wl,-soname,libmongoose.so", "-o", "libmongoose.so", "mongoose.o", "-lc", "-lpthread"
+    end
+    lib.install shared_library("libmongoose")
     include.install "mongoose.h"
-    lib.install "libmongoose.dylib"
     pkgshare.install "examples"
     doc.install Dir["docs/*"]
   end

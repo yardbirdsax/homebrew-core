@@ -1,18 +1,25 @@
 class Kettle < Formula
   desc "Pentaho Data Integration software"
   homepage "https://www.hitachivantara.com/en-us/products/data-management-analytics.html"
-  url "https://downloads.sourceforge.net/project/pentaho/Pentaho%209.1/client-tools/pdi-ce-9.1.0.0-324.zip"
-  sha256 "ffbcb7bba736af765bbb14ccb0a5f2ae239e75b5aebf0ecfee924a5738d2c530"
-  revision 1
+  url "https://downloads.sourceforge.net/project/pentaho/Pentaho-9.3/client-tools/pdi-ce-9.3.0.0-428.zip"
+  sha256 "5c7a453ec448d4b8a568e445b119bcf4f0f41517b42e3626bc437f882c9f46c1"
+  license "Apache-2.0"
 
   livecheck do
     url :stable
     regex(%r{url=.*?/pdi-ce[._-]v?(\d+(?:\.\d+)+(?:-\d+)?)\.(?:t|zip)}i)
   end
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "ba4505bc117fbad7cec2d0e9421062f018b2f749256c478e8aad75e79bba065c"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ba4505bc117fbad7cec2d0e9421062f018b2f749256c478e8aad75e79bba065c"
+    sha256 cellar: :any_skip_relocation, monterey:       "c4ad0f19a4e41e7d86694e6835fbd6072879419e34c4bfab1ab55ee664ffeced"
+    sha256 cellar: :any_skip_relocation, big_sur:        "c4ad0f19a4e41e7d86694e6835fbd6072879419e34c4bfab1ab55ee664ffeced"
+    sha256 cellar: :any_skip_relocation, catalina:       "c4ad0f19a4e41e7d86694e6835fbd6072879419e34c4bfab1ab55ee664ffeced"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ba4505bc117fbad7cec2d0e9421062f018b2f749256c478e8aad75e79bba065c"
+  end
 
-  depends_on "openjdk@8"
+  depends_on "openjdk"
 
   def install
     rm_rf Dir["*.{bat}"]
@@ -25,44 +32,18 @@ class Kettle < Formula
     (var+"log/kettle").mkpath
 
     # We don't assume that carte, kitchen or pan are in anyway unique command names so we'll prepend "pdi"
-    env = { BASEDIR: libexec, JAVA_HOME: Language::Java.java_home("1.8") }
+    env = { BASEDIR: libexec, JAVA_HOME: Language::Java.java_home }
     %w[carte kitchen pan].each do |command|
       (bin+"pdi#{command}").write_env_script libexec+"#{command}.sh", env
     end
   end
 
-  plist_options manual: "pdicarte #{HOMEBREW_PREFIX}/etc/kettle/carte-config.xml"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN"
-      "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_bin}/pdicarte</string>
-            <string>#{etc}/kettle/carte-config.xml</string>
-          </array>
-          <key>EnvironmentVariables</key>
-          <dict>
-            <key>KETTLE_HOME</key>
-            <string>#{etc}/kettle</string>
-          </dict>
-          <key>WorkingDirectory</key>
-          <string>#{etc}/kettle</string>
-          <key>StandardOutPath</key>
-          <string>#{var}/log/kettle/carte.log</string>
-          <key>StandardErrorPath</key>
-          <string>#{var}/log/kettle/carte.log</string>
-          <key>RunAtLoad</key>
-          <true/>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_bin/"pdicarte", etc/"kettle/carte-config.xml"]
+    working_dir etc/"kettle"
+    log_path var/"log/kettle/carte.log"
+    error_log_path var/"log/kettle/carte.log"
+    environment_variables KETTLE_HOME: etc/"kettle"
   end
 
   test do

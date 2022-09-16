@@ -1,8 +1,8 @@
 class Lnav < Formula
   desc "Curses-based tool for viewing and analyzing log files"
   homepage "https://lnav.org/"
-  url "https://github.com/tstack/lnav/releases/download/v0.9.0/lnav-0.9.0.tar.gz"
-  sha256 "03e15449a87fa511cd19c6bb5e95de4fffe17612520ff7683f2528d3b2a7238f"
+  url "https://github.com/tstack/lnav/releases/download/v0.11.0/lnav-0.11.0.tar.gz"
+  sha256 "d3fa5909af8e5eb2aa7818b90120cae35aa7dd1775a3b0d2097d7e6075b8f935"
   license "BSD-2-Clause"
 
   livecheck do
@@ -11,32 +11,40 @@ class Lnav < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "6b79f37c40cf7a626865ffef75bc445813d91473d64068e6d906eb3cedeeab4a"
-    sha256 cellar: :any, big_sur:       "11eb34ef34f635e008facc8890c0bcb07585d62dd9c273890552890d863adf0e"
-    sha256 cellar: :any, catalina:      "b21b188394092e3ca801819e0b2eb26017132fb2baadfcb014d6fb3c8c6253e3"
-    sha256 cellar: :any, mojave:        "49510aa07d98f6a05f6d7ea19dc30f2ada6456b3fb644620efe1e7e3c92673b4"
-    sha256 cellar: :any, high_sierra:   "538a2a0b9f09829b33901bd33e5d8f566745f23a3d3fe95d6fa7f6608d3bb485"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "e51730f08b4c25a058b5a6925d749d292f7a34eee829cd0028aae93f7b3447d7"
+    sha256 cellar: :any,                 arm64_big_sur:  "c02f6a4c62725349bb24336ee3bebd325f3615f474236f2a9ca95d2119b22283"
+    sha256 cellar: :any,                 monterey:       "ceec299dc99dc1ed5d230e9a81d4f50b86451b61827314d4e796b303e35c323c"
+    sha256 cellar: :any,                 big_sur:        "e418b8dd04fc1b7193968e4dbcad1e7652cae0649c05d99673be778594aa00fe"
+    sha256 cellar: :any,                 catalina:       "c28f62a13c4618830fd145c5b449d24f3df92d681c61dd456f0756d1620d79e8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6b089fd04dc4d3eac67c4890a551027325e0f583c8c0b7050cc9bf5fe7eff706"
   end
 
   head do
-    url "https://github.com/tstack/lnav.git"
+    url "https://github.com/tstack/lnav.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
     depends_on "re2c" => :build
   end
 
+  depends_on "libarchive"
   depends_on "pcre"
   depends_on "readline"
   depends_on "sqlite"
+  uses_from_macos "curl"
+
+  fails_with gcc: "5"
 
   def install
     system "./autogen.sh" if build.head?
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--with-sqlite=#{Formula["sqlite"].opt_prefix}",
-                          "--with-readline=#{Formula["readline"].opt_prefix}"
-    system "make", "install"
+    ENV.append "LDFLAGS", "-L#{Formula["libarchive"].opt_lib}"
+    system "./configure", *std_configure_args,
+                          "--with-sqlite3=#{Formula["sqlite"].opt_prefix}",
+                          "--with-readline=#{Formula["readline"].opt_prefix}",
+                          "--with-libarchive=#{Formula["libarchive"].opt_prefix}",
+                          "LDFLAGS=#{ENV.ldflags}"
+    system "make", "install", "V=1"
   end
 
   test do

@@ -1,10 +1,10 @@
 class Goreman < Formula
   desc "Foreman clone written in Go"
   homepage "https://github.com/mattn/goreman"
-  url "https://github.com/mattn/goreman/archive/v0.3.7.tar.gz"
-  sha256 "424dde6592c99468dce19c1302222a15ccc2367f0c908ee2147709398ce6497b"
+  url "https://github.com/mattn/goreman/archive/v0.3.13.tar.gz"
+  sha256 "dfc20682714626c69db2fde9ce48432e7116f267488a123b79d72f6dabcca7a3"
   license "MIT"
-  head "https://github.com/mattn/goreman.git"
+  head "https://github.com/mattn/goreman.git", branch: "master"
 
   livecheck do
     url :homepage
@@ -12,11 +12,12 @@ class Goreman < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "b23fc772de996cff73c26a93ba73c826b5f7e56929f0c717c9388066bb689067"
-    sha256 cellar: :any_skip_relocation, big_sur:       "7935ca50f9a9c6fc0caceb81d64a6439aab37c61fb75edbbff99729e3542568b"
-    sha256 cellar: :any_skip_relocation, catalina:      "8985d410d3b9c56064ceb7a01be4fd448e46c414f0a0b8c3a4f6ec7374c2f5b6"
-    sha256 cellar: :any_skip_relocation, mojave:        "d7781e6ce9c1ab5844f06d77dbbb8355a5f749daa5cd3c2b12266385d73b9a77"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "df59dbb8a079d4eaf095b7a807dcbd0a96de11874dec3b6e560454617eed9b2b"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "986155fa8952bfc2f2e642a3dd8fef50d273fe086aa7a4c33774a4d13f4eca18"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f4b24f1d784da2b808ef927b8432d0a8cc12ba573f4a5e714be0eaeb735eb8c1"
+    sha256 cellar: :any_skip_relocation, monterey:       "8a43d0685955570af59741794d37c4b215860b2b3c9d60823774b2c047a1cf98"
+    sha256 cellar: :any_skip_relocation, big_sur:        "bab40f093c03c2e988489dee4ab7387df524831e21c502c9585846f41c3a7735"
+    sha256 cellar: :any_skip_relocation, catalina:       "31c67a12dc71a363b8ba88fbeff4c15eabc40aeb8cc194aabb123752744fc673"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d6966ffced430d09be24f06c54954cdfba15a149e9d1d518c883a7ff3a9f150b"
   end
 
   depends_on "go" => :build

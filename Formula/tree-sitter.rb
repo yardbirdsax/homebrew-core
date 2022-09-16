@@ -3,17 +3,18 @@ require "language/node"
 class TreeSitter < Formula
   desc "Parser generator tool and incremental parsing library"
   homepage "https://tree-sitter.github.io/"
-  url "https://github.com/tree-sitter/tree-sitter/archive/0.18.0.tar.gz"
-  sha256 "574458dbc8b6761027d3090bc2fd474f17ea77d875d4713ed9260d0def125bce"
+  url "https://github.com/tree-sitter/tree-sitter/archive/v0.20.7.tar.gz"
+  sha256 "b355e968ec2d0241bbd96748e00a9038f83968f85d822ecb9940cbe4c42e182e"
   license "MIT"
-  head "https://github.com/tree-sitter/tree-sitter.git"
+  head "https://github.com/tree-sitter/tree-sitter.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any, arm64_big_sur: "bcb908e01eb052b68fb3780f12d9cf74da9b36967f9cd6be1f37ffcce5a65805"
-    sha256 cellar: :any, big_sur:       "99f761f4f254e03c4a1340389f0997e168695764f448984b691b4c2ed636a228"
-    sha256 cellar: :any, catalina:      "6acc385bf4be8cbbc3199a57c918346fc724f4da7afbdd3bc7612595b04d27c2"
-    sha256 cellar: :any, mojave:        "d15a8f3640166e717d4dd1f805b19aa48272c72d414bde3838d66a6a6d8c2197"
+    sha256 cellar: :any,                 arm64_monterey: "ed7732dfb93b41a1a9dec118f119903214b2733059a4666b4811a8c0b4995fb6"
+    sha256 cellar: :any,                 arm64_big_sur:  "1ca16211e94d5a9c72785bf1206141c18c10836027a8e7e58961809fb1e10141"
+    sha256 cellar: :any,                 monterey:       "c863b441b7df332c195dd7be16c67108d2bffab77cb6b5d336c59b77d2ac28b0"
+    sha256 cellar: :any,                 big_sur:        "49fc36d28fb16ab79081fd579585be955473a4c196971385b8425cb928fd8959"
+    sha256 cellar: :any,                 catalina:       "84744c0f0ac2af90eb3929ffedcd3284906da54186d923f3449e98cf53aea8d3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3a9847f8198c9fc9b3da2b65a37e397a1eabaf549f0f7cb93a18a47a6fa0254c"
   end
 
   depends_on "emscripten" => [:build, :test]
@@ -21,18 +22,21 @@ class TreeSitter < Formula
   depends_on "rust" => :build
 
   def install
+    system "make", "AMALGAMATED=1"
+    system "make", "install", "PREFIX=#{prefix}"
+
+    # NOTE: This step needs to be done *before* `cargo install`
     cd "lib/binding_web" do
       system "npm", "install", *Language::Node.local_npm_install_args
     end
     system "script/build-wasm"
 
-    system "make"
-    system "make", "install", "PREFIX=#{prefix}"
-
     cd "cli" do
       system "cargo", "install", *std_cargo_args
     end
 
+    # Install the wasm module into the prefix.
+    # NOTE: This step needs to be done *after* `cargo install`.
     %w[tree-sitter.js tree-sitter-web.d.ts tree-sitter.wasm package.json].each do |file|
       (lib/"binding_web").install "lib/binding_web/#{file}"
     end
@@ -51,7 +55,7 @@ class TreeSitter < Formula
         }
       });
     EOS
-    system bin/"tree-sitter", "generate"
+    system bin/"tree-sitter", "generate", "--abi=latest"
 
     # test `tree-sitter parse`
     (testpath/"test/corpus/hello.txt").write <<~EOS
@@ -100,13 +104,8 @@ class TreeSitter < Formula
     system ENV.cc, "test_program.c", "-L#{lib}", "-ltree-sitter", "-o", "test_program"
     assert_equal "tree creation failed", shell_output("./test_program")
 
-    # test `tree-sitter web-ui`
+    # test `tree-sitter build-wasm`
     ENV.delete "CPATH"
     system bin/"tree-sitter", "build-wasm"
-    fork do
-      exec bin/"tree-sitter", "web-ui"
-    end
-    sleep 10
-    system "killall", "tree-sitter"
   end
 end

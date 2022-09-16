@@ -1,9 +1,10 @@
 class S2n < Formula
   desc "Implementation of the TLS/SSL protocols"
-  homepage "https://github.com/awslabs/s2n"
-  url "https://github.com/awslabs/s2n/archive/v0.10.0.tar.gz"
-  sha256 "ace34f0546f50551ee2124d25f8de3b7b435ddb1b4fbf640ea0dcb0f1c677451"
+  homepage "https://github.com/aws/s2n-tls"
+  url "https://github.com/aws/s2n-tls/archive/v1.3.21.tar.gz"
+  sha256 "415120a7baefaf56e122af93d4c0f51ee96afe00b79b7f4990cb0dbc4d8a6b8b"
   license "Apache-2.0"
+  head "https://github.com/aws/s2n-tls.git", branch: "main"
 
   livecheck do
     url :stable
@@ -11,22 +12,21 @@ class S2n < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "e777f779afcfcdedf621642693d6c257fbf2f7bb3730e57011063643e6b32697"
-    sha256 cellar: :any, big_sur:       "d2de6735ea9b3b5dbc6c027959beb240f5fe7dbcf66c5d7be10eb2e1fd9e6230"
-    sha256 cellar: :any, catalina:      "563c56399c77a3d3a6a7fa265a854c11671e671ad679316e0f5eb3fadfe1d3ea"
-    sha256 cellar: :any, mojave:        "5dfe9d90d210cf4df21c785d866efb35a4e2a2c23fc79e8de2c77d732ae666c7"
-    sha256 cellar: :any, high_sierra:   "fa1f38966a646891d5fda5573743d5212f462a3d816e7879c92e27ef243858e8"
+    sha256 cellar: :any,                 arm64_monterey: "7ee23453fe96d44d4b6d9d75b71a3844762b5f9ea3e0874ca7cf82a34c025b63"
+    sha256 cellar: :any,                 arm64_big_sur:  "463d1b4ce99f8224521a0463d891b38fc85671199aa763006331c192cc5d05af"
+    sha256 cellar: :any,                 monterey:       "2054d65d2289571a938c0c36957161e8858202f7cfdfff30954da3c7e3af1e52"
+    sha256 cellar: :any,                 big_sur:        "f652e67bee55f2988c83f157981cfd02e544446aba2b3efd966757daba6c80f0"
+    sha256 cellar: :any,                 catalina:       "515846a82d3f1568f8254850a6d88bcfada4854452c4c80dab4d4190cba3cb3b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6a2be42bc45e319a6d2174639bce61a04c140891632747291ec90df1f0a08b71"
   end
 
   depends_on "cmake" => :build
   depends_on "openssl@1.1"
 
   def install
-    mkdir "build" do
-      system "cmake", "..", *std_cmake_args, "-DBUILD_SHARED_LIBS=ON"
-      system "make"
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args, "-DBUILD_SHARED_LIBS=ON"
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
@@ -38,7 +38,8 @@ class S2n < Formula
         return 0;
       }
     EOS
-    system ENV.cc, "test.c", "-L#{lib}", "-ls2n", "-o", "test"
+    system ENV.cc, "test.c", "-L#{opt_lib}", "-ls2n", "-o", "test"
+    ENV["S2N_DONT_MLOCK"] = "1" if OS.linux?
     system "./test"
   end
 end

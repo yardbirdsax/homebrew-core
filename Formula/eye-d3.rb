@@ -4,9 +4,10 @@ class EyeD3 < Formula
   desc "Work with ID3 metadata in .mp3 files"
   homepage "https://eyed3.nicfit.net/"
   url "https://eyed3.nicfit.net/releases/eyeD3-0.9.6.tar.gz"
-  mirror "https://files.pythonhosted.org/packages/3a/7a/07fc7a0e4f7913f599dae950ea5024f006ccef2bc1bbffba288ed8fdfcab/eyeD3-0.9.6.tar.gz"
+  mirror "https://files.pythonhosted.org/packages/fb/f2/27b42a10b5668df27ce87aa22407e5115af7fce9b1d68f09a6d26c3874ec/eyeD3-0.9.6.tar.gz"
   sha256 "4b5064ec0fb3999294cca0020d4a27ffe4f29149e8292fdf7b2de9b9cabb7518"
   license "GPL-3.0-or-later"
+  revision 1
 
   livecheck do
     url "https://github.com/nicfit/eyeD3.git"
@@ -14,13 +15,15 @@ class EyeD3 < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "a4613276d6a11d859910c4fc261acd46ed8c79f6fb39e1174fc9a0e3aa9a425f"
-    sha256 cellar: :any_skip_relocation, big_sur:       "fabd715d3a65c1227ba6f6f0f5f5ef6e4f30311fdb6a81c6ee64f29ab06b6315"
-    sha256 cellar: :any_skip_relocation, catalina:      "fac417d9f81abb4a7f9a7c422e166eecafc1d7eedfeb0db93e47d59d9e1894b7"
-    sha256 cellar: :any_skip_relocation, mojave:        "9a2595374e19a747a5c5e04bd25cd95d80cf99e3a78c9259fe9b4cd9414f9afc"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "2e439834b1f3942d1318b958cf4363dc68386dcc5930841207d13d56e3bf0be3"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e3bf5857dd54a6b08e2367bfca0d01a23ad251fc4fbbc1479ffb27dca61deb08"
+    sha256 cellar: :any_skip_relocation, monterey:       "a815764695f279f4f0402da82ab02d5db6c7acae8678b9f4bc486f2fe8e1d628"
+    sha256 cellar: :any_skip_relocation, big_sur:        "884850552176a42baf923bf4c0b1a57144c8ebc6b7b5a9451dbdb1c932995e24"
+    sha256 cellar: :any_skip_relocation, catalina:       "0279f0d6ae173bbfc09afbd493e1b2ee6265bda57b312cfd8b7f1f4229ee9e76"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c511552fe4d3bbed9ef74934bfd5cf2e2cc42d395f38106cf78d70a40ad8f5aa"
   end
 
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   # Looking for documentation? Please submit a PR to build some!
   # See https://github.com/Homebrew/homebrew/issues/32770 for previous attempt.
@@ -56,7 +59,13 @@ class EyeD3 < Formula
   end
 
   def install
-    virtualenv_install_with_resources
+    python3 = "python3.10"
+    venv = virtualenv_create(libexec, python3)
+    venv.pip_install resources
+
+    bin_before = Dir[libexec/"bin/*"].to_set
+    system libexec/"bin"/python3, *Language::Python.setup_install_args(libexec, python3)
+    bin.install_symlink (Dir[libexec/"bin/*"].to_set - bin_before).to_a
     share.install Dir["docs/*"]
   end
 

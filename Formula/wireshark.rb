@@ -1,11 +1,11 @@
 class Wireshark < Formula
   desc "Graphical network analyzer and capture tool"
   homepage "https://www.wireshark.org"
-  url "https://www.wireshark.org/download/src/all-versions/wireshark-3.4.3.tar.xz"
-  mirror "https://1.eu.dl.wireshark.org/src/all-versions/wireshark-3.4.3.tar.xz"
-  sha256 "f467cc77f0fc73fce0b854cdbc292f132d4879fca69d417eccad5f967fbf262b"
+  url "https://www.wireshark.org/download/src/all-versions/wireshark-3.6.7.tar.xz"
+  mirror "https://1.eu.dl.wireshark.org/src/all-versions/wireshark-3.6.7.tar.xz"
+  sha256 "cce10a35caa2f79b73d3e6e4dc5388dd47d216114a550fdeb06ae78da0edb7c5"
   license "GPL-2.0-or-later"
-  head "https://gitlab.com/wireshark/wireshark.git"
+  head "https://gitlab.com/wireshark/wireshark.git", branch: "master"
 
   livecheck do
     url "https://www.wireshark.org/download.html"
@@ -13,9 +13,12 @@ class Wireshark < Formula
   end
 
   bottle do
-    sha256 big_sur:  "a14d571d799188aa534bdaef7e5504366c024a69028345c246df33cbbe621871"
-    sha256 catalina: "925e6c36a6e3adbc01d5cc6835359b42b02c21acae35a64e54673a529d90c0f3"
-    sha256 mojave:   "7f29abe5359f06d4317d69e616643ea3ac5765ac3b87366f4717c5372231f534"
+    sha256 arm64_monterey: "2af55f85377ba3bf6e10dc4173cc8c55785c4f2c37c65430606692a9add0d4a6"
+    sha256 arm64_big_sur:  "4eb76a02dbd3b155b205a8f8e16409fa83d0bb606d08d2914c81cfb769125c44"
+    sha256 monterey:       "ced94ed71232b873f0807d994184b09764f2e51e147ffb62f4240ab128f0c3fb"
+    sha256 big_sur:        "8718d561354155c1d49bf9c601fbb6788c461bb1fc933305e87e05d9ff2379b7"
+    sha256 catalina:       "812521a69760692ec3142f959f8f275d8a0fc34132b8305ea30a859505e05c17"
+    sha256 x86_64_linux:   "3bfef710231b69378c6b9f6f64e41a051a6b250560286b90c0eac53768dfe892"
   end
 
   depends_on "cmake" => :build
@@ -24,13 +27,14 @@ class Wireshark < Formula
   depends_on "gnutls"
   depends_on "libgcrypt"
   depends_on "libmaxminddb"
+  depends_on "libnghttp2"
   depends_on "libsmi"
   depends_on "libssh"
   depends_on "lua"
-  depends_on "nghttp2"
 
   uses_from_macos "bison" => :build
   uses_from_macos "flex" => :build
+  uses_from_macos "python" => :build
 
   def install
     args = std_cmake_args + %W[
@@ -41,7 +45,7 @@ class Wireshark < Formula
       -DENABLE_PORTAUDIO=OFF
       -DENABLE_LUA=ON
       -DLUA_INCLUDE_DIR=#{Formula["lua"].opt_include}/lua
-      -DLUA_LIBRARY=#{Formula["lua"].opt_lib}/liblua.dylib
+      -DLUA_LIBRARY=#{Formula["lua"].opt_lib/shared_library("liblua")}
       -DCARES_INCLUDE_DIR=#{Formula["c-ares"].opt_include}
       -DGCRYPT_INCLUDE_DIR=#{Formula["libgcrypt"].opt_include}
       -DGNUTLS_INCLUDE_DIR=#{Formula["gnutls"].opt_include}
@@ -53,6 +57,7 @@ class Wireshark < Formula
       -DBUILD_wireshark=OFF
       -DENABLE_APPLICATION_BUNDLE=OFF
       -DENABLE_QT5=OFF
+      -DCMAKE_INSTALL_NAME_DIR:STRING=#{lib}
     ]
 
     system "cmake", *args, "."

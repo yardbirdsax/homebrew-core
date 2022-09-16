@@ -1,13 +1,17 @@
 class BatsCore < Formula
   desc "Bash Automated Testing System"
   homepage "https://github.com/bats-core/bats-core"
-  url "https://github.com/bats-core/bats-core/archive/v1.2.1.tar.gz"
-  sha256 "91c49b1fe6f0656c46491929ed728f8dfa9a96df0cce294963e8c6082bff87a2"
+  url "https://github.com/bats-core/bats-core/archive/v1.8.0.tar.gz"
+  sha256 "0d4c44823905af5e52a92f9164595c183fb0d0b43b0c4e9c9acf794af20468b7"
   license "MIT"
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "e9c11ca0383ecccf76065ccf65b0c53ab172ac26d3325a5f067adbe10e7de48a"
+  end
 
   depends_on "coreutils"
+
+  uses_from_macos "bc" => :test
 
   conflicts_with "bats", because: "both install `bats` executables"
 

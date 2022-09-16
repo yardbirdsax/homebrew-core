@@ -1,28 +1,32 @@
 class H3 < Formula
   desc "Hexagonal hierarchical geospatial indexing system"
   homepage "https://uber.github.io/h3/"
-  url "https://github.com/uber/h3/archive/v3.7.1.tar.gz"
-  sha256 "cfa3b4e1d46251929bd30575f09c89edb2c209be7ad8b0af15ff3f9a04132688"
+  url "https://github.com/uber/h3/archive/v4.0.0.tar.gz"
+  sha256 "218ce453cf7548a843fc23271dc48523cd6a601b6d26d9dd8d23a35b6128793b"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any, big_sur:     "65c2cd49b30043d5927f3cb1d83250e1cae623056faf823d596ed6e84186c145"
-    sha256 cellar: :any, catalina:    "6fcd1a31fac3329f1f3d8e84e5d46cc601eb348956bca155e5aa614a18146101"
-    sha256 cellar: :any, mojave:      "2bb08dbd4274ba9f9195aefe3bd90d2afc3751b89ab11e3d2eb6e4ee67d418b5"
-    sha256 cellar: :any, high_sierra: "bb8bd6d67bfc428e38c637ec755fe32e52093dc94be4e787a7e37f8c6da6d980"
+    sha256 cellar: :any,                 arm64_monterey: "5ccfa8701b32825395c48a357bd2e70a36667f2b4baa98764f76843315a23273"
+    sha256 cellar: :any,                 arm64_big_sur:  "5caef45b04bc8bc3213e0188a81d162c6169683823f04203adc9242ed773d0dd"
+    sha256 cellar: :any,                 monterey:       "f131ea0412bcaa6686152d9497ed329ffa5418f6130aa5239a49e8d2ff5e82c4"
+    sha256 cellar: :any,                 big_sur:        "ccb72ef40580a82c89b254dab5d0f1ea08a256dfdd6af1b3fc8cfb940643ca00"
+    sha256 cellar: :any,                 catalina:       "46948db333917ed24a8c558f48477cbfecabbe5dfcb058745008404a22571aa2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cfc07c7796ea3ee96808a8cfdd3001e1b46a25a2cc913991faaca41baed2c702"
   end
 
   depends_on "cmake" => :build
 
   def install
-    mkdir "build" do
-      system "cmake", "..", "-DBUILD_SHARED_LIBS=YES", *std_cmake_args
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build",
+                    "-DBUILD_SHARED_LIBS=ON",
+                    "-DCMAKE_INSTALL_RPATH=#{rpath}",
+                    *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
-    result = pipe_output("#{bin}/geoToH3 -r 10 --lat 40.689167 --lon -74.044444")
+    result = pipe_output("#{bin}/latLngToCell -r 10 --lat 40.689167 --lng -74.044444")
     assert_equal "8a2a1072b59ffff", result.chomp
   end
 end

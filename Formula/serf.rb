@@ -2,17 +2,18 @@ class Serf < Formula
   desc "Service orchestration and management tool"
   homepage "https://serfdom.io/"
   url "https://github.com/hashicorp/serf.git",
-      tag:      "v0.9.5",
-      revision: "7faa1b06262f70780c3c35ac25a4c96d754f06f3"
+      tag:      "v0.10.0",
+      revision: "3805ead385cbd7f3bf57d41facefbe0fe2e848c7"
   license "MPL-2.0"
-  head "https://github.com/hashicorp/serf.git"
+  head "https://github.com/hashicorp/serf.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "9ebda6b1a139cb8b900799676be12c0993bbd894b1869577739a0ef2a4682d38"
-    sha256 cellar: :any_skip_relocation, big_sur:       "5ae109c95ab044f550a3e20702eb165d014d618198a7fbf280f9731cc02f9e1b"
-    sha256 cellar: :any_skip_relocation, catalina:      "9fa6ba9a73d743e404c84088e64ef860dcf3f8e0bc0fbeb74a39437440c0dc72"
-    sha256 cellar: :any_skip_relocation, mojave:        "2bcfffa14b7a86099e6dc3574f1dcece4d125b72f32d8fad6be943a63380da75"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "78b0abfda4b9f41da7df720f79e93346ad524450e801c3528706232d012cbadc"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "072bf0a61633a6ee92d9c80fa26caa80bc7347f8a05bc1375f69c2988f7b75e2"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "44572bc73830df57ff5888e4e87312ee4cd193a2c593d4daaf8f9d628560f676"
+    sha256 cellar: :any_skip_relocation, monterey:       "e440b4ee34d49a1218451f3386d82de12b200b0f91926624bf34ad7e58ccac54"
+    sha256 cellar: :any_skip_relocation, big_sur:        "76d6f3326f99e239d3fec8d3becbe08ad21ca51dfb52bdd6cca04ade960edfa6"
+    sha256 cellar: :any_skip_relocation, catalina:       "384e75b881441902f6d7e0b96f72f547a7de6cb9dda0ef6f606ae241110418ff"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6cc701296a0e70345a64c7e3d5b15edb99572e60ab461395dafd5f9fb1aad2e2"
   end
 
   depends_on "go" => :build
@@ -33,7 +34,7 @@ class Serf < Formula
       exec "#{bin}/serf", "agent"
     end
     sleep 1
-    assert_match /:7946.*alive$/, shell_output("#{bin}/serf members")
+    assert_match(/:7946.*alive$/, shell_output("#{bin}/serf members"))
   ensure
     system "#{bin}/serf", "leave"
     Process.kill "SIGINT", pid

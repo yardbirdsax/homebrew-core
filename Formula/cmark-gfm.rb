@@ -1,27 +1,28 @@
 class CmarkGfm < Formula
   desc "C implementation of GitHub Flavored Markdown"
   homepage "https://github.com/github/cmark-gfm"
-  url "https://github.com/github/cmark-gfm/archive/0.29.0.gfm.0.tar.gz"
-  version "0.29.0.gfm.0"
-  sha256 "6a94aeaa59a583fadcbf28de81dea8641b3f56d935dda5b2447a3c8df6c95fea"
+  url "https://github.com/github/cmark-gfm/archive/0.29.0.gfm.5.tar.gz"
+  version "0.29.0.gfm.5"
+  sha256 "f665079062e05abc44ae933a74f1bdc5c89af1e1d2f4152042fc1ec5571093fe"
   license "BSD-2-Clause"
-  revision 2
 
   bottle do
-    sha256 cellar: :any, big_sur:     "3e26c1d17fc758db9384e87ae0fb9c14bf72131e907999f3df7e92e82db9f740"
-    sha256 cellar: :any, catalina:    "f7d1e82fce11d59440842e86065a21ec244b85159e091528dca7e004a32615ba"
-    sha256 cellar: :any, mojave:      "e203ca97951abc32dc20dede8c504df44a6972f8cb03df7a0e597bc7caeb20f5"
-    sha256 cellar: :any, high_sierra: "461d5443abc76191e65b3df9f2448072107e31211017e38bbb461842b523ee43"
+    sha256 cellar: :any,                 arm64_monterey: "e319253d9762d75a1d72ba449cedd86a1a2362568b10dd91fdc0b7d60ba7435d"
+    sha256 cellar: :any,                 arm64_big_sur:  "30b8c1e28d62302b0b91d260315bd4208ece7edb582ba9cb1ee90ed32df44ea3"
+    sha256 cellar: :any,                 monterey:       "c6c52d9b82aacdcb35dd8e92ac20815c419c15a648bcc4ff9345c43346c8f93c"
+    sha256 cellar: :any,                 big_sur:        "27fa10766c92a82c2fc81485c21ebd2ba37da3730fd3032d4eb51b71eb005d64"
+    sha256 cellar: :any,                 catalina:       "caa4c5bf3a77a079799e330f17af0144dcb9b068f0f5a55978c1142591743ef0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1a03572908861ae5eaf0c1e611d68e40c391097917ed8f87287b3adc46f6595a"
   end
 
   depends_on "cmake" => :build
-  depends_on "python@3.9" => :build
+  depends_on "python@3.10" => :build
 
   conflicts_with "cmark", because: "both install a `cmark.h` header"
 
   def install
     mkdir "build" do
-      system "cmake", "..", *std_cmake_args
+      system "cmake", "..", *std_cmake_args, "-DCMAKE_INSTALL_RPATH=#{rpath}"
       system "make", "install"
     end
   end

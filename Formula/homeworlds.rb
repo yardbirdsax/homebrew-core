@@ -5,19 +5,22 @@ class Homeworlds < Formula
       revision: "917cd7e7e6d0a5cdfcc56cd69b41e3e80b671cde"
   version "20141022"
   license "BSD-2-Clause"
+  revision 5
 
-  bottle do
-    sha256 cellar: :any, arm64_big_sur: "4a024da7560148c9d94c347226e325968fd087c09610ee14757c618eaf6d52f1"
-    sha256 cellar: :any, big_sur:       "d6a22f3c56da49ec935804ed17594b8a82a8114781d953b0c3315330eb64ef18"
-    sha256 cellar: :any, catalina:      "a31bff64509e705b514068d75a4bdd6b9e11fa1f0e0aa45bef8b6ecb2b10c7be"
-    sha256 cellar: :any, mojave:        "9998b77fea42a5c72c4ffdab61b84165ae8ce067763e4c661a058235749eaf84"
-    sha256 cellar: :any, high_sierra:   "b26fbb5f7955afa48247667b0caeff13d504eee6ef744284c498702026f9528e"
-    sha256 cellar: :any, sierra:        "499e9a94e24c8965b9a31902ab2a14a021c780756451b82ac2313c7c86ac5756"
-    sha256 cellar: :any, el_capitan:    "2665c0ed4da2eb399314d044699385250ca5db54e6f8c22287222b7877881d22"
-    sha256 cellar: :any, yosemite:      "47251f13fa79c98b3c41d45cafade044bded134256f56e6ee1a118f67eb325d8"
+  livecheck do
+    skip "No version information available to check"
   end
 
-  depends_on "wxmac"
+  bottle do
+    sha256 cellar: :any,                 arm64_monterey: "c64318bee66cc6f65c77c7cb846b87a3a756f0fe92045824f32963341564669d"
+    sha256 cellar: :any,                 arm64_big_sur:  "cccfb68554076f1c70337b70ca450779546af81986e81973cb7b25acb9a0220f"
+    sha256 cellar: :any,                 monterey:       "4ee671d1292a1e9c8f63ea3e1a40625d20b4349e3a3d188077646936ae9f60c5"
+    sha256 cellar: :any,                 big_sur:        "311295581320a095f2754a7adc5c1c291d2ad9a9baa368daee04c0c73c78ceca"
+    sha256 cellar: :any,                 catalina:       "117c083e402e42c76765855805ecda628538eab7372fc80cceef84a100b9368f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "88f7a3976037aea175f742cb16c1e3e0e7e0f7945bf9f24b42eaedeabe16834c"
+  end
+
+  depends_on "wxwidgets"
 
   def install
     system "make"

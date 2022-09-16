@@ -2,8 +2,8 @@ class Fluxctl < Formula
   desc "Command-line tool to access Weave Flux, the Kubernetes GitOps operator"
   homepage "https://github.com/fluxcd/flux"
   url "https://github.com/fluxcd/flux.git",
-      tag:      "1.21.1",
-      revision: "930a2cc43487033ac70e38f7389a2a573a55fdf5"
+      tag:      "1.25.4",
+      revision: "95493343346f2000299996bab0fc49caf31201dd"
   license "Apache-2.0"
 
   livecheck do
@@ -12,18 +12,18 @@ class Fluxctl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "21279a68c5e174c9dc901b9de1782716cbc7130d85259ac24234e339a2573945"
-    sha256 cellar: :any_skip_relocation, big_sur:       "53227e9833e63f339d03dc38c1b542debe9bc00cc122e40b128f37be43a7b03f"
-    sha256 cellar: :any_skip_relocation, catalina:      "18d0f73be5406c24147a4092f05aed13788032a51c8acb7e3a62709889d2313c"
-    sha256 cellar: :any_skip_relocation, mojave:        "26df944d2b25badcf9cb4a742b442f6e40657be2987b86ad0be7e7cf0296ebf0"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "8c059cb7ecb8747a61ef8fc416bbe908a4b42efcbb020e48effc3beaa9bd0472"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "21b213416a61ed795b87fcb56ab7cff2fcd7142aebba9bc1a14978bb5b2e0d20"
+    sha256 cellar: :any_skip_relocation, monterey:       "7808c99b3b5f1b0c541399b1733ad6e40075b447cb0874db8dd46d6583f5511f"
+    sha256 cellar: :any_skip_relocation, big_sur:        "6d55de8657ae06d13b86d387653d672770280e9e5f56b6cc17e264914c1c21b3"
+    sha256 cellar: :any_skip_relocation, catalina:       "4f9eca9faa6b11dd4986a7ffba7665702a69acfd80d97a9da65d16df38c8f34a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "870b2dcecf960807ddb6d5fa8e2e62b1a806dd13d0daac409e8aa7a65e593601"
   end
 
   depends_on "go" => :build
 
   def install
-    cd buildpath/"cmd/fluxctl" do
-      system "go", "build", "-ldflags", "-s -w -X main.version=#{version}", "-trimpath", "-o", bin/"fluxctl"
-    end
+    system "go", "build", *std_go_args(ldflags: "-s -w -X main.version=#{version}"), "./cmd/fluxctl"
   end
 
   test do

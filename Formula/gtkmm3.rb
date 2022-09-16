@@ -1,10 +1,9 @@
 class Gtkmm3 < Formula
   desc "C++ interfaces for GTK+ and GNOME"
   homepage "https://www.gtkmm.org/"
-  url "https://download.gnome.org/sources/gtkmm/3.24/gtkmm-3.24.3.tar.xz"
-  sha256 "60497c4f7f354c3bd2557485f0254f8b7b4cf4bebc9fee0be26a77744eacd435"
+  url "https://download.gnome.org/sources/gtkmm/3.24/gtkmm-3.24.7.tar.xz"
+  sha256 "1d7a35af9c5ceccacb244ee3c2deb9b245720d8510ac5c7e6f4b6f9947e6789c"
   license "LGPL-2.1-or-later"
-  revision 3
 
   livecheck do
     url :stable
@@ -12,10 +11,12 @@ class Gtkmm3 < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "3b532015fa27753a66beb7d3f3d878df3287854239a5a8dbe3e4d2d21925d39f"
-    sha256 cellar: :any, big_sur:       "2a868d1c823f77a92609967b978d9507e0c53cc6975e13e74ab86f2cc7dc18a6"
-    sha256 cellar: :any, catalina:      "4f38441a8e8ad604a828292b5ce994c342512151607cfd291e79794b9c9c4235"
-    sha256 cellar: :any, mojave:        "36e3de79e24802c980b23b9136bc6291120fc693c2d1b766dfc2542d5abb97d8"
+    sha256 cellar: :any, arm64_monterey: "808bfe18b6b0520ae339f1547226186e26d2921aec56a1a893e23d944a4c8526"
+    sha256 cellar: :any, arm64_big_sur:  "27b6d3262145f8603093b58ca8acb18f2ab85e0a7c278e5b07cf6af9da8e6095"
+    sha256 cellar: :any, monterey:       "0d993ae9c31063d3e051809dc39e5c519f757488d0dc2329cd55088676d0ee89"
+    sha256 cellar: :any, big_sur:        "d02cdf945b5d228921bd461fadffeb28e384e29166b4483760ee3be9f7ab2c9f"
+    sha256 cellar: :any, catalina:       "c482ea55a5f8d0eace78b24ce5b8337b355f47816cc3c3b71f2767af2ed5bdb1"
+    sha256               x86_64_linux:   "a13ec506b7a75317c847535caa40ab647b8ac562d306eee35a499030ab9594d2"
   end
 
   depends_on "meson" => :build

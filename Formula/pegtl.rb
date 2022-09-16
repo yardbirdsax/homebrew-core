@@ -1,25 +1,18 @@
 class Pegtl < Formula
   desc "Parsing Expression Grammar Template Library"
   homepage "https://github.com/taocpp/PEGTL"
-  url "https://github.com/taocpp/PEGTL/archive/3.2.0.tar.gz"
-  sha256 "3816d1a26afc04513df172678444377e0e35b9473f1f7ff85189589b831298f1"
-  license "MIT"
+  url "https://github.com/taocpp/PEGTL/archive/3.2.7.tar.gz"
+  sha256 "d6cd113d8bd14e98bcbe7b7f8fc1e1e33448dc359e8cd4cca30e034ec2f0642d"
+  license "BSL-1.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "6491c5852303ef963aaae07cfa64a8b7e456ef3ae38b120e6e63ffdb46e03e0f"
-    sha256 cellar: :any_skip_relocation, big_sur:       "e3160182c7fdba3e18d8e1695a71cdda66f33848099639d315daf2165118203b"
-    sha256 cellar: :any_skip_relocation, catalina:      "623df5a0987ee67f3c6f6e72a65c8b9ff26733a395c208ba0026773058a82db1"
-    sha256 cellar: :any_skip_relocation, mojave:        "b27d99aa5cfb3b1b49a7e3a427dd45f2ca176b40f9b5e12bef4e595acf30f82b"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "7688f9b9cba1325c28f231fa6266c7a7c4177dfb5fe4467147878aec7b7778da"
   end
 
   depends_on "cmake" => :build
 
-  if MacOS.version <= :mojave
-    depends_on "gcc"
-    fails_with :clang do
-      cause "'path' is unavailable in c++ < 17: introduced in macOS 10.15"
-    end
-  end
+  fails_with gcc: "5"
 
   def install
     mkdir "build" do

@@ -1,15 +1,18 @@
 class Glibmm < Formula
   desc "C++ interface to glib"
   homepage "https://www.gtkmm.org/"
-  url "https://download.gnome.org/sources/glibmm/2.68/glibmm-2.68.0.tar.xz"
-  sha256 "c1f38573191dceed85a05600888cf4cf4695941f339715bd67d51c2416f4f375"
+  url "https://download.gnome.org/sources/glibmm/2.72/glibmm-2.72.1.tar.xz"
+  sha256 "2a7649a28ab5dc53ac4dabb76c9f61599fbc628923ab6a7dd74bf675d9155cd8"
   license "LGPL-2.1-or-later"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "ad82e21e43601e8804150bea12157afa6c38201a441d97a91521ecea93bbfc13"
-    sha256 cellar: :any, big_sur:       "59b86d3d2fe4f28e8a19ba0f5faf0174f7829bb46ae3b04f06bdcf5f3c24935b"
-    sha256 cellar: :any, catalina:      "f4d4326c91b4c573e07a832a0b204bd5a8bc75da331e87f18c044e1397951bc2"
-    sha256 cellar: :any, mojave:        "ff82b1c3e7e8467ac8cd91f01cd97ca2bb4329861b2dd99bda0be89954f730b6"
+    rebuild 1
+    sha256 cellar: :any, arm64_monterey: "6a64c235fc6a9c86a5f63e2ed5f6bdff7ee7255879f0c67382884b4a41817066"
+    sha256 cellar: :any, arm64_big_sur:  "f3c0131d708f404c29ac9b1a1b24766294f4d2616eae6e505b15af3234085b7f"
+    sha256 cellar: :any, monterey:       "493b21bfbacd2922030467242906c47183e2849e98e3a7653f755d48f26faa67"
+    sha256 cellar: :any, big_sur:        "fe7183b28b58884d27217d851e28d4fb89227204e4f50cf9b238fc03a103ac68"
+    sha256 cellar: :any, catalina:       "e2bb1811d324f8bcb4fae160f834ae931770f6c7a14287c4ca9ca46bdab0f757"
+    sha256               x86_64_linux:   "75e7999ade666972bbebaa8bf7a73ba9a8c2aa26187b1e9227b28ca9097fd5db"
   end
 
   depends_on "meson" => :build
@@ -17,6 +20,8 @@ class Glibmm < Formula
   depends_on "pkg-config" => :build
   depends_on "glib"
   depends_on "libsigc++"
+
+  fails_with gcc: "5"
 
   def install
     ENV.cxx11
@@ -58,9 +63,7 @@ class Glibmm < Formula
       -lgobject-2.0
       -lsigc-3.0
     ]
-    on_macos do
-      flags << "-lintl"
-    end
+    flags << "-lintl" if OS.mac?
     system ENV.cxx, "-std=c++17", "test.cpp", "-o", "test", *flags
     system "./test"
   end

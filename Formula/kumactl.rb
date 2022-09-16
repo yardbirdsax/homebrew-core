@@ -1,37 +1,37 @@
 class Kumactl < Formula
   desc "Kuma control plane command-line utility"
   homepage "https://kuma.io/"
-  url "https://github.com/kumahq/kuma/archive/1.0.6.tar.gz"
-  sha256 "3d93c7508174d456a1d8a50f64227d243fa1226f8116c3dac6c044b246698415"
+  url "https://github.com/kumahq/kuma/archive/1.8.0.tar.gz"
+  sha256 "14b02c104c6cb724a47a7fe48c76f84b462c4b72e8fe1a371ae858aacd57916b"
   license "Apache-2.0"
-  revision 1
+
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "6fbacebfb67fa9351a3bd17567406f3f306755695eacaa458facd0506b3fd3fa"
-    sha256 cellar: :any_skip_relocation, big_sur:       "d22ab1e7d9e6da7e903b5726dcc537af8f18e32418bc402993a816b534277583"
-    sha256 cellar: :any_skip_relocation, catalina:      "a31bd84333e97c744e12ef4451b69c1dd954b30a8a31cf49d7e8771ccc07d65e"
-    sha256 cellar: :any_skip_relocation, mojave:        "361e3c9056d5643ac1e64b2d75927e746484dcb12c89c8d53001181633fdfd15"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "4adf2b7115a278a7e650959347e6459d6f9843316bc2275062d40da6daf5baff"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "fc9cb3ea61086b0a260619de9b4a626bf1a309b25f8b89b86f9e70565466fdbe"
+    sha256 cellar: :any_skip_relocation, monterey:       "5a65966a1ce501feae6903af1f10f2a10b7efff7480e4183bdea9bd1f62a0fd6"
+    sha256 cellar: :any_skip_relocation, big_sur:        "9dc3265d87c5c68d72f6d7f311bc57c2aac4ebd50500cf24be51d74831b30e22"
+    sha256 cellar: :any_skip_relocation, catalina:       "ed27e008739b293b2bc1ce0ee59fdb2fcd8d6cfc6a36b5717207de8e33101ae0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "377939feec85b7ba5b4f493016c366e6338f5a00dc4c509c219911edccce80f7"
   end
 
   depends_on "go" => :build
 
   def install
-    srcpath = buildpath/"src/kuma.io/kuma"
-    srcpath.install buildpath.children
+    ldflags = %W[
+      -s -w
+      -X github.com/kumahq/kuma/pkg/version.version=#{version}
+      -X github.com/kumahq/kuma/pkg/version.gitTag=#{version}
+      -X github.com/kumahq/kuma/pkg/version.buildDate=#{time.strftime("%F")}
+    ]
 
-    cd srcpath do
-      system "make", "build/kumactl", "BUILD_INFO_VERSION=#{version}"
-      bin.install Dir["build/artifacts-*/kumactl/kumactl"].first
-    end
+    system "go", "build", *std_go_args(ldflags: ldflags), "./app/kumactl"
 
-    output = Utils.safe_popen_read("#{bin}/kumactl", "completion", "bash")
-    (bash_completion/"kumactl").write output
-
-    output = Utils.safe_popen_read("#{bin}/kumactl", "completion", "zsh")
-    (zsh_completion/"_kumactl").write output
-
-    output = Utils.safe_popen_read("#{bin}/kumactl", "completion", "fish")
-    (fish_completion/"kumactl.fish").write output
+    generate_completions_from_executable(bin/"kumactl", "completion")
   end
 
   test do

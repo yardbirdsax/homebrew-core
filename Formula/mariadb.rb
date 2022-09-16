@@ -1,46 +1,65 @@
 class Mariadb < Formula
   desc "Drop-in replacement for MySQL"
   homepage "https://mariadb.org/"
-  url "https://downloads.mariadb.com/MariaDB/mariadb-10.5.8/source/mariadb-10.5.8.tar.gz"
-  sha256 "eb4824f6f2c532cd3fc6a6bce7bf78ea7c6b949f8bdd07656b2c84344e757be8"
+  url "https://downloads.mariadb.com/MariaDB/mariadb-10.8.3/source/mariadb-10.8.3.tar.gz"
+  sha256 "887eadc55176ac1ead1fccfc89ade4b5990ef192745ad4dcd879acb41c050892"
   license "GPL-2.0-only"
+  revision 1
 
+  # This uses a placeholder regex to satisfy the `PageMatch` strategy
+  # requirement. In the future, this will be updated to use a `Json` strategy
+  # and we can remove the unused regex at that time.
   livecheck do
-    url "https://downloads.mariadb.org/"
-    regex(/Download v?(\d+(?:\.\d+)+) Stable Now/i)
+    url "https://downloads.mariadb.org/rest-api/mariadb/all-releases/?olderReleases=false"
+    regex(/unused/i)
+    strategy :page_match do |page|
+      json = JSON.parse(page)
+      json["releases"]&.map do |release|
+        release["status"].include?("stable") ? release["release_number"] : nil
+      end
+    end
   end
 
   bottle do
-    rebuild 3
-    sha256 arm64_big_sur: "1e168542dc43d8c2d88153ee7bfcbbac167de161599a257ef82e8c2ebc094fd5"
-    sha256 big_sur:       "802d047b15b594c3170d90e355f44a6585cd5cd255788ee4922b6e757b216bd0"
-    sha256 catalina:      "abd58d85de7c08ed22f82331b09afe3f90bab796fc4bfe318a952826b7c1498e"
-    sha256 mojave:        "a0c0f4cb430cf7b462be33c94f34e840f6d0510b1c78c50e596bb36bf0536761"
+    rebuild 1
+    sha256 arm64_monterey: "26865f1cd7779f31e24637b02ab9dfb2bced57e00314f1e345eae444a6b41560"
+    sha256 arm64_big_sur:  "57ad96779d8310f87083143da1878233185c4573ef3b4e22ca35441efbaf82b3"
+    sha256 monterey:       "8df94b657126b6c2a16eb240c75ddd08286b16a51dec11823d18db039ddcc0aa"
+    sha256 big_sur:        "c8dc67dfa037bc6d982bf7653e7770f8a618ae6ff3d9e6422ea3ffbaa9e6010b"
+    sha256 catalina:       "7b0164df6ba088b3080bc6515719c0fdb784d33677acaf003e4a5de99e084431"
+    sha256 x86_64_linux:   "a09e8b55bc948a0e5ece29c18dd86865c2fe8e62cbfe9b6f1c4f3238878fb06f"
   end
 
+  depends_on "bison" => :build
   depends_on "cmake" => :build
+  depends_on "fmt" => :build
   depends_on "pkg-config" => :build
   depends_on "groonga"
   depends_on "openssl@1.1"
+  depends_on "pcre2"
+  depends_on "zstd"
 
-  uses_from_macos "bison" => :build
   uses_from_macos "bzip2"
+  uses_from_macos "libxcrypt"
   uses_from_macos "ncurses"
   uses_from_macos "zlib"
 
+  on_linux do
+    depends_on "linux-pam"
+    depends_on "readline" # uses libedit on macOS
+  end
+
   conflicts_with "mysql", "percona-server",
     because: "mariadb, mysql, and percona install the same binaries"
+
   conflicts_with "mytop", because: "both install `mytop` binaries"
   conflicts_with "mariadb-connector-c", because: "both install `mariadb_config`"
 
-  # Upstream fix for Apple Silicon, remove in next version
-  # https://github.com/MariaDB/server/pull/1743
-  patch do
-    url "https://raw.githubusercontent.com/Homebrew/formula-patches/bc0c5033d15f4aa30ed6f4bf29e2ad61608f3299/mariadb/mariadb-10.5.8-apple-silicon.patch"
-    sha256 "30a3c608b25e25d2b98b4a3508f8c0be211f0e02ba919d2d2b50fa2d77744a52"
-  end
+  fails_with gcc: "5"
 
   def install
+    ENV.cxx11
+
     # Set basedir and ldata so that mysql_install_db can find the server
     # without needing an explicit path to be set. This can still
     # be overridden by calling --basedir= when calling.
@@ -60,23 +79,26 @@ class Mariadb < Formula
       -DINSTALL_DOCDIR=share/doc/#{name}
       -DINSTALL_INFODIR=share/info
       -DINSTALL_MYSQLSHAREDIR=share/mysql
-      -DWITH_PCRE=bundled
-      -DWITH_READLINE=yes
-      -DWITH_SSL=yes
+      -DWITH_LIBFMT=system
+      -DWITH_SSL=system
       -DWITH_UNIT_TESTS=OFF
       -DDEFAULT_CHARSET=utf8mb4
       -DDEFAULT_COLLATION=utf8mb4_general_ci
       -DINSTALL_SYSCONFDIR=#{etc}
-      -DCOMPILATION_COMMENT=Homebrew
+      -DCOMPILATION_COMMENT=#{tap.user}
     ]
 
-    # disable TokuDB, which is currently not supported on macOS
-    args << "-DPLUGIN_TOKUDB=NO"
+    if OS.linux?
+      args << "-DWITH_NUMA=OFF"
+      args << "-DENABLE_DTRACE=NO"
+      args << "-DCONNECT_WITH_JDBC=OFF"
+    end
 
     # Disable RocksDB on Apple Silicon (currently not supported)
     args << "-DPLUGIN_ROCKSDB=NO" if Hardware::CPU.arm?
 
     system "cmake", ".", *std_cmake_args, *args
+
     system "make"
     system "make", "install"
 
@@ -110,7 +132,7 @@ class Mariadb < Formula
       wsrep_sst_rsync
       wsrep_sst_mariabackup
     ].each do |f|
-      inreplace "#{bin}/#{f}", "$(dirname $0)/wsrep_sst_common",
+      inreplace "#{bin}/#{f}", "$(dirname \"$0\")/wsrep_sst_common",
                                "#{libexec}/wsrep_sst_common"
     end
 
@@ -125,10 +147,12 @@ class Mariadb < Formula
   end
 
   def post_install
-    return if ENV["CI"]
-
     # Make sure the var/mysql directory exists
     (var/"mysql").mkpath
+
+    # Don't initialize database, it clashes when testing other MySQL-like implementations.
+    return if ENV["HOMEBREW_GITHUB_ACTIONS"]
+
     unless File.exist? "#{var}/mysql/mysql/user.frm"
       ENV["TMPDIR"] = nil
       system "#{bin}/mysql_install_db", "--verbose", "--user=#{ENV["USER"]}",
@@ -145,30 +169,10 @@ class Mariadb < Formula
     EOS
   end
 
-  plist_options manual: "mysql.server start"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-      <dict>
-        <key>KeepAlive</key>
-        <true/>
-        <key>Label</key>
-        <string>#{plist_name}</string>
-        <key>ProgramArguments</key>
-        <array>
-          <string>#{opt_bin}/mysqld_safe</string>
-          <string>--datadir=#{var}/mysql</string>
-        </array>
-        <key>RunAtLoad</key>
-        <true/>
-        <key>WorkingDirectory</key>
-        <string>#{var}</string>
-      </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_bin/"mysqld_safe", "--datadir=#{var}/mysql"]
+    keep_alive true
+    working_dir var
   end
 
   test do

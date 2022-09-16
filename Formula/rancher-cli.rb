@@ -1,29 +1,29 @@
 class RancherCli < Formula
   desc "Unified tool to manage your Rancher server"
   homepage "https://github.com/rancher/cli"
-  url "https://github.com/rancher/cli/archive/v2.4.10.tar.gz"
-  sha256 "cfe1d7a73cc8b2f83dcdf68645ad38a6dca8bc4d178cef123a9203e15a40dc58"
+  url "https://github.com/rancher/cli/archive/v2.6.7.tar.gz"
+  sha256 "aee5b0233e88e194694ddf4eb1cf47b32dcc84ae067a95ced3a8b7ca014e5dc3"
   license "Apache-2.0"
-  head "https://github.com/rancher/cli.git"
+  head "https://github.com/rancher/cli.git", branch: "master"
 
   livecheck do
     url :stable
-    strategy :github_latest
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "c622dca7979bbed7ab4213d794200a8aa9eac0bd8ae6991b08e2636f5c974b4a"
-    sha256 cellar: :any_skip_relocation, big_sur:       "9573b4250d11f974d15afc78deabc07d8516d053a77d3311411c46f3ef648ab1"
-    sha256 cellar: :any_skip_relocation, catalina:      "7892f574ed7975505315c87cbffb13101f3da5a4763a1e9ac2fcc7fc951e8f1b"
-    sha256 cellar: :any_skip_relocation, mojave:        "c5cbcad2b1f0ec6f179d23b3e4bb5dda5beb6868091ee702ce0ae8ce57400888"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "f5234d5c89f6d7bb2fa71df0eb108039f7de1b4a90a7b991f8162c79dc4655e1"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "aef23a2a61faadbc9573f9ae21464a1f41f05a4521d2adb61d82a053834c3b47"
+    sha256 cellar: :any_skip_relocation, monterey:       "19e66a2574024cdbfde0f95a5d5504792af9a29c8a85c5e9f5ce5e951c59cad1"
+    sha256 cellar: :any_skip_relocation, big_sur:        "628f687b0f414a52655760df091ffb5db1b15a6e06fbff2258b6716958ede882"
+    sha256 cellar: :any_skip_relocation, catalina:       "6c6788da6e3f2dda04d4f2360f76d917bf4a999ff1941cad3fc893c21ab8ea33"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "95a3142a03597d384770ded51547b63f8ad908275c26b306323fe4fa41204f31"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", "-mod=vendor", "-ldflags",
-           "-w -X main.VERSION=#{version}",
-           "-trimpath", "-o", bin/"rancher"
+    system "go", "build", *std_go_args(ldflags: "-s -w -X main.VERSION=#{version}"), "-o", bin/"rancher"
   end
 
   test do

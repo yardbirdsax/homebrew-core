@@ -4,14 +4,21 @@ class Glui < Formula
   url "https://github.com/libglui/glui/archive/2.37.tar.gz"
   sha256 "f7f6983f7410fe8dfaa032b2b7b1aac2232ec6a400a142b73f680683dad795f8"
   license "Zlib"
+  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "2436b9df6b4d25bcd4734c5257ad4388fe4b9591396f155e6dd7d716093d8836"
-    sha256 cellar: :any_skip_relocation, big_sur:       "e0e6490b5f5044282ef8769a9702597667dfc5bfc72331790deeac6997116d6d"
-    sha256 cellar: :any_skip_relocation, catalina:      "a9e404e892ccdf44f28504a433b598a08533290486189bc4a707b3e333dd3950"
-    sha256 cellar: :any_skip_relocation, mojave:        "24c323dbaa5f6f1b01fbf8f837c379ef503d323a448d2bb3d673c31ced622f0d"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "7cd9b9d6bffa3b6b6ff806c4041f495d5a7ef40296cb50097db25d17eb616265"
-    sha256 cellar: :any_skip_relocation, sierra:        "c087de27b46b86a14d583904e0a9d293428af37d8710b521ae7aeeb5174fc8fd"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "4446bb9bfbe249e1c9b306e5286e0e9279b189def2f1b1c97cb7cbce0a243d86"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "67cba51fd8f00de16bfc0f14db93a31f543681eb558a452a790e0d400a8bbcd4"
+    sha256 cellar: :any_skip_relocation, monterey:       "1ae9d5b6a49f0a0b82ed3763ba118e7614a690dda330d1db0124293257bc3711"
+    sha256 cellar: :any_skip_relocation, big_sur:        "c1884496c319d53faf60c40a4dfe83d0198af2d4a13d377e06c0187624392f74"
+    sha256 cellar: :any_skip_relocation, catalina:       "aeea8d3b8f76471bfdcf0f10bb51afc0d721452cbd8fa4613135685d7bbb00ae"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a89d82496e644e5501928803452b47ff2399c9386757b6013e9a58868255bf90"
+  end
+
+  on_linux do
+    depends_on "freeglut"
+    depends_on "mesa"
+    depends_on "mesa-glu"
   end
 
   # Fix compiler warnings in glui.h. Merged into master on November 28, 2016.
@@ -28,17 +35,37 @@ class Glui < Formula
   end
 
   test do
-    (testpath/"test.cpp").write <<~EOS
-      #include <cassert>
-      #include <GL/glui.h>
-      int main() {
-        GLUI *glui = GLUI_Master.create_glui("GLUI");
-        assert(glui != nullptr);
-        return 0;
-      }
-    EOS
-    system ENV.cxx, "-framework", "GLUT", "-framework", "OpenGL", "-I#{include}",
-      "-L#{lib}", "-lglui", "-std=c++11", "test.cpp"
-    system "./a.out"
+    if OS.mac?
+      (testpath/"test.cpp").write <<~EOS
+        #include <cassert>
+        #include <GL/glui.h>
+        int main() {
+          GLUI *glui = GLUI_Master.create_glui("GLUI");
+          assert(glui != nullptr);
+          return 0;
+        }
+      EOS
+      system ENV.cxx, "-framework", "GLUT", "-framework", "OpenGL", "-I#{include}",
+        "-L#{lib}", "-lglui", "-std=c++11", "test.cpp"
+      system "./a.out"
+    else
+      (testpath/"test.cpp").write <<~EOS
+        #include <cassert>
+        #include <GL/glui.h>
+        #include <GL/glut.h>
+        int main(int argc, char **argv) {
+          glutInit(&argc, argv);
+          GLUI *glui = GLUI_Master.create_glui("GLUI");
+          assert(glui != nullptr);
+          return 0;
+        }
+      EOS
+      system ENV.cxx, "-I#{include}", "-std=c++11", "test.cpp",
+        "-L#{lib}", "-lglui", "-lglut", "-lGLU", "-lGL"
+      if ENV["DISPLAY"]
+        # Fails without X display: freeglut (./a.out): failed to open display ''
+        system "./a.out"
+      end
+    end
   end
 end

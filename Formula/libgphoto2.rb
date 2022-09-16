@@ -1,9 +1,10 @@
 class Libgphoto2 < Formula
   desc "Gphoto2 digital camera library"
   homepage "http://www.gphoto.org/proj/libgphoto2/"
-  url "https://downloads.sourceforge.net/project/gphoto/libgphoto/2.5.26/libgphoto2-2.5.26.tar.bz2"
-  sha256 "7740fea3cbb78489071cdfec06c07fab528e69e27ac82734eae6a73eaeeabcd4"
+  url "https://downloads.sourceforge.net/project/gphoto/libgphoto/2.5.30/libgphoto2-2.5.30.tar.bz2"
+  sha256 "ee61a1dac6ad5cf711d114e06b90a6d431961a6e7ec59f4b757a7cd77b1c0fb4"
   license "LGPL-2.1-or-later"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,15 +12,16 @@ class Libgphoto2 < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "2215d38a580f2d8e80bbcdfc6eb0a6b84db905e33db309fc8225fd73cf2cf480"
-    sha256 big_sur:       "d622d90aec3ddb4e168eda447ff0841c318b701710906290636ba24d4b9d7b60"
-    sha256 catalina:      "9ab56abc466d07fdb2d16aced13ae7afffb9e71642b8c86a0b1610304e34baba"
-    sha256 mojave:        "434336b976e6c930255891e9d478fec925c484f50fdf153dca262a9184b6874b"
-    sha256 high_sierra:   "918032eba6577fda5b956841d50abd91c5272a0d1b69d21f3ac9f40eb24027af"
+    sha256 arm64_monterey: "68c8f29614d57710c8d00f5ad526b848eaaf38c4d70ec77f8531283255ed2c1b"
+    sha256 arm64_big_sur:  "e3744a3675a5f6b5727181755d126730bcc79a39545e6a0a1133a1e4d5a97e74"
+    sha256 monterey:       "d72b3a28421b921f1189717b8aa9cefb819e7d90fcd0029b8b2c4e354836023a"
+    sha256 big_sur:        "54eb7a59f8fe1f56eafb31441f29c577e7685e39590cd8d3cfa59ee54c8c24b0"
+    sha256 catalina:       "31adfaaaee016330cf07e8e9a71ccc4517a987038504d8a6992cb6bf2deea596"
+    sha256 x86_64_linux:   "96e0c553d9c3d7d25ba2a73b35660403ada42e5bc2dc7f7b7be98e3acad846e2"
   end
 
   head do
-    url "https://github.com/gphoto/libgphoto2.git"
+    url "https://github.com/gphoto/libgphoto2.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -28,11 +30,16 @@ class Libgphoto2 < Formula
 
   depends_on "pkg-config" => :build
   depends_on "gd"
+  depends_on "jpeg-turbo"
+  depends_on "libexif"
   depends_on "libtool"
   depends_on "libusb-compat"
 
+  uses_from_macos "curl"
+  uses_from_macos "libxml2"
+
   def install
-    system "autoreconf", "-fvi" if build.head?
+    system "autoreconf", "--force", "--install", "--verbose" if build.head?
     system "./configure", "--disable-dependency-tracking",
                           "--disable-silent-rules",
                           "--prefix=#{prefix}"

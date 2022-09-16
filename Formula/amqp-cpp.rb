@@ -1,10 +1,10 @@
 class AmqpCpp < Formula
   desc "C++ library for communicating with a RabbitMQ message broker"
   homepage "https://github.com/CopernicaMarketingSoftware/AMQP-CPP"
-  url "https://github.com/CopernicaMarketingSoftware/AMQP-CPP/archive/v4.3.11.tar.gz"
-  sha256 "be2b11ada1020f77b859857310be54bd073c3a4f579d99a5e251a738576ca28c"
+  url "https://github.com/CopernicaMarketingSoftware/AMQP-CPP/archive/v4.3.17.tar.gz"
+  sha256 "e69377633c3b63eb2af911446c57bada3b591456cb61daf4d9625593a0ef1f96"
   license "Apache-2.0"
-  head "https://github.com/CopernicaMarketingSoftware/AMQP-CPP.git"
+  head "https://github.com/CopernicaMarketingSoftware/AMQP-CPP.git", branch: "master"
 
   livecheck do
     url :stable
@@ -12,11 +12,12 @@ class AmqpCpp < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "754684e971db63046c2ba2aae19a4a2d6b0e33b18e07aa7ee324b9df5fd6c8ad"
-    sha256 cellar: :any_skip_relocation, big_sur:       "1442f286a2b310a52bb50fe96a3a7ed9c0195d5ce56c6b57d6bb113622e08798"
-    sha256 cellar: :any_skip_relocation, catalina:      "1360b3ab9cdd7a8deed94088bbfaf3851ff505f2f395e407ea80ae3526d3b3fb"
-    sha256 cellar: :any_skip_relocation, mojave:        "9a18301146ab0ea720276fdc838f00841e1c3ea9a80dd2688ff6e1c054432c99"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "ff2d7a54df33bf1ec13c773a9714f63751b32fd2e30dac53e3dd96c040f86c59"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "6771e28f8bf4e2a82103e4d546b5f5e3330defb5fc6181d96f67555900094701"
+    sha256 cellar: :any_skip_relocation, monterey:       "144f87760489d917765495730f434c374d00a9a22f9c77a604d94b32266bd408"
+    sha256 cellar: :any_skip_relocation, big_sur:        "09c573a61befb1eff39e68b81800dcf78a5b232271e3f1c164420a68c12ef085"
+    sha256 cellar: :any_skip_relocation, catalina:       "4a7803c5420d64e98f60b56cd9521382942b284502cae7a499b92a38fce3b6b0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "64169d2c9dd1ca845eecaca7cb67d09b60cdc7fe6ff263fa4350c2a8c52f6fb6"
   end
 
   depends_on "cmake" => :build

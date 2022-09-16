@@ -1,9 +1,9 @@
 class Siege < Formula
   desc "HTTP regression testing and benchmarking utility"
   homepage "https://www.joedog.org/siege-home/"
-  url "http://download.joedog.org/siege/siege-4.0.7.tar.gz"
-  sha256 "bfa75b3eaad372e7b89eee75d789cd6acbda34900a0c6e49030cf0f803b56df8"
-  license "GPL-3.0"
+  url "http://download.joedog.org/siege/siege-4.1.5.tar.gz"
+  sha256 "076df9fcdb7f63c46d6f661acc2ccc8405937ae9cae490ab8a9d78a9d2e7b8cb"
+  license "GPL-3.0-or-later"
 
   livecheck do
     url "http://download.joedog.org/siege/?C=M&O=D"
@@ -11,14 +11,17 @@ class Siege < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "1d2ed2396c11a8637af2c8a5e3f32bac5b2ac9f73c6f5506443eb0270f360c34"
-    sha256 big_sur:       "d9319969845b82b053d675fa125cfce2241c498be7966fca5790af1410d7050e"
-    sha256 catalina:      "ccc545449c2a0bacb0054078faee630f23e4728d1bf137cba9c5d8aa82e02495"
-    sha256 mojave:        "0704038a2995eec4ffacbb3554230b2825ebb21c3c9c612baae24999a620e183"
-    sha256 high_sierra:   "d2793b5aee87ffe4c04fca2c807477c3bcc8c5979888d26db995e0e58bece246"
+    sha256 arm64_monterey: "4c25cc322a4873186c5d3621af5bc2a1aa1b9bc36bd61d01cbc6e8ffb936381d"
+    sha256 arm64_big_sur:  "c4774a5b6fc668aa03d0b8fad53d4e0e736ff475549a77ef1b7b409f370a8bf5"
+    sha256 monterey:       "bbf2686f1b3664b7a7f4392e74f5748046dac9dd5f25b6c929c34b25610826e6"
+    sha256 big_sur:        "bee643fc153e438ec4020c3e7a619cade1bcad2bdf08d25262b5040150bb9abc"
+    sha256 catalina:       "2e67988df1c76bb2dbde08064246f94cd7a356ea2273a0ef7a70d2b8ae8aa2d6"
+    sha256 x86_64_linux:   "df87d178ad402ff12a7ab1c14100147e4319c3a9227e087b2f148faccb467450"
   end
 
   depends_on "openssl@1.1"
+
+  uses_from_macos "zlib"
 
   def install
     # To avoid unnecessary warning due to hardcoded path, create the folder first

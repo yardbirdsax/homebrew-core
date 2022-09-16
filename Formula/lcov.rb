@@ -5,26 +5,26 @@ class Lcov < Formula
 
   desc "Graphical front-end for GCC's coverage testing tool (gcov)"
   homepage "https://github.com/linux-test-project/lcov"
-  url "https://github.com/linux-test-project/lcov/releases/download/v1.15/lcov-1.15.tar.gz"
-  sha256 "c1cda2fa33bec9aa2c2c73c87226cfe97de0831887176b45ee523c5e30f8053a"
+  url "https://github.com/linux-test-project/lcov/releases/download/v1.16/lcov-1.16.tar.gz"
+  sha256 "987031ad5528c8a746d4b52b380bc1bffe412de1f2b9c2ba5224995668e3240b"
   license "GPL-2.0-or-later"
-  head "https://github.com/linux-test-project/lcov.git"
+  head "https://github.com/linux-test-project/lcov.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "157d247e5fb878c1b0a4e58387a6f6f868df1e0b1cee820511cad5a34492abd8"
-    sha256 cellar: :any_skip_relocation, big_sur:       "c3fe31eeb887f60b1e349c2fa13c09059cc75dbe49471a7da41a5cfc07dc3c01"
-    sha256 cellar: :any_skip_relocation, catalina:      "1c84487473440a6f7971ecf25f2b8b5022d23a230d16e863825b43944788e3be"
-    sha256 cellar: :any_skip_relocation, mojave:        "41ebe534e6bf4166e88d0eb59ac04d28df457a86fb514fc610ca485386bd06b4"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "9c3a3586283d61ae1f1ce30145b613ebdc50e28a7656cf4b4f4e935408f4c147"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "9fd558cedeedc95fa3bc481a3bde4781c941a63e8c7bb2259bb2e32483f123ea"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "6c5d93417fd0352f458241daaebc89c4a67042e4e74c30018e09ee56d15ae832"
+    sha256 cellar: :any_skip_relocation, monterey:       "8b4c4367f9392015d4448038ec82822d986244f9184f6200fcac7dbbaccd6267"
+    sha256 cellar: :any_skip_relocation, big_sur:        "a8f0fb6ec023076edce63a9197bb96a3a3b9a98371c17dbe3e315eaa52de0169"
+    sha256 cellar: :any_skip_relocation, catalina:       "7018ff8e61a4229d1ce47e80124ac10f90aa9ed36504798295d0a1a6e4344729"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "660d399d6fc26591066767f4514c5c961427afde6bbcb7eb4a853a2b06022adc"
   end
 
-  depends_on "gcc" => :test
-
   uses_from_macos "perl"
+  uses_from_macos "zlib"
 
   resource "JSON" do
-    url "https://cpan.metacpan.org/authors/id/I/IS/ISHIGAKI/JSON-4.02.tar.gz"
-    sha256 "444a88755a89ffa2a5424ab4ed1d11dca61808ebef57e81243424619a9e8627c"
+    url "https://cpan.metacpan.org/authors/id/I/IS/ISHIGAKI/JSON-4.06.tar.gz"
+    sha256 "1137e98a42208d802f3ad94a10855606c0455ddad167ba018557d751f6f7672e"
   end
 
   resource "PerlIO::gzip" do
@@ -50,15 +50,14 @@ class Lcov < Formula
     # Disable dynamic selection of perl which may cause segfault when an
     # incompatible perl is picked up.
     # https://github.com/Homebrew/homebrew-core/issues/4936
-    bin.find { |f| rewrite_shebang detected_perl_shebang, f }
+    rewrite_shebang detected_perl_shebang, *bin.children
 
     bin.env_script_all_files(libexec/"bin", PERL5LIB: ENV["PERL5LIB"])
   end
 
   test do
-    gcc_major_ver = Formula["gcc"].any_installed_version.major
-    gcc = Formula["gcc"].opt_bin/"gcc-#{gcc_major_ver}"
-    gcov = Formula["gcc"].opt_bin/"gcov-#{gcc_major_ver}"
+    gcc = ENV.cc
+    gcov = "gcov"
 
     (testpath/"hello.c").write <<~EOS
       #include <stdio.h>
@@ -74,6 +73,6 @@ class Lcov < Formula
     system "#{bin}/lcov", "--gcov-tool", gcov, "--directory", ".", "--capture", "--output-file", "all_coverage.info"
 
     assert_predicate testpath/"all_coverage.info", :exist?
-    assert_include (testpath/"all_coverage.info").read, testpath/"hello.c"
+    assert_includes (testpath/"all_coverage.info").read, testpath/"hello.c"
   end
 end

@@ -2,22 +2,20 @@ class Inlets < Formula
   desc "Expose your local endpoints to the Internet"
   homepage "https://github.com/inlets/inlets"
   url "https://github.com/inlets/inlets.git",
-      tag:      "2.7.12",
-      revision: "448880e64b35b4027321cc4f328392649dca923c"
+      tag:      "3.0.2",
+      revision: "7b18a394b74390133e511957d954b1ba3b7d01a2"
   license "MIT"
-  head "https://github.com/inlets/inlets.git"
-
-  livecheck do
-    url :stable
-    strategy :github_latest
-  end
+  head "https://github.com/inlets/inlets.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "7e8c975df59151c14040f9188c727667309c93025f92ea9ef2caac82515af64a"
-    sha256 cellar: :any_skip_relocation, big_sur:       "4c89bedf66827ec3d8247a195a997de7bd7df075ae78cc74c1af408b4a6c3d49"
-    sha256 cellar: :any_skip_relocation, catalina:      "2a0d9aa35bd843b2ed9773cee4b7b05c02b21cbcb78b085bb1c73363dc8a8ec4"
-    sha256 cellar: :any_skip_relocation, mojave:        "b1c8a139e4d6f18c666d7f6380bfad18ea3d8836c6aa394c5026e1e872840225"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur: "55fdb93d26dacaca8cbb42cc68b9387423e3b618220e57f9de67855209132eeb"
+    sha256 cellar: :any_skip_relocation, big_sur:       "5d6d55f2b32adc41a92f908ee15b263f9090dad596d137bf448d0d224288f365"
+    sha256 cellar: :any_skip_relocation, catalina:      "392626560257c399929a81954c6c20bc2f2485564b30597dd49ac85ffcb19a86"
+    sha256 cellar: :any_skip_relocation, mojave:        "f87a32ce9f00b128379a23e83e62e2d9e4c811303c1b760cdde9cad16a599e99"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "fc3dc0b39ea492fd4d00bef8ff4b5019567eb1e5fda0db6e7d7b276f46de4b4a"
   end
+
+  disable! date: "2022-05-08", because: :repo_removed
 
   depends_on "go" => :build
 
@@ -73,7 +71,11 @@ class Inlets < Formula
     EOS
 
     mock_upstream_server_pid = fork do
-      exec "ruby mock_upstream_server.rb"
+      if OS.mac?
+        exec "ruby mock_upstream_server.rb"
+      elsif OS.linux?
+        exec "#{Formula["ruby"].opt_bin}/ruby mock_upstream_server.rb"
+      end
     end
 
     begin
@@ -94,12 +96,12 @@ class Inlets < Formula
 
       client_pid = fork do
         # Starting inlets client
-        exec "#{bin}/inlets client --remote localhost:#{remote_port} " \
-             "--upstream localhost:#{upstream_port} --token #{secret_token}"
+        exec "#{bin}/inlets client --url ws://localhost:#{remote_port} " \
+             "--upstream localhost:#{upstream_port} --token #{secret_token} --insecure"
       end
 
       sleep 3 # Waiting for inlets websocket tunnel
-      assert_match mock_response, shell_output("curl -s http://localhost:#{remote_port}/inlets-test")
+      assert_match mock_response, shell_output("curl -s localhost:#{remote_port}/inlets-test")
     ensure
       cleanup("Mock Server", mock_upstream_server_pid)
       cleanup("Inlets Server", server_pid)

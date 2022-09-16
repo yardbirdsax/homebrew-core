@@ -1,17 +1,18 @@
 class Opam < Formula
   desc "OCaml package manager"
   homepage "https://opam.ocaml.org"
-  url "https://github.com/ocaml/opam/releases/download/2.0.7/opam-full-2.0.7.tar.gz"
-  sha256 "9c0dac1094ed624158fff13000cdfa8edbc96798d32b9fab40b0b5330f9490a2"
-  license "LGPL-2.1"
-  head "https://github.com/ocaml/opam.git"
+  url "https://github.com/ocaml/opam/releases/download/2.1.3/opam-full-2.1.3.tar.gz"
+  sha256 "cb2ab00661566178318939918085aa4b5c35c727df83751fd92d114fdd2fa001"
+  license "LGPL-2.1-only"
+  head "https://github.com/ocaml/opam.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, big_sur:     "34baee7b82515f19b8b5163bb8dd410128519e67635c079e392fc35b4625deb9"
-    sha256 cellar: :any_skip_relocation, catalina:    "2b1115dfcdfe71a806d07da60597a76f0e531c828e33e2c2c9901b0ef343c285"
-    sha256 cellar: :any_skip_relocation, mojave:      "39900786c86d1534586d261ced1876e9d0a90d119d41b37ba7eb2fbed948c033"
-    sha256 cellar: :any_skip_relocation, high_sierra: "2d363ac12943a0505c55b9fe3249a5f12b37d666d6b811e374908ae2cbd22626"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "8563eb7d39ff28e820a742a93b43a792b51015abefb7f717addeb37940749000"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "0c36da51223f65fd44a96d112fe39541fa7250a73350bad309d5a65ba2e894ef"
+    sha256 cellar: :any_skip_relocation, monterey:       "b716d483047de32ecef958e0a0169240735fa1193522746c673e09414bd3acd0"
+    sha256 cellar: :any_skip_relocation, big_sur:        "78675942dcb92da0acc6c0f156a86a5068aa628e093f661ec6d0bbbc4bcbd968"
+    sha256 cellar: :any_skip_relocation, catalina:       "dfa026d9771b2942d7eb6157eb8cff877b94de1f15f581ad2b7e3c48db8535ab"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2034d975561c9fd928d95cb82c45268f8a15f1fe30c7d6e953b22f99ba3f43e2"
   end
 
   depends_on "ocaml" => [:build, :test]
@@ -41,7 +42,7 @@ class Opam < Formula
   end
 
   test do
-    system bin/"opam", "init", "--disable-sandboxing"
+    system bin/"opam", "init", "--auto-setup", "--disable-sandboxing"
     system bin/"opam", "list"
   end
 end

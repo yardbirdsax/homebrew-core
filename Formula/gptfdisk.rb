@@ -1,28 +1,44 @@
 class Gptfdisk < Formula
   desc "Text-mode partitioning tools"
   homepage "https://www.rodsbooks.com/gdisk/"
-  url "https://downloads.sourceforge.net/project/gptfdisk/gptfdisk/1.0.6/gptfdisk-1.0.6.tar.gz"
-  sha256 "ddc551d643a53f0bd4440345d3ae32c49b04a797e9c01036ea460b6bb4168ca8"
+  url "https://downloads.sourceforge.net/project/gptfdisk/gptfdisk/1.0.9/gptfdisk-1.0.9.tar.gz"
+  sha256 "dafead2693faeb8e8b97832b23407f6ed5b3219bc1784f482dd855774e2d50c2"
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "dfe0b4cbc0e2cb2118fb2fbbbcd3ad1d42ff9fad8c7ad785c7a27bfd8cc48c5f"
-    sha256 cellar: :any, big_sur:       "a3e4b6f68aba2aca20a6a197613e662af80a84a71765f7cdc9760ea495d00a86"
-    sha256 cellar: :any, catalina:      "b3fc1b140c2a2c4b713460483134620b61066d351a4bdd5a1adc5dfe9c53f1be"
-    sha256 cellar: :any, mojave:        "9d8b7f91e699513e4c6c42d4b8e56548f93d76d0e30da1d09b8f9725d49d0f15"
+    sha256 cellar: :any,                 arm64_monterey: "a324c027ce6d6f41d464ba001961e0481180ce5d43eddfebcec2c108358479cd"
+    sha256 cellar: :any,                 arm64_big_sur:  "6ba98737562bd6ca00091e4259fa8195592e0d6f25b9650f8451f3cae553d6f9"
+    sha256 cellar: :any,                 monterey:       "1d114b23a2a5cd0bbeb5b52bf9eb049a38f1ddd41b53abdfaf245b2ff333ae51"
+    sha256 cellar: :any,                 big_sur:        "0e9d348490a0610c6342d624dafc745a838e33d3cf64287985470c79ac95e5a4"
+    sha256 cellar: :any,                 catalina:       "ac261cf0e7e1b9848f4c2d9ce7cb85854eb10392d332018333330df0ebd6ba49"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d42a4448e83c5f84f9f947f9aef03bd1a67dffd95cea7edeb28bc1eae07c7be0"
   end
 
   depends_on "popt"
 
   uses_from_macos "ncurses"
 
-  # Fix Big Sur compilation issue with 1.0.5; the physical *.dylib files
-  # are no longer present directly on the filesystem, but the linker still
-  # knows what to do.
-  patch :DATA
+  on_linux do
+    depends_on "util-linux"
+  end
 
   def install
-    system "make", "-f", "Makefile.mac"
+    if OS.mac?
+      inreplace "Makefile.mac" do |s|
+        s.gsub! "/usr/local/Cellar/ncurses/6.2/lib/libncurses.dylib", "-L/usr/lib -lncurses"
+        s.gsub! "-L/usr/local/lib $(LDLIBS) -lpopt", "-L#{Formula["popt"].opt_lib} $(LDLIBS) -lpopt"
+      end
+
+      system "make", "-f", "Makefile.mac"
+    else
+      %w[ncurses popt util-linux].each do |dep|
+        ENV.append_to_cflags "-I#{Formula[dep].opt_include}"
+        ENV.append "LDFLAGS", "-L#{Formula[dep].opt_lib}"
+      end
+
+      system "make", "-f", "Makefile"
+    end
+
     %w[cgdisk fixparts gdisk sgdisk].each do |program|
       bin.install program
       man8.install "#{program}.8"
@@ -30,23 +46,9 @@ class Gptfdisk < Formula
   end
 
   test do
-    system "dd", "if=/dev/zero", "of=test.dmg", "bs=1m", "count=1"
+    system "dd", "if=/dev/zero", "of=test.dmg", "bs=1024k", "count=1"
     assert_match "completed successfully", shell_output("#{bin}/sgdisk -o test.dmg")
     assert_match "GUID", shell_output("#{bin}/sgdisk -p test.dmg")
     assert_match "Found valid GPT with protective MBR", shell_output("#{bin}/gdisk -l test.dmg")
   end
 end
-
-__END__
-diff -ur a/Makefile.mac b/Makefile.mac
---- a/Makefile.mac	2020-02-17 22:34:11.000000000 +0000
-+++ b/Makefile.mac	2020-12-05 22:12:04.000000000 +0000
-@@ -21,7 +21,7 @@
- #	$(CXX) $(LIB_OBJS) -L/usr/lib -licucore gpttext.o gdisk.o -o gdisk
- 
- cgdisk: $(LIB_OBJS) cgdisk.o gptcurses.o
--	$(CXX) $(LIB_OBJS) cgdisk.o gptcurses.o /usr/lib/libncurses.dylib $(LDFLAGS) $(FATBINFLAGS) -o cgdisk
-+	$(CXX) $(LIB_OBJS) cgdisk.o gptcurses.o -L/usr/lib -lncurses $(LDFLAGS) $(FATBINFLAGS) -o cgdisk
- #	$(CXX) $(LIB_OBJS) cgdisk.o gptcurses.o $(LDFLAGS) -licucore -lncurses -o cgdisk
- 
- sgdisk: $(LIB_OBJS) gptcl.o sgdisk.o

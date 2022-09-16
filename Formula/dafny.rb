@@ -1,25 +1,28 @@
 class Dafny < Formula
   desc "Verification-aware programming language"
   homepage "https://github.com/dafny-lang/dafny/blob/master/README.md"
-  url "https://github.com/dafny-lang/dafny/archive/v3.0.0.tar.gz"
-  sha256 "5e9af6ca59c3329cd93d792bf9890c55c68c4f656afb19c85d1c44b0c7989fc2"
+  url "https://github.com/dafny-lang/dafny/archive/refs/tags/v3.8.1.tar.gz"
+  sha256 "901b7e39dec8ac96159f32ac2fc8d795c3908d37788c80ce736754d4b6e142b4"
   license "MIT"
 
   livecheck do
     url :stable
-    regex(/^v?(\d+(?:\.\d+)+)$/i)
+    strategy :github_latest
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, big_sur:  "3509c42eaa5d7a44d8de60b9f0ec3f0f8e5b6f2f69724988b89ac71266fa1236"
-    sha256 cellar: :any_skip_relocation, catalina: "35229c27248fe2da8362e4dc6610aca3dd38ccfcaaaefab7971fce1957a9f3b1"
-    sha256 cellar: :any_skip_relocation, mojave:   "75e758fa9f89593859f02258a917a86fbe938f341eb51d7e05a5c10717a640f1"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "28ae36d8b02dfbdf1278286c5573ef39c2cd87c62320e8b420f0f7b53fd3a82f"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5126542ebdb6a739d510e3ef2428faa780f80bd344c434d504bcf8c3dea91eef"
+    sha256 cellar: :any_skip_relocation, monterey:       "277da0d24e564809ac47eb2dbc11cc8f38614300f70ce7bc32243a6fb16f3fa8"
+    sha256 cellar: :any_skip_relocation, big_sur:        "551ef73b92c418ede02b4847ad544490cf3cbb2158ea3b0235325106500660ec"
+    sha256 cellar: :any_skip_relocation, catalina:       "0a1516c97d4d4d08b17b3a38415b51485fe953c666acd9b0adb1dbe96adf5fa9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1d64ba218701542afd0e306251df60f924ddb92e12d022328086e247fc3f6282"
   end
 
   depends_on "gradle" => :build
-  depends_on "nuget" => :build
+  depends_on "python@3.10" => :build # for z3
   depends_on "dotnet"
-  depends_on "openjdk"
+  depends_on "openjdk@11"
 
   # Use the following along with the z3 build below, as long as dafny
   # cannot build with latest z3 (https://github.com/dafny-lang/dafny/issues/810)
@@ -29,7 +32,7 @@ class Dafny < Formula
   end
 
   def install
-    system "make", "exe", "runtime"
+    system "make", "exe"
 
     libexec.install Dir["Binaries/*", "Scripts/quicktest.sh"]
 
@@ -37,6 +40,7 @@ class Dafny < Formula
     dst_z3_bin.mkpath
 
     resource("z3").stage do
+      ENV["PYTHON"] = which("python3.10")
       system "./configure"
       system "make", "-C", "build"
       mv("build/z3", dst_z3_bin/"z3")

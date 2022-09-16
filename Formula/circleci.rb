@@ -3,42 +3,42 @@ class Circleci < Formula
   homepage "https://circleci.com/docs/2.0/local-cli/"
   # Updates should be pushed no more frequently than once per week.
   url "https://github.com/CircleCI-Public/circleci-cli.git",
-      tag:      "v0.1.12331",
-      revision: "32ed3b0cfade76d564501ede209be3059d470b13"
+      tag:      "v0.1.21091",
+      revision: "45afa93d0ae256aded8a2c3bbd3daae8adfa8842"
   license "MIT"
-  head "https://github.com/CircleCI-Public/circleci-cli.git"
+  head "https://github.com/CircleCI-Public/circleci-cli.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, big_sur:  "b23f2f6c744e47a84fdf2d48bc598dfba29e04b4211dcb981cc61d9cfe45e2f9"
-    sha256 cellar: :any_skip_relocation, catalina: "a2de5910bccb5d0e8bef73f81eb7f3cd0d86a0a0e26e8c2f333f858164825840"
-    sha256 cellar: :any_skip_relocation, mojave:   "b3c0c9d0067fa95c1fe8853bc2496522c6987d3db392b043fbb8e1820c080f98"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "c88b3edd5c17a505adf43b93fde4d06cfc576ac0c6c8c4bcfe41e317b877567f"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f232eabfa564c9338d0098258899d4ff9482df7194a24bd1e5091261f6c8bbc6"
+    sha256 cellar: :any_skip_relocation, monterey:       "7f069904f4aa52c40893b8697a00a7b1050eb9dc2e0a671f4a780fd4fd24fd6b"
+    sha256 cellar: :any_skip_relocation, big_sur:        "038e97772f107d4eb68c6f95927b2f03eb6ee3fb9660f513b15484ccaafdde50"
+    sha256 cellar: :any_skip_relocation, catalina:       "bd626de91ad8db17ba5a038a956d8451aa631cfffd562331f6c01214a5f81f8a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8becf1f44d4c169deea08507cfa93209eba46e53fd703994c0a9e0aab4c32d33"
   end
 
-  depends_on "go" => :build
+  # Bump to 1.18 when the x/sys dependency is updated upstream.
+  depends_on "go@1.17" => :build
+  depends_on "packr" => :build
 
   def install
-    ENV["GOPATH"] = buildpath
+    system "packr2", "--ignore-imports", "-v"
 
-    dir = buildpath/"src/github.com/CircleCI-Public/circleci-cli"
-    dir.install buildpath.children
+    ldflags = %W[
+      -s -w
+      -X github.com/CircleCI-Public/circleci-cli/version.packageManager=homebrew
+      -X github.com/CircleCI-Public/circleci-cli/version.Version=#{version}
+      -X github.com/CircleCI-Public/circleci-cli/version.Commit=#{Utils.git_short_head}
+    ]
+    system "go", "build", *std_go_args(ldflags: ldflags)
 
-    cd dir do
-      ldflags = %W[
-        -s -w
-        -X github.com/CircleCI-Public/circleci-cli/version.packageManager=homebrew
-        -X github.com/CircleCI-Public/circleci-cli/version.Version=#{version}
-        -X github.com/CircleCI-Public/circleci-cli/version.Commit=#{Utils.git_short_head}
-      ]
-      system "make", "pack"
-      system "go", "build", "-ldflags", ldflags.join(" "),
-             "-o", bin/"circleci"
-      prefix.install_metafiles
-    end
+    generate_completions_from_executable(bin/"circleci", "--skip-update-check", "completion",
+                                        shells: [:bash, :zsh])
   end
 
   test do
     # assert basic script execution
-    assert_match /#{version}\+.{7}/, shell_output("#{bin}/circleci version").strip
+    assert_match(/#{version}\+.{7}/, shell_output("#{bin}/circleci version").strip)
     (testpath/".circleci.yml").write("{version: 2.1}")
     output = shell_output("#{bin}/circleci config pack #{testpath}/.circleci.yml")
     assert_match "version: 2.1", output

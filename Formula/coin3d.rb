@@ -2,27 +2,44 @@ class Coin3d < Formula
   desc "Open Inventor 2.1 API implementation (Coin) with Python bindings (Pivy)"
   homepage "https://coin3d.github.io/"
   license all_of: ["BSD-3-Clause", "ISC"]
+  revision 3
 
   stable do
     url "https://github.com/coin3d/coin/archive/Coin-4.0.0.tar.gz"
     sha256 "b00d2a8e9d962397cf9bf0d9baa81bcecfbd16eef675a98c792f5cf49eb6e805"
 
     resource "pivy" do
-      url "https://github.com/coin3d/pivy/archive/0.6.5.tar.gz"
-      sha256 "16f2e339e5c59a6438266abe491013a20f53267e596850efad1559564a2c1719"
+      url "https://github.com/coin3d/pivy/archive/0.6.6.tar.gz"
+      sha256 "27204574d894cc12aba5df5251770f731f326a3e7de4499e06b5f5809cc5659e"
+
+      # Support Python 3.10.
+      # Remove with the next version.
+      patch do
+        url "https://github.com/coin3d/pivy/commit/2f049c19200ab4a3a1e4740268450496c12359f9.patch?full_index=1"
+        sha256 "4fcbe10b28aff1e20c2fd42ca393df7cc1bde59839f37f62d2b938831157d27b"
+      end
+      patch do
+        url "https://github.com/coin3d/pivy/commit/4b919a3f6b9f477d0e95a2fd2b6a149a55eb9792.patch?full_index=1"
+        sha256 "41107612702d9eec17d225d52f4b8b26a84d95492e418b265dc4c40284d595a3"
+      end
+
+      # Fix segmentation fault on Apple Silicon
+      patch :DATA
     end
   end
 
   livecheck do
     url :stable
-    regex(/^Coin-(\d+\.\d+\.\d+)$/i)
+    regex(/^Coin[._-]v?(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    sha256 arm64_big_sur: "df8e2e369aad234bc940bfc8e64d3956ba9a0e1896ab68214a7fff82c14e05d7"
-    sha256 big_sur:       "509b6d290e63f31756b1040b46366e8c0cafe173b098544caf7e8c61cd8a9b7e"
-    sha256 catalina:      "7ff9151841889454aea31e68576541e0f8b2e2021fd7133abf3e596ac2ae9de8"
-    sha256 mojave:        "a791ec37b8aa81bd249cdb2837753ca4419c38957f60c60e249e6c8274976ab6"
+    sha256 cellar: :any,                 arm64_monterey: "6e90d8890b3fb62e64c230cf6d18e8421cdfeb3f32566f53bd2922d695e30f43"
+    sha256 cellar: :any,                 arm64_big_sur:  "52a07abdd5d902857a565c483dba9873b87e2b62ec76d22f0c7313bddce93b8f"
+    sha256 cellar: :any,                 monterey:       "405ae02aa2ad54e90eaa4a027a293952dd8a275709a103eeb5660cfbb3660fdf"
+    sha256 cellar: :any,                 big_sur:        "a549965ef49f10d7869ea3ff334d7872da6ea7c9c2251900212c2153db235cbf"
+    sha256 cellar: :any,                 catalina:       "993bb8ae8ce7ad3e2622857e73a9a5af18e06b18cd34296f6c028d2a82872edc"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "389a8a6add2f83c9ec9a6cbeba3d7f9cc6762c79d7be1ee1b41de4f31c1b0ccb"
   end
 
   head do
@@ -38,8 +55,17 @@ class Coin3d < Formula
   depends_on "ninja" => :build
   depends_on "swig" => :build
   depends_on "boost"
-  depends_on "pyside"
-  depends_on "python@3.9"
+  depends_on "pyside@2"
+  depends_on "python@3.10"
+
+  on_linux do
+    depends_on "mesa"
+    depends_on "mesa-glu"
+  end
+
+  def python3
+    "python3.10"
+  end
 
   def install
     # Create an empty directory for cpack to make the build system
@@ -64,9 +90,8 @@ class Coin3d < Formula
 
     resource("pivy").stage do
       ENV.append_path "CMAKE_PREFIX_PATH", prefix.to_s
-      ENV["LDFLAGS"] = "-rpath #{opt_lib}"
-      system Formula["python@3.9"].opt_bin/"python3",
-             *Language::Python.setup_install_args(prefix)
+      ENV["LDFLAGS"] = "-Wl,-rpath,#{opt_lib}"
+      system python3, *Language::Python.setup_install_args(prefix, python3)
     end
   end
 
@@ -79,13 +104,39 @@ class Coin3d < Formula
         return 0;
       }
     EOS
-    system ENV.cc, "test.cpp", "-L#{lib}", "-lCoin", "-Wl,-framework,OpenGL", \
-           "-o", "test"
+
+    opengl_flags = if OS.mac?
+      ["-Wl,-framework,OpenGL"]
+    else
+      ["-L#{Formula["mesa"].opt_lib}", "-lGL"]
+    end
+
+    system ENV.cc, "test.cpp", "-L#{lib}", "-lCoin", *opengl_flags, "-o", "test"
     system "./test"
 
-    system Formula["python@3.9"].opt_bin/"python3", "-c", <<~EOS
+    ENV.append_path "PYTHONPATH", Formula["pyside@2"].opt_prefix/Language::Python.site_packages(python3)
+    # Set QT_QPA_PLATFORM to minimal to avoid error:
+    # "This application failed to start because no Qt platform plugin could be initialized."
+    ENV["QT_QPA_PLATFORM"] = "minimal" if OS.linux? && ENV["HOMEBREW_GITHUB_ACTIONS"]
+    system python3, "-c", <<~EOS
+      import shiboken2
       from pivy.sogui import SoGui
       assert SoGui.init("test") is not None
     EOS
   end
 end
+
+__END__
+diff --git a/interfaces/pivy_common_typemaps.i b/interfaces/pivy_common_typemaps.i
+index 27e26a6..73162c0 100644
+--- a/interfaces/pivy_common_typemaps.i
++++ b/interfaces/pivy_common_typemaps.i
+@@ -76,7 +76,7 @@ SWIGEXPORT PyObject *
+ cast(PyObject * self, PyObject * args)
+ {
+   char * type_name;
+-  int type_len;
++  Py_ssize_t type_len;
+   PyObject * obj = 0;
+ 
+   if (!PyArg_ParseTuple(args, "Os#:cast", &obj, &type_name, &type_len)) {

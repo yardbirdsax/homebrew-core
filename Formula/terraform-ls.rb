@@ -1,22 +1,34 @@
 class TerraformLs < Formula
   desc "Terraform Language Server"
   homepage "https://github.com/hashicorp/terraform-ls"
-  url "https://github.com/hashicorp/terraform-ls/archive/v0.13.0.tar.gz"
-  sha256 "7962a30cad982794ec6976dca130908acbb081355ba57b807ddc7216726080a3"
+  url "https://github.com/hashicorp/terraform-ls/archive/v0.29.2.tar.gz"
+  sha256 "95a21bb7f0a5df7adb7ca94cb4e0e8db0a318b4d39102ff8e79199c188a33823"
   license "MPL-2.0"
-  head "https://github.com/hashicorp/terraform-ls.git"
+  head "https://github.com/hashicorp/terraform-ls.git", branch: "main"
+
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "3629ebc8543ab98dd8a02a77ccae3e47575e31965441fdc8fd6c035bb30f72da"
-    sha256 cellar: :any_skip_relocation, big_sur:       "a5694059a150e38151efda727ea648e6138dd618efb287ad0e86666bd75e9fe9"
-    sha256 cellar: :any_skip_relocation, catalina:      "63fba7d57c5b7504463ddd4f207aa00911afa78a97e3a1d97153bdb53f2c373a"
-    sha256 cellar: :any_skip_relocation, mojave:        "e796d66cbf4bda8dc72ddd1b00b69e804e73132bd66a7af1ca9eb4f1354df2b2"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "5e3fb1e39522b407161ac5f79da5c0ec186eaf658a736b1d57708d520765b4be"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "63198f8117af9caba2d75e09961680a49b4ff09b09685d6757cc6fdedd069214"
+    sha256 cellar: :any_skip_relocation, monterey:       "fbd54302b4972b4be24a34ae341c91f62c8ff4080e49cc069fdf7a3e0443adcc"
+    sha256 cellar: :any_skip_relocation, big_sur:        "786e323cb7eb606e92fe8f4886e1991cd7a9cfafdb66ad5b752b1cc930801252"
+    sha256 cellar: :any_skip_relocation, catalina:       "e35f506cd0d3b264050748f754e2ec180b8a086439d5b16a1e602277c8587c4f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a8cd3d9e597956330fdd4a701941cd802f3a0e320870fcef7819ca068e1d4d86"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", *std_go_args, "-ldflags", "-s -w"
+    ldflags = %W[
+      -s -w
+      -X main.version=#{version}
+      -X main.versionPrerelease=#{tap.user}
+    ]
+    system "go", "build", *std_go_args(ldflags: ldflags.join(" "))
   end
 
   test do

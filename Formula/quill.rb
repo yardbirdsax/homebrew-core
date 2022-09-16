@@ -1,23 +1,27 @@
 class Quill < Formula
-  desc "C++14 Asynchronous Low Latency Logging Library"
+  desc "C++17 Asynchronous Low Latency Logging Library"
   homepage "https://github.com/odygrd/quill"
-  url "https://github.com/odygrd/quill/archive/v1.6.1.tar.gz"
-  sha256 "282f54a67fecaa7f094cf986a9e2f7fab342f39e9167c76d7619ad531d0bbaa5"
+  url "https://github.com/odygrd/quill/archive/v2.1.0.tar.gz"
+  sha256 "66c59501ad827207e7d4682ccba0f1c33ca215269aa13a388df4d59ca195ee76"
   license "MIT"
-  head "https://github.com/odygrd/quill.git"
+  head "https://github.com/odygrd/quill.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "95fe2829bbb6e32603f6643bcee27c1d35cedbbe2a0fd46c68c9e761a69a2e20"
-    sha256 cellar: :any_skip_relocation, big_sur:       "68eb91bec1bb6aa4940c8810fcc52249d481d561d330c3b47e1a81bf7ad04e05"
-    sha256 cellar: :any_skip_relocation, catalina:      "f2cbdd35b47985eb42e2704dcf66350bdedf9e81d71e2d180ed2c584882056ff"
-    sha256 cellar: :any_skip_relocation, mojave:        "d44cf769025e1d4b1a0cb54e4f6868bbfd48f7b2f7b21d9043add433d3163244"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "9da39652cc8a8062fb29f133cca8169fcc97a7d99e274354ceeae53f4fa631ab"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "358f4fdc5c5af2ba5a66f1cd289d527d021c2ac215c3b99f0bd3f73415eac949"
+    sha256 cellar: :any_skip_relocation, monterey:       "96f579939efcd4561b42b35ada08992ccf3ed5ea8674f3ac4148fda74bd9a5ff"
+    sha256 cellar: :any_skip_relocation, big_sur:        "d46bffb6fe69bb16447610147df267527eab987e9b102383a09d0d7e0b8bad89"
+    sha256 cellar: :any_skip_relocation, catalina:       "95470ef86303a15a927b293383935f68c99d7ee72ab6eebdce7c432a0f451d13"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3440c7c92f4cf8f3980028c8d861743af7e77eb45c18efa8e9ad78868252f135"
   end
 
   depends_on "cmake" => :build
+  depends_on macos: :catalina
+
+  fails_with gcc: "5"
 
   def install
-    ENV.cxx11
-
     mkdir "quill-build" do
       args = std_cmake_args
       args << ".."
@@ -38,7 +42,7 @@ class Quill < Formula
       }
     EOS
 
-    system ENV.cxx, "-std=c++14", "test.cpp", "-I#{include}", "-L#{lib}", "-lquill", "-o", "test"
+    system ENV.cxx, "-std=c++17", "test.cpp", "-I#{include}", "-L#{lib}", "-lquill", "-o", "test", "-pthread"
     system "./test"
     assert_predicate testpath/"basic-log.txt", :exist?
     assert_match "Test", (testpath/"basic-log.txt").read

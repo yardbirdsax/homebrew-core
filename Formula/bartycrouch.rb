@@ -1,19 +1,21 @@
 class Bartycrouch < Formula
   desc "Incrementally update/translate your Strings files"
-  homepage "https://github.com/Flinesoft/BartyCrouch"
-  url "https://github.com/Flinesoft/BartyCrouch.git",
-      tag:      "4.4.1",
-      revision: "d0ea3568044e2348e5fa87b9fdbc9254561039e2"
+  homepage "https://github.com/FlineDev/BartyCrouch"
+  url "https://github.com/FlineDev/BartyCrouch.git",
+      tag:      "4.11.0",
+      revision: "31c4cb250caae44dc3ab62c84becd3a85e55e8ad"
   license "MIT"
-  head "https://github.com/Flinesoft/BartyCrouch.git"
+  head "https://github.com/FlineDev/BartyCrouch.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "290d66a6a7164de7c459553fcaaf6ffdc2c8e48673d4536626aac4a644a18107"
-    sha256 cellar: :any_skip_relocation, big_sur:       "635a9fff91e57290f013826f3b102fd1e639ed4d8dd9f2a5fc84ee3ee86b3383"
-    sha256 cellar: :any_skip_relocation, catalina:      "a403e05eef2353f041f499275a0ebcea1fc9381bea71b9205227a319ed5547c9"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "6c7ce850d5c1cc49da218324e7f9fea5720fda9c5a84043fadf47afb53838233"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "1e7a2f682e92d36b55d7af5169bcf78abd688475083550ab785bf2c9277ad438"
+    sha256 cellar: :any_skip_relocation, monterey:       "296152c7b9ece6d199d04f569293b610c4594eb7a85fc34b80948e7022d33a65"
+    sha256 cellar: :any_skip_relocation, big_sur:        "91e75b3257969acc5a38e0bff550fdfea6f8b8d54bed52443b88b32451be0512"
   end
 
-  depends_on xcode: ["12.0", :build]
+  depends_on xcode: ["12.5", :build]
+  depends_on :macos
 
   def install
     system "make", "install", "prefix=#{prefix}"
@@ -36,7 +38,7 @@ class Bartycrouch < Formula
     EOS
 
     system bin/"bartycrouch", "update"
-    assert_match /"oldKey" = "/, File.read("en.lproj/Localizable.strings")
-    assert_match /"test" = "/, File.read("en.lproj/Localizable.strings")
+    assert_match '"oldKey" = "', File.read("en.lproj/Localizable.strings")
+    assert_match '"test" = "', File.read("en.lproj/Localizable.strings")
   end
 end

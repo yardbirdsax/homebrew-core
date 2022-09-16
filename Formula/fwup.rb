@@ -1,15 +1,17 @@
 class Fwup < Formula
   desc "Configurable embedded Linux firmware update creator and runner"
-  homepage "https://github.com/fhunleth/fwup"
-  url "https://github.com/fhunleth/fwup/releases/download/v1.8.3/fwup-1.8.3.tar.gz"
-  sha256 "32354c5581a666320ebe951ed9b85efac270e20cfe8dbd5a50c73cefc5dd2e23"
+  homepage "https://github.com/fwup-home/fwup"
+  url "https://github.com/fwup-home/fwup/releases/download/v1.9.1/fwup-1.9.1.tar.gz"
+  sha256 "fc76f74dadbde53cdc9786737983f9dcdd7da3dbcc4dbd683404c8e136112741"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "24af6cc94eb8d03ab198e93d451a56933751f550a822d5b4dba69d62fa989d12"
-    sha256 cellar: :any, big_sur:       "5f66239fb94a6b04ffbf6e74d2f3a6ebd083625faa78b96ee8c671fd33919e94"
-    sha256 cellar: :any, catalina:      "c7f3841b362480d6b900147a0155948fa079728e10709f695409e122fcbec4de"
-    sha256 cellar: :any, mojave:        "a7a157b8950cd5929e1c525012835880f6f9cc7e1e626ac33a0f49938b6a957f"
+    sha256 cellar: :any,                 arm64_monterey: "efb4d1812874d9aafc14cc182f9845f532ab07c61d15b0e64f93db2a3da9d281"
+    sha256 cellar: :any,                 arm64_big_sur:  "7619546ff2c4b4ed240742537a401e2dfee974ddbcdd791e447e43df77dca91e"
+    sha256 cellar: :any,                 monterey:       "58f6ff63d19cd1d365f9956ec6f7ef81da32af71e22b35a4629a3de6c334b0d3"
+    sha256 cellar: :any,                 big_sur:        "b5782437e98337b35e9b1a652e05282e7c48bc70b30e69aebc2d715a3f604fce"
+    sha256 cellar: :any,                 catalina:       "ca4c2eb6a2b97bb54914b86517f7bb51f16b72eb59511e118e7c989fce402df0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "87c4e711f5c0929c83c151c1ee4e4d11920317b73d1edb3308938f13161d5a72"
   end
 
   depends_on "pkg-config" => :build

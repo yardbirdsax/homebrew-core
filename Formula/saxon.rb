@@ -1,19 +1,27 @@
 class Saxon < Formula
   desc "XSLT and XQuery processor"
   homepage "https://saxon.sourceforge.io"
-  url "https://downloads.sourceforge.net/project/saxon/Saxon-HE/10/Java/SaxonHE10-3J.zip"
-  version "10.3"
-  sha256 "6cfb72a68418d3b9a0c9dc0d0b399179c23dfe312e792eec578bf745caa58a25"
+  url "https://downloads.sourceforge.net/project/saxon/Saxon-HE/11/Java/SaxonHE11-4J.zip"
+  version "11.4"
+  sha256 "2ec48dde4092862b1d3510d7a673d3149ad48885f8831c7878c9a85d79417094"
+  license all_of: ["BSD-3-Clause", "MIT", "MPL-2.0"]
 
   livecheck do
     url :stable
     regex(%r{url=.*?/SaxonHE(\d+(?:[.-]\d+)+)J?\.(?:t|zip)}i)
+    strategy :sourceforge do |page, regex|
+      page.scan(regex).map { |match| match&.first&.gsub("-", ".") }
+    end
   end
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "39e9110c49b68bd767e5faabff06a566bd60649b69e7f0d068006702713eafb8"
+  end
+
+  depends_on "openjdk"
 
   def install
-    libexec.install Dir["*.jar", "doc", "notices"]
+    libexec.install Dir["*.jar", "doc", "lib", "notices"]
     bin.write_jar_script libexec/"saxon-he-#{version.major_minor}.jar", "saxon"
   end
 

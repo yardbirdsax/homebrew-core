@@ -1,39 +1,22 @@
 class Emacs < Formula
   desc "GNU Emacs text editor"
   homepage "https://www.gnu.org/software/emacs/"
+  url "https://ftp.gnu.org/gnu/emacs/emacs-28.2.tar.xz"
+  mirror "https://ftpmirror.gnu.org/emacs/emacs-28.2.tar.xz"
+  sha256 "ee21182233ef3232dc97b486af2d86e14042dbb65bbc535df562c3a858232488"
   license "GPL-3.0-or-later"
 
-  stable do
-    url "https://ftp.gnu.org/gnu/emacs/emacs-27.1.tar.xz"
-    mirror "https://ftpmirror.gnu.org/emacs/emacs-27.1.tar.xz"
-    sha256 "4a4c128f915fc937d61edfc273c98106711b540c9be3cd5d2e2b9b5b2f172e41"
-
-    # The emacs binary is patched with a signature after linking. This invalidates the code
-    # signature. Code signing is required on Apple Silicon. This patch adds a step to resign
-    # the binary after it is patched.
-    patch do
-      url "https://github.com/emacs-mirror/emacs/commit/868f51324ac96bc3af49a826e1db443548c9d6cc.patch?full_index=1"
-      sha256 "d2b19fcca66338d082c15fa11d57abf7ad6b40129478bef4c6234c19966db988"
-    end
-
-    # Back-ported patch for configure and configure.guess to allow configure to complete
-    # for aarch64-apple-darwin targets.
-    patch do
-      url "https://raw.githubusercontent.com/Homebrew/formula-patches/25c1e1797d4004a9e5b9453779399afc63d04b97/emacs/arm.patch"
-      sha256 "5f812fc413b722e294c7f7abd38f3a9bbda84ec68537cea42900a81e57c7ecb1"
-    end
-  end
-
   bottle do
-    rebuild 1
-    sha256 arm64_big_sur: "66c4fc4a6f21c3303ac39939e8971894560fd4d8e632539e72436bd05a203816"
-    sha256 big_sur:       "c4d216163623ccb65f21964df378f1c96871657cbc8ffa702dd3812e7d0e76d8"
-    sha256 catalina:      "86274cfc78b97cf6b5e2e942b9283c2da926b8fa4a9a0400515661a9dccc7c24"
-    sha256 mojave:        "8ed16db6ab57f13c9ec1104caf06388829118c8e94b13974f39d4c59d0faf612"
+    sha256 arm64_monterey: "109fb5a7ab9ad048b04169c10bc7af54814ea366a1b7d8d45a54692aed585a41"
+    sha256 arm64_big_sur:  "824782de415411e7bb107143d1505fc9f844ecc15ffa2157a0987e0e282a396f"
+    sha256 monterey:       "d47f7fabda9e2e2e3679608253debb6865061a28f45045c8319b65d569268096"
+    sha256 big_sur:        "2163de8aa7c2150522e7d8b025ad4ea68ad628118ae4f9602f616c6866aaec95"
+    sha256 catalina:       "387278e4f542a29ca68598ead7a9671074fd75744db3a643db1af2702aa0f835"
+    sha256 x86_64_linux:   "ad7f9af688ff25c9a7ec44cda8a287529c27e9e32ed3a1e8cd0c33d1f4a430ca"
   end
 
   head do
-    url "https://github.com/emacs-mirror/emacs.git"
+    url "https://github.com/emacs-mirror/emacs.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "gnu-sed" => :build
@@ -95,28 +78,9 @@ class Emacs < Formula
     (man1/"ctags.1.gz").unlink
   end
 
-  plist_options manual: "emacs"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-      <dict>
-        <key>KeepAlive</key>
-        <true/>
-        <key>Label</key>
-        <string>#{plist_name}</string>
-        <key>ProgramArguments</key>
-        <array>
-          <string>#{opt_bin}/emacs</string>
-          <string>--fg-daemon</string>
-        </array>
-        <key>RunAtLoad</key>
-        <true/>
-      </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_bin/"emacs", "--fg-daemon"]
+    keep_alive true
   end
 
   test do

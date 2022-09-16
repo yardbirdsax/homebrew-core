@@ -1,28 +1,36 @@
 class Latexindent < Formula
   desc "Add indentation to LaTeX files"
-  homepage "https://ctan.org/pkg/latexindent"
-  url "https://github.com/cmhughes/latexindent.pl/archive/V3.8.3.tar.gz"
-  sha256 "34ad26e69257f5a9dd475e16417a8c16b590ccf17e98a4b05f6316f65df621cd"
+  homepage "https://latexindentpl.readthedocs.io"
+  url "https://github.com/cmhughes/latexindent.pl/archive/V3.18.tar.gz"
+  sha256 "ac67f08c4deb8d75adc7704d17f1145e96131a87abda9b996b67a66bd27a3b7c"
   license "GPL-3.0-or-later"
-  revision 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "990afa8cf06b7d7d6e4564af13d4f8054873e03ca320c9da7b75efef7769aa86"
-    sha256 cellar: :any_skip_relocation, big_sur:       "78f0e4bc0d5963fa6dcad8ac5486ab9a34c2da4bfd9cffabd16337385ce1824f"
-    sha256 cellar: :any_skip_relocation, catalina:      "80bc255ec4660c8cec1f8af2ec9f30d6b810af189a168dab4c61128430cf25e0"
-    sha256 cellar: :any_skip_relocation, mojave:        "13bb96a8f2256a72a53c0f6338300dace9853b0cb0b97c2892b9e3a81b8cc5ee"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "5597c888dce5c08018adc793b8d41241d3212dd81a01f83a1c31e0029339e959"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "12fc56e80b4b4956e66ad76df97c1a5d5e8d724c0df173bf4e25b900b8fed24f"
+    sha256 cellar: :any_skip_relocation, monterey:       "5e9c74ff12fd0f684964c0e5747b8e6436e614eaac50aef3f996c34b9ff30bfd"
+    sha256 cellar: :any_skip_relocation, big_sur:        "b28df9cbbdb529017bf9ec4d35ca0baa5e033d1e287040a66abf61d90bcb3958"
+    sha256 cellar: :any_skip_relocation, catalina:       "0fea1aca58a1a77358f21163ba31dfcfa9d07f09cfad9896dbfa329fc1daf8d1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9c61f0e325a27d882e2e17605af27a1a00b600402ff7b8a6e7560d1b008ed413"
   end
 
   depends_on "perl"
 
+  resource "Mac::SystemDirectory" do
+    on_macos do
+      url "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Mac-SystemDirectory-0.14.tar.gz"
+      sha256 "b3c336fe20850042d30e1db1e8d191d3c056cc1072a472eb4e5bd7229056dee1"
+    end
+  end
+
   resource "B::Hooks::EndOfScope" do
-    url "https://cpan.metacpan.org/authors/id/E/ET/ETHER/B-Hooks-EndOfScope-0.24.tar.gz"
-    sha256 "03aa3dfe5d0aa6471a96f43fe8318179d19794d4a640708f0288f9216ec7acc6"
+    url "https://cpan.metacpan.org/authors/id/E/ET/ETHER/B-Hooks-EndOfScope-0.26.tar.gz"
+    sha256 "39df2f8c007a754672075f95b90797baebe97ada6d944b197a6352709cb30671"
   end
 
   resource "Class::Data::Inheritable" do
-    url "https://cpan.metacpan.org/authors/id/T/TM/TMTM/Class-Data-Inheritable-0.08.tar.gz"
-    sha256 "9967feceea15227e442ec818723163eb6d73b8947e31f16ab806f6e2391af14a"
+    url "https://cpan.metacpan.org/authors/id/R/RS/RSHERER/Class-Data-Inheritable-0.09.tar.gz"
+    sha256 "44088d6e90712e187b8a5b050ca5b1c70efe2baa32ae123e9bd8f59f29f06e4d"
   end
 
   resource "Devel::GlobalDestruction" do
@@ -46,8 +54,8 @@ class Latexindent < Formula
   end
 
   resource "Exception::Class" do
-    url "https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Exception-Class-1.44.tar.gz"
-    sha256 "33f3fbf8b138d3b04ea4ec0ba83fb0df6ba898806bcf4ef393d4cafc1a23ee0d"
+    url "https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Exception-Class-1.45.tar.gz"
+    sha256 "5482a77ef027ca1f9f39e1f48c558356e954936fc8fbbdee6c811c512701b249"
   end
 
   resource "File::HomeDir" do
@@ -56,8 +64,8 @@ class Latexindent < Formula
   end
 
   resource "File::Which" do
-    url "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/File-Which-1.23.tar.gz"
-    sha256 "b79dc2244b2d97b6f27167fc3b7799ef61a179040f3abd76ce1e0a3b0bc4e078"
+    url "https://cpan.metacpan.org/authors/id/P/PL/PLICEASE/File-Which-1.27.tar.gz"
+    sha256 "3201f1a60e3f16484082e6045c896842261fc345de9fb2e620fd2a2c7af3a93a"
   end
 
   resource "Log::Dispatch" do
@@ -66,8 +74,8 @@ class Latexindent < Formula
   end
 
   resource "Log::Log4perl" do
-    url "https://cpan.metacpan.org/authors/id/E/ET/ETJ/Log-Log4perl-1.53.tar.gz"
-    sha256 "8fbfb48d016eec7344a539f3ad70870b4ac4638e49666bfa70d10f6ffd4ac38e"
+    url "https://cpan.metacpan.org/authors/id/E/ET/ETJ/Log-Log4perl-1.55.tar.gz"
+    sha256 "c4f3caa1328fdc48595ccd0d1e16c40bd74af2547552370125b4b7e5eae1ff44"
   end
 
   resource "MIME::Charset" do
@@ -76,13 +84,8 @@ class Latexindent < Formula
   end
 
   resource "MRO::Compat" do
-    url "https://cpan.metacpan.org/authors/id/H/HA/HAARG/MRO-Compat-0.13.tar.gz"
-    sha256 "8a2c3b6ccc19328d5579d02a7d91285e2afd85d801f49d423a8eb16f323da4f8"
-  end
-
-  resource "Mac::SystemDirectory" do
-    url "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Mac-SystemDirectory-0.13.tar.gz"
-    sha256 "8730740e4ff3ea4812139b0787dbd1b544e093a08218d908071629b70fde3684"
+    url "https://cpan.metacpan.org/authors/id/H/HA/HAARG/MRO-Compat-0.15.tar.gz"
+    sha256 "0d4535f88e43babd84ab604866215fc4d04398bd4db7b21852d4a31b1c15ef61"
   end
 
   resource "Module::Build" do
@@ -101,13 +104,13 @@ class Latexindent < Formula
   end
 
   resource "Package::Stash" do
-    url "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Package-Stash-0.39.tar.gz"
-    sha256 "9165f555112e080493ce0e9129de0886da30b2593fb353a2abd1c76b2d2621b5"
+    url "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Package-Stash-0.40.tar.gz"
+    sha256 "5a9722c6d9cb29ee133e5f7b08a5362762a0b5633ff5170642a5b0686e95e066"
   end
 
   resource "Package::Stash::XS" do
-    url "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Package-Stash-XS-0.29.tar.gz"
-    sha256 "d3676ba94641e03d6a30e951f09266c4c3ca3f5b58aa7b314a67f28e419878aa"
+    url "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Package-Stash-XS-0.30.tar.gz"
+    sha256 "26bad65c1959c57379b3e139dc776fbec5f702906617ef27cdc293ddf1239231"
   end
 
   resource "Params::ValidationCompiler" do
@@ -116,13 +119,13 @@ class Latexindent < Formula
   end
 
   resource "Role::Tiny" do
-    url "https://cpan.metacpan.org/authors/id/H/HA/HAARG/Role-Tiny-2.001004.tar.gz"
-    sha256 "92ba5712850a74102c93c942eb6e7f62f7a4f8f483734ed289d08b324c281687"
+    url "https://cpan.metacpan.org/authors/id/H/HA/HAARG/Role-Tiny-2.002004.tar.gz"
+    sha256 "d7bdee9e138a4f83aa52d0a981625644bda87ff16642dfa845dcb44d9a242b45"
   end
 
   resource "Specio" do
-    url "https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Specio-0.46.tar.gz"
-    sha256 "0bf42aa116076d6efc18f72b72c7acb5638bd41c0aa09aecc12fc8bf9ceb9596"
+    url "https://cpan.metacpan.org/authors/id/D/DR/DROLSKY/Specio-0.48.tar.gz"
+    sha256 "0c85793580f1274ef08173079131d101f77b22accea7afa8255202f0811682b2"
   end
 
   resource "Sub::Exporter::Progressive" do
@@ -146,8 +149,8 @@ class Latexindent < Formula
   end
 
   resource "Try::Tiny" do
-    url "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Try-Tiny-0.30.tar.gz"
-    sha256 "da5bd0d5c903519bbf10bb9ba0cb7bcac0563882bcfe4503aee3fb143eddef6b"
+    url "https://cpan.metacpan.org/authors/id/E/ET/ETHER/Try-Tiny-0.31.tar.gz"
+    sha256 "3300d31d8a4075b26d8f46ce864a1d913e0e8467ceeba6655d5d2b2e206c11be"
   end
 
   resource "Unicode::LineBreak" do

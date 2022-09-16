@@ -1,17 +1,21 @@
 class Bettercap < Formula
   desc "Swiss army knife for network attacks and monitoring"
   homepage "https://www.bettercap.org/"
-  url "https://github.com/bettercap/bettercap/archive/v2.29.tar.gz"
-  sha256 "c414be98a48d9f279460b325dddaef8479132a1470c6f305790d79e04dac1297"
+  url "https://github.com/bettercap/bettercap/archive/v2.32.0.tar.gz"
+  sha256 "ea28d4d533776a328a54723a74101d1720016ffe7d434bf1d7ab222adb397ac6"
   license "GPL-3.0-only"
+  head "https://github.com/bettercap/bettercap.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any, big_sur:  "6de77638b77e9b826cd2085147a5c312156d578f3376f2e0cc3397be9a48e7bd"
-    sha256 cellar: :any, catalina: "8e7ccb9e8da1c79916eec5b77c2c55141bd13943d022ffee7cdbf13ee1e9640f"
-    sha256 cellar: :any, mojave:   "4b59d7b9b41bcd5ee77ca8dc5ecb00c4ba158910dc30c2083c5e4dee6b994e1d"
+    sha256 cellar: :any,                 arm64_monterey: "1fb738ccae7f3e2257ee1a7311d355c3f7c9381a43a774bf06c892142c10a1a2"
+    sha256 cellar: :any,                 arm64_big_sur:  "e52d4ecc4d9b34037d66f1399b4111f3753ac6fde6fdebb922170367d82578f2"
+    sha256 cellar: :any,                 monterey:       "18e97d317c9dd3f3561074f23fd83f748e68f1070a06ccb3548afbfde9962829"
+    sha256 cellar: :any,                 big_sur:        "6ca4df5dc6af80e97961923613220f3930989b3b2ef2911609a719003500d613"
+    sha256 cellar: :any,                 catalina:       "d719df24fe3a24f2712fd5e08027b20ec0cf4a1e3e9f659d1b085a0b23bc7ee8"
+    sha256 cellar: :any,                 mojave:         "cb44f7b4fed4e8c10049d4e69f3745f78d07a70b03b77327b9e6d02e03e7c020"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4eee88cd3e242be845ff45289d6d350a5bbbe9bac3801c2a17665c770ba24492"
   end
 
-  depends_on "dep" => :build
   depends_on "go" => :build
   depends_on "pkg-config" => :build
   depends_on "libusb"
@@ -35,6 +39,11 @@ class Bettercap < Formula
   end
 
   test do
-    assert_match "Operation not permitted", shell_output("#{bin}/bettercap 2>&1", 1)
+    expected = if OS.mac?
+      "Operation not permitted"
+    else
+      "Permission Denied"
+    end
+    assert_match expected, shell_output(bin/"bettercap 2>&1", 1)
   end
 end

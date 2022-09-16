@@ -1,16 +1,24 @@
 class Isl < Formula
   desc "Integer Set Library for the polyhedral model"
-  homepage "http://isl.gforge.inria.fr"
-  # NOTE: Always use tarball instead of git tag for stable version.
-  #
-  # Currently isl detects its version using source code directory name
-  # and update isl_version() function accordingly.  All other names will
-  # result in isl_version() function returning "UNKNOWN" and hence break
-  # package detection.
-  url "http://isl.gforge.inria.fr/isl-0.23.tar.xz"
-  mirror "https://deb.debian.org/debian/pool/main/i/isl/isl_0.23.orig.tar.xz"
-  sha256 "5efc53efaef151301f4e7dde3856b66812d8153dede24fab17673f801c8698f2"
+  homepage "https://libisl.sourceforge.io/"
   license "MIT"
+
+  stable do
+    # NOTE: Always use tarball instead of git tag for stable version.
+    #
+    # Currently isl detects its version using source code directory name
+    # and update isl_version() function accordingly.  All other names will
+    # result in isl_version() function returning "UNKNOWN" and hence break
+    # package detection.
+    url "https://libisl.sourceforge.io/isl-0.25.tar.xz"
+    sha256 "be7b210647ccadf90a2f0b000fca11a4d40546374a850db67adb32fad4b230d9"
+
+    # Fix -flat_namespace being used on Big Sur and later.
+    patch do
+      url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+      sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+    end
+  end
 
   livecheck do
     url :homepage
@@ -18,10 +26,12 @@ class Isl < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "5b066bc471862c8d166082f0d1bf6b132aac0117f67e19bba139dfe907eb2614"
-    sha256 cellar: :any, big_sur:       "77907a43a415210de713d9e82588b452e5546a31b42194c7c75e07486d319a51"
-    sha256 cellar: :any, catalina:      "bb4c986e9f49c7eea6349a536889e6223549885c0aab3d7692542cd48bc06481"
-    sha256 cellar: :any, mojave:        "066330367dcc69e8d200a1d26a7f6ca580ecc3c397a686fa3b2fbd36d5d88ada"
+    sha256 cellar: :any,                 arm64_monterey: "764bde8aa0d015c13cbf53891489f3ef56a5951f617ad9906aea34382dc1f4d1"
+    sha256 cellar: :any,                 arm64_big_sur:  "24f86a50eea8a2d4dbc24ecb5f8b8ded61f6f7cd7054886b5dafcb82854b28ed"
+    sha256 cellar: :any,                 monterey:       "568dd08209728ad3a036cf45287ff8384b9ed821460a216a9a79fa80fdcfbf52"
+    sha256 cellar: :any,                 big_sur:        "be6456799bb670c16115d89feacf72cee9b444fe87aca6b1bd350bfb89ff6247"
+    sha256 cellar: :any,                 catalina:       "c2ccd96c92ab0bbfdb775ccd7c8f20c2057cbe976769cf078e728b6f5f5938bc"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c0244c95ed9cc89b826868de83bec3150fcc120add1265017176770150757083"
   end
 
   head do
@@ -41,6 +51,7 @@ class Isl < Formula
                           "--prefix=#{prefix}",
                           "--with-gmp=system",
                           "--with-gmp-prefix=#{Formula["gmp"].opt_prefix}"
+    system "make"
     system "make", "install"
     (share/"gdb/auto-load").install Dir["#{lib}/*-gdb.py"]
   end

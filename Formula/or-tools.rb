@@ -1,10 +1,10 @@
 class OrTools < Formula
   desc "Google's Operations Research tools"
   homepage "https://developers.google.com/optimization/"
-  url "https://github.com/google/or-tools/archive/v8.1.tar.gz"
-  sha256 "beb9fe379977033151045d0815d26c628ad99d74d68b9f3b707578492723731e"
+  url "https://github.com/google/or-tools/archive/v9.4.tar.gz"
+  sha256 "180fbc45f6e5ce5ff153bea2df0df59b15346f2a7f8ffbd7cb4aed0fb484b8f6"
   license "Apache-2.0"
-  head "https://github.com/google/or-tools.git"
+  head "https://github.com/google/or-tools.git", branch: "stable"
 
   livecheck do
     url :stable
@@ -12,9 +12,13 @@ class OrTools < Formula
   end
 
   bottle do
-    sha256 cellar: :any, big_sur:  "225e9d0e06a0d60d66d474d5b567d35b918726763f0a5220bd31715118ec8a0b"
-    sha256 cellar: :any, catalina: "26aaa8b0bbea0325a86e44f76b2e1ebcb0be6f44e6448658b81d663821101b38"
-    sha256 cellar: :any, mojave:   "98261b04fd5559a35aa399d01a6f1f806212b0c06445c46ba0ea5f677b5257aa"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "20bc508ae78b76ad3d9a45ccc33b990d526813b3a4b8c14d7442368723613c51"
+    sha256 cellar: :any,                 arm64_big_sur:  "002887469e355d785e7ca16f6932e0218f151a2344977f2c5506105d0d1744c7"
+    sha256 cellar: :any,                 monterey:       "5f80b6b6fede8324e9cd53558057eb47d5e91081af7098db4f93e1e67b280a9e"
+    sha256 cellar: :any,                 big_sur:        "8a3a5a7b988dbcff82875424e90b4e625290f4c9a101a89c93815d9121da12b4"
+    sha256 cellar: :any,                 catalina:       "8beb1393eb22e984c9d715ff94f1b63d3a16b21ee5d50e6eb7595a491387ca68"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "baf89a9af23e9ddf7dfae1d113cba8a751b676a73bac5b38272117488fd8beac"
   end
 
   depends_on "cmake" => :build
@@ -24,14 +28,21 @@ class OrTools < Formula
   depends_on "cgl"
   depends_on "clp"
   depends_on "coinutils"
-  depends_on "gflags"
-  depends_on "glog"
+  depends_on "eigen"
+  depends_on "openblas"
   depends_on "osi"
   depends_on "protobuf"
+  depends_on "re2"
+
+  uses_from_macos "zlib"
+
+  fails_with gcc: "5"
 
   def install
-    system "cmake", "-S.", "-Bbuild", *std_cmake_args,
-           "-DUSE_SCIP=OFF", "-DBUILD_SAMPLES=OFF", "-DBUILD_EXAMPLES=OFF"
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args,
+                    "-DUSE_SCIP=OFF",
+                    "-DBUILD_SAMPLES=OFF",
+                    "-DBUILD_EXAMPLES=OFF"
     system "cmake", "--build", "build", "-v"
     system "cmake", "--build", "build", "--target", "install"
     pkgshare.install "ortools/linear_solver/samples/simple_lp_program.cc"
@@ -41,25 +52,21 @@ class OrTools < Formula
 
   test do
     # Linear Solver & Glop Solver
-    system ENV.cxx, "-std=c++17",
+    system ENV.cxx, "-std=c++17", pkgshare/"simple_lp_program.cc",
            "-I#{include}", "-L#{lib}", "-lortools",
-           "-L#{Formula["gflags"].opt_lib}", "-lgflags",
-           "-L#{Formula["glog"].opt_lib}", "-lglog",
-           pkgshare/"simple_lp_program.cc", "-o", "simple_lp_program"
+           "-L#{Formula["abseil"].opt_lib}", "-labsl_time",
+           "-o", "simple_lp_program"
     system "./simple_lp_program"
     # Routing Solver
-    system ENV.cxx, "-std=c++17",
+    system ENV.cxx, "-std=c++17", pkgshare/"simple_routing_program.cc",
            "-I#{include}", "-L#{lib}", "-lortools",
-           "-L#{Formula["gflags"].opt_lib}", "-lgflags",
-           "-L#{Formula["glog"].opt_lib}", "-lglog",
-           pkgshare/"simple_routing_program.cc", "-o", "simple_routing_program"
+           "-o", "simple_routing_program"
     system "./simple_routing_program"
     # Sat Solver
-    system ENV.cxx, "-std=c++17",
+    system ENV.cxx, "-std=c++17", pkgshare/"simple_sat_program.cc",
            "-I#{include}", "-L#{lib}", "-lortools",
-           "-L#{Formula["gflags"].opt_lib}", "-lgflags",
-           "-L#{Formula["glog"].opt_lib}", "-lglog",
-           pkgshare/"simple_sat_program.cc", "-o", "simple_sat_program"
+           "-L#{Formula["abseil"].opt_lib}", "-labsl_raw_hash_set",
+           "-o", "simple_sat_program"
     system "./simple_sat_program"
   end
 end

@@ -1,51 +1,42 @@
 class Zabbix < Formula
   desc "Availability and monitoring solution"
   homepage "https://www.zabbix.com/"
-  url "https://cdn.zabbix.com/zabbix/sources/stable/5.0/zabbix-5.0.8.tar.gz"
-  sha256 "a6a61d2aec82210506f02e4d51594d28f2cb8d40e061fe487460334c6ba0e7e3"
+  url "https://cdn.zabbix.com/zabbix/sources/stable/6.2/zabbix-6.2.2.tar.gz"
+  sha256 "f0e7a9abb0f65d700f531253b91c31165077a9c94769cc8d238a423ada852773"
   license "GPL-2.0-or-later"
+  head "https://github.com/zabbix/zabbix.git", branch: "master"
 
-  # As of writing, the Zabbix SourceForge repository is missing the latest
-  # version (4.4.8), so we have to check for the newest version on the Zabbix
-  # CDN index page instead. Unfortunately, the versions are separated into
-  # folders for a given major/minor version, so this will quietly stop being
-  # a proper check sometime in the future and need to be updated.
   livecheck do
-    url "https://cdn.zabbix.com/zabbix/sources/stable/5.0/"
-    regex(/href=.*?zabbix[._-](\d+(?:\.\d+)+)\.t/i)
+    url "https://www.zabbix.com/download_sources"
+    regex(/href=.*?zabbix[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 arm64_big_sur: "06e0c80759269bf5b3012744f5941303d2f3dd6ffcd2f0869293455b82145f57"
-    sha256 big_sur:       "1d87ce6d547b21c7700577a35cea2564a09a1fc777738e0eae8b447bc6fa25ca"
-    sha256 catalina:      "192b4cb43357824e0967f73f707d3cf33bdb830b48e2dc22dd7161cd831fa607"
-    sha256 mojave:        "e9af4d5e670a2f6116ed53d3927853b4b197feb72329bb1c165f74237e9a88ca"
+    sha256 arm64_monterey: "54e290f946b05442f6aea69e14df76ffc39448960e7f35f834f5d7aaee79aa87"
+    sha256 arm64_big_sur:  "95daba9c12acab84e686f13e3c7612438ebe0958a524f79ceb0d3818f086b2f9"
+    sha256 monterey:       "5e37f05abc4f086ca020a694dfc59a01829b86aab1b2bbdef57cc89442cd17ff"
+    sha256 big_sur:        "c21f9a3ded5f9a4b907b09d40672ac2374f4be5033c5ff90ea029ac1f463fab7"
+    sha256 catalina:       "85be8059ec39f94532c9a8458db4d0c533cd4cfbbad8bf19e3612353670588dc"
+    sha256 x86_64_linux:   "9ee9cd71552f20b44206ea7bbaffd8edd5e9587377272bafb69a0a0cccac4cd3"
   end
 
-  depends_on "openssl@1.1"
-  depends_on "pcre"
-
-  def brewed_or_shipped(db_config)
-    brewed_db_config = "#{HOMEBREW_PREFIX}/bin/#{db_config}"
-    (File.exist?(brewed_db_config) && brewed_db_config) || which(db_config)
-  end
+  depends_on "pkg-config" => :build
+  depends_on "openssl@3"
+  depends_on "pcre2"
 
   def install
-    sdk = MacOS::CLT.installed? ? "" : MacOS.sdk_path
-
     args = %W[
       --disable-dependency-tracking
       --prefix=#{prefix}
       --sysconfdir=#{etc}/zabbix
       --enable-agent
-      --with-iconv=#{sdk}/usr
-      --with-libpcre=#{Formula["pcre"].opt_prefix}
-      --with-openssl=#{Formula["openssl@1.1"].opt_prefix}
+      --with-libpcre2
+      --with-openssl=#{Formula["openssl@3"].opt_prefix}
     ]
 
-    if MacOS.version == :el_capitan && MacOS::Xcode.version >= "8.0"
-      inreplace "configure", "clock_gettime(CLOCK_REALTIME, &tp);",
-                             "undefinedgibberish(CLOCK_REALTIME, &tp);"
+    if OS.mac?
+      sdk = MacOS::CLT.installed? ? "" : MacOS.sdk_path
+      args << "--with-iconv=#{sdk}/usr"
     end
 
     system "./configure", *args

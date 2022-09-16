@@ -2,27 +2,44 @@ class Serialosc < Formula
   desc "Opensound control server for monome devices"
   homepage "https://github.com/monome/docs/blob/gh-pages/serialosc/osc.md"
   url "https://github.com/monome/serialosc.git",
-      tag:      "v1.4.1",
-      revision: "4fec6f11276dd302faf9ca8e0a8e126f273cf954"
+      tag:      "v1.4.3",
+      revision: "12fa410a14b2759617c6df2ff9088bc79b3ee8de"
   license "ISC"
-  head "https://github.com/monome/serialosc.git"
+  head "https://github.com/monome/serialosc.git", branch: "main"
 
   bottle do
     rebuild 1
-    sha256 cellar: :any, arm64_big_sur: "34c28ed9daba6253e5683b1843d4232991be7194b9121684c1e22e45f4f29fa6"
-    sha256 cellar: :any, big_sur:       "a67757d6de9663c606ae5baad6c98b1e05270f6ebc7dce5ee856cebd9359523e"
-    sha256 cellar: :any, catalina:      "652e246d1df70f602f497f545c7ef8d69bf7fcbd98fc0af43da944c983f72a32"
-    sha256 cellar: :any, mojave:        "88d5711e7c26674071d8f5b659c44bc5112edf2b0033b42dc04dba302a418ce5"
+    sha256 cellar: :any,                 arm64_monterey: "318e77a4ee30e5b95315e2d05ee4967400fabc94cfb9621961f425132fa96f78"
+    sha256 cellar: :any,                 arm64_big_sur:  "f5b5a750553afaad105661c6c3a1d863bd18e89a6c1f818877e09fab50798e23"
+    sha256 cellar: :any,                 monterey:       "cf20c8747d7be7d4fea6709348af811a25f7e82c40ec462f6f2fe746951da665"
+    sha256 cellar: :any,                 big_sur:        "dd151339ca334c6719b61216a4ca378f1980079de8b7d666a7b544aa3eb71484"
+    sha256 cellar: :any,                 catalina:       "8f47b03bae3c5309d74a3032264246f33e9c05141b6679a057b9cfbc0fa3a8c8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a80b151ced619522b991261dfb4a40a18acd6b47a02c82a2748fe13b29636813"
   end
 
+  depends_on "python@3.10" => :build
   depends_on "confuse"
   depends_on "liblo"
   depends_on "libmonome"
+  depends_on "libuv"
+
+  on_linux do
+    depends_on "avahi"
+    depends_on "systemd" # for libudev
+  end
 
   def install
-    system "./waf", "configure", "--prefix=#{prefix}"
-    system "./waf", "build"
-    system "./waf", "install"
+    python3 = "python3.10"
+    system python3, "./waf", "configure", "--enable-system-libuv", "--prefix=#{prefix}"
+    system python3, "./waf", "build"
+    system python3, "./waf", "install"
+  end
+
+  service do
+    run [opt_bin/"serialoscd"]
+    keep_alive true
+    log_path var/"log/serialoscd.log"
+    error_log_path var/"log/serialoscd.log"
   end
 
   test do

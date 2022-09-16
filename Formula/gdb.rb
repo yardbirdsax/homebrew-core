@@ -1,32 +1,35 @@
 class Gdb < Formula
   desc "GNU debugger"
   homepage "https://www.gnu.org/software/gdb/"
-  url "https://ftp.gnu.org/gnu/gdb/gdb-10.1.tar.xz"
-  mirror "https://ftpmirror.gnu.org/gdb/gdb-10.1.tar.xz"
-  sha256 "f82f1eceeec14a3afa2de8d9b0d3c91d5a3820e23e0a01bbb70ef9f0276b62c0"
+  url "https://ftp.gnu.org/gnu/gdb/gdb-12.1.tar.xz"
+  mirror "https://ftpmirror.gnu.org/gdb/gdb-12.1.tar.xz"
+  sha256 "0e1793bf8f2b54d53f46dea84ccfd446f48f81b297b28c4f7fc017b818d69fed"
   license "GPL-3.0-or-later"
   revision 1
-  head "https://sourceware.org/git/binutils-gdb.git"
+  head "https://sourceware.org/git/binutils-gdb.git", branch: "master"
 
   bottle do
-    sha256 big_sur:  "e091e16129311d4c9c444e415dc8f8cd58f0ba2f3647952cab242c32c049426e"
-    sha256 catalina: "33e0973094baeb29eeeb29472a8534e11f8c870e94864777ab3d66a1ba68416f"
-    sha256 mojave:   "e9629327e54e84b14ae2c3f54712376428f6c62e070760e6c62b0bdf83f691af"
+    rebuild 1
+    sha256 monterey:     "abd5971ed1807705c206f4a0302785af984aa781b185672de0fbcace98eadb47"
+    sha256 big_sur:      "e1c84f92d867ebe2f41ea4f3bd16a7a8fe96d14461c8e3bd6ee2bcf53e51e4b9"
+    sha256 catalina:     "d787042cc42e53808fcee2528e0369ab5fa55fb4e8cb8cbfbc6f4574052e8f0b"
+    sha256 x86_64_linux: "e00341b4932632977ceace30cd3c9ee2cdb707c6fb60d241ac680eb6773958e9"
   end
 
-  depends_on "python@3.9"
+  depends_on arch: :x86_64 # gdb is not supported on macOS ARM
+  depends_on "gmp"
+  depends_on "python@3.10"
   depends_on "xz" # required for lzma support
 
+  uses_from_macos "texinfo" => :build
   uses_from_macos "expat"
+  uses_from_macos "libxcrypt"
   uses_from_macos "ncurses"
 
   on_linux do
     depends_on "pkg-config" => :build
     depends_on "guile"
   end
-
-  conflicts_with "i386-elf-gdb", because: "both install include/gdb, share/gdb and share/info"
-  conflicts_with "x86_64-elf-gdb", because: "both install include/gdb, share/gdb and share/info"
 
   fails_with :clang do
     build 800
@@ -36,6 +39,8 @@ class Gdb < Formula
     EOS
   end
 
+  fails_with gcc: "5"
+
   def install
     args = %W[
       --enable-targets=all
@@ -43,7 +48,7 @@ class Gdb < Formula
       --disable-debug
       --disable-dependency-tracking
       --with-lzma
-      --with-python=#{Formula["python@3.9"].opt_bin}/python3
+      --with-python=#{Formula["python@3.10"].opt_bin}/python3.10
       --disable-binutils
     ]
 
@@ -61,11 +66,7 @@ class Gdb < Formula
       gdb requires special privileges to access Mach ports.
       You will need to codesign the binary. For instructions, see:
 
-        https://sourceware.org/gdb/wiki/BuildingOnDarwin
-
-      On 10.12 (Sierra) or later with SIP, you need to run this:
-
-        echo "set startup-with-shell off" >> ~/.gdbinit
+        https://sourceware.org/gdb/wiki/PermissionsDarwin
     EOS
   end
 

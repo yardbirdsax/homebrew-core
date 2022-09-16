@@ -1,9 +1,10 @@
 class Postgis < Formula
   desc "Adds support for geographic objects to PostgreSQL"
   homepage "https://postgis.net/"
-  url "https://download.osgeo.org/postgis/source/postgis-3.1.1.tar.gz"
-  sha256 "0e96afef586db6939d48fb22fbfbc9d0de5e6bc1722d6d553d63bb41441a2a7d"
+  url "https://download.osgeo.org/postgis/source/postgis-3.2.3.tar.gz"
+  sha256 "1b4d8b5c756e5aba59efbc1833b22efe4d6562778eeca56fa497feb2eb13668c"
   license "GPL-2.0-or-later"
+  revision 2
 
   livecheck do
     url "https://download.osgeo.org/postgis/source/"
@@ -11,14 +12,16 @@ class Postgis < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "0a9f31b8eb858c8deec060b547a2cb6604b0123b666a11e3370f6a89e2489672"
-    sha256 cellar: :any, big_sur:       "c8ce4eea7e0fd796b62c6cf0dd68ad103c7367f6941e68b17d271074f024c3e1"
-    sha256 cellar: :any, catalina:      "9b759aee6e27a9636737594d4bab226e94d3b138952b060e2856d4cc611ee2f9"
-    sha256 cellar: :any, mojave:        "d90ff542d074be8ac87823764911c34ec778277e6ba32d5e1028f36006b18b8e"
+    sha256 cellar: :any,                 arm64_monterey: "7e7dacce81ec0d01e3c27b58bdb1b8c42f3a7c6953d4fb315cddb51d9d5426d0"
+    sha256 cellar: :any,                 arm64_big_sur:  "7a6bc4986c959ef5572daf43041485c0c2243b8f4b5f0950b18f398ac4ee640e"
+    sha256 cellar: :any,                 monterey:       "d41db5cc7ccc7b939851b1aa19f63a9d84861a1f6f53323c1bc6aa13b2c064a7"
+    sha256 cellar: :any,                 big_sur:        "f3f4a30d31cbc8d039d82c8ccb5fd20be9dc9f71af90ab00bcdacc12582cb060"
+    sha256 cellar: :any,                 catalina:       "09c2e0581a7ecc738e9c0b884600ec733df8a00281a09e1c43489d74c1b3b8ab"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "04d5d88eb85e726579b5b01314af1bbf4bece5f474d1759658b19007ad10c72d"
   end
 
   head do
-    url "https://git.osgeo.org/gitea/postgis/postgis.git"
+    url "https://git.osgeo.org/gitea/postgis/postgis.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -30,19 +33,31 @@ class Postgis < Formula
   depends_on "gdal" # for GeoJSON and raster handling
   depends_on "geos"
   depends_on "json-c" # for GeoJSON and raster handling
-  depends_on "pcre"
-  depends_on "postgresql"
+  depends_on "pcre2"
+  depends_on "postgresql@14"
   depends_on "proj"
   depends_on "protobuf-c" # for MVT (map vector tiles) support
   depends_on "sfcgal" # for advanced 2D/3D functions
 
+  on_linux do
+    depends_on "gcc"
+  end
+
+  fails_with gcc: "5"
+
+  def postgresql
+    Formula["postgresql@14"]
+  end
+
   def install
     ENV.deparallelize
+
+    ENV["PG_CONFIG"] = postgresql.opt_bin/"pg_config"
 
     args = [
       "--with-projdir=#{Formula["proj"].opt_prefix}",
       "--with-jsondir=#{Formula["json-c"].opt_prefix}",
-      "--with-pgconfig=#{Formula["postgresql"].opt_bin}/pg_config",
+      "--with-pgconfig=#{postgresql.opt_bin}/pg_config",
       "--with-protobufdir=#{Formula["protobuf-c"].opt_bin}",
       # Unfortunately, NLS support causes all kinds of headaches because
       # PostGIS gets all of its compiler flags from the PGXS makefiles. This
@@ -55,16 +70,23 @@ class Postgis < Formula
     system "./configure", *args
     system "make"
 
+    # Install to a staging directory to circumvent the hardcoded install paths
+    # set by the PGXS makefiles.
     mkdir "stage"
     system "make", "install", "DESTDIR=#{buildpath}/stage"
 
-    bin.install Dir["stage/**/bin/*"]
-    lib.install Dir["stage/**/lib/*"]
-    include.install Dir["stage/**/include/*"]
-    (doc/"postgresql/extension").install Dir["stage/**/share/doc/postgresql/extension/*"]
-    (share/"postgresql/extension").install Dir["stage/**/share/postgresql/extension/*"]
-    pkgshare.install Dir["stage/**/contrib/postgis-*/*"]
-    (share/"postgis_topology").install Dir["stage/**/contrib/postgis_topology-*/*"]
+    # Some files are stored in the stage directory with the cellar prefix of
+    # the version of postgresql used to build postgis.  Since we copy these
+    # files into the postgis keg and symlink them to HOMEBREW_PREFIX, postgis
+    # only needs to be rebuilt when there is a new major version of postgresql.
+    postgresql_prefix = postgresql.prefix.realpath
+    postgresql_stage_path = File.join("stage", postgresql_prefix)
+    bin.install (buildpath/postgresql_stage_path/"bin").children
+    doc.install (buildpath/postgresql_stage_path/"share/doc").children
+
+    stage_path = File.join("stage", HOMEBREW_PREFIX)
+    lib.install (buildpath/stage_path/"lib").children
+    share.install (buildpath/stage_path/"share").children
 
     # Extension scripts
     bin.install %w[
@@ -77,11 +99,14 @@ class Postgis < Formula
       utils/test_geography_joinestimation.pl
       utils/test_joinestimation.pl
     ]
-
-    man1.install Dir["doc/**/*.1"]
   end
 
   test do
+    pg_version = postgresql.version.major
+    expected = /'PostGIS built for PostgreSQL % cannot be loaded in PostgreSQL %',\s+#{pg_version}\.\d,/
+    postgis_version = Formula["postgis"].version.major_minor
+    assert_match expected, (share/postgresql.name/"contrib/postgis-#{postgis_version}/postgis.sql").read
+
     require "base64"
     (testpath/"brew.shp").write ::Base64.decode64 <<~EOS
       AAAnCgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoOgDAAALAAAAAAAAAAAAAAAA
@@ -115,7 +140,21 @@ class Postgis < Formula
       igAAABI=
     EOS
     result = shell_output("#{bin}/shp2pgsql #{testpath}/brew.shp")
-    assert_match(/Point/, result)
-    assert_match(/AddGeometryColumn/, result)
+    assert_match "Point", result
+    assert_match "AddGeometryColumn", result
+
+    pg_ctl = postgresql.opt_bin/"pg_ctl"
+    psql = postgresql.opt_bin/"psql"
+    port = free_port
+
+    system pg_ctl, "initdb", "-D", testpath/"test"
+    (testpath/"test/postgresql.conf").write <<~EOS, mode: "a+"
+
+      shared_preload_libraries = 'postgis-3'
+      port = #{port}
+    EOS
+    system pg_ctl, "start", "-D", testpath/"test", "-l", testpath/"log"
+    system psql, "-p", port.to_s, "-c", "CREATE EXTENSION \"postgis\";", "postgres"
+    system pg_ctl, "stop", "-D", testpath/"test"
   end
 end

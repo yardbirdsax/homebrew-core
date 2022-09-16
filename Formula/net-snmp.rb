@@ -1,10 +1,10 @@
 class NetSnmp < Formula
   desc "Implements SNMP v1, v2c, and v3, using IPv4 and IPv6"
   homepage "http://www.net-snmp.org/"
-  url "https://downloads.sourceforge.net/project/net-snmp/net-snmp/5.9/net-snmp-5.9.tar.gz"
-  sha256 "04303a66f85d6d8b16d3cc53bde50428877c82ab524e17591dfceaeb94df6071"
+  url "https://downloads.sourceforge.net/project/net-snmp/net-snmp/5.9.3/net-snmp-5.9.3.tar.gz"
+  sha256 "2097f29b7e1bf3f1300b4bae52fa2308d0bb8d5d3998dbe02f9462a413a2ef0a"
   license "Net-SNMP"
-  head "https://github.com/net-snmp/net-snmp.git"
+  head "https://github.com/net-snmp/net-snmp.git", branch: "master"
 
   livecheck do
     url :stable
@@ -12,57 +12,47 @@ class NetSnmp < Formula
   end
 
   bottle do
-    rebuild 2
-    sha256 arm64_big_sur: "546fe0a8e74e43d8e8ba6d5526a73096aa7e4e92b9f66d910b6146206753e556"
-    sha256 big_sur:       "f76220e8e7bffba146b3886d46d61dca81e947d2d77937e8c756b1f6f242526d"
-    sha256 catalina:      "04210e391fad9e36b9fe9945e4a8b6436263e64aaf24ac0069202c6581c8d624"
-    sha256 mojave:        "1ac45c38fa251f876c70073ef1757c0a3b7659fb8f2ce7f5ec41af2febb1cac9"
+    sha256 arm64_monterey: "634fb231f5cc587aa3a327e190f9f43333c34742fbe2d003742a0b627bcfde1a"
+    sha256 arm64_big_sur:  "3a143759145e8d8adc231c73f006b9e434c2f706d62d1904b27eee925cd93ceb"
+    sha256 monterey:       "c3bc6964e8232d21ccf46f16a4e0b35f1474cbe6676a5ebc27b7caf89737513a"
+    sha256 big_sur:        "9e90ad8567f8bab19f76243cbabe2c39fb36c2473e2d5ea5ce4d0708f0b09933"
+    sha256 catalina:       "80436ed0c97eb7fac29c905cdfd831bda8e6265c964006b3024cd57a728b5dc8"
+    sha256 x86_64_linux:   "61f84c8fe4ecbc75c018359a8dff265638598efbf4dbf4d22fc5dea859908be0"
   end
 
   keg_only :provided_by_macos
 
   depends_on "openssl@1.1"
 
-  # Fix "make install" bug with 5.9
-  patch do
-    url "https://github.com/net-snmp/net-snmp/commit/52d4a465dcd92db004c34c1ad6a86fe36726e61b.patch?full_index=1"
-    sha256 "669185758aa3a4815f4bbbe533795c4b6969c0c80c573f8c8abfa86911c57492"
+  on_arm do
+    depends_on "autoconf" => :build
+    depends_on "automake" => :build
+    depends_on "libtool" => :build
   end
 
-  # Clean up some Xcode 12 issues with ./configure
+  # Fix -flat_namespace being used on x86_64 Big Sur and later.
   patch do
-    url "https://github.com/net-snmp/net-snmp/commit/a7c8c26c48c954a19bca5fdc6ba285396610d7aa.patch?full_index=1"
-    sha256 "8ccc46a3c15d145e5034c0749f3c0e7bd11eca451809ae7f2312dab459e07cec"
-  end
-
-  # Apple Silicon support
-  # https://github.com/net-snmp/net-snmp/issues/228
-  if Hardware::CPU.arm?
-    patch do
-      url "https://github.com/net-snmp/net-snmp/commit/bcc654e7.patch?full_index=1"
-      sha256 "b5e35ef021e1962bd2fbf675f05eb43cc75bd7d417687d736a4c4b508a9eed47"
-    end
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
   end
 
   def install
-    # Workaround https://github.com/net-snmp/net-snmp/issues/226 in 5.9:
-    inreplace "agent/mibgroup/mibII/icmp.h", "darwin10", "darwin"
-
-    args = %W[
-      --disable-debugging
-      --prefix=#{prefix}
-      --enable-ipv6
-      --with-defaults
-      --with-persistent-directory=#{var}/db/net-snmp
-      --with-logfile=#{var}/log/snmpd.log
-      --with-mib-modules=host\ ucd-snmp/diskio
-      --without-rpm
-      --without-kmem-usage
-      --disable-embedded-perl
-      --without-perl-modules
-      --with-openssl=#{Formula["openssl@1.1"].opt_prefix}
+    args = [
+      "--disable-debugging",
+      "--prefix=#{prefix}",
+      "--enable-ipv6",
+      "--with-defaults",
+      "--with-persistent-directory=#{var}/db/net-snmp",
+      "--with-logfile=#{var}/log/snmpd.log",
+      "--with-mib-modules=host ucd-snmp/diskio",
+      "--without-rpm",
+      "--without-kmem-usage",
+      "--disable-embedded-perl",
+      "--without-perl-modules",
+      "--with-openssl=#{Formula["openssl@1.1"].opt_prefix}",
     ]
 
+    system "autoreconf", "-fvi" if Hardware::CPU.arm?
     system "./configure", *args
     system "make"
     system "make", "install"

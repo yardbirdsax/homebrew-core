@@ -1,30 +1,32 @@
 class StressNg < Formula
   desc "Stress test a computer system in various selectable ways"
-  homepage "https://kernel.ubuntu.com/~cking/stress-ng/"
-  url "https://kernel.ubuntu.com/~cking/tarballs/stress-ng/stress-ng-0.12.02.tar.xz"
-  sha256 "f847be115f60d3ad7d37c806fd1bfb1412aa3c631fca581d6dc233322f50d6a5"
+  homepage "https://wiki.ubuntu.com/Kernel/Reference/stress-ng"
+  url "https://github.com/ColinIanKing/stress-ng/archive/refs/tags/V0.14.05.tar.gz"
+  sha256 "2ee20333d306037cf44f4e8d038bc6253106dcb54f37ee548e9adfd94a6a391c"
   license "GPL-2.0-or-later"
 
-  livecheck do
-    url "https://kernel.ubuntu.com/~cking/tarballs/stress-ng/"
-    regex(/href=.*?stress-ng[._-]v?(\d+(?:\.\d+)+)\.t/i)
-  end
-
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "312a05b9ce3a3516ed3d0f74389e5903364a746d5ceb73aa01c40baef3727e2d"
-    sha256 cellar: :any_skip_relocation, big_sur:       "879f99e97af9b9f06b00d96d653ab685fa53e74f1f413eb2d22a3b6431f83297"
-    sha256 cellar: :any_skip_relocation, catalina:      "3d7b6c7cef170967a0f7cb55ba1bd20f6fd39774442a27351cc6396969df663f"
-    sha256 cellar: :any_skip_relocation, mojave:        "b0b3a384f412f4e34a32632b446eda2617f74214a85218dd059d0ab2de40c4cb"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "44400b7a983b62df04973d92c261b74795e554ad86749b830983e18d97f413d9"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e9ab13708da22ddbe36344dfe91a81090c674c522f3cf4e5df36068a9eee808b"
+    sha256 cellar: :any_skip_relocation, monterey:       "a18edcbf0eb0361a03f3bdf0eb9cec879abdcbd0bd1eec31bffbedd73056a669"
+    sha256 cellar: :any_skip_relocation, big_sur:        "075d66725792ceff5da2c221fd66819b388d9da54d3b993bdf01a980d3068bdb"
+    sha256 cellar: :any_skip_relocation, catalina:       "70b045f8083a8c680eca66337345934e6b32a3efd9c294b42f16b689ce0e136a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "36b825d81bc3622d9840a3ac7e8d78d5095b949f8323b594e908f345863e7f99"
   end
 
   depends_on macos: :sierra
 
+  uses_from_macos "libxcrypt"
   uses_from_macos "zlib"
 
   def install
-    inreplace "Makefile", "/usr", prefix
+    inreplace "Makefile" do |s|
+      s.gsub! "/usr", prefix
+      s.change_make_var! "BASHDIR", prefix/"etc/bash_completion.d"
+    end
     system "make"
     system "make", "install"
+    bash_completion.install "bash-completion/stress-ng"
   end
 
   test do

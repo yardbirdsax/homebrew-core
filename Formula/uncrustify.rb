@@ -1,22 +1,29 @@
 class Uncrustify < Formula
   desc "Source code beautifier"
   homepage "https://uncrustify.sourceforge.io/"
-  url "https://github.com/uncrustify/uncrustify/archive/uncrustify-0.72.0.tar.gz"
-  sha256 "d6fff70bc7823fac4c77013055333b79a4839909094e8eee8a14ee8f1777374e"
+  url "https://github.com/uncrustify/uncrustify/archive/uncrustify-0.75.1.tar.gz"
+  sha256 "fd14acc0a31ed88b33137bdc26d32964327488c835f885696473ef07caf2e182"
   license "GPL-2.0-or-later"
-  head "https://github.com/uncrustify/uncrustify.git"
+  head "https://github.com/uncrustify/uncrustify.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "327603c90e291b6f9f8c5bf837bfe4f22295cdf18dc397e012537eab2e7ca9b2"
-    sha256 cellar: :any_skip_relocation, big_sur:       "ee6e6b6d193ed163cd8365382bc56dd621f5c8f6c3776f52e4b0b2aeb1b90329"
-    sha256 cellar: :any_skip_relocation, catalina:      "c22df6af4af60a023f95f2cdce327fffe740264e44382e5bcd97e6ea9245bdb7"
-    sha256 cellar: :any_skip_relocation, mojave:        "3340dd41ba1ad700ba8014225ac005c9a171d16b990ff275257f9c4f30097861"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "2af96b34e949ec3034f0c66c90918ac69b6b3f312e32ce4c27b0dfe158bfef40"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "18fd62fc09199932669b7dae942275db9b01cb0f41426bb498d4c0c62fa281d4"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "125f9215b38b8479bf19a3e2bd2a26b69d852330c5ea814efc4f321fd7c7845c"
+    sha256 cellar: :any_skip_relocation, monterey:       "91b46324697bb64ff4dd19a14b03c76f121413cee986b1fbbadc28ee9606dbe6"
+    sha256 cellar: :any_skip_relocation, big_sur:        "d3aa70ab113276545fe3dcf0a29a1549f41e1f2237ffa3ee41ece14aeb321a4e"
+    sha256 cellar: :any_skip_relocation, catalina:       "d9718ce807174f7673bd384b14df90b3e0089c95ae2d023f0dd51cbf895c5c51"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "33c4e0474ecf3ef68598a8babe888a568b87db5c1156c87c72c289e00e2df078"
   end
 
   depends_on "cmake" => :build
+  uses_from_macos "python" => :build
+
+  fails_with gcc: "5"
 
   def install
+    ENV.cxx11
+
     mkdir "build" do
       system "cmake", "..", *std_cmake_args
       system "make", "install"

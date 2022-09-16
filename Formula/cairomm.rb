@@ -1,8 +1,8 @@
 class Cairomm < Formula
   desc "Vector graphics library with cross-device output support"
   homepage "https://cairographics.org/cairomm/"
-  url "https://cairographics.org/releases/cairomm-1.16.0.tar.xz"
-  sha256 "7e881492c5f9f546688c31160deb742c166fc4c68b6b8eb9920c00a0f0f144f9"
+  url "https://cairographics.org/releases/cairomm-1.16.1.tar.xz"
+  sha256 "6f6060d8e98dd4b8acfee2295fddbdd38cf487c07c26aad8d1a83bb9bff4a2c6"
   license "LGPL-2.0-or-later"
 
   livecheck do
@@ -11,10 +11,13 @@ class Cairomm < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "e35cb366d4afd2a5a7153ddf2bd648ef6bdd75a82f79980480ec9c9b71afd821"
-    sha256 cellar: :any, big_sur:       "6177df22ea052d3e7ccd44d621d24837478340ea0d1385ef401a069414f893f1"
-    sha256 cellar: :any, catalina:      "cad19588b9a033b690cd2f1b73cb75282e017e1d32dfd39e29f7a35e2e8d3d91"
-    sha256 cellar: :any, mojave:        "b90f4177caced79c28888be8b38150c22d9a147eaa96493810ddbdf3fee87bf4"
+    rebuild 1
+    sha256 cellar: :any, arm64_monterey: "7a67caede999c7ba7519176448e9339693f0db227f09a6828d1ae3429dd35b18"
+    sha256 cellar: :any, arm64_big_sur:  "56c5d0ece32f63cb06fb262077630694b3296e06daad0842b0734f2f288646d3"
+    sha256 cellar: :any, monterey:       "6f710276849eb221328f91d02d8360afefb22ee7f5443e354a48ca9570e2a605"
+    sha256 cellar: :any, big_sur:        "80c9e4d2948354442cba31e225f4343b8bd3985e8f9fd8fa3bb06c9ba50db9ff"
+    sha256 cellar: :any, catalina:       "bd8824b5da978158d1e7fdb6d156f9a41783d09a8dc82b4d56aabffc37335434"
+    sha256               x86_64_linux:   "3ffb4fbfb4ffc223341488313deb3bcbcd71dd9572d5ce10a1f489897f993e97"
   end
 
   depends_on "meson" => :build
@@ -23,6 +26,8 @@ class Cairomm < Formula
   depends_on "cairo"
   depends_on "libpng"
   depends_on "libsigc++"
+
+  fails_with gcc: "5"
 
   def install
     ENV.cxx11

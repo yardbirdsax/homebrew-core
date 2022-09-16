@@ -1,9 +1,9 @@
 class ArgyllCms < Formula
   desc "ICC compatible color management system"
   homepage "https://www.argyllcms.com/"
-  url "https://www.argyllcms.com/Argyll_V2.1.2_src.zip"
-  sha256 "be378ca836b17b8684db05e9feaab138d711835ef00a04a76ac0ceacd386a3e3"
-  license "AGPL-3.0"
+  url "https://www.argyllcms.com/Argyll_V2.3.1_src.zip"
+  sha256 "bd0bcf58cec284824b79ff55baa242903ed361e12b1b37e12228679f9754961c"
+  license "AGPL-3.0-only"
 
   livecheck do
     url "https://www.argyllcms.com/downloadsrc.html"
@@ -11,9 +11,12 @@ class ArgyllCms < Formula
   end
 
   bottle do
-    sha256 cellar: :any, catalina:    "242a8a56d37402e681d630d1df0702088df5555e367afb65469679aa96ee9f29"
-    sha256 cellar: :any, mojave:      "6edcbef10d3f93d7f527cc875a35cb9c6bf636da03d6a1c548f560fcbca83866"
-    sha256 cellar: :any, high_sierra: "4b7bcbe2cd555d9606812afc676cab750c6f8bc4be54db0551bb2becefd176e0"
+    sha256 cellar: :any,                 arm64_monterey: "2eb28a59cef2bdcc142008d4d36470e586e8e22285273303802a7e16bb95d08f"
+    sha256 cellar: :any,                 arm64_big_sur:  "253c5434082b4237f8067ad31ee6fae81811048f76d2cad8e2ae3ca360d51be8"
+    sha256 cellar: :any,                 monterey:       "efa97d39822d0ded97541bc095e59a976eb3f893da6bd4cbb2a90a3174cd9830"
+    sha256 cellar: :any,                 big_sur:        "eb7a9fd709675ccd7f1b59ae9d3e17bc301b4f7c15857a4c32f8f71e6801dc05"
+    sha256 cellar: :any,                 catalina:       "36860658ac2513441fcf1968c16d57fa6fbb5b7385d5437df24ffebe84ed7e1b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4f4ed53c2d490076f96e3833f36d35c8629f909eba688142349489138856037c"
   end
 
   depends_on "jam" => :build
@@ -21,25 +24,33 @@ class ArgyllCms < Formula
   depends_on "libpng"
   depends_on "libtiff"
 
+  on_linux do
+    depends_on "libx11"
+    depends_on "libxinerama"
+    depends_on "libxrandr"
+    depends_on "libxscrnsaver"
+    depends_on "libxxf86vm"
+    depends_on "xorgproto"
+  end
+
   conflicts_with "num-utils", because: "both install `average` binaries"
 
-  # Fixes calls to obj_msgSend, whose signature changed in macOS 10.15.
-  # Follows the advice in this blog post, which should be compatible
-  # with both older and newer versions of macOS.
-  # https://www.mikeash.com/pyblog/objc_msgsends-new-prototype.html
-  # Submitted upstream: https://www.freelists.org/post/argyllcms/Patch-Fix-macOS-build-failures-from-obj-msgSend-definition-change
+  # Fixes a missing header, which is an error by default on arm64 but not x86_64
   patch do
-    url "https://www.freelists.org/archives/argyllcms/02-2020/bin7VecLntD2x.bin"
-    sha256 "fa86f5f21ed38bec6a20a79cefb78ef7254f6185ef33cac23e50bb1de87507a4"
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/f6ede0dff06c2d9e3383416dc57c5157704b6f3a/argyll-cms/unistd_import.diff"
+    sha256 "5ce1e66daf86bcd43a0d2a14181b5e04574757bcbf21c5f27b1f1d22f82a8a6e"
   end
 
   def install
-    # dyld: lazy symbol binding failed: Symbol not found: _clock_gettime
-    # Reported 20 Aug 2017 to graeme AT argyllcms DOT com
-    if MacOS.version == :el_capitan && MacOS::Xcode.version >= "8.0"
-      inreplace "numlib/numsup.c", "CLOCK_MONOTONIC", "UNDEFINED_GIBBERISH"
+    # These two inreplaces make sure /opt/homebrew can be found by the
+    # Jamfile, which otherwise fails to locate system libraries
+    inreplace "Jamtop", "/usr/include/x86_64-linux-gnu$(subd)", "#{HOMEBREW_PREFIX}/include$(subd)"
+    inreplace "Jamtop", "/usr/lib/x86_64-linux-gnu", "#{HOMEBREW_PREFIX}/lib"
+    # These two inreplaces make sure the X11 headers can be found on Linux.
+    unless OS.mac?
+      inreplace "Jamtop", "/usr/X11R6/include", HOMEBREW_PREFIX/"include"
+      inreplace "Jamtop", "/usr/X11R6/lib", HOMEBREW_PREFIX/"lib"
     end
-
     system "sh", "makeall.sh"
     system "./makeinstall.sh"
     rm "bin/License.txt"
@@ -52,6 +63,10 @@ class ArgyllCms < Formula
     %w[test.ti1.ps test.ti1.ti1 test.ti1.ti2].each do |f|
       assert_predicate testpath/f, :exist?
     end
+
+    # Skip this part of the test on Linux because it hangs due to lack of a display.
+    return if OS.linux? && ENV["HOMEBREW_GITHUB_ACTIONS"]
+
     assert_match "Calibrate a Display", shell_output("#{bin}/dispcal 2>&1", 1)
   end
 end

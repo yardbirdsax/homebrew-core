@@ -3,15 +3,18 @@ class Dnsviz < Formula
 
   desc "Tools for analyzing and visualizing DNS and DNSSEC behavior"
   homepage "https://github.com/dnsviz/dnsviz/"
-  url "https://files.pythonhosted.org/packages/64/77/b0a03044bda0fc57581dbac832ad974b47fafda6fe0f1efd9394d7dac0ea/dnsviz-0.9.1.tar.gz"
-  sha256 "368b25ce506c8f5ce0ce9e5a4b1817ace3459bd65883eb3edf6011e2a3a4b330"
+  url "https://files.pythonhosted.org/packages/a5/7c/b38750c866e7e29bc76450c75f61ede6c2560e75cfe36df81e9517612434/dnsviz-0.9.4.tar.gz"
+  sha256 "6448d4c6e7c1844aa2a394d60f7cc53721ad985e0e830c30265ef08a74a7aa28"
   license "GPL-2.0-or-later"
+  revision 1
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "a7198e45539b7bbee521cb2433670269c98cce7e47f8d511503323cdfe8c110e"
-    sha256 cellar: :any, big_sur:       "d4f4e549c3184c0e7bf1ab1639e096b5eb53e2ee4f00a2015c84cc2991eb80f6"
-    sha256 cellar: :any, catalina:      "ef016731870649b2f385f19e3f2750fe7a3ec1597232943f6c30539e2a80daec"
-    sha256 cellar: :any, mojave:        "7cba6ba3c4ed08f3dbb8d992077dac4b73cff72a61d6020aa45ccd7c6c0a3c2a"
+    sha256 cellar: :any,                 arm64_monterey: "2b83c0a01a198db8d3b51b8bf21776db5d588a9e26b883152a33ca977023ccda"
+    sha256 cellar: :any,                 arm64_big_sur:  "72e840f23d1b266b67e527a3e202a9bbbab7cd34d25339d68c9596a6cb8d2782"
+    sha256 cellar: :any,                 monterey:       "1fcc941ceb4512d851192296a774b3f217954d1d6f05f57df32bc3fc337f357b"
+    sha256 cellar: :any,                 big_sur:        "059c0c9185c1da78c4f29d737522b650299a04eb7fb60b020aad9754665cd5ff"
+    sha256 cellar: :any,                 catalina:       "c451f734d697e0301510e6ca78fb77d4ff1fd9a0f9ac63611a75d427234a3fef"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3ce6484ee91c02a670ffc61c7085259b783661d64ff741b8bb06dde1cfb8f434"
   end
 
   depends_on "pkg-config" => :build
@@ -19,7 +22,7 @@ class Dnsviz < Formula
   depends_on "bind" => :test
   depends_on "graphviz"
   depends_on "openssl@1.1"
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   on_linux do
     # Fix build error of m2crypto, see https://github.com/crocs-muni/roca/issues/1#issuecomment-336893096
@@ -27,18 +30,18 @@ class Dnsviz < Formula
   end
 
   resource "dnspython" do
-    url "https://files.pythonhosted.org/packages/13/27/5277de856f605f3429d752a39af3588e29d10181a3aa2e2ee471d817485a/dnspython-2.1.0.zip"
-    sha256 "e4a87f0b573201a0f3727fa18a516b055fd1107e0e5477cded4a2de497df1dd4"
+    url "https://files.pythonhosted.org/packages/99/fb/e7cd35bba24295ad41abfdff30f6b4c271fd6ac70d20132fa503c3e768e0/dnspython-2.2.1.tar.gz"
+    sha256 "0f7569a4a6ff151958b64304071d370daa3243d15941a7beedf0c9fe5105603e"
   end
 
   resource "M2Crypto" do
-    url "https://files.pythonhosted.org/packages/aa/36/9fef97358e378c1d3bd567c4e8f8ca0428a8d7e869852cef445ee6da91fd/M2Crypto-0.37.1.tar.gz"
-    sha256 "e4e42f068b78ccbf113e5d0a72ae5f480f6c3ace4940b91e4fff5598cfff6fb3"
+    url "https://files.pythonhosted.org/packages/2c/52/c35ec79dd97a8ecf6b2bbd651df528abb47705def774a4a15b99977274e8/M2Crypto-0.38.0.tar.gz"
+    sha256 "99f2260a30901c949a8dc6d5f82cd5312ffb8abc92e76633baf231bbbcb2decb"
   end
 
   resource "pygraphviz" do
-    url "https://files.pythonhosted.org/packages/1e/19/acf3b8dbd378a2b38c6d9aaa6fa9fcd9f7b4aea5fcd3460014999ff92b3c/pygraphviz-1.6.zip"
-    sha256 "411ae84a5bc313e3e1523a1cace59159f512336318a510573b47f824edef8860"
+    url "https://files.pythonhosted.org/packages/c7/21/063c3ec261904f3c67b7d8bb0033e4e53bbdacb17e6d27097239d50fb7ca/pygraphviz-1.9.zip"
+    sha256 "fa18f7c6cea28341a4e466ed0cf05682b0a68288afe8dd7c9426782f7c1ae01c"
   end
 
   def install
@@ -125,14 +128,14 @@ class Dnsviz < Formula
       example.com.		IN DS 34983 10 1 EC358CFAAEC12266EF5ACFC1FEAF2CAFF083C418
       example.com.		IN DS 34983 10 2 608D3B089D79D554A1947BD10BEC0A5B1BDBE67B4E60E34B1432ED00 33F24B49
     EOS
-    system "#{bin}/dnsviz", "probe", "-d", "0", "-A",
+    system bin/"dnsviz", "probe", "-d", "0", "-A",
       "-x", "example.com:example.com.zone.signed",
       "-N", "example.com:example.com.zone-delegation",
       "-D", "example.com:example.com.zone-delegation",
       "-o", "example.com.json",
       "example.com"
-    system "#{bin}/dnsviz", "graph", "-r", "example.com.json", "-Thtml", "-o", "/dev/null"
-    system "#{bin}/dnsviz", "grok", "-r", "example.com.json", "-o", "/dev/null"
-    system "#{bin}/dnsviz", "print", "-r", "example.com.json", "-o", "/dev/null"
+    system bin/"dnsviz", "graph", "-r", "example.com.json", "-Thtml", "-o", "/dev/null"
+    system bin/"dnsviz", "grok", "-r", "example.com.json", "-o", "/dev/null"
+    system bin/"dnsviz", "print", "-r", "example.com.json", "-o", "/dev/null"
   end
 end

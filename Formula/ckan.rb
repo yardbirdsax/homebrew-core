@@ -1,8 +1,8 @@
 class Ckan < Formula
   desc "Comprehensive Kerbal Archive Network"
   homepage "https://github.com/KSP-CKAN/CKAN/"
-  url "https://github.com/KSP-CKAN/CKAN/releases/download/v1.29.2/ckan.exe"
-  sha256 "f0248b7795967010c44747b4fa4fc33d0a81b558a75973edaafb78c16b306d83"
+  url "https://github.com/KSP-CKAN/CKAN/releases/download/v1.31.0/ckan.exe"
+  sha256 "f939b56905226d1367d637dec28c0e4c11edd4e9e024a0fe25e87d99e8346310"
   license "MIT"
 
   livecheck do
@@ -10,7 +10,9 @@ class Ckan < Formula
     strategy :github_latest
   end
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "abde3768457424230138bf83635fd6ae533ef0a7003b33724f672467675982bb"
+  end
 
   depends_on "mono"
 

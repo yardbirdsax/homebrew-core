@@ -1,24 +1,30 @@
 class Monetdb < Formula
   desc "Column-store database"
   homepage "https://www.monetdb.org/"
-  url "https://www.monetdb.org/downloads/sources/Oct2020-SP2/MonetDB-11.39.11.tar.xz"
-  sha256 "28d950bca160e1e2df918472079b760c06687903d69603eb540f3a827ecced1b"
+  url "https://www.monetdb.org/downloads/sources/Jan2022-SP4/MonetDB-11.43.21.tar.xz"
+  sha256 "ade155f6bb692f030e01f94bfaafd7732f2b980a415f86485c31f4bc35a5b0ae"
   license "MPL-2.0"
   head "https://dev.monetdb.org/hg/MonetDB", using: :hg
 
-  bottle do
-    sha256 arm64_big_sur: "c5acec7f20a9c75be9b550b2ffc8570b62695709dbf0d0c1d8fd59a924f49be5"
-    sha256 big_sur:       "dbc2666cc8ae05d4c16167a41f2aa95a22f8d01ed29061ac11ddee661c096157"
-    sha256 catalina:      "8e7cacf13312cfff1659f1a28ebd7203f42f7169c15e2576b59365b9c5447f5f"
-    sha256 mojave:        "eee94fafd8855829ab25237a6b4cf0adadff303a0d7e211c5567a231e46f347b"
+  livecheck do
+    url "https://www.monetdb.org/downloads/sources/archive/"
+    regex(/href=.*?MonetDB[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-  depends_on "bison" => :build  # macOS bison is too old
+  bottle do
+    sha256 arm64_monterey: "56c8aeb7a8ee4c7e1b99d67a0e96c53f56fe3d5c48831fa992d9421652eeb73a"
+    sha256 arm64_big_sur:  "177fc4fc6b39869dbaaa945cd103ca2a2fb7243b0c80e2d5028cc8317ef129dd"
+    sha256 monterey:       "85514474d20b9d8a4cc3dd1f368065dbce587eafe76f9fa6d9c2e97743a55400"
+    sha256 big_sur:        "fe49d4cfdb90ffd4cc623d8ee6e8f0cf5cee145d1d42d05432fc3232ad9298b9"
+    sha256 catalina:       "82a32f55f20c4c15156699d0cef3bf8856d3ee3405e5fd985188f53ca0660245"
+    sha256 x86_64_linux:   "2945dda661cfb58943d47467317d3b04cfeaf2438e2173bf3efe442fea5594a2"
+  end
+
+  depends_on "bison" => :build # macOS bison is too old
   depends_on "cmake" => :build
   depends_on "pkg-config" => :build
-  depends_on "python@3.9" => :build
+  depends_on "python@3.10" => :build
   depends_on "lz4"
-  depends_on "openssl@1.1"
   depends_on "pcre"
   depends_on "readline" # Compilation fails with libedit
   depends_on "xz"
@@ -46,9 +52,7 @@ class Monetdb < Formula
                       "-DWITH_PROJ=OFF",
                       "-DWITH_SNAPPY=OFF",
                       "-DWITH_XML2=ON",
-                      "-DWITH_ZLIB=ON",
-                      "-DOPENSSL_ROOT_DIR=#{Formula["openssl@1.1"].opt_prefix}",
-                      "-DREADLINE_ROOT=#{Formula["readline"].opt_prefix}"
+                      "-DWITH_ZLIB=ON"
       # remove reference to shims directory from compilation/linking info
       inreplace "tools/mserver/monet_version.c", %r{"/[^ ]*/}, "\""
       system "cmake", "--build", "."

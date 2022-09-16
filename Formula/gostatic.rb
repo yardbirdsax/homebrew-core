@@ -1,22 +1,24 @@
 class Gostatic < Formula
   desc "Fast static site generator"
   homepage "https://github.com/piranha/gostatic"
-  url "https://github.com/piranha/gostatic/archive/2.26.tar.gz"
-  sha256 "9d09ad744aa6130fd3a94e2ba7cbeadaab3078f2f92bab3d1beabdc3757d07b1"
+  url "https://github.com/piranha/gostatic/archive/2.34.tar.gz"
+  sha256 "fc61c77e76e81b17b9955d18341da3f62e2f8def6a8f33156681e046ab1e80c5"
   license "ISC"
-  head "https://github.com/piranha/gostatic.git"
+  head "https://github.com/piranha/gostatic.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "355771ae8c73f34c0f9a4c305bf235b82da246471502a15dfe7bc151c4688ead"
-    sha256 cellar: :any_skip_relocation, big_sur:       "a2773f06d4dc430bf5983f04dd3b70ed9b47835e1eb4de5e0f6a5b090151c4b4"
-    sha256 cellar: :any_skip_relocation, catalina:      "194b3e611cf3edeac3fdb92fb29613a032e82c8cf890ffca41e1562108f1c8e3"
-    sha256 cellar: :any_skip_relocation, mojave:        "4dc77286ca070bd2417e42e5e37882a0526b5451f14630fe8a1a0a1853a645be"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "4daa04700da1032af0a162412f3c9c853ba1c2044daef8169fbbd55eae60fe46"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5ea61a4050fccf533069aefa065611beedf2d43438fcf6d5eacb0df0789271a4"
+    sha256 cellar: :any_skip_relocation, monterey:       "716362ef77b40110d1ae1613613b67d51a985c84c567fefd0e759ac5c7d168bb"
+    sha256 cellar: :any_skip_relocation, big_sur:        "8493519376ae8512fb5e2d4c83481c27e964bb63c854c1aa14f15d0494311fa3"
+    sha256 cellar: :any_skip_relocation, catalina:       "01d319962c9ad1c3f5955ceaeadf4286944d33e82d90b44d36a0f4bec37089d1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ce5a780002a737100f543ff761ae7c8bdff06de65e0f0931ceb931061d740f61"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", *std_go_args, "-ldflags", "-s -w"
+    system "go", "build", *std_go_args(ldflags: "-s -w")
   end
 
   test do

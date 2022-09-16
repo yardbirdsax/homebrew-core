@@ -1,8 +1,8 @@
 class Uftp < Formula
   desc "Secure, reliable, efficient multicast file transfer program"
   homepage "https://uftp-multicast.sourceforge.io/"
-  url "https://downloads.sourceforge.net/project/uftp-multicast/source-tar/uftp-5.0.tar.gz"
-  sha256 "562f71ea5a24b615eb491f5744bad01e9c2e58244c1d6252d5ae98d320d308e0"
+  url "https://downloads.sourceforge.net/project/uftp-multicast/source-tar/uftp-5.0.1.tar.gz"
+  sha256 "f0435fbc8e9ffa125e05600cb6c7fc933d7d587f5bae41b257267be4f2ce0e61"
   license "GPL-3.0-or-later"
 
   livecheck do
@@ -11,11 +11,12 @@ class Uftp < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any, arm64_big_sur: "b38ccf77d80d8b662c86abd4c11b3c94e6a1a166b011392f16261289ebb1d923"
-    sha256 cellar: :any, big_sur:       "8bb1c997a162785aae612d640fb4e9a69c22af980b38d82484b899041c024f1b"
-    sha256 cellar: :any, catalina:      "9a5f0d2a7fd5887a164733d78a5d57ded16f398284d58b258ca7221f3e5287e6"
-    sha256 cellar: :any, mojave:        "7193614091b37c59942a9d0cdf0cca676083b83062cc3db48c15a097734cc1d3"
+    sha256 cellar: :any,                 arm64_monterey: "d8d9b1b7a1c7e9a359242de153b087f05dee5a65d0261b042040464edd9613af"
+    sha256 cellar: :any,                 arm64_big_sur:  "ef47b9d11a228c6daa4e8a8311ed4e2e0f983aa1036efcc7029895d0b56631b7"
+    sha256 cellar: :any,                 monterey:       "ca0f38ccddec9d9e655874dfd129609fa72fb0d428769b34e97f8b21ae11cab1"
+    sha256 cellar: :any,                 big_sur:        "d15a9b0f78488e86e802bc67e949b0ec9ceaf38e1096be34e007440e0c519a4e"
+    sha256 cellar: :any,                 catalina:       "8cdfc5565a6010c1149e72c910751a65e8792e4ef4c02a76f170da4a46b3e376"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ab28f1ccdf3f8f1aff8c2123122fb41f32bd6e5f235945e37322241696f32191"
   end
 
   depends_on "openssl@1.1"
@@ -28,30 +29,10 @@ class Uftp < Formula
     (prefix/"usr").unlink
   end
 
-  plist_options manual: "uftpd"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-      <dict>
-        <key>KeepAlive</key>
-        <true/>
-        <key>Label</key>
-        <string>#{plist_name}</string>
-        <key>ProgramArguments</key>
-        <array>
-          <string>#{opt_bin}/uftpd</string>
-          <string>-d</string>
-        </array>
-        <key>RunAtLoad</key>
-        <true/>
-        <key>WorkingDirectory</key>
-        <string>#{var}</string>
-      </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_bin/"uftpd", "-d"]
+    keep_alive true
+    working_dir var
   end
 
   test do

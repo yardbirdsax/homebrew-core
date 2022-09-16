@@ -1,9 +1,17 @@
 class Libdap < Formula
   desc "Framework for scientific data networking"
   homepage "https://www.opendap.org/"
-  url "https://www.opendap.org/pub/source/libdap-3.20.7.tar.gz"
-  sha256 "6856813d0b29e70a36e8a53e9cf20ad680d21d615952263e9c6586704539e78c"
   license "LGPL-2.1-or-later"
+
+  stable do
+    url "https://www.opendap.org/pub/source/libdap-3.20.11.tar.gz"
+    sha256 "850debf6ee6991350bf31051308093bee35ddd2121e4002be7e130a319de1415"
+
+    patch do
+      url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+      sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+    end
+  end
 
   livecheck do
     url "https://www.opendap.org/pub/source/"
@@ -11,10 +19,12 @@ class Libdap < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "232beef8fecad3beed966204d1bf42622e637492fc161801ff1c352ae429ce4b"
-    sha256 big_sur:       "660a8cd6c01ce10d30ec4dda70912cefe949b3aa5b56756c14cba5120b0f579e"
-    sha256 catalina:      "7664a9d567e5c0304ce2430cb93d02fd3431ef480105170c130327cb09da014e"
-    sha256 mojave:        "ab8664fda0c8a71409c54315011992d397315c15a5842f83771f7c30d2eafa8c"
+    sha256 arm64_monterey: "0110dd93e378ea92ffdb3ef93a55e6f0318b0213afc47c34672167ef3838569e"
+    sha256 arm64_big_sur:  "0bb35b663ee9c9ee835781a2b3fd370d4af6342673d64e90791e6e673a9f2d5f"
+    sha256 monterey:       "74a2d396f08b072b0255351185d5cd1fab6ec822fb267d55ee969aec41a1266a"
+    sha256 big_sur:        "242e4b6903097098b4a11c95fe1dbd7431b19071db1c27876073437a054b69b3"
+    sha256 catalina:       "a40f6f6812a65cf3a16f5f8f49a6435e9bd97b8fe8d08f9484ead497be2eae79"
+    sha256 x86_64_linux:   "be215472473e21ed6763ad8591131295752813704039e816a415045f1f82101e"
   end
 
   head do

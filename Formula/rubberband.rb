@@ -1,52 +1,48 @@
 class Rubberband < Formula
   desc "Audio time stretcher tool and library"
   homepage "https://breakfastquay.com/rubberband/"
-  url "https://breakfastquay.com/files/releases/rubberband-1.9.0.tar.bz2"
-  sha256 "4f5b9509364ea876b4052fc390c079a3ad4ab63a2683aad09662fb905c2dc026"
+  url "https://breakfastquay.com/files/releases/rubberband-3.0.0.tar.bz2"
+  sha256 "df6530b403c8300a23973df22f36f3c263f010d53792063e411f633cebb9ed85"
   license "GPL-2.0-or-later"
   head "https://hg.sr.ht/~breakfastquay/rubberband", using: :hg
 
   livecheck do
     url :homepage
-    regex(/Rubber Band Library v?(\d+(?:\.\d+)+) released/i)
+    regex(/href=.*?rubberband[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "b7436d1a91b540cc384f15f3c4416f229635c5412b5939ae0037ceb8158bf451"
-    sha256 cellar: :any, big_sur:       "f5b7d05107fadeca115e0ab09130178ede93fb6f0e18c7b392bdd77e3587b966"
-    sha256 cellar: :any, catalina:      "4598d98fb8994cd6545f5858a38beae10b43968317b53ec0916542d95355f27c"
-    sha256 cellar: :any, mojave:        "487182397781621580ecb07f51d301d84b46c6f2f8458880cb8213044f5181cb"
-    sha256 cellar: :any, high_sierra:   "15082ba72d1f88258739752b4f4a8094d5f931fac1d69aa64d8bf25ecb21648d"
+    sha256 cellar: :any, arm64_monterey: "5e69d82b8ac49175b0d5f7ce7cd144cf5ad0a1a53256ec3d320a88e049f519d4"
+    sha256 cellar: :any, arm64_big_sur:  "fe47590afe376f2f7e1b24a239a5e4947534d8425e97c42a3a34b30d343f3d02"
+    sha256 cellar: :any, monterey:       "ff93a71a132ce14e836d9f3d80d430ef41c39470da40d4088d3d8d3e58cf827f"
+    sha256 cellar: :any, big_sur:        "b02d05078216b43fe33e2b1354fd8a67fa5c3330f893480ccb3bc2b6bb9880f2"
+    sha256 cellar: :any, catalina:       "b73a156422b447a2c5a9426abbc70e58e97b0bb644080849e796d8ddbbbab630"
+    sha256               x86_64_linux:   "2edf30d682c1aeebe61f194a30e8d06203baa8bf88a05a83a5465e4fa30496d3"
   end
 
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
   depends_on "pkg-config" => :build
   depends_on "libsamplerate"
   depends_on "libsndfile"
 
   on_linux do
     depends_on "fftw"
+    depends_on "gcc"
     depends_on "ladspa-sdk"
-    depends_on "openjdk"
     depends_on "vamp-plugin-sdk"
   end
 
+  fails_with gcc: "5"
+
   def install
-    # Pass OPTFLAGS and ARCHFLAGS to avoid Intel-specific flags
-    system "make", "-f", "Makefile.osx",
-                   "OPTFLAGS='-DNDEBUG -ffast-math -O3 -ftree-vectorize'",
-                   "ARCHFLAGS="
-
-    # HACK: Manual install because "make install" is broken
-    # https://github.com/Homebrew/homebrew-core/issues/28660
-    bin.install "bin/rubberband"
-    lib.install "lib/librubberband.dylib" => "librubberband.2.1.1.dylib"
-    lib.install_symlink lib/"librubberband.2.1.1.dylib" => "librubberband.2.dylib"
-    lib.install_symlink lib/"librubberband.2.1.1.dylib" => "librubberband.dylib"
-    include.install "rubberband"
-
-    cp "rubberband.pc.in", "rubberband.pc"
-    inreplace "rubberband.pc", "%PREFIX%", opt_prefix
-    (lib/"pkgconfig").install "rubberband.pc"
+    args = ["-Dresampler=libsamplerate"]
+    args << "-Dfft=fftw" if OS.linux?
+    mkdir "build" do
+      system "meson", *std_meson_args, *args
+      system "ninja", "-v"
+      system "ninja", "install", "-v"
+    end
   end
 
   test do

@@ -1,16 +1,18 @@
 class Terracognita < Formula
   desc "Reads from existing Cloud Providers and generates Terraform code"
   homepage "https://github.com/cycloidio/terracognita"
-  url "https://github.com/cycloidio/terracognita/archive/v0.6.0.tar.gz"
-  sha256 "25aa4000fd78ac4005574261026173cb6ba8989e90e80d6f7b14d9efc353508b"
+  url "https://github.com/cycloidio/terracognita/archive/v0.8.1.tar.gz"
+  sha256 "dff35a6913d64dbd4e0595bd15d2f2029a8605a8bf0ba32a1de95f3236d85f1c"
   license "MIT"
-  head "https://github.com/cycloidio/terracognita.git"
+  head "https://github.com/cycloidio/terracognita.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "398ddc41ce7c7e92ba66e3e5a7e2d95b0105370db5d6cffb9f825e5d3a5ac393"
-    sha256 cellar: :any_skip_relocation, big_sur:       "91aedc3bc0275d4519a0bca398cdc42f1c419cc4979b89e9063c04cb58ee9769"
-    sha256 cellar: :any_skip_relocation, catalina:      "ed1875f71c6e7c16a0857815f3e97e2c258d591b21d7a3fb3db2cd0d4434db5a"
-    sha256 cellar: :any_skip_relocation, mojave:        "f4233f3a50dcd2e872eef49d00b7cbdc80af701dd686039be71d6b2fbb6f2251"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "b53dd1ceec5ddfff075c398cd24ca74f21b4138db629bc7f65978862369bcd34"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f7ecd47c9c3e4021264cdf69f8e70dc94a149eb4076d7cf8e97f78fefa5ca3cc"
+    sha256 cellar: :any_skip_relocation, monterey:       "8345abff73f0893b1ac9328f0cfdf4bbb926b79bd2101fe0b5566d3032dc49cf"
+    sha256 cellar: :any_skip_relocation, big_sur:        "7460a4ddf60cec0fe51e86b98dc39abab4ba5b50ad6a5c4c987fc9dd3765a014"
+    sha256 cellar: :any_skip_relocation, catalina:       "b86f9559051ced717bef608d9997f073d1b4af491fdafa736e679b7bbc6c0fd6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cca175e1cbaf3603eb6a2fcc5fe52369a0b644a586028aaae3505950fe6569e1"
   end
 
   depends_on "go" => :build
@@ -22,9 +24,8 @@ class Terracognita < Formula
 
   test do
     assert_match "v#{version}", shell_output("#{bin}/terracognita version")
-
-    assert_match "Error: the flag \"access-key\" is required", shell_output("#{bin}/terracognita aws 2>&1", 1)
-
+    assert_match "Error: one of --module, --hcl  or --tfstate are required",
+      shell_output("#{bin}/terracognita aws 2>&1", 1)
     assert_match "aws_instance", shell_output("#{bin}/terracognita aws resources")
   end
 end

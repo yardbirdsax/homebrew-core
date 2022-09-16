@@ -3,7 +3,8 @@ class Libvisio < Formula
   homepage "https://wiki.documentfoundation.org/DLP/Libraries/libvisio"
   url "https://dev-www.libreoffice.org/src/libvisio/libvisio-0.1.7.tar.xz"
   sha256 "8faf8df870cb27b09a787a1959d6c646faa44d0d8ab151883df408b7166bea4c"
-  revision 2
+  license "MPL-2.0"
+  revision 6
 
   livecheck do
     url "https://dev-www.libreoffice.org/src/"
@@ -11,11 +12,12 @@ class Libvisio < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "d6e958b730a4516dc3041563b18d80879ed2b85b732e12e83f57a90d2031caaf"
-    sha256 cellar: :any, big_sur:       "a284e8c456caa89555af24f961f0679423add081798fff96dbce645516d208ea"
-    sha256 cellar: :any, catalina:      "a32916487b500b927b22b2e3cbd0f3ec5de65a56dd5306472ee6dc09080c7a38"
-    sha256 cellar: :any, mojave:        "2866289c378dcf276526de732f830dff28d1dbb12eb690209140e987b6bf2f10"
-    sha256 cellar: :any, high_sierra:   "793fa03c334b4faea7b94c2b4e2992b40070358a94914272a119c411060baabd"
+    sha256 cellar: :any,                 arm64_monterey: "b6914749c1bda7f6796c1f2908dda35f564860830cfc202ed9bb9f1652ce3562"
+    sha256 cellar: :any,                 arm64_big_sur:  "ee945d14878160dba16e983ede8c3fefbc5c82b028d340851d5c8b2ce486e0b9"
+    sha256 cellar: :any,                 monterey:       "9db99dc5397773cd0628ed1ce6c183eea4c0deab7aee30f483eb96941cfa2a24"
+    sha256 cellar: :any,                 big_sur:        "2153b5bd416812b4d5448e5f38554dd93d4baf82cf21672abb24215669f21e5f"
+    sha256 cellar: :any,                 catalina:       "99d2f84618430bdc6a7876512a65a365da8cdeb94aa6198193b2eb933aeb8556"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "728b3e6817c2d78dd463de90ebdbde10d5e8a468357b7d6b66759444da0286ab"
   end
 
   depends_on "cppunit" => :build
@@ -23,6 +25,9 @@ class Libvisio < Formula
   depends_on "boost"
   depends_on "icu4c"
   depends_on "librevenge"
+
+  uses_from_macos "gperf" => :build
+  uses_from_macos "libxml2"
 
   def install
     # Needed for Boost 1.59.0 compatibility.

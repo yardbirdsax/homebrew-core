@@ -1,9 +1,10 @@
 class Nagios < Formula
   desc "Network monitoring and management system"
   homepage "https://www.nagios.org/"
-  url "https://downloads.sourceforge.net/project/nagios/nagios-4.x/nagios-4.4.6/nagios-4.4.6.tar.gz"
-  sha256 "ab0d5a52caf01e6f4dcd84252c4eb5df5a24f90bb7f951f03875eef54f5ab0f4"
+  url "https://downloads.sourceforge.net/project/nagios/nagios-4.x/nagios-4.4.7/nagios-4.4.7.tar.gz"
+  sha256 "6429d93cc7db688bc529519a020cad648dc55b5eff7e258994f21c83fbf16c4d"
   license "GPL-2.0"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,17 +12,20 @@ class Nagios < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_big_sur: "7724f5ce89e429cd7483f7318ca1fbb0ffeb08d4045ae2a883ef9f80a76a698f"
-    sha256 big_sur:       "0e8c1624e0265e3889c16ce76609b49752ea8e2d3a3b55f5c48cb4e891db402f"
-    sha256 catalina:      "a9c2c8baae137bfbfa46f67d62f7fb29a0fb4327b7a366cfe44a1502207d62fd"
-    sha256 mojave:        "c074419ad5ee9d3446410e7ff05b8454c840771f5cae1246a9de20e33775d4f0"
-    sha256 high_sierra:   "162b5d50061d7a2ef4bfa8a9899d7fad3558ccfea80e105c43a66061d1780cd9"
+    sha256 arm64_monterey: "f129414f6baa43479019c88b0efcc9000fe774ee28d6516c6ebd0f5cedec5b8c"
+    sha256 arm64_big_sur:  "46b24f0161ce9b73425fd8e96704b162d60e8cc128805ed85069dbd2c397ba96"
+    sha256 monterey:       "09326aea33e587a7d5f46f78b7f773ae76e5cd02071ba6a4ab309d2b76d91b4a"
+    sha256 big_sur:        "5f0d5c561f17014252b5d1cfd3df48e409045618d05443eef83cde1a3cf2eade"
+    sha256 catalina:       "49cb65b966dbc3988b0509596818bd22fa066e9f931a7b09579e6246eb26d23f"
+    sha256 x86_64_linux:   "3ef3a37c3d7421022f1edfa6f36d447354c1008034b7ef5b71ff84a0c3a1b418"
   end
 
   depends_on "gd"
   depends_on "libpng"
   depends_on "nagios-plugins"
+  depends_on "openssl@1.1"
+
+  uses_from_macos "unzip"
 
   def nagios_sbin
     prefix/"cgi-bin"
@@ -48,22 +52,24 @@ class Nagios < Formula
   end
 
   def install
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--sbindir=#{nagios_sbin}",
-                          "--sysconfdir=#{nagios_etc}",
-                          "--localstatedir=#{nagios_var}",
-                          "--datadir=#{htdocs}",
-                          "--libexecdir=#{HOMEBREW_PREFIX}/sbin", # Plugin dir
-                          "--with-cgiurl=/nagios/cgi-bin",
-                          "--with-htmurl=/nagios",
-                          "--with-nagios-user=#{user}",
-                          "--with-nagios-group='#{group}'",
-                          "--with-command-user=#{user}",
-                          "--with-command-group=_www",
-                          "--with-httpd-conf=#{share}",
-                          "--disable-libtool"
+    args = [
+      "--sbindir=#{nagios_sbin}",
+      "--sysconfdir=#{nagios_etc}",
+      "--localstatedir=#{nagios_var}",
+      "--datadir=#{htdocs}",
+      "--libexecdir=#{HOMEBREW_PREFIX}/sbin", # Plugin dir
+      "--with-cgiurl=/nagios/cgi-bin",
+      "--with-htmurl=/nagios",
+      "--with-nagios-user=#{user}",
+      "--with-nagios-group='#{group}'",
+      "--with-command-user=#{user}",
+      "--with-httpd-conf=#{share}",
+      "--with-ssl=#{Formula["openssl@1.1"].opt_prefix}",
+      "--disable-libtool",
+    ]
+    args << "--with-command-group=_www" if OS.mac?
+
+    system "./configure", *std_configure_args, *args
     system "make", "all"
     system "make", "install"
 
@@ -115,32 +121,12 @@ class Nagios < Formula
     EOS
   end
 
-  plist_options startup: true, manual: "nagios #{HOMEBREW_PREFIX}/etc/nagios/nagios.cfg"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-      <dict>
-        <key>KeepAlive</key>
-        <true/>
-        <key>Label</key>
-        <string>#{plist_name}</string>
-        <key>ProgramArguments</key>
-        <array>
-          <string>#{opt_bin}/nagios</string>
-          <string>#{nagios_etc}/nagios.cfg</string>
-        </array>
-        <key>RunAtLoad</key>
-        <true/>
-        <key>StandardErrorPath</key>
-        <string>/dev/null</string>
-        <key>StandardOutPath</key>
-        <string>/dev/null</string>
-      </dict>
-      </plist>
-    EOS
+  plist_options startup: true
+  service do
+    run [opt_bin/"nagios", etc/"nagios/nagios.cfg"]
+    keep_alive true
+    log_path "/dev/null"
+    error_log_path "/dev/null"
   end
 
   test do

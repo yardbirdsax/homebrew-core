@@ -1,8 +1,12 @@
 class Irrlicht < Formula
   desc "Realtime 3D engine"
   homepage "https://irrlicht.sourceforge.io/"
-  url "https://downloads.sourceforge.net/project/irrlicht/Irrlicht%20SDK/1.8/1.8.4/irrlicht-1.8.4.zip"
-  sha256 "f42b280bc608e545b820206fe2a999c55f290de5c7509a02bdbeeccc1bf9e433"
+  url "https://downloads.sourceforge.net/project/irrlicht/Irrlicht%20SDK/1.8/1.8.5/irrlicht-1.8.5.zip"
+  sha256 "effb7beed3985099ce2315a959c639b4973aac8210f61e354475a84105944f3d"
+  # Irrlicht is available under alternative license terms. See
+  # https://metadata.ftp-master.debian.org/changelogs//main/i/irrlicht/irrlicht_1.8.4+dfsg1-1.1_copyright
+  license "Zlib"
+  revision 1
   head "https://svn.code.sf.net/p/irrlicht/code/trunk"
 
   livecheck do
@@ -11,40 +15,105 @@ class Irrlicht < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, big_sur:     "611abae20f145f6026ddb16b24564fd11599f7ca7e4f59b0971b3b2304fad466"
-    sha256 cellar: :any_skip_relocation, catalina:    "665031602d338528055bfb7dba5c1a4c94c0deaea6c3db8d4d4cddb061a54e7d"
-    sha256 cellar: :any_skip_relocation, mojave:      "e5b9b3d8b58f26c138b9dcd421fad9769e6ab7833bbf668cdeac909fd204a601"
-    sha256 cellar: :any_skip_relocation, high_sierra: "508d300a52f1f1d5b1d5193f07559ca3da5aa3286181ae88b415bf5468c521bc"
-    sha256 cellar: :any_skip_relocation, sierra:      "d2236f351b11847d960909fa0e96d83ab0448228de30cd21014fea47a2c636a5"
+    sha256 cellar: :any,                 arm64_monterey: "1f80ce9c03a5ebf3220c5d89bf6b99fb710cde5fccacd9d5a6002102a70260d7"
+    sha256 cellar: :any,                 arm64_big_sur:  "8c6b7ab06bdcc19d8860114516f77fd58c5afd8b9f5574ed59adb6d9140105aa"
+    sha256 cellar: :any,                 monterey:       "7bd3837250e6ad688a177a8d3cbbab368967e0bd8f55e4971ba8d9700205d78b"
+    sha256 cellar: :any,                 big_sur:        "ef94ddaa3dcb668253d03433c09d68806b4437c38c6abfeb6616d30849a18540"
+    sha256 cellar: :any,                 catalina:       "9b97a72a9d6a454c512b8d5c395bbc4229e271ae6ec3feecc422bbdeb70a7955"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "972f4d1016a83b88a7c9162695b8f1bce97c0a707f3fd8db11bdb527f7a0637a"
   end
 
   depends_on xcode: :build
 
+  depends_on "jpeg-turbo"
+  depends_on "libpng"
+
+  uses_from_macos "bzip2"
+  uses_from_macos "zlib"
+
+  on_linux do
+    depends_on "libx11"
+    depends_on "libxxf86vm"
+    depends_on "mesa"
+  end
+
+  # Use libraries from Homebrew or macOS
+  patch do
+    url "https://github.com/Homebrew/formula-patches/raw/69ad57d16cdd4ecdf2dfa50e9ce751b082d78cf9/irrlicht/use-system-libs.patch"
+    sha256 "70d2534506e0e34279c3e9d8eff4b72052cb2e78a63d13ce0bc60999cbdb411b"
+  end
+
+  # Update Xcode project to use libraries from Homebrew and macOS
+  patch do
+    url "https://github.com/Homebrew/formula-patches/raw/69ad57d16cdd4ecdf2dfa50e9ce751b082d78cf9/irrlicht/xcode.patch"
+    sha256 "2cfcc34236469fcdb24b6a77489272dfa0a159c98f63513781245f3ef5c941c0"
+  end
+
   def install
-    # Fix "error: cannot initialize a parameter of type
-    # 'id<NSApplicationDelegate> _Nullable' with an rvalue of type
-    # 'id<NSFileManagerDelegate>'"
-    # Reported 5 Oct 2016 https://irrlicht.sourceforge.io/forum/viewtopic.php?f=7&t=51562
-    inreplace "source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm",
-      "[NSApp setDelegate:(id<NSFileManagerDelegate>)",
-      "[NSApp setDelegate:(id<NSApplicationDelegate>)"
+    %w[bzip2 jpeglib libpng zlib].each { |l| (buildpath/"source/Irrlicht"/l).rmtree }
 
-    # Fix "error: ZLIB_VERNUM != PNG_ZLIB_VERNUM" on Mojave (picking up system zlib)
-    # Reported 21 Oct 2018 https://sourceforge.net/p/irrlicht/bugs/442/
-    inreplace "source/Irrlicht/libpng/pngpriv.h",
-      "#  error ZLIB_VERNUM != PNG_ZLIB_VERNUM \\",
-      "#  warning ZLIB_VERNUM != PNG_ZLIB_VERNUM \\"
+    if OS.mac?
+      inreplace "source/Irrlicht/MacOSX/MacOSX.xcodeproj/project.pbxproj" do |s|
+        s.gsub! "@LIBPNG_PREFIX@", Formula["libpng"].opt_prefix
+        s.gsub! "@JPEG_PREFIX@", Formula["jpeg-turbo"].opt_prefix
+      end
 
-    xcodebuild "-project", "source/Irrlicht/MacOSX/MacOSX.xcodeproj",
-               "-configuration", "Release",
-               "-target", "libIrrlicht.a",
-               "SYMROOT=build"
-    lib.install "source/Irrlicht/MacOSX/build/Release/libIrrlicht.a"
-    include.install "include" => "irrlicht"
+      extra_args = []
+
+      # Fix "Undefined symbols for architecture arm64: "_png_init_filter_functions_neon"
+      # Reported 18 Nov 2020 https://sourceforge.net/p/irrlicht/bugs/452/
+      extra_args << "GCC_PREPROCESSOR_DEFINITIONS='PNG_ARM_NEON_OPT=0'" if Hardware::CPU.arm?
+
+      xcodebuild "-project", "source/Irrlicht/MacOSX/MacOSX.xcodeproj",
+                 "-configuration", "Release",
+                 "-target", "IrrFramework",
+                 "SYMROOT=build",
+                 *extra_args
+
+      xcodebuild "-project", "source/Irrlicht/MacOSX/MacOSX.xcodeproj",
+                 "-configuration", "Release",
+                 "-target", "libIrrlicht.a",
+                 "SYMROOT=build",
+                 *extra_args
+
+      frameworks.install "source/Irrlicht/MacOSX/build/Release/IrrFramework.framework"
+      lib.install_symlink frameworks/"IrrFramework.framework/Versions/A/IrrFramework" => "libIrrlicht.dylib"
+      lib.install "source/Irrlicht/MacOSX/build/Release/libIrrlicht.a"
+      include.install "include" => "irrlicht"
+    else
+      cd "source/Irrlicht" do
+        inreplace "Makefile" do |s|
+          s.gsub! "/usr/X11R6/lib$(LIBSELECT)", Formula["libx11"].opt_lib
+          s.gsub! "/usr/X11R6/include", Formula["libx11"].opt_include
+        end
+        ENV.append "LDFLAGS", "-L#{Formula["bzip2"].opt_lib} -lbz2"
+        ENV.append "LDFLAGS", "-L#{Formula["jpeg-turbo"].opt_lib} -ljpeg"
+        ENV.append "LDFLAGS", "-L#{Formula["libpng"].opt_lib} -lpng"
+        ENV.append "LDFLAGS", "-L#{Formula["zlib"].opt_lib} -lz"
+        ENV.append "LDFLAGS", "-L#{Formula["mesa"].opt_lib}"
+        ENV.append "LDFLAGS", "-L#{Formula["libxxf86vm"].opt_lib}"
+        ENV.append "CXXFLAGS", "-I#{Formula["libxxf86vm"].opt_include}"
+        args = %w[
+          NDEBUG=1
+          BZIP2OBJ=
+          JPEGLIBOBJ=
+          LIBPNGOBJ=
+          ZLIBOBJ=
+        ]
+        system "make", "sharedlib", *args
+        system "make", "install", "INSTALL_DIR=#{lib}"
+        system "make", "clean"
+        system "make", "staticlib", *args
+      end
+      lib.install "lib/Linux/libIrrlicht.a"
+    end
+
+    (pkgshare/"examples").install "examples/01.HelloWorld"
   end
 
   test do
-    assert_match "x86_64", shell_output("lipo -info #{lib}/libIrrlicht.a")
+    assert_match Hardware::CPU.arch.to_s, shell_output("lipo -info #{lib}/libIrrlicht.a") if OS.mac?
+    cp_r Dir["#{pkgshare}/examples/01.HelloWorld/*"], testpath
+    system ENV.cxx, "main.cpp", "-I#{include}/irrlicht", "-L#{lib}", "-lIrrlicht", "-o", "hello"
   end
 end

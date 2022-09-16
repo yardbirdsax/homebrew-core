@@ -2,11 +2,10 @@ class Kustomize < Formula
   desc "Template-free customization of Kubernetes YAML manifests"
   homepage "https://github.com/kubernetes-sigs/kustomize"
   url "https://github.com/kubernetes-sigs/kustomize.git",
-      tag:      "kustomize/v3.9.2",
-      revision: "e98eada7365fc564c9aba392e954f306a9cbf1dd"
+      tag:      "kustomize/v4.5.7",
+      revision: "56d82a8378dfc8dc3b3b1085e5a6e67b82966bd7"
   license "Apache-2.0"
-  revision 2
-  head "https://github.com/kubernetes-sigs/kustomize.git"
+  head "https://github.com/kubernetes-sigs/kustomize.git", branch: "master"
 
   livecheck do
     url :stable
@@ -14,36 +13,31 @@ class Kustomize < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "521a2cb12359f6dac37604ef15995e4ffba2fc86ef1512bb04b302bbf5156c54"
-    sha256 cellar: :any_skip_relocation, big_sur:       "75e67191c19af18ced915e0b1e54aafe1d1c23bd000575766d938aed13f1a7e4"
-    sha256 cellar: :any_skip_relocation, catalina:      "b0c24578d829ae5ee53debb872488220c6410e39a605c4976b720d6ac105935a"
-    sha256 cellar: :any_skip_relocation, mojave:        "c5540417ed2d8db9a313defd9494fa688ae5068c6125d076c131936b6daa43a7"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "001f113a50c425d7c0cdbd42461be315b9696dbc89f4d775dce572a87d6cb4ea"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b573afb3aff29de518a7b60d13dceedf956521a233ee82722cdda4b7fa47e389"
+    sha256 cellar: :any_skip_relocation, monterey:       "7878dd7bad7bde751736bac6de721f0e20ba3b75bea81c017105218cf96df369"
+    sha256 cellar: :any_skip_relocation, big_sur:        "628577f3b6148a07e7f96b33f2e69d1f778170ed0814a6592b4d32da3ed61266"
+    sha256 cellar: :any_skip_relocation, catalina:       "e471ba925c2bb5544a31e1af7eb15cec88b94fc578c902585bf492f240f7bff1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "18cab0642b06d0f60ed61b4fbca2264e475c1564eeff9f83249cc24ffa1c48ba"
   end
 
   depends_on "go" => :build
 
   def install
     commit = Utils.git_head
-    tag = Utils.safe_popen_read("git", "tag", "--contains", "HEAD").strip
 
     cd "kustomize" do
       ldflags = %W[
-        -s
-        -X sigs.k8s.io/kustomize/api/provenance.version=#{tag}
+        -s -w
+        -X sigs.k8s.io/kustomize/api/provenance.version=#{name}/v#{version}
         -X sigs.k8s.io/kustomize/api/provenance.gitCommit=#{commit}
-        -X sigs.k8s.io/kustomize/api/provenance.buildDate=#{Time.now.iso8601}
+        -X sigs.k8s.io/kustomize/api/provenance.buildDate=#{time.iso8601}
       ]
-      system "go", "build", "-ldflags", ldflags.join(" "), "-o", bin/"kustomize"
+
+      system "go", "build", *std_go_args(ldflags: ldflags)
     end
 
-    output = Utils.safe_popen_read("#{bin}/kustomize", "completion", "bash")
-    (bash_completion/"kustomize").write output
-
-    output = Utils.safe_popen_read("#{bin}/kustomize", "completion", "zsh")
-    (zsh_completion/"_kustomize").write output
-
-    output = Utils.safe_popen_read("#{bin}/kustomize", "completion", "fish")
-    (fish_completion/"kustomize.fish").write output
+    generate_completions_from_executable(bin/"kustomize", "completion")
   end
 
   test do
@@ -73,6 +67,6 @@ class Kustomize < Formula
         type: LoadBalancer
     EOS
     output = shell_output("#{bin}/kustomize build #{testpath}")
-    assert_match /type:\s+"?LoadBalancer"?/, output
+    assert_match(/type:\s+"?LoadBalancer"?/, output)
   end
 end

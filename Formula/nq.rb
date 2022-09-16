@@ -1,19 +1,17 @@
 class Nq < Formula
   desc "Unix command-line queue utility"
-  homepage "https://github.com/chneukirchen/nq"
-  url "https://github.com/chneukirchen/nq/archive/v0.3.1.tar.gz"
-  sha256 "8897a747843fe246a6f8a43e181ae79ef286122a596214480781a02ef4ea304b"
+  homepage "https://github.com/leahneukirchen/nq"
+  url "https://github.com/leahneukirchen/nq/archive/v0.5.tar.gz"
+  sha256 "3f01aaf0b8eee4f5080ed1cd71887cb6485d366257d4cf5470878da2b734b030"
   license "CC0-1.0"
-  head "https://github.com/chneukirchen/nq.git"
+  head "https://github.com/leahneukirchen/nq.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "e20a81316a20ce81b4396831d87a88e5e7025a5d7792116352297882565875ec"
-    sha256 cellar: :any_skip_relocation, big_sur:       "97df5cbf63b142bf49bbbe683f869a96b003ab3c30eee3ae36ad0ee741744b1c"
-    sha256 cellar: :any_skip_relocation, catalina:      "95011ee6d48728704ee95480374c545d3c2bcea8f4482cecd9b8dbbab9a2407b"
-    sha256 cellar: :any_skip_relocation, mojave:        "b5b3f7b76cc79a5bc6d4a55e4fb3e018b08052dc7faa173300b1ddf2e16e6bee"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "a6d18f2d7f1fafd661a5d145599969707efe71969ccc6ac34593f3f60c59081a"
-    sha256 cellar: :any_skip_relocation, sierra:        "0e8d6557f7713be4c1e5074ea909d36cd12e2e17d85a1c0a1141ac64f06953d3"
-    sha256 cellar: :any_skip_relocation, el_capitan:    "67374f5db8a35f877a16e0fdbd313276fb269db81ce49e7654fb61fa865417cd"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "5b050bc2a3667662b9f12ec156c2aa73758b5a58803029c56172ba8c8ce0dd0f"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "8f30174530722649e4515ff41c06d3d4d88d96db7a5f69299ee827c2112c9274"
+    sha256 cellar: :any_skip_relocation, monterey:       "3b0266ca4e323c0d7edabfe047d20d2dad6065d2d41708e89ed29af617ddc5c4"
+    sha256 cellar: :any_skip_relocation, big_sur:        "57fa203a54904a2fdc06cb0031a6d2bea0cfcd3137562b0c64cf3ac92dc4dd7f"
+    sha256 cellar: :any_skip_relocation, catalina:       "c33190abc0b66757582008bf593ab4e37c977f7d9faeafdea6b1631c455ca4a6"
   end
 
   def install
@@ -23,7 +21,7 @@ class Nq < Formula
 
   test do
     system "#{bin}/nq", "touch", "TEST"
-    assert_match /exited with status 0/, shell_output("#{bin}/fq -a")
+    assert_match "exited with status 0", shell_output("#{bin}/fq -a")
     assert_predicate testpath/"TEST", :exist?
   end
 end

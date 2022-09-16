@@ -1,10 +1,11 @@
 class Cgns < Formula
   desc "CFD General Notation System"
   homepage "http://cgns.org/"
-  url "https://github.com/CGNS/CGNS/archive/v4.1.2.tar.gz"
-  sha256 "951653956f509b8a64040f1440c77f5ee0e6e2bf0a9eef1248d370f60a400050"
+  url "https://github.com/CGNS/CGNS/archive/v4.3.0.tar.gz"
+  sha256 "7709eb7d99731dea0dd1eff183f109eaef8d9556624e3fbc34dc5177afc0a032"
   license "BSD-3-Clause"
-  head "https://github.com/CGNS/CGNS.git"
+  revision 2
+  head "https://github.com/CGNS/CGNS.git", branch: "develop"
 
   livecheck do
     url :stable
@@ -12,35 +13,34 @@ class Cgns < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "abc3326bddbf58509b5ffb3834d68836ad803abf83f9958ae6a012870e7e9f85"
-    sha256 cellar: :any, big_sur:       "e2e5eb665f0f5c94c7782f0aed3708124705792ff5a7adf945a537369db6d724"
-    sha256 cellar: :any, catalina:      "4371c695cad1aa0bccbaaf0deccb9a8f5ddf7271dcbbddf6307b8d0bc254cec5"
-    sha256 cellar: :any, mojave:        "d9904ca7c839a5d0421b99ba784e98fec047971de47efa5d3cc00725cd892e26"
-    sha256 cellar: :any, high_sierra:   "8bfeb33c22f79c998b31fea6aafc60aecf2edf18ea754799c67c012d90555ec9"
+    sha256 cellar: :any,                 arm64_monterey: "31c4c8fb55e1b0445f2a0bffd5891e88f76d103c91ce718ba7b13a5506ebc7ee"
+    sha256 cellar: :any,                 arm64_big_sur:  "b40fb01503689516098100b3c493dee84cf3a182c6751d35778fd7e7f6067705"
+    sha256 cellar: :any,                 monterey:       "ef0306b868e4bdbe5884234dcadf93da65d0178d1b2cf9ecf5b85a3087efeb1d"
+    sha256 cellar: :any,                 big_sur:        "c59cacfb19bd04311ea1296643e53badb53a6e8c4b355703743dd0cecfca9dc0"
+    sha256 cellar: :any,                 catalina:       "32711a2b525fac2a509440ec5837ff0b4c68ca9d5e37400afd8bc628fe53f08b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "fb248e590f24966f13030464c284d71884c519ebb5da5cdd6f85a3658547e959"
   end
 
   depends_on "cmake" => :build
-  depends_on "gcc"
+  depends_on "gcc" # for gfortran
   depends_on "hdf5"
-  depends_on "szip"
+  depends_on "libaec"
 
   uses_from_macos "zlib"
 
   def install
-    args = std_cmake_args + %w[
+    args = %w[
       -DCGNS_ENABLE_64BIT=YES
       -DCGNS_ENABLE_FORTRAN=YES
       -DCGNS_ENABLE_HDF5=YES
     ]
 
-    mkdir "build" do
-      system "cmake", "..", *args
-      system "make"
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args, *args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
 
     # Avoid references to Homebrew shims
-    inreplace include/"cgnsBuild.defs", HOMEBREW_LIBRARY/"Homebrew/shims/mac/super/clang", "/usr/bin/clang"
+    inreplace include/"cgnsBuild.defs", Superenv.shims_path/ENV.cc, ENV.cc
   end
 
   test do
@@ -55,7 +55,9 @@ class Cgns < Formula
         return 0;
       }
     EOS
-    system Formula["hdf5"].opt_prefix/"bin/h5cc", testpath/"test.c", "-L#{opt_lib}", "-lcgns"
+    flags = %W[-L#{lib} -lcgns]
+    flags << "-Wl,-rpath,#{lib},-rpath,#{Formula["libaec"].opt_lib}" if OS.linux?
+    system Formula["hdf5"].opt_prefix/"bin/h5cc", "test.c", *flags
     system "./a.out"
   end
 end

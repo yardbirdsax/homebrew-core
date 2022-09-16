@@ -1,23 +1,43 @@
 class Thrax < Formula
-  desc "Tools for compiling grammars into finite state transducers"
-  homepage "http://www.openfst.org/twiki/bin/view/GRM/Thrax"
-  url "http://www.openfst.org/twiki/pub/GRM/ThraxDownload/thrax-1.3.5.tar.gz"
-  sha256 "823182c9bca7f866437c0d8db9fc4c90688766f4492239bfbd73be20687c622e"
-  license "Apache-2.0"
+  include Language::Python::Shebang
 
-  bottle do
-    sha256 cellar: :any, arm64_big_sur: "df4c441ebe13c259e7ca96811eaa6df1d77aa6da679c1d168a6a783bc156f5d1"
-    sha256 cellar: :any, big_sur:       "a072e3d04f88b542f3b52bc87c2e759c7bab28ae275a82f56f9cb289c5d35361"
-    sha256 cellar: :any, catalina:      "d78aa60f3cd29ac49ef887d6534a93cfbb605e133514e75681041d0b5744e0ac"
-    sha256 cellar: :any, mojave:        "6047f5e9d277a6987f580803d7e7220f6eceb76f84805f91aafb5c729bb39f0a"
+  desc "Tools for compiling grammars into finite state transducers"
+  homepage "https://www.openfst.org/twiki/bin/view/GRM/Thrax"
+  url "https://www.openfst.org/twiki/pub/GRM/ThraxDownload/thrax-1.3.8.tar.gz"
+  sha256 "e21c449798854f7270bb5ac723f6a8d292e149fc6bbe24fd9f345c85aabc7cd4"
+  license "Apache-2.0"
+  revision 1
+
+  livecheck do
+    url "https://www.openfst.org/twiki/bin/view/GRM/ThraxDownload"
+    regex(/href=.*?thrax[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
+  bottle do
+    sha256 cellar: :any,                 arm64_monterey: "da67cbb76545ecb423feca1b6a3a6e3dab7251177842ad37e22c5a3f3dbfafa2"
+    sha256 cellar: :any,                 arm64_big_sur:  "c5290fa4de107eb9d7c7a283ca01d3e646dc3d14e5add34c4e6187d418af8222"
+    sha256 cellar: :any,                 monterey:       "510a3aa7dfc3782dfe81735407191ab6ecbc851710dc8d6cd402629dfaef5f53"
+    sha256 cellar: :any,                 big_sur:        "1b5fcd1dcc4ff93508ddfcef21e4b280225cb9238766bc40f0551261dd1ea158"
+    sha256 cellar: :any,                 catalina:       "da9d875ee86c08a3263d6a7a7b1e2f9465c5811da56893293f387a879a2d5530"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7710590e03ff85fbf3a348d90651ca6161f7add1a2b2d986111f7b06c6a96536"
+  end
+
+  # Regenerate `configure` to avoid `-flat_namespace` bug.
+  # None of our usual patches apply.
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "libtool" => :build
+
   depends_on "openfst"
+  uses_from_macos "python", since: :catalina
+
+  fails_with gcc: "5"
 
   def install
-    system "./configure", "--prefix=#{prefix}",
-                          "--disable-dependency-tracking"
+    system "autoreconf", "--force", "--install", "--verbose"
+    system "./configure", *std_configure_args
     system "make", "install"
+    rewrite_shebang detected_python_shebang(use_python_from_path: true), bin/"thraxmakedep"
   end
 
   test do
@@ -26,8 +46,7 @@ class Thrax < Formula
     cd "grammars" do
       system "#{bin}/thraxmakedep", "example.grm"
       system "make"
-      system "#{bin}/thraxrandom-generator", "--far=example.far",
-                                      "--rule=TOKENIZER"
+      system "#{bin}/thraxrandom-generator", "--far=example.far", "--rule=TOKENIZER"
     end
   end
 end

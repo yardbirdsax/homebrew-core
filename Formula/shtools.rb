@@ -1,38 +1,35 @@
 class Shtools < Formula
   desc "Spherical Harmonic Tools"
   homepage "https://shtools.github.io/SHTOOLS/"
-  url "https://github.com/SHTOOLS/SHTOOLS/releases/download/v4.8/SHTOOLS-4.8.tar.gz"
-  sha256 "c36fc86810017e544abbfb12f8ddf6f101a1ac8b89856a76d7d9801ffc8dac44"
+  url "https://github.com/SHTOOLS/SHTOOLS/releases/download/v4.10.1/SHTOOLS-4.10.1.tar.gz"
+  sha256 "f4fb5c86841fe80136b520d2040149eafd4bc2d49da6b914d8a843b812f20b61"
   license "BSD-3-Clause"
-  head "https://github.com/SHTOOLS/SHTOOLS.git"
+  head "https://github.com/SHTOOLS/SHTOOLS.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, big_sur:  "1a9fd37585d31ef6f1c61b431bfab4fde9755db5ee081d8eba1c9a358278481f"
-    sha256 cellar: :any_skip_relocation, catalina: "99aea0397bae82f956eab6868704b493b99f9160e4c5f8f558937db3e349b96b"
-    sha256 cellar: :any_skip_relocation, mojave:   "00f6302f52c6df51ee3477d0c05d66c1a1feec59a4b8883b2af53faa6a631e30"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "038729713c3013c2c06e453ea99ff52eb83f01adcd3bfd6435e1101054d4698f"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "063c1e3013bf6dfc56ae3c0dbafe3214d52c3446b84f084accc2214838cd8d46"
+    sha256 cellar: :any_skip_relocation, monterey:       "8164fa3de31c5909455ec628c680e35c051b0858fd643e0694b10debbd85d134"
+    sha256 cellar: :any_skip_relocation, big_sur:        "170def5eead4a05b223b214bdff418edd84c62008687a246117362ea0e0f4cb3"
+    sha256 cellar: :any_skip_relocation, catalina:       "e1e43ac26408f5592cc0b2140d18dee20048d91efb55782fe93389229fceba3c"
   end
 
   depends_on "fftw"
   depends_on "gcc"
   depends_on "openblas"
 
+  on_linux do
+    depends_on "libtool" => :build
+  end
+
   def install
     system "make", "fortran"
     system "make", "fortran-mp"
-
-    pkgshare.install "examples/fortran/", "examples/ExampleDataFiles/"
-
-    lib.install "lib/libSHTOOLS.a", "lib/libSHTOOLS-mp.a"
-    include.install "include/fftw3.mod",
-                    "include/planetsconstants.mod",
-                    "include/shtools.mod",
-                    "include/ftypes.mod",
-                    "include/shtools.h"
-    share.install "man"
+    system "make", "install", "PREFIX=#{prefix}"
   end
 
   test do
-    cp_r pkgshare, testpath
+    cp_r "#{share}/examples/shtools", testpath
     system "make", "-C", "shtools/fortran",
                    "run-fortran-tests-no-timing",
                    "F95=gfortran",

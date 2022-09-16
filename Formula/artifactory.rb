@@ -1,15 +1,20 @@
 class Artifactory < Formula
   desc "Manages binaries"
   homepage "https://www.jfrog.com/artifactory/"
-  url "https://dl.bintray.com/jfrog/artifactory/jfrog-artifactory-oss-6.23.7.zip"
-  sha256 "39b54a9126e2e55359d95c20a0eae81a4beb77f63b9fe8a915d26d4c195a44b8"
+  # v7 is available but does contain a number of pre-builts that need to be avoided.
+  # Note that just using the source archive is not sufficient.
+  url "https://releases.jfrog.io/artifactory/bintray-artifactory/org/artifactory/oss/jfrog-artifactory-oss/6.23.42/jfrog-artifactory-oss-6.23.42.zip"
+  sha256 "b7d152435df543ae50c6a0ff44208aead93ca4f1b47b6658b1825df6ddcc2292"
   license "AGPL-3.0-or-later"
+
   livecheck do
-    url "https://dl.bintray.com/jfrog/artifactory/"
-    regex(/href=.*?jfrog-artifactory-oss[._-]v?(\d+(?:\.\d+)+)\.zip/i)
+    url "https://releases.jfrog.io/artifactory/bintray-artifactory/org/artifactory/oss/jfrog-artifactory-oss/"
+    regex(/href=.*?v?(\d+(?:\.\d+)+)/i)
   end
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "39f95a12d5e609016171cb09106bdfd211f9ac910a9c1b1ac4241fb64e0fbc8c"
+  end
 
   depends_on "openjdk"
 
@@ -17,6 +22,9 @@ class Artifactory < Formula
     # Remove Windows binaries
     rm_f Dir["bin/*.bat"]
     rm_f Dir["bin/*.exe"]
+
+    # Prebuilts
+    rm_rf "bin/metadata"
 
     # Set correct working directory
     inreplace "bin/artifactory.sh",
@@ -43,28 +51,10 @@ class Artifactory < Formula
     libexec.install_symlink data => "data"
   end
 
-  plist_options manual: "#{HOMEBREW_PREFIX}/opt/artifactory/libexec/bin/artifactory.sh"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>com.jfrog.artifactory</string>
-
-          <key>WorkingDirectory</key>
-          <string>#{libexec}</string>
-
-          <key>Program</key>
-          <string>#{bin}/artifactory.sh</string>
-
-          <key>KeepAlive</key>
-          <true/>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run opt_bin/"artifactory.sh"
+    keep_alive true
+    working_dir libexec
   end
 
   test do

@@ -1,55 +1,85 @@
 class Sonarqube < Formula
   desc "Manage code quality"
   homepage "https://www.sonarqube.org/"
-  url "https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-8.6.1.40680.zip"
-  sha256 "e16a4208658c485247f06f9b79c2d3b060e86751b35e95adef9f881754ce3e1d"
+  url "https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-9.6.1.59531.zip"
+  sha256 "3569bbb19e7d821a362ef4b18cb38960e9f3045d0a10b9b2707e54522a744199"
   license "LGPL-3.0-or-later"
-  revision 1
 
   livecheck do
-    url "https://binaries.sonarsource.com/Distribution/sonarqube/"
+    url "https://www.sonarqube.org/success-download-community-edition/"
     regex(/href=.*?sonarqube[._-]v?(\d+(?:\.\d+)+)\.zip/i)
   end
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "ac87c5da33c6c6abef8a53d2e646be52f6ccc5c3de6d856c0ca12ac2a865ce53"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ac87c5da33c6c6abef8a53d2e646be52f6ccc5c3de6d856c0ca12ac2a865ce53"
+    sha256 cellar: :any_skip_relocation, monterey:       "80e9e61b9539bef70d1310be0619b444d89ed0ec1600b9131ab2b87fe6c2138c"
+    sha256 cellar: :any_skip_relocation, big_sur:        "80e9e61b9539bef70d1310be0619b444d89ed0ec1600b9131ab2b87fe6c2138c"
+    sha256 cellar: :any_skip_relocation, catalina:       "80e9e61b9539bef70d1310be0619b444d89ed0ec1600b9131ab2b87fe6c2138c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b9f9b0ca1a9e978257c589963ec8b269f05ab44d813a1bb4812850764f534412"
+  end
 
   depends_on "openjdk@11"
 
   conflicts_with "sonarqube-lts", because: "both install the same binaries"
 
   def install
-    # Delete native bin directories for other systems
-    rm_rf Dir["bin/{linux,windows}-*"]
+    platform = OS.mac? ? "macosx-universal-64" : "linux-x86-64"
+
+    inreplace buildpath/"bin"/platform/"sonar.sh",
+      %r{^PIDFILE="\./\$APP_NAME\.pid"$},
+      "PIDFILE=#{var}/run/\$APP_NAME.pid"
+
+    inreplace "conf/sonar.properties" do |s|
+      # Write log/data/temp files outside of installation directory
+      s.sub!(/^#sonar\.path\.data=.*/, "sonar.path.data=#{var}/sonarqube/data")
+      s.sub!(/^#sonar\.path\.logs=.*/, "sonar.path.logs=#{var}/sonarqube/logs")
+      s.sub!(/^#sonar\.path\.temp=.*/, "sonar.path.temp=#{var}/sonarqube/temp")
+    end
 
     libexec.install Dir["*"]
-
-    (bin/"sonar").write_env_script libexec/"bin/macosx-universal-64/sonar.sh",
-      Language::Java.overridable_java_home_env("11")
+    env = Language::Java.overridable_java_home_env("11")
+    env["PATH"] = "$JAVA_HOME/bin:$PATH"
+    (bin/"sonar").write_env_script libexec/"bin"/platform/"sonar.sh", env
   end
 
-  plist_options manual: "sonar console"
+  def post_install
+    (var/"run").mkpath
+    (var/"sonarqube/logs").mkpath
+  end
 
-  def plist
+  def caveats
     <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-      <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-          <string>#{opt_bin}/sonar</string>
-          <string>start</string>
-          </array>
-          <key>RunAtLoad</key>
-          <true/>
-      </dict>
-      </plist>
+      Data: #{var}/sonarqube/data
+      Logs: #{var}/sonarqube/logs
+      Temp: #{var}/sonarqube/temp
     EOS
   end
 
+  service do
+    run [opt_bin/"sonar", "console"]
+    keep_alive true
+  end
+
   test do
-    assert_match "SonarQube", shell_output("#{bin}/sonar status", 1)
+    port = free_port
+    ENV["SONAR_WEB_PORT"] = port.to_s
+    ENV["SONAR_EMBEDDEDDATABASE_PORT"] = free_port.to_s
+    ENV["SONAR_SEARCH_PORT"] = free_port.to_s
+    ENV["SONAR_PATH_DATA"] = testpath/"data"
+    ENV["SONAR_PATH_LOGS"] = testpath/"logs"
+    ENV["SONAR_PATH_TEMP"] = testpath/"temp"
+    ENV["SONAR_TELEMETRY_ENABLE"] = "false"
+
+    assert_match(/SonarQube.* is not running/, shell_output("#{bin}/sonar status", 1))
+    pid = fork { exec bin/"sonar", "console" }
+    begin
+      sleep 15
+      output = shell_output("#{bin}/sonar status")
+      assert_match(/SonarQube is running \([0-9]*?\)/, output)
+    ensure
+      Process.kill 9, pid
+      Process.wait pid
+    end
   end
 end

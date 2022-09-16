@@ -1,35 +1,39 @@
 class Verilator < Formula
   desc "Verilog simulator"
   homepage "https://www.veripool.org/wiki/verilator"
-  url "https://www.veripool.org/ftp/verilator-4.108.tgz"
-  sha256 "8e8ec1de0bf200b6206035214f9071a5acc64bd2e7134361d564271e48552702"
+  url "https://github.com/verilator/verilator/archive/refs/tags/v4.226.tar.gz"
+  sha256 "70bc941d86e4810253d51aa94898b0802d916ab76296a398f8ceb8798122c9be"
   license any_of: ["LGPL-3.0-only", "Artistic-2.0"]
 
-  livecheck do
-    url "https://github.com/verilator/verilator.git"
-    regex(/^v?(\d+(?:\.\d+)+)$/i)
-  end
-
   bottle do
-    sha256 arm64_big_sur: "54cb01cc42dcbb937393cb3359459b18c4cc29c424d19065b09f1095fdee685b"
-    sha256 big_sur:       "45d7504fefb899372cd2ee8876e8a82d56b59f14972309b9dbeed83b580029b3"
-    sha256 catalina:      "8e616f827d635b2659f454a3f5dc302fced30bad4b26930ccd392944f71dbfd9"
-    sha256 mojave:        "97797a992b626adf8ae83c8ee22d881ec26bf12f390c6a807e0635bc67d6e09b"
+    rebuild 1
+    sha256 arm64_monterey: "8e5f635658b007f27fecaece0588bd715f1e12ae4aead2170a45a0bedc3bd766"
+    sha256 arm64_big_sur:  "4905b78faa6c65c317680e8904704bc0c11d0cb5e4a5d6d51390adafbc8056aa"
+    sha256 monterey:       "669276002757d11080befc9a6cb22bcd491e4df70390a63db9674fe56a02f54c"
+    sha256 big_sur:        "696a5c432c02769cf383d279e0aad7de1fbca58262f3c03cd1a2608b8a512c10"
+    sha256 catalina:       "66810bc435954d3f8dfb3016ac31d7e557bd5c7ff2932c91f614ba505f9592df"
+    sha256 x86_64_linux:   "41b0a1e5d3f0ba30284ef69f887a49e2af4e9bb76c546c3a7f6c204cc347b2ae"
   end
 
   head do
-    url "https://git.veripool.org/git/verilator", using: :git
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
+    url "https://github.com/verilator/verilator.git", using: :git
   end
 
-  depends_on "python@3.9" => :build
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "python@3.10" => :build
+
+  uses_from_macos "bison"
+  uses_from_macos "flex"
   uses_from_macos "perl"
 
   skip_clean "bin" # Allows perl scripts to keep their executable flag
 
+  # error: specialization of 'template<class _Tp> struct std::hash' in different namespace
+  fails_with gcc: "5"
+
   def install
-    system "autoconf" if build.head?
+    system "autoconf"
     system "./configure", "--prefix=#{prefix}"
     # `make` and `make install` need to be separate for parallel builds
     system "make"

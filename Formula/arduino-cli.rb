@@ -2,10 +2,10 @@ class ArduinoCli < Formula
   desc "Arduino command-line interface"
   homepage "https://github.com/arduino/arduino-cli"
   url "https://github.com/arduino/arduino-cli.git",
-     tag:      "0.15.1",
-     revision: "c7403ed2453635d5ce39cae5ffaab761cb745be1"
+      tag:      "0.27.1",
+      revision: "a900cfb2e7e58a9ed7e06be607c0f9878a17b15d"
   license "GPL-3.0-only"
-  head "https://github.com/arduino/arduino-cli.git"
+  head "https://github.com/arduino/arduino-cli.git", branch: "master"
 
   livecheck do
     url :stable
@@ -13,9 +13,12 @@ class ArduinoCli < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, big_sur:  "d5438f2ee0920cbb6dffff455a73a443afc2e69b83672f1546c2999eb9d02742"
-    sha256 cellar: :any_skip_relocation, catalina: "eb2bac314118c84292f2aee842e7d784392e7301027c9f9b24014e8f5fd17550"
-    sha256 cellar: :any_skip_relocation, mojave:   "9f90efcec38edb0f276e08f42fe810cf8ab19ff0a9edabe4d1b334409e1e401a"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "a15b34f012e389e4c7a9f19361994ca9b7a7a8a53b0de8423056bd1d443df7dd"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "19cd18e42d133765c6c063841d0a1e49fce6efe1752bd45e77ed7312593b8f1d"
+    sha256 cellar: :any_skip_relocation, monterey:       "1d12c1f7a21bfcd6068b89a6ef260af6f6212a13e9e6caa514b5b13b380697c3"
+    sha256 cellar: :any_skip_relocation, big_sur:        "11b70276994f04ce086d8237fbf15807aca91f8ae75c3150e8a9e6e7dbbe5e40"
+    sha256 cellar: :any_skip_relocation, catalina:       "86acba84493ff259f808ed7d896f466dd2a51d58c9ddef6b9dc15f8ae2ea4482"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "01ccd8a332aa5e9ef7a8b209bc57a6b4ac7abcdfb70042258edd716577f574ad"
   end
 
   depends_on "go" => :build
@@ -24,18 +27,12 @@ class ArduinoCli < Formula
     ldflags = %W[
       -s -w
       -X github.com/arduino/arduino-cli/version.versionString=#{version}
-      -X github.com/arduino/arduino-cli/version.commit=#{Utils.git_head}
+      -X github.com/arduino/arduino-cli/version.commit=#{Utils.git_head(length: 8)}
+      -X github.com/arduino/arduino-cli/version.date=#{time.iso8601}
     ]
-    system "go", "build", *std_go_args, "-ldflags", ldflags.join(" ")
+    system "go", "build", *std_go_args(ldflags: ldflags)
 
-    output = Utils.safe_popen_read({ "SHELL" => "bash" }, "#{bin}/arduino-cli", "completion", "bash")
-    (bash_completion/"arduino-cli").write output
-
-    output = Utils.safe_popen_read({ "SHELL" => "zsh" }, "#{bin}/arduino-cli", "completion", "zsh")
-    (zsh_completion/"_arduino-cli").write output
-
-    output = Utils.safe_popen_read({ "SHELL" => "fish" }, "#{bin}/arduino-cli", "completion", "fish")
-    (fish_completion/"arduino-cli.fish").write output
+    generate_completions_from_executable(bin/"arduino-cli", "completion")
   end
 
   test do
@@ -43,6 +40,10 @@ class ArduinoCli < Formula
     assert File.directory?("#{testpath}/test_sketch")
 
     version_output = shell_output("#{bin}/arduino-cli version 2>&1")
-    assert_match "arduino-cli alpha Version: #{version}", version_output
+    assert_match("arduino-cli  Version: #{version}", version_output)
+    assert_match("Commit:", version_output)
+    assert_match(/[a-f0-9]{8}/, version_output)
+    assert_match("Date: ", version_output)
+    assert_match(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z/, version_output)
   end
 end

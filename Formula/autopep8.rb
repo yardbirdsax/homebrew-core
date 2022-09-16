@@ -3,22 +3,24 @@ class Autopep8 < Formula
 
   desc "Automatically formats Python code to conform to the PEP 8 style guide"
   homepage "https://github.com/hhatto/autopep8"
-  url "https://files.pythonhosted.org/packages/32/23/3bc0b99f932155c19e8b6b4f01021b735727ee6b0ccda6b8e5f99bef1b6d/autopep8-1.5.5.tar.gz"
-  sha256 "cae4bc0fb616408191af41d062d7ec7ef8679c7f27b068875ca3a9e2878d5443"
+  url "https://files.pythonhosted.org/packages/d0/5d/016888824972086a4ee164806520d85ff173e83699907b9cfe119aaefbbc/autopep8-1.7.0.tar.gz"
+  sha256 "ca9b1a83e53a7fad65d731dc7a2a2d50aa48f43850407c59f6a1a306c4201142"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "abf487f3114b67ebfe0760421a3df96e948fbcb2ec378cd2fcab08e2d73aaf49"
-    sha256 cellar: :any_skip_relocation, big_sur:       "0d9286b07276cd78d5fb31ed9bd126b5675ffb9b8509793f17d49a571e44b49b"
-    sha256 cellar: :any_skip_relocation, catalina:      "7445d78c6c97dad32d841a2afaa2f655d1514b72eca5650460d1d1a8f175e1fe"
-    sha256 cellar: :any_skip_relocation, mojave:        "b3ea685a6f92eb1c2b283a38c54a1155fe06fc3f0f7374c8a99ffcbd483286c8"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "c52de22dd0b9d9a7773db27b587ee9d27c3cafedc121fe7a0abaa3d1c50605cc"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c52de22dd0b9d9a7773db27b587ee9d27c3cafedc121fe7a0abaa3d1c50605cc"
+    sha256 cellar: :any_skip_relocation, monterey:       "282206f1a762ce0bcead1bac457509057287548089b3d16c2ca032de98deca37"
+    sha256 cellar: :any_skip_relocation, big_sur:        "282206f1a762ce0bcead1bac457509057287548089b3d16c2ca032de98deca37"
+    sha256 cellar: :any_skip_relocation, catalina:       "282206f1a762ce0bcead1bac457509057287548089b3d16c2ca032de98deca37"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "548a6fadf6bcc710185bbd29d444a45cab853b29817949f1208a58bd292c9bc3"
   end
 
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   resource "pycodestyle" do
-    url "https://files.pythonhosted.org/packages/bb/82/0df047a5347d607be504ad5faa255caa7919562962b934f9372b157e8a70/pycodestyle-2.6.0.tar.gz"
-    sha256 "c58a7d2815e0e8d7972bf1803331fb0152f867bd89adf8a01dfd55085434192e"
+    url "https://files.pythonhosted.org/packages/b6/83/5bcaedba1f47200f0665ceb07bcb00e2be123192742ee0edfb66b600e5fd/pycodestyle-2.9.1.tar.gz"
+    sha256 "2c9607871d58c76354b697b42f5d57e1ada7d261c261efac224b664affdc5785"
   end
 
   resource "toml" do
@@ -31,7 +33,7 @@ class Autopep8 < Formula
   end
 
   test do
-    output = shell_output("echo \"x='homebrew'\" | #{bin}/autopep8 -")
+    output = pipe_output("#{bin}/autopep8 -", "x='homebrew'")
     assert_equal "x = 'homebrew'", output.strip
   end
 end

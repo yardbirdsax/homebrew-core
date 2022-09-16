@@ -1,17 +1,29 @@
 class Znapzend < Formula
   desc "ZFS backup with remote capabilities and mbuffer integration"
   homepage "https://www.znapzend.org/"
-  url "https://github.com/oetiker/znapzend/releases/download/v0.20.0/znapzend-0.20.0.tar.gz"
-  sha256 "c0a1ab9df5d6c4936560b5f8f08d393d4e99313da190fa404cd8ee5df420a7ca"
-  head "https://github.com/oetiker/znapzend.git"
+  url "https://github.com/oetiker/znapzend/releases/download/v0.21.1/znapzend-0.21.1.tar.gz"
+  sha256 "1b438816a9a647a5bb3282ad26a6a8cd3ecce0a874f2fb506cbc156527e188f7"
+  license "GPL-3.0-or-later"
+  head "https://github.com/oetiker/znapzend.git", branch: "master"
+
+  # The `stable` URL uses a download from the GitHub release, so the release
+  # needs to exist before the formula can be version bumped. It's more
+  # appropriate to check the GitHub releases instead of tags in this context.
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "b2b88cca83d22ee9484aebd5f2643d4c9d40b8156ad75c86d480d6c14b30d40e"
-    sha256 cellar: :any_skip_relocation, big_sur:       "5f33411823e939c59d7c9b117f042654dc4b6eac4a9d7a0fa20c4f8df0d21385"
-    sha256 cellar: :any_skip_relocation, catalina:      "37b73cba5b7ed887b1e72175d3c601c08e449ed3bbcaa87668641704477889d1"
-    sha256 cellar: :any_skip_relocation, mojave:        "9a508c6a3fb15609b3552ce38369b16664f08515f635bd8a3dc92ed79d17d381"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "18e1269f3ab2964382c1cc7578fa8785ee7ba1412a1c247861d76accde2a6cc5"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "12f39e6dd76784910e3db0296309bdeaf5edc3c71872c4b47e27dc6aae018efb"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "6cc4e37853b49ca05491ecf1736b2dc9b670e50763b45252ef93f9ca7ed0eb7a"
+    sha256 cellar: :any_skip_relocation, monterey:       "9eefd9fcafcf5e7cf5966e5970a808431672d1ee939e6db175348f696234ffc9"
+    sha256 cellar: :any_skip_relocation, big_sur:        "13449e4ddb4e8235101837cb6c170ffca97260a76f22774020e7cc534946a27d"
+    sha256 cellar: :any_skip_relocation, catalina:       "8c30fbfdf41fbbd7ae1a45ca4e7de4c9787c826cc67209d50f0df27e91247e63"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cf73cdc45c34661115e3f47ddc267410917fcd5543fb8ecd46e5eb06d32c7e14"
   end
+
+  uses_from_macos "perl", since: :big_sur
 
   def install
     system "./configure", "--disable-silent-rules",
@@ -24,43 +36,14 @@ class Znapzend < Formula
     (var/"run/znapzend").mkpath
   end
 
-  plist_options startup: true, manual: "sudo znapzend --daemonize"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
-      "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>EnvironmentVariables</key>
-          <dict>
-            <key>PATH</key>
-            <string>/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:#{HOMEBREW_PREFIX}/bin</string>
-          </dict>
-          <key>KeepAlive</key>
-          <true/>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_bin}/znapzend</string>
-            <string>--connectTimeout=120</string>
-            <string>--logto=#{var}/log/znapzend/znapzend.log</string>
-          </array>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>StandardErrorPath</key>
-          <string>#{var}/log/znapzend/znapzend.err.log</string>
-          <key>StandardOutPath</key>
-          <string>#{var}/log/znapzend/znapzend.out.log</string>
-          <key>ThrottleInterval</key>
-          <integer>30</integer>
-          <key>WorkingDirectory</key>
-          <string>#{var}/run/znapzend</string>
-        </dict>
-      </plist>
-    EOS
+  plist_options startup: true
+  service do
+    run [opt_bin/"znapzend", "--connectTimeout=120", "--logto=#{var}/log/znapzend/znapzend.log"]
+    environment_variables PATH: std_service_path_env
+    keep_alive true
+    error_log_path var/"log/znapzend.err.log"
+    log_path var/"log/znapzend.out.log"
+    working_dir var/"run/znapzend"
   end
 
   test do

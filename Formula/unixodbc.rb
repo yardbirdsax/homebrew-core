@@ -1,8 +1,9 @@
 class Unixodbc < Formula
   desc "ODBC 3 connectivity for UNIX"
   homepage "http://www.unixodbc.org/"
-  url "http://www.unixodbc.org/unixODBC-2.3.9.tar.gz"
-  sha256 "52833eac3d681c8b0c9a5a65f2ebd745b3a964f208fc748f977e44015a31b207"
+  url "http://www.unixodbc.org/unixODBC-2.3.11.tar.gz"
+  mirror "https://fossies.org/linux/privat/unixODBC-2.3.11.tar.gz"
+  sha256 "d9e55c8e7118347e3c66c87338856dad1516b490fb7c756c1562a2c267c73b5c"
   license "LGPL-2.1-or-later"
 
   livecheck do
@@ -11,11 +12,12 @@ class Unixodbc < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "112790241d32af0dedc7173711c714eae35ddac6f6aee9d5a7bc979063956990"
-    sha256 big_sur:       "1b7672ec7e627941ab8e36dbe98516be3cc5861d77861dabdddf00a76aed135b"
-    sha256 catalina:      "b312633496b3b92a61751508d0c35b7053a1cf202aedae79d2609cf6dfdede27"
-    sha256 mojave:        "f52d9ff5a13e7e78560cead35ca4a3d17e4582e791319c6c15d47ac8ac6f63d4"
-    sha256 high_sierra:   "f7bbaf85f41df090d7ea6c8103543ec2890164ef43c4c2bdb7cef13c0993585d"
+    sha256 arm64_monterey: "41252118b5c049b7fb24be4d68aa0efd821d1b263db205b6b8395d538acdebbc"
+    sha256 arm64_big_sur:  "d7c4effd78343a0e35e1ed173321299393132c84d383b34dacaa82abb09bfbcc"
+    sha256 monterey:       "a4d5de6d53870f610840a88bd31c0d0442bc3580068f9330207ab8e0488fa523"
+    sha256 big_sur:        "7c2e9b5e3e8b9e082afa7d669d0b073897fd30ebcc3ec566a2fa38fd63369087"
+    sha256 catalina:       "c398fc445679a3619a8e602444963a4e46e9302a1813c192ac42d9b6cc2d7e63"
+    sha256 x86_64_linux:   "e8d1c01d05e821f0e4aa4aa65f104266ed16331a3e39ae72071bbe0eaec03ea0"
   end
 
   depends_on "libtool"

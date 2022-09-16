@@ -1,20 +1,23 @@
 class Bpytop < Formula
   include Language::Python::Virtualenv
+  include Language::Python::Shebang
 
   desc "Linux/OSX/FreeBSD resource monitor"
   homepage "https://github.com/aristocratos/bpytop"
-  url "https://files.pythonhosted.org/packages/4a/68/af63843b898c9b8a6010147ec306aab21b4d8cb684087ce9c50a94f065e7/bpytop-1.0.61.tar.gz"
-  sha256 "4bca4202ca986210250d25a182852c2fd48e46d0f51f8efc6266232377ceb2dc"
+  url "https://github.com/aristocratos/bpytop/archive/v1.0.68.tar.gz"
+  sha256 "3a936f8899efb66246e82bbcab33249bf94aabcefbe410e56f045a1ce3c9949f"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "86e301b52ef369a02e5beaf9e726a0da377f29759395485b52718a168a90ee14"
-    sha256 cellar: :any_skip_relocation, big_sur:       "a50aaf97067280960a462596625be6af01098e6e23850aa546e29490f222c2a5"
-    sha256 cellar: :any_skip_relocation, catalina:      "040c3f76fc5dc9df03b44eff4053d8edb74908447ea7081c06d0a913a9b600c8"
-    sha256 cellar: :any_skip_relocation, mojave:        "0cfe29295f282bc25e4ce89139da7302ba33f981600af39e4da512af3da6f455"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "a1056028c0249a04cdb1696c1f265d175b5678076ae2cd5b27145f4b875334bd"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "9f268476fd2df933516f1de95768823eced9da2cd13c59be425accf26b5b938c"
+    sha256 cellar: :any_skip_relocation, monterey:       "ba6ba12c03d0a7ff3f01e9185f0139009ea71035fabc0da0fdf990a974cdab4d"
+    sha256 cellar: :any_skip_relocation, big_sur:        "98fe82eb4ede78b2ea8dce83bce7648ae338b6e8478eb5fb2c9138db8ccea1d4"
+    sha256 cellar: :any_skip_relocation, catalina:       "85bc433985ef601004bbb0393e2b4a092b840f1abf48e42e5eb12a59893e8796"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f4a390cf927eaab56b3432ecfe161e07066e99ce2fd964b4e6980013f4c78d32"
   end
 
-  depends_on "python@3.9"
+  depends_on "python@3.10"
   on_macos do
     depends_on "osx-cpu-temp"
   end
@@ -25,12 +28,19 @@ class Bpytop < Formula
   end
 
   def install
-    virtualenv_install_with_resources
-    pkgshare.install "bpytop-themes" => "themes"
+    venv = virtualenv_create(libexec, "python3.10")
+    venv.pip_install resources
+    system "make", "install", "PREFIX=#{prefix}"
+    pkgshare.install "themes"
+
+    # Replace shebang with virtualenv python
+    rw_info = python_shebang_rewrite_info("#{libexec}/bin/python")
+    rewrite_shebang rw_info, bin/"bpytop"
   end
 
   test do
     config = (testpath/".config/bpytop")
+    mkdir config/"themes"
     (config/"bpytop.conf").write <<~EOS
       #? Config file for bpytop v. #{version}
 
@@ -48,7 +58,7 @@ class Bpytop < Formula
 
     log = (config/"error.log").read
     assert_match "bpytop version #{version} started with pid #{pid}", log
-    assert_not_match /ERROR:/, log
+    refute_match(/ERROR:/, log)
   ensure
     Process.kill("TERM", pid)
   end

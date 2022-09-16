@@ -1,16 +1,18 @@
 class Elixir < Formula
   desc "Functional metaprogramming aware language built on Erlang VM"
   homepage "https://elixir-lang.org/"
-  url "https://github.com/elixir-lang/elixir/archive/v1.11.3.tar.gz"
-  sha256 "d961305e893f4fe1a177fa00233762c34598bc62ff88b32dcee8af27e36f0564"
+  url "https://github.com/elixir-lang/elixir/archive/v1.14.0.tar.gz"
+  sha256 "ac129e266a1e04cdc389551843ec3dbdf36086bb2174d3d7e7936e820735003b"
   license "Apache-2.0"
-  head "https://github.com/elixir-lang/elixir.git"
+  head "https://github.com/elixir-lang/elixir.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "dc94bf65bccb57f6794c8bb081faa5914cc7184a6ecf71c8ce904cb91331445a"
-    sha256 cellar: :any_skip_relocation, big_sur:       "a06541e028cdd23af796aacb0c4217828a4066eb9239f414250937dd7d7775e8"
-    sha256 cellar: :any_skip_relocation, catalina:      "e0ff8e34210c0c1bc477b225b2cf3edfcafa82d2a1dcf071d1da49a51758003a"
-    sha256 cellar: :any_skip_relocation, mojave:        "dfcaa759c90179c486044fbf04e6300b2c7588e9d5169fa050fafe618415dec3"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "90b3ec6264ad38ec73c7612cfce7d3f6b9738a66156c63e8896827c298c335ad"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "419ddd38f0070c9a4742a7153d9379e28166923119779b74d7d96e7c240c007d"
+    sha256 cellar: :any_skip_relocation, monterey:       "2b15f8f6aba2a99af34a32676bae9e27749151c311cae54b5c484a0ad8df106f"
+    sha256 cellar: :any_skip_relocation, big_sur:        "32933c532e5fff3b91922d6e6d9bbadd1fb41408957508e1296d735778c604e5"
+    sha256 cellar: :any_skip_relocation, catalina:       "cc3f455ff4f77f53c53854d924cea5d0564b7266d6c4a28ddc7bf3078df414e8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "dbcae8c2219987f2df81cae6003943fee3f0e40b9558f27bb8ae80cd188f88ea"
   end
 
   depends_on "erlang"
@@ -28,6 +30,6 @@ class Elixir < Formula
   end
 
   test do
-    system "#{bin}/elixir", "-v"
+    assert_match(%r{(compiled with Erlang/OTP 25)}, shell_output("#{bin}/elixir -v"))
   end
 end

@@ -1,14 +1,17 @@
 class OpenImageDenoise < Formula
   desc "High-performance denoising library for ray tracing"
   homepage "https://openimagedenoise.github.io"
-  url "https://github.com/OpenImageDenoise/oidn/releases/download/v1.3.0/oidn-1.3.0.src.tar.gz"
-  sha256 "88367b2bbea82d1df45d65141c36b6d86491bc6b397dc70beb3a05dda566f31c"
+  url "https://github.com/OpenImageDenoise/oidn/releases/download/v1.4.3/oidn-1.4.3.src.tar.gz"
+  sha256 "3276e252297ebad67a999298d8f0c30cfb221e166b166ae5c955d88b94ad062a"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any, big_sur:  "7398e8653fa5a904f0110788c24e1135542ad2310c496997015feb60af53c23e"
-    sha256 cellar: :any, catalina: "10cf7627f04aee03b80b001d80ded196c3d419c2232dca8950f6a7cfd0c031c2"
-    sha256 cellar: :any, mojave:   "93d16bc36a6a125f4a3ca7979c9052d890502c9c19f6820acf0e855ea073e22e"
+    sha256 cellar: :any,                 arm64_monterey: "abcfb384ec75c0be7933f21fb5b20a5f82cd5d8f45b5f64754c5b46071d71a56"
+    sha256 cellar: :any,                 arm64_big_sur:  "763b04f83cdb7ebcc7cf21c57f52b67bd5e231cd33a6d7388647bd33df1c691f"
+    sha256 cellar: :any,                 monterey:       "c19c4706250613ffb8832e3256f238c2c1745136bd629b13fc69052f3235783b"
+    sha256 cellar: :any,                 big_sur:        "ef4e28b6d261098552eb6b295e4d1cd9a7ea55536fca0aa6d80a67ac7d3adc1b"
+    sha256 cellar: :any,                 catalina:       "1fb2669f02c65527f8be5e6ce33dea156e13a2bd4127286e818da13de9708b6a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "472e35a8971652911ae333378ebe84333a8867ebd473cb17bd2e48552b7f6462"
   end
 
   depends_on "cmake" => :build
@@ -19,6 +22,9 @@ class OpenImageDenoise < Formula
   depends_on "tbb"
 
   def install
+    # Fix arm64 build targeting iOS
+    inreplace "cmake/oidn_ispc.cmake", 'set(ISPC_TARGET_OS "--target-os=ios")', ""
+
     mkdir "build" do
       system "cmake", *std_cmake_args, ".."
       system "make", "install"

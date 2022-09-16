@@ -3,15 +3,18 @@ require "language/node"
 class WriteGood < Formula
   desc "Naive linter for English prose"
   homepage "https://github.com/btford/write-good"
-  url "https://registry.npmjs.org/write-good/-/write-good-1.0.5.tgz"
-  sha256 "efffbfb63057ad214ff07957a5423b7e9fb75f4cae45ebf013554defe0bdb3e5"
+  url "https://registry.npmjs.org/write-good/-/write-good-1.0.8.tgz"
+  sha256 "f54db3db8db0076fd1c05411c7f3923f055176632c51dc4046ab216e51130221"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "dcb36d15082245bd32277d964bd77d11f3610a9e0cf48401bf20ca7cff2291bc"
-    sha256 cellar: :any_skip_relocation, big_sur:       "17ed562f70bddc92d7f52a4c1e8cf62bbc1aef49d51e78076dd357044737545b"
-    sha256 cellar: :any_skip_relocation, catalina:      "af36a1a3ec8609ee811afd157bacc62503c0f96b7b91571a2d4b114277fca274"
-    sha256 cellar: :any_skip_relocation, mojave:        "5f60c1de800c479bfa7d1f4995e9fb7bb0e58e718314888329a7bfbc00ed9aa5"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "0d7f61673e4bf3404da929427c3ac1003ba259f9d781248d1cfde01da6780d6c"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "61d0833a983986732c1d6abb5491a3cc787f30c6987d2c420ef69af5a82e8340"
+    sha256 cellar: :any_skip_relocation, monterey:       "86bd56a8ef2b340804f9da813b086f49f2f2f9f6eb8f31fe1d4137c2c44a1202"
+    sha256 cellar: :any_skip_relocation, big_sur:        "9d0239747d4aaff293b839c0cd3d4ee175eb69260d965d810b33b4081a20845c"
+    sha256 cellar: :any_skip_relocation, catalina:       "1bb59d5fc6bc1e3350b3ff45eef3aa3e78500e3cd9342c690f6dcf8b6163a77b"
+    sha256 cellar: :any_skip_relocation, mojave:         "0850f0679ded1af752f6f62b3f88e80134563cfd6d313c9d9b7e42549d421d9d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3b0159ea80386272010aec12e84b6c7793b2a358b6f1320797cca326b2c61d61"
   end
 
   depends_on "node"

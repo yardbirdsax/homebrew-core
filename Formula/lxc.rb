@@ -1,8 +1,8 @@
 class Lxc < Formula
   desc "CLI client for interacting with LXD"
   homepage "https://linuxcontainers.org"
-  url "https://linuxcontainers.org/downloads/lxd/lxd-4.11.tar.gz"
-  sha256 "3d70bb0a07b6b343b1ff4b06f62d11147d205b30a808abc13978ea18ebed8fdd"
+  url "https://linuxcontainers.org/downloads/lxd/lxd-5.5.tar.gz"
+  sha256 "462e66c03b5eb08eaf3a3b5be4be73043e3af63218c79af100989bd018daf29b"
   license "Apache-2.0"
 
   livecheck do
@@ -11,24 +11,22 @@ class Lxc < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "7587be383f80df06098c27228a321bfa80aa1263410121b6f5724fbb72131c87"
-    sha256 cellar: :any_skip_relocation, big_sur:       "7883dea752070fbeeafefca87ec599f57bd1cb56884083c727582a65b7ace74d"
-    sha256 cellar: :any_skip_relocation, catalina:      "930ef7166268f2a1f3ac23b5983e5e96b59e9992b68ff87a837fe92c7bd54db5"
-    sha256 cellar: :any_skip_relocation, mojave:        "86c31e43fb5cf1976bf5c0d1d220cb1265a8e0848b461c402330601d220a35f0"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "714228afe2a3b99b4f54f9c98a825e33d69ed40a51f02c77418b012a7a6ec8af"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b3c2213f827ec4718fe73395ba31f52ae6857c6fa42ba25bfec78569f1c02f66"
+    sha256 cellar: :any_skip_relocation, monterey:       "828d4b67d6293d3b1ae58d93846a21b5fc65370b4c1f2a1cfa9c0636a03bb3b2"
+    sha256 cellar: :any_skip_relocation, big_sur:        "75efe0fabe1441e2b4dd6f59dcf75d30eda2454a50a31c9eacbced068a0b8324"
+    sha256 cellar: :any_skip_relocation, catalina:       "cbfd6d5b06298bfe8019f5418b221a2fc7bd20fc110f86c0abbf975716278175"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7a5807e801b2b9422e67da3fefe68b52e5a1949281771d427572ec38049bb484"
   end
 
   depends_on "go" => :build
 
   def install
-    ENV["GOPATH"] = buildpath
-    ENV["GOBIN"] = bin
-    ENV["GO111MODULE"] = "auto"
-
-    ln_s buildpath/"_dist/src", buildpath/"src"
-    system "go", "install", "-v", "github.com/lxc/lxd/lxc"
+    system "go", "build", *std_go_args, "./lxc"
   end
 
   test do
-    system "#{bin}/lxc", "--version"
+    output = JSON.parse(shell_output("#{bin}/lxc remote list --format json"))
+    assert_equal "https://images.linuxcontainers.org", output["images"]["Addr"]
   end
 end

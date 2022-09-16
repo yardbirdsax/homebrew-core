@@ -1,8 +1,9 @@
 class Qd < Formula
   desc "C++/Fortran-90 double-double and quad-double package"
   homepage "https://www.davidhbailey.com/dhbsoftware/"
-  url "https://www.davidhbailey.com/dhbsoftware/qd-2.3.22.tar.gz"
-  sha256 "30c1ffe46b95a0e9fa91085949ee5fca85f97ff7b41cd5fe79f79bab730206d3"
+  url "https://www.davidhbailey.com/dhbsoftware/qd-2.3.23.tar.gz"
+  sha256 "b3eaf41ce413ec08f348ee73e606bd3ff9203e411c377c3c0467f89acf69ee26"
+  revision 1
 
   livecheck do
     url :homepage
@@ -10,15 +11,21 @@ class Qd < Formula
   end
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any, arm64_big_sur: "a142fb3e68694ee7529043e985fd898069553ec2ca37483336b6ead7246e28bc"
-    sha256 cellar: :any, big_sur:       "380c30f837eed2027f1f1a353cfca4b5f71f551e504c26b2ab635cba4918681b"
-    sha256 cellar: :any, catalina:      "9700e6163692f31c736ddd74f535305fef730e021c4ca9f85b5860926397e330"
-    sha256 cellar: :any, mojave:        "53e4efc8ab2d1c18b1c4198bed031eb1b97b4431b1c0a4e8e4195c9b01659098"
-    sha256 cellar: :any, high_sierra:   "0ff67d07426a90d2897f0f69da0bd91bedb8a40ea52c0201c80225dd6c22510d"
+    sha256 cellar: :any,                 arm64_monterey: "c1cef2704e1fcd44953f70cdde726d584a09b4dab2ad4622783deabc6f64caf5"
+    sha256 cellar: :any,                 arm64_big_sur:  "98047f6136ad8b68370755021b1e127e60b5050a6a5b903c68943527b28ecfae"
+    sha256 cellar: :any,                 monterey:       "2f324b4dd203182d4f6b4944ce69d62bcf0720365e19a77903d4829570a6b6a9"
+    sha256 cellar: :any,                 big_sur:        "e9b1241f3d1d0f3b78d129ee8bd863eaaa42db2b6bfa74c5d53b419d47cfd331"
+    sha256 cellar: :any,                 catalina:       "d9900fff146db8cf036730fa0ac5c6cbed48c9ea362e91875dcd3393f30093cc"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "551b9eac56f835c4b4a210be82d30dd2692018967c236b50bc0697820c1a7515"
   end
 
   depends_on "gcc" # for gfortran
+
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+  end
 
   def install
     system "./configure", "--disable-dependency-tracking", "--enable-shared",

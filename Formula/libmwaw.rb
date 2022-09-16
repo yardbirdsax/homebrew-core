@@ -1,22 +1,26 @@
 class Libmwaw < Formula
   desc "Library for converting legacy Mac document formats"
   homepage "https://sourceforge.net/p/libmwaw/wiki/Home/"
-  url "https://downloads.sourceforge.net/project/libmwaw/libmwaw/libmwaw-0.3.17/libmwaw-0.3.17.tar.xz"
-  sha256 "8e1537eb1de1b4714f4bf0a20478f342c5d71a65bf99307a694b1e9e30bb911c"
+  url "https://downloads.sourceforge.net/project/libmwaw/libmwaw/libmwaw-0.3.21/libmwaw-0.3.21.tar.xz"
+  sha256 "e8750123a78d61b943cef78b7736c8a7f20bb0a649aa112402124fba794fc21c"
   license any_of: ["LGPL-2.1-or-later", "MPL-2.0"]
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "36820eedbe0a09fdb594c065effba926ef287dae4ffe1f141a2a55615c46d4e2"
-    sha256 cellar: :any, big_sur:       "a070c58f39b1cec0e17145f3c48ab2f42c6d4cfb3b6d1f10d55d6f215b725c7f"
-    sha256 cellar: :any, catalina:      "807cff54beea1a3e68897da872ba18fcff59a6f617d46080beb95c769c97db2f"
-    sha256 cellar: :any, mojave:        "2c2d73c68fd3b5f0b3b1c028fda9900d9c75589e498b16bf275eafc3f414c8ab"
-    sha256 cellar: :any, high_sierra:   "7d29c815ecf0f72bc8623a1b13fc5d8e6786b54dd27609490ed75b720cdd5d90"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "6ffaa69023d1fb57fea42045e747e6df08336b1f00277fd1697c4480523533df"
+    sha256 cellar: :any,                 arm64_big_sur:  "a4c331f83eb77f6bd74a828f984c376be9a916e7671946e299f7aeb347562d02"
+    sha256 cellar: :any,                 monterey:       "d20dccf2c767fceea530bc66a1c0c1631a8961245d627ef806b060781bc7f4b4"
+    sha256 cellar: :any,                 big_sur:        "75d8edfd8ec17fdb6ca028ef30d183200539d8a47165fe0debfe27827eb4d081"
+    sha256 cellar: :any,                 catalina:       "4966ab87822fed4a14a231116d3c4f84e17b40b1e632e353d0161976e4b151cd"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "646ae7bc535dc1b1ee19ce42ee1a438ea4adde05af0fb873048f41af857e108b"
   end
 
   depends_on "pkg-config" => :build
   depends_on "librevenge"
 
-  resource "test_document" do
+  fails_with gcc: "5"
+
+  resource "homebrew-test_document" do
     url "https://github.com/openpreserve/format-corpus/raw/825c8a5af012a93cf7aac408b0396e03a4575850/office-examples/Old%20Word%20file/NEWSSLID.DOC"
     sha256 "df0af8f2ae441f93eb6552ed2c6da0b1971a0d82995e224b7663b4e64e163d2b"
   end
@@ -30,7 +34,7 @@ class Libmwaw < Formula
   end
 
   test do
-    testpath.install resource("test_document")
+    testpath.install resource("homebrew-test_document")
     # Test ID on an actual office document
     assert_equal shell_output("#{bin}/mwawFile #{testpath}/NEWSSLID.DOC").chomp,
                  "#{testpath}/NEWSSLID.DOC:Microsoft Word 2.0[pc]"

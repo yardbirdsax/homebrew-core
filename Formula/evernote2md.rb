@@ -1,21 +1,23 @@
 class Evernote2md < Formula
   desc "Convert Evernote .enex file to Markdown"
   homepage "https://github.com/wormi4ok/evernote2md"
-  url "https://github.com/wormi4ok/evernote2md/archive/v0.14.0.tar.gz"
-  sha256 "9dcdd838ac6a260c4a96345f6e0927dd0254c01272023976a58ca714d61f49da"
+  url "https://github.com/wormi4ok/evernote2md/archive/v0.18.0.tar.gz"
+  sha256 "504643760dae72c6cb92d2d47c57bcd5abd9c387cb6a8905bd37d0701a667337"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "3f817932a1968881fd29c64da832be7bc04bbe497d8270ca6a357f382b004b85"
-    sha256 cellar: :any_skip_relocation, big_sur:       "6b4898185aa1fabed60a737dc2d9e87b516d58e7790fd870dab3bd7fd326dacb"
-    sha256 cellar: :any_skip_relocation, catalina:      "545d63ce9af061e6e54d9eb8ac0cb17fafbd56c499b9360a39ad227c736d792f"
-    sha256 cellar: :any_skip_relocation, mojave:        "8a30f1809b722ebb7b2a923e8b34941a6341e19c0c9adf520335e43ebfc20428"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "11d45306252f1dd5bbd7ded3115ccfdba6740cb67fdad70bd5bbcbd83cdceef1"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "1557c34b5e7cca74b6dd60bf27658a93b87b38f4bad245686239fc82eac582bf"
+    sha256 cellar: :any_skip_relocation, monterey:       "a45395b345cc446d72afc9fa47fca285e2807cc8465cf5b85bf5631ed0fc6825"
+    sha256 cellar: :any_skip_relocation, big_sur:        "43005070722194a3f73833d5b2e53a371ce58ebcf0b70e5641929604df30e695"
+    sha256 cellar: :any_skip_relocation, catalina:       "73976d8face6a9cdebc8796b70370fa79eb464d77bf16dab3c2c03f81e309c7c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "bb9a0064b54faba9d18b94bdb751e04ddbef1808d0f66e205aa12ae506a288e7"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", *std_go_args, "-ldflags", "-s -w -X main.version=#{version}"
+    system "go", "build", *std_go_args(ldflags: "-s -w -X main.version=#{version}")
   end
 
   test do

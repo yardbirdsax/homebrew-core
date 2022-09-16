@@ -1,25 +1,34 @@
 class Procs < Formula
   desc "Modern replacement for ps written by Rust"
   homepage "https://github.com/dalance/procs"
-  url "https://github.com/dalance/procs/archive/v0.11.3.tar.gz"
-  sha256 "bf56fde52d0f6544a2ca3db6d4552867e5cf9daf1c5a31f8b3ad6e3258986b0f"
+  url "https://github.com/dalance/procs/archive/v0.13.0.tar.gz"
+  sha256 "77642878d503f876db05d99a620c8c91834354a074bf71ab65474aa433f75fc5"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "3008bb790329683036c24cf85abe1088f6058db3a3eb54e033a42f24878df0aa"
-    sha256 cellar: :any_skip_relocation, big_sur:       "94ee0bcfdb8ff6a0aa12591593a8b70a0f77cc5a2b7159bd34d34b34bff92a61"
-    sha256 cellar: :any_skip_relocation, catalina:      "74096d5074fa5171235dbeef0d8ba9c227f6da4128b9094e393651795bd20a8f"
-    sha256 cellar: :any_skip_relocation, mojave:        "38eb93c5e9ecb2b684fee7bbc9c7e479f72df7e4799b202891a7158ae53ea02b"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "17e8bfdcbda59e63ebb95355cab2f68610c8dc2f7431f0bccdfdc8bdbf741a81"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "eb3fdbbe55e7addc2f10cb058a124475cc5b8851c5e323aa565b6a64e0baba03"
+    sha256 cellar: :any_skip_relocation, monterey:       "8cca4cf1b843200f8b0a6d2bd935ca647ed74242490ac57ebfebaada3c6b1037"
+    sha256 cellar: :any_skip_relocation, big_sur:        "f2d0e607ad4e282ba9d529f261ba99b2c059323e23e7ba726c8e07fd44f9b560"
+    sha256 cellar: :any_skip_relocation, catalina:       "577d41ffda4ab435ed507fc80c566b0184f230776c813dc84bbada1b32fbe7a2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cd5e9324e8dae71349ee60cff89b8e17fb314befd104c7b667fd5c50d1fc8230"
   end
 
   depends_on "rust" => :build
 
   def install
     system "cargo", "install", *std_cargo_args
+
+    system bin/"procs", "--completion", "bash"
+    system bin/"procs", "--completion", "fish"
+    system bin/"procs", "--completion", "zsh"
+    bash_completion.install "procs.bash" => "procs"
+    fish_completion.install "procs.fish"
+    zsh_completion.install "_procs"
   end
 
   test do
-    output = shell_output("#{bin}/procs")
+    output = shell_output(bin/"procs")
     count = output.lines.count
     assert count > 2
     assert output.start_with?(" PID:")

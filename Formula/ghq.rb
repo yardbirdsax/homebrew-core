@@ -2,17 +2,18 @@ class Ghq < Formula
   desc "Remote repository management made easy"
   homepage "https://github.com/x-motemen/ghq"
   url "https://github.com/x-motemen/ghq.git",
-      tag:      "v1.1.5",
-      revision: "f5ac3e5655ced9bf3aee2690a2aaa43431cc567f"
+      tag:      "v1.3.0",
+      revision: "ccbbc18efc1802a5f9bf50d9fbb6b8b020c3f8f7"
   license "MIT"
-  head "https://github.com/x-motemen/ghq.git"
+  head "https://github.com/x-motemen/ghq.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "4b20b63da37b5c05ef8b0da54015a6f16fa08d43ed32920cd980b8243be22967"
-    sha256 cellar: :any_skip_relocation, big_sur:       "65c3fa300e2dc1f8e20634feb2acb60b7ba2ee9aa17a87dab39acafd4869246d"
-    sha256 cellar: :any_skip_relocation, catalina:      "247f4e7b0964b0a27321b24ae06349d9eac65280345dda17680fa8049c29ac75"
-    sha256 cellar: :any_skip_relocation, mojave:        "a863be3a3b307c82821d0dbed2d4d1faa05aaea9c6dd150d7b3f2a878e4bd79c"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "060f3bc0d7b55e04274383faa21b45e8d8457ca61e25fd3416b2fe0d3177036b"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "0c3c4b22cb50e06c75b1a268a9e5c83560277595e32aa706c67e9b5d21400b60"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "daf8e475bcb2917e46f6988e3656e0f700b5501fbaa60d5a793d1a2875f9144f"
+    sha256 cellar: :any_skip_relocation, monterey:       "38d099e4a5a7e67edd8e4a3be8f4f44e6eff4d157d9f00595298c80e48c6b593"
+    sha256 cellar: :any_skip_relocation, big_sur:        "2c141aa554879fbe830f03cda0e833e4f3a4c0f77864938168594c6aa7b6515a"
+    sha256 cellar: :any_skip_relocation, catalina:       "d7c8f6c1b6d5d65f4547e91054f5c3d15a96e25487e34d62cb26dfcf80388424"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "82c795523276c88efd6b43e2946d6f2c25339f341b58eda93c63596ac31977f8"
   end
 
   depends_on "go" => :build
@@ -22,7 +23,6 @@ class Ghq < Formula
     bin.install "ghq"
     bash_completion.install "misc/bash/_ghq" => "ghq"
     zsh_completion.install "misc/zsh/_ghq"
-    prefix.install_metafiles
   end
 
   test do

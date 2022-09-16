@@ -1,15 +1,17 @@
 class Gleam < Formula
   desc "✨ A statically typed language for the Erlang VM"
   homepage "https://gleam.run"
-  url "https://github.com/gleam-lang/gleam/archive/v0.13.2.tar.gz"
-  sha256 "731c09bdfd02bb9c16ca77929c838a4ebe3430704050a982eeac114b68a46551"
+  url "https://github.com/gleam-lang/gleam/archive/v0.22.1.tar.gz"
+  sha256 "99f885f706e6410f7857bed04c3599867f6f3d5fed304dfeab17488b49bf73a7"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "507e4e923dbd2360124ab6753a8091427a0ce84bf95d66911d82b31d57dad697"
-    sha256 cellar: :any_skip_relocation, big_sur:       "55010c559d4fbbe94940136eb1667fb3b67c79bd213e17c7b30d15499055e4ed"
-    sha256 cellar: :any_skip_relocation, catalina:      "3469ba547cef8f9ff75f009e80861f5e7710d237a8cc7ebfc5b575f8edee7e6d"
-    sha256 cellar: :any_skip_relocation, mojave:        "41f34ecdf5ffacfc732a6685bba365a43e15cab4ba21679b9ae5a86ba0eea460"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "3ba8442554f7582d737829121ef96397214212f31c2b62b3de352b9d33de86d8"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f9ff99bedcc22eac4c684599cef69e5bccc9b649bfed256a73c068c475344e67"
+    sha256 cellar: :any_skip_relocation, monterey:       "de4c1cf9ca5a644dd6873260faeaf815f0d86463f2e0c355f982944862807f0e"
+    sha256 cellar: :any_skip_relocation, big_sur:        "19da8411c7e57db14af62eff4131621b9a0118edeffb7c3d57fc34f4caea7a2e"
+    sha256 cellar: :any_skip_relocation, catalina:       "b16efc6390fcf47ddf26286a95a76ff19ec6016ebf50617b1b29aca1cf38dd96"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f295158e2f75d0257fbe58a661cdf4a5336117a50efd57f68fd7f7ce2af8057a"
   end
 
   depends_on "rust" => :build
@@ -21,13 +23,13 @@ class Gleam < Formula
   end
 
   def install
-    system "cargo", "install", *std_cargo_args
+    system "cargo", "install", *std_cargo_args(path: "compiler-cli")
   end
 
   test do
     Dir.chdir testpath
-    system "#{bin}/gleam", "new", "test_project"
+    system bin/"gleam", "new", "test_project"
     Dir.chdir "test_project"
-    system "rebar3", "eunit"
+    system "gleam", "test"
   end
 end

@@ -1,22 +1,24 @@
 class Nfpm < Formula
   desc "Simple deb and rpm packager"
   homepage "https://nfpm.goreleaser.com/"
-  url "https://github.com/goreleaser/nfpm/archive/v2.2.3.tar.gz"
-  sha256 "8e5143d732d49dbd02ef8f778de5bbb6ca16cb9f91843f9c401596f73c1c4294"
+  url "https://github.com/goreleaser/nfpm/archive/v2.18.1.tar.gz"
+  sha256 "b11544236307cc90b105ffcffccd020b0825eab7046bd1b72d983ae035bbe420"
   license "MIT"
-  head "https://github.com/goreleaser/nfpm.git"
+  head "https://github.com/goreleaser/nfpm.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "b5865bf3035ba42cf8006693de37fa8186ce9a1b9bff4e747023f6e046e84b44"
-    sha256 cellar: :any_skip_relocation, big_sur:       "402e53dc2b7b5862650700d448d892a2871520824f1cff960c49a71024e2c2c9"
-    sha256 cellar: :any_skip_relocation, catalina:      "1adb3b0950732117f0fde089b6be96688d90f2d5bc69322fa77c45559a481b8a"
-    sha256 cellar: :any_skip_relocation, mojave:        "f443bac7b2f5fac7623ef365a9629c35321d83f48c374212356e847d410d3feb"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "decea9b1522190b80a904838ddc5082aa27098e43ccef90dfe91837ca485bc2d"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e24283fb0b2b6e5b50038ce859c553cfe6458a21dd9820e14c530c17c82344a9"
+    sha256 cellar: :any_skip_relocation, monterey:       "c87da0d2ad1f57a580f8d23db6e7a538640b1f627d7462ed2157ac4e6b0df228"
+    sha256 cellar: :any_skip_relocation, big_sur:        "372fd9a8d4afd15820bde3bd02b1ba75e871f04844999c4eb579ba7f771af5c8"
+    sha256 cellar: :any_skip_relocation, catalina:       "8d9e505951f321315d632e3b6d1b1a7b7c593ec3d0eb61694642ad779d3eee97"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c7d4a6a29ca2b2c3f3947de1b396cf0f8b32f25988372a62089f2d1202eecc20"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", "-ldflags", "-X main.version=v#{version}", *std_go_args, "./cmd/nfpm"
+    system "go", "build", *std_go_args(ldflags: "-X main.version=v#{version}"), "./cmd/nfpm"
   end
 
   test do

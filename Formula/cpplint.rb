@@ -3,18 +3,20 @@ class Cpplint < Formula
 
   desc "Static code checker for C++"
   homepage "https://pypi.org/project/cpplint/"
-  url "https://files.pythonhosted.org/packages/3c/2d/9867b195c5c9b427e07cfeeb982c56086c00bca13c560e093e4133775635/cpplint-1.5.4.tar.gz"
-  sha256 "c5d70711f06a7a8bfdc09bd7a19c13e114e009a70c8dc16caad1e5f0d2f3cc71"
+  url "https://files.pythonhosted.org/packages/18/72/ea0f4035bcf35d8f8df053657d7f3370d56ff4d4e6617021b6544b9958d4/cpplint-1.6.1.tar.gz"
+  sha256 "d430ce8f67afc1839340e60daa89e90de08b874bc27149833077bba726dfc13a"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "2e90a23cdf7c41fc41541d8ce4716eccae1fb9de74acb4a0c43027532eb8772c"
-    sha256 cellar: :any_skip_relocation, big_sur:       "e9294810d16c29dc48b4cfb5c2100c031bed1afa1e2dca8c69914e2ea3b2bb75"
-    sha256 cellar: :any_skip_relocation, catalina:      "f6e997327f819be03b1bed333bd633463a752cd97fd381b3e837ad07d4583273"
-    sha256 cellar: :any_skip_relocation, mojave:        "a0436c4fb92a6727d44692c399fc572c176c8f85c051e5b98c57ab01ec5f51c9"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "b5e4909f4e4f917b642a3f3fbca24eac07a1fa383bff44d3f8f8a789c71b8425"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b5e4909f4e4f917b642a3f3fbca24eac07a1fa383bff44d3f8f8a789c71b8425"
+    sha256 cellar: :any_skip_relocation, monterey:       "e453098f9d51ea4ea5869aafc40ad7601ecb01476021008830529a5c463d6689"
+    sha256 cellar: :any_skip_relocation, big_sur:        "e453098f9d51ea4ea5869aafc40ad7601ecb01476021008830529a5c463d6689"
+    sha256 cellar: :any_skip_relocation, catalina:       "e453098f9d51ea4ea5869aafc40ad7601ecb01476021008830529a5c463d6689"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "88f63a058d78a8f2fb9434afb9760c46d879316ac8d577730e1eb77df7f107ff"
   end
 
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   def install
     virtualenv_install_with_resources

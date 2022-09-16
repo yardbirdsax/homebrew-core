@@ -1,23 +1,33 @@
 class Tgui < Formula
   desc "GUI library for use with sfml"
   homepage "https://tgui.eu"
-  url "https://github.com/texus/TGUI/archive/v0.8.8.tar.gz"
-  sha256 "a00e34eea7dc584211b2ebbfabc026af7c261d7935c32ca77fd90ed7a6c85230"
+  url "https://github.com/texus/TGUI/archive/v0.9.5.tar.gz"
+  sha256 "819865bf13661050161bce1e1ad68530a1f234becd3358c96d8701ea4e76bcc1"
   license "Zlib"
 
   bottle do
-    sha256 cellar: :any, big_sur:     "444fd41c767dee6a1c372d282aec98f42f5056a0940f33cc57272cb2b9cf9cd9"
-    sha256 cellar: :any, catalina:    "195afefa361330ca0a2ff5c582162bb1c7b4a55e32c3454bbece2d6053e52872"
-    sha256 cellar: :any, mojave:      "2ee5a851b200d21f8c70bb82daaef342c9d0d2f8dee94c143855a55f6b6a29a9"
-    sha256 cellar: :any, high_sierra: "3272f8d3194ed5a1f55503ac524d67dd03cabb80f6ac7aa8aeee43f322a3db08"
+    sha256 cellar: :any,                 arm64_monterey: "b9df36b637acb021e6a48820d3bfc8fd8921ce2bc6e1098cbfe0020481bafdb3"
+    sha256 cellar: :any,                 arm64_big_sur:  "fc9b9d68d0eb79c88f04a936c4e2bb28c76ecf70aeadb8eb4d0397f15bf03337"
+    sha256 cellar: :any,                 monterey:       "ae814b6976689b902356e4aad9ded09431ca45ba37ab33283a4c2156591e61d9"
+    sha256 cellar: :any,                 big_sur:        "4295dbcf07ac7e2b2c3253823ea1743252db212ee81f5feddbf8ff1c14183ff1"
+    sha256 cellar: :any,                 catalina:       "bf8e0820e7909e78a7c758ba3fc745dd2b3dd1e226451a855d90b642fdf26b5a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4bce36f7002bb1e2c81842cd7c683d3a5678b22f18ab8ab6636e97836ae4270d"
   end
 
   depends_on "cmake" => :build
   depends_on "sfml"
 
   def install
-    system "cmake", ".", *std_cmake_args,
-                    "-DTGUI_MISC_INSTALL_PREFIX=#{pkgshare}"
+    args = std_cmake_args + %W[
+      -DTGUI_MISC_INSTALL_PREFIX=#{pkgshare}
+      -DTGUI_BUILD_FRAMEWORK=FALSE
+      -DTGUI_BUILD_EXAMPLES=TRUE
+      -DTGUI_BUILD_GUI_BUILDER=TRUE
+      -DTGUI_BUILD_TESTS=FALSE
+      -DCMAKE_INSTALL_RPATH=#{rpath}
+    ]
+
+    system "cmake", ".", *args
     system "make", "install"
   end
 

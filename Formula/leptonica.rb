@@ -1,9 +1,10 @@
 class Leptonica < Formula
   desc "Image processing and image analysis library"
   homepage "http://www.leptonica.org/"
-  url "http://www.leptonica.org/source/leptonica-1.80.0.tar.gz"
-  sha256 "ec9c46c2aefbb960fb6a6b7f800fe39de48343437b6ce08e30a8d9688ed14ba4"
+  url "http://www.leptonica.org/source/leptonica-1.82.0.tar.gz"
+  sha256 "155302ee914668c27b6fe3ca9ff2da63b245f6d62f3061c8f27563774b8ae2d6"
   license "BSD-2-Clause"
+  revision 1
 
   livecheck do
     url "http://www.leptonica.org/download.html"
@@ -11,30 +12,26 @@ class Leptonica < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "2d7db56dad646ed732585242e50716dd3152882d16811f72a86de11ea651e0d8"
-    sha256 cellar: :any, big_sur:       "7cdcfbb0616b884ace6657b1a009f874ac249bf7c38e08ec8b43217584968e64"
-    sha256 cellar: :any, catalina:      "2772ab6d50bb48132db5bf6d2d7b4086058635c060392dc375b23769513ebca7"
-    sha256 cellar: :any, mojave:        "b6503796ec87ac555bb4c5278aa3c8bf6b5ef3c88d66da9a040c04e0cafdcade"
-    sha256 cellar: :any, high_sierra:   "01c2fe703b082f830fffec5f1d21d50d41c1c30967cb74e1bc0b744dcb72d50d"
+    sha256 cellar: :any,                 arm64_monterey: "f12078d1dd4aaeaad14a7f83e3fc80531b44c5468db5e4de2ac7e7e15c05b2ae"
+    sha256 cellar: :any,                 arm64_big_sur:  "7149a71af47d2c56ee6d42b3bfbbd3e1acd028b5d88c06fd12ba9f53b8bce25d"
+    sha256 cellar: :any,                 monterey:       "d38cfdaa7ef6c06742a68619a4a6ff1832693fc5a3fc17326e5ada7562a64232"
+    sha256 cellar: :any,                 big_sur:        "7f3cf712964bbdfdda8f2bb6ce5c6b72c2e60155fc0ed3e61f1b67b2a168dfd6"
+    sha256 cellar: :any,                 catalina:       "fc3413c1bdc6e0fa60fa3b1a0c1cc5106f5c963f3f9322171f9ae5fd87a15a9e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "fe46f8ffbba3c0447d13174be795b0052510b7000a1aeee5b237f585334365c1"
   end
 
   depends_on "pkg-config" => :build
   depends_on "giflib"
-  depends_on "jpeg"
+  depends_on "jpeg-turbo"
   depends_on "libpng"
   depends_on "libtiff"
   depends_on "openjpeg"
   depends_on "webp"
 
   def install
-    args = %W[
-      --disable-dependency-tracking
-      --prefix=#{prefix}
-      --with-libwebp
-      --with-libopenjpeg
-    ]
-
-    system "./configure", *args
+    system "./configure", *std_configure_args,
+                          "--with-libwebp",
+                          "--with-libopenjpeg"
     system "make", "install"
   end
 
@@ -44,7 +41,7 @@ class Leptonica < Formula
       #include <leptonica/allheaders.h>
 
       int main(int argc, char **argv) {
-          std::fprintf(stdout, "%d.%d.%d", LIBLEPT_MAJOR_VERSION, LIBLEPT_MINOR_VERSION, LIBLEPT_PATCH_VERSION);
+          fprintf(stdout, "%d.%d.%d", LIBLEPT_MAJOR_VERSION, LIBLEPT_MINOR_VERSION, LIBLEPT_PATCH_VERSION);
           return 0;
       }
     EOS

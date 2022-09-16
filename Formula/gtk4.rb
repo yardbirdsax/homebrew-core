@@ -1,9 +1,9 @@
 class Gtk4 < Formula
   desc "Toolkit for creating graphical user interfaces"
   homepage "https://gtk.org/"
-  url "https://download.gnome.org/sources/gtk/4.0/gtk-4.0.2.tar.xz"
-  sha256 "626707ac6751426ed76fed49c5b2d052dfee45757ce3827088ba87ca7f1dbc84"
-  license "LGPL-2.0-or-later"
+  url "https://download.gnome.org/sources/gtk/4.8/gtk-4.8.0.tar.xz"
+  sha256 "c8d6203437d1e359d83124dc591546d403f67e3b00544e53dd50a9baacdcbd7f"
+  license "LGPL-2.1-or-later"
 
   livecheck do
     url :stable
@@ -11,14 +11,17 @@ class Gtk4 < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "1159bfb49111f3507fbab1220a90d1cbb01ca8a2529c4db0ea3d511e6a731f41"
-    sha256 big_sur:       "b6abf6800954f62aec5a7247a3e9770b369a928e1218fdd38f4032fc7c010859"
-    sha256 catalina:      "3a910d30c4e69c6cbfc8e205843567a14fe9627b359b7414e9eba310d87cf87e"
-    sha256 mojave:        "5f8c723029b787a4d579eebd225b9e26d97e7b81b6f88e945693fe68dd836a97"
+    sha256 arm64_monterey: "54b8e7f50a5832fd99912759228130168bf5cb9a591f18d13b39118868c5b17b"
+    sha256 arm64_big_sur:  "d9693f95cda78f4e9ce38b760ade183830d5824e5b5e8f74a688a402e05c373a"
+    sha256 monterey:       "fa806df7647e05bbe2c3b63c4796de1f14023d1a9fc6e9d3f3aeb323ecf0f30d"
+    sha256 big_sur:        "ee8ebb1cbfd841b6fd72962d9fe6a9f099fc0d0858390da02398c54105360c02"
+    sha256 catalina:       "79914b9e2c7a76a85eaa2573f9ea9b174004d9468b2de1d35e2a0326d033c09f"
+    sha256 x86_64_linux:   "cab3ca11b6d523854e92782c4eefe03c9c38d2f5b370b1ddf01b6f2cffc4deff"
   end
 
   depends_on "docbook" => :build
   depends_on "docbook-xsl" => :build
+  depends_on "docutils" => :build
   depends_on "gobject-introspection" => :build
   depends_on "meson" => :build
   depends_on "ninja" => :build
@@ -28,23 +31,35 @@ class Gtk4 < Formula
   depends_on "glib"
   depends_on "graphene"
   depends_on "hicolor-icon-theme"
+  depends_on "jpeg-turbo"
   depends_on "libepoxy"
+  depends_on "libpng"
+  depends_on "libtiff"
   depends_on "pango"
 
   uses_from_macos "libxslt" => :build # for xsltproc
+  uses_from_macos "cups"
+
+  on_linux do
+    depends_on "libxcursor"
+    depends_on "libxkbcommon"
+  end
 
   def install
-    args = std_meson_args + %w[
-      -Dx11-backend=false
-      -Dmacos-backend=true
+    args = %w[
       -Dgtk_doc=false
       -Dman-pages=true
       -Dintrospection=enabled
       -Dbuild-examples=false
       -Dbuild-tests=false
+      -Dmedia-gstreamer=disabled
     ]
 
-    args << "-Dprint-cups=disabled" if MacOS.version <= :mojave
+    if OS.mac?
+      args << "-Dx11-backend=false"
+      args << "-Dmacos-backend=true"
+      args << "-Dprint-cups=disabled" if MacOS.version <= :mojave
+    end
 
     # ensure that we don't run the meson post install script
     ENV["DESTDIR"] = "/"
@@ -52,17 +67,18 @@ class Gtk4 < Formula
     # Find our docbook catalog
     ENV["XML_CATALOG_FILES"] = "#{etc}/xml/catalog"
 
-    mkdir "build" do
-      system "meson", *args, ".."
-      system "ninja", "-v"
-      system "ninja", "install", "-v"
-    end
+    # Disable asserts and cast checks explicitly
+    ENV.append "CPPFLAGS", "-DG_DISABLE_ASSERT -DG_DISABLE_CAST_CHECKS"
+
+    system "meson", *std_meson_args, "build", *args
+    system "meson", "compile", "-C", "build", "-v"
+    system "meson", "install", "-C", "build"
   end
 
   def post_install
     system "#{Formula["glib"].opt_bin}/glib-compile-schemas", "#{HOMEBREW_PREFIX}/share/glib-2.0/schemas"
     system bin/"gtk4-update-icon-cache", "-f", "-t", "#{HOMEBREW_PREFIX}/share/icons/hicolor"
-    system "#{Formula["glib"].opt_bin}/gio-querymodules #{HOMEBREW_PREFIX}/lib/gtk-4.0/4.0.0/immodules.cache"
+    system "#{Formula["glib"].opt_bin}/gio-querymodules", "#{HOMEBREW_PREFIX}/lib/gtk-4.0/4.0.0/printbackends"
   end
 
   test do
@@ -74,6 +90,7 @@ class Gtk4 < Formula
         return 0;
       }
     EOS
+    ENV.prepend_path "PKG_CONFIG_PATH", Formula["jpeg-turbo"].opt_lib/"pkgconfig"
     flags = shell_output("#{Formula["pkg-config"].opt_bin}/pkg-config --cflags --libs gtk4").strip.split
     system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"

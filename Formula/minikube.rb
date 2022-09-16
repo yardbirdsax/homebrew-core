@@ -2,15 +2,18 @@ class Minikube < Formula
   desc "Run a Kubernetes cluster locally"
   homepage "https://minikube.sigs.k8s.io/"
   url "https://github.com/kubernetes/minikube.git",
-      tag:      "v1.17.1",
-      revision: "043bdca07e54ab6e4fc0457e3064048f34133d7e"
+      tag:      "v1.26.1",
+      revision: "62e108c3dfdec8029a890ad6d8ef96b6461426dc"
   license "Apache-2.0"
-  head "https://github.com/kubernetes/minikube.git"
+  head "https://github.com/kubernetes/minikube.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, big_sur:  "645cc05655411bddc944818278eca867049e7e2712411dd79028f404ed83d08a"
-    sha256 cellar: :any_skip_relocation, catalina: "4d5263bf35d8800cec7c820f6efcb32fac1677627f21954888b97daedbeeb7a1"
-    sha256 cellar: :any_skip_relocation, mojave:   "0edb5f37a1d108806f20966b02a0cb805e69f285a8b00ece64f1e0dad42449e6"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "ae9660e6a96289bfe9c3c8ab6e8e313fcfd46661710b2e77ba75ca315f5648a3"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "78b706d37a0a265df8a83898eaf0cb511d78b2153669d39a2c2f751a72c8edb7"
+    sha256 cellar: :any_skip_relocation, monterey:       "2bdf472a85208242313060def43b69c79c4571325076e6854d798442cf35a826"
+    sha256 cellar: :any_skip_relocation, big_sur:        "22f479980e0b8c0c0b2857246f8b498f7c0758896ba19d167698b122cc69da6c"
+    sha256 cellar: :any_skip_relocation, catalina:       "445bed958a7af5a8a77914f02c00c80eb94fd8cb6761789057e4b5fc4b4ec313"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6a8b5e593170c5a4eb520dfa86d7b77ed3781f085a5aaa2eead83c31b774534f"
   end
 
   depends_on "go" => :build
@@ -21,11 +24,7 @@ class Minikube < Formula
     system "make"
     bin.install "out/minikube"
 
-    output = Utils.safe_popen_read("#{bin}/minikube", "completion", "bash")
-    (bash_completion/"minikube").write output
-
-    output = Utils.safe_popen_read("#{bin}/minikube", "completion", "zsh")
-    (zsh_completion/"_minikube").write output
+    generate_completions_from_executable(bin/"minikube", "completion")
   end
 
   test do

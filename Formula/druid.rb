@@ -1,9 +1,9 @@
 class Druid < Formula
   desc "High-performance, column-oriented, distributed data store"
   homepage "https://druid.apache.org/"
-  url "https://www.apache.org/dyn/closer.lua?path=druid/0.20.1/apache-druid-0.20.1-bin.tar.gz"
-  mirror "https://archive.apache.org/dist/druid/0.20.1/apache-druid-0.20.1-bin.tar.gz"
-  sha256 "9ed9f0b4090043ed7daf73d8a1a9bfa068be7a418967d88df78ad94209b835f4"
+  url "https://dlcdn.apache.org/druid/0.23.0/apache-druid-0.23.0-bin.tar.gz"
+  mirror "https://archive.apache.org/dist/druid/0.23.0/apache-druid-0.23.0-bin.tar.gz"
+  sha256 "6a00187fb6eaf7fa03148b01900bc92302fff9c809c02ae7584029c1c028d3d4"
   license "Apache-2.0"
 
   livecheck do
@@ -11,14 +11,21 @@ class Druid < Formula
     regex(/href=.*?druid[._-]v?(\d+(?:\.\d+)+)-bin\.t/i)
   end
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "13c6d41fb0acc0f371666d0dd274bc42d2b3dd8ecd863f0c8f25699df8b59870"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "13c6d41fb0acc0f371666d0dd274bc42d2b3dd8ecd863f0c8f25699df8b59870"
+    sha256 cellar: :any_skip_relocation, monterey:       "331bc1799f1dc1d2aa11314b60b6a9ad296a29048ffdff6627052b34c3fee9c6"
+    sha256 cellar: :any_skip_relocation, big_sur:        "331bc1799f1dc1d2aa11314b60b6a9ad296a29048ffdff6627052b34c3fee9c6"
+    sha256 cellar: :any_skip_relocation, catalina:       "331bc1799f1dc1d2aa11314b60b6a9ad296a29048ffdff6627052b34c3fee9c6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "13c6d41fb0acc0f371666d0dd274bc42d2b3dd8ecd863f0c8f25699df8b59870"
+  end
 
   depends_on "zookeeper" => :test
-  depends_on "openjdk@8"
+  depends_on "openjdk@11"
 
-  resource "mysql-metadata-storage" do
-    url "http://static.druid.io/artifacts/releases/mysql-metadata-storage-0.12.3.tar.gz"
-    sha256 "8ee27e3c7906abcd401cfd59072602bd1f83828b66397ae2cf2c3ff0e1860162"
+  resource "mysql-connector-java" do
+    url "https://search.maven.org/remotecontent?filepath=mysql/mysql-connector-java/5.1.49/mysql-connector-java-5.1.49.jar"
+    sha256 "5bba9ff50e5e637a0996a730619dee19ccae274883a4d28c890d945252bb0e12"
   end
 
   def install
@@ -38,16 +45,16 @@ class Druid < Formula
       s.gsub! "nohup $JAVA", "nohup $JAVA -Ddruid.extensions.directory=\"#{libexec}/extensions\""
       s.gsub! ":=lib", ":=#{libexec}/lib"
       s.gsub! ":=conf/druid", ":=#{libexec}/conf/druid"
-      s.gsub! ":=log", ":=#{var}/druid/log"
+      s.gsub! ":=${WHEREAMI}/log", ":=#{var}/druid/log"
       s.gsub! ":=var/druid/pids", ":=#{var}/druid/pids"
     end
 
-    resource("mysql-metadata-storage").stage do
+    resource("mysql-connector-java").stage do
       (libexec/"extensions/mysql-metadata-storage").install Dir["*"]
     end
 
     bin.install Dir["#{libexec}/bin/*.sh"]
-    bin.env_script_all_files libexec/"bin", Language::Java.overridable_java_home_env("1.8")
+    bin.env_script_all_files libexec/"bin", Language::Java.overridable_java_home_env("11")
 
     Pathname.glob("#{bin}/*.sh") do |file|
       mv file, bin/"druid-#{file.basename}"
@@ -78,9 +85,11 @@ class Druid < Formula
       pid = fork { exec bin/"druid-broker.sh", "start" }
       sleep 40
       output = shell_output("curl -s http://localhost:8082/status")
-      assert_match /version/m, output
+      assert_match "version", output
     ensure
       system bin/"druid-broker.sh", "stop"
+      # force zookeeper stop since it is sometimes still alive after druid-broker.sh finishes
+      system Formula["zookeeper"].opt_bin/"zkServer", "stop"
       Process.wait pid
     end
   end

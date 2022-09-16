@@ -1,21 +1,21 @@
 class Googletest < Formula
   desc "Google Testing and Mocking Framework"
   homepage "https://github.com/google/googletest"
-  url "https://github.com/google/googletest/archive/release-1.10.0.tar.gz"
-  sha256 "9dc9157a9a1551ec7a7e43daea9a694a0bb5fb8bec81235d8a1e6ef64c716dcb"
+  url "https://github.com/google/googletest/archive/release-1.12.1.tar.gz"
+  sha256 "81964fe578e9bd7c94dfdb09c8e4d6e6759e19967e397dbea48d1c10e45d0df2"
   license "BSD-3-Clause"
+  revision 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "b31c1f09e496782c536ece5a805b12e7d5db3250bf89657d55885366c37bb6df"
-    sha256 cellar: :any_skip_relocation, big_sur:       "66021a83c2dfe2a3baba769a76babde2f7224e9d6b555d8909995765bc555231"
-    sha256 cellar: :any_skip_relocation, catalina:      "f9819a67ff4c54bfde932f1d83d9db44f8ca0e7b65e77dd812d4f71931d3deed"
-    sha256 cellar: :any_skip_relocation, mojave:        "58f238b7d2fea41af22c3e4bc6b52d79510c84adba6b6145f548a248a2687f16"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "e8d15f600c78e4189affaf098ac674308eb67c9dca60e2f64f2b8eefd4b82d05"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5e72dd7898776d58f31b6ed5b487d95a08e38b75a1bff696d5e622724633c880"
+    sha256 cellar: :any_skip_relocation, monterey:       "59e79a6ad6278dd1a0ffba9f65067ff8e2095d4599da64c632de2f4b5f3db00e"
+    sha256 cellar: :any_skip_relocation, big_sur:        "e35fd9bd800c8ffe070c021c374ef889ec8f26788a7b6ae70dc22b32558b0ca1"
+    sha256 cellar: :any_skip_relocation, catalina:       "786560832242b13dec1b0427c68da775b986c7ec758b487bc9159c82ddddbea6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "68187908a5ff0161c709fbaff14c665c4f176b3bfcdaf7878da8740c824aa99d"
   end
 
   depends_on "cmake" => :build
-
-  conflicts_with "nss", because: "both install `libgtest.a`"
 
   def install
     system "cmake", ".", *std_cmake_args
@@ -36,7 +36,7 @@ class Googletest < Formula
         ASSERT_TRUE(true);
       }
     EOS
-    system ENV.cxx, "test.cpp", "-std=c++11", "-L#{lib}", "-lgtest", "-lgtest_main", "-o", "test"
+    system ENV.cxx, "test.cpp", "-std=c++11", "-L#{lib}", "-lgtest", "-lgtest_main", "-pthread", "-o", "test"
     system "./test"
   end
 end

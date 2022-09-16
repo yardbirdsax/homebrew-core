@@ -3,7 +3,7 @@ class Timidity < Formula
   homepage "https://timidity.sourceforge.io/"
   url "https://downloads.sourceforge.net/project/timidity/TiMidity++/TiMidity++-2.15.0/TiMidity++-2.15.0.tar.bz2"
   sha256 "161fc0395af16b51f7117ad007c3e434c825a308fa29ad44b626ee8f9bb1c8f5"
-  revision 1
+  revision 2
 
   livecheck do
     url :stable
@@ -11,11 +11,17 @@ class Timidity < Formula
   end
 
   bottle do
-    sha256 big_sur:     "b7f6a933b163f87baad3e1799160fc42bf1b14829a5223e903ae38a26dc2c4c2"
-    sha256 catalina:    "4ebc752f9ca4fcfa88ade5f6806037678d855d97470adb5507c1290527fe6260"
-    sha256 mojave:      "2cae56b69dc38af0de2d80816539ac5d6c78da535d20d63a2103dcf907ec9b80"
-    sha256 high_sierra: "563d4ffe26aff2b7b4453d5cb159cc596bae4f804cc977978cb01856184ed9c7"
+    sha256 arm64_monterey: "215a1a95a53e1f8f136d96107135133375060c7c5f97e37ea61224c152cfd17e"
+    sha256 arm64_big_sur:  "8e0f3d548b9566140d1c2f1f12ebb221260e062060eb2c374fabc998efab5d1d"
+    sha256 monterey:       "7aeddb0863d411f946560c9a25606de141db96a596f63bbd80d19ccebbb4b4ec"
+    sha256 big_sur:        "2feeeebd41909eb7296bbe8fd7b09b99e49bb4f52341eed107d0cb423a673793"
+    sha256 catalina:       "761a0dd6e3c1499005cc2722a5cef8e8529216c8c668c18b9b1fc8711ea409f4"
+    sha256 x86_64_linux:   "bfb585896b4dcdc915adefea538fcb691a213a7f672e10d24b5ff34f95139a9a"
   end
+
+  depends_on "autoconf" => :build
+  depends_on "automake" => :build
+  depends_on "libtool" => :build
 
   depends_on "flac"
   depends_on "libao"
@@ -29,10 +35,19 @@ class Timidity < Formula
   end
 
   def install
+    audio_options = %w[
+      vorbis
+      flac
+      speex
+      ao
+    ]
+    audio_options << "darwin" if OS.mac?
+
+    system "./autogen.sh" if Hardware::CPU.arm?
     system "./configure", "--disable-dependency-tracking",
                           "--prefix=#{prefix}",
                           "--mandir=#{man}",
-                          "--enable-audio=darwin,vorbis,flac,speex,ao"
+                          "--enable-audio=#{audio_options.join(",")}"
     system "make", "install"
 
     # Freepats instrument patches from https://freepats.zenvoid.org/

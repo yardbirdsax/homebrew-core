@@ -1,12 +1,14 @@
 class Liquidprompt < Formula
   desc "Adaptive prompt for bash and zsh shells"
   homepage "https://github.com/nojhan/liquidprompt"
-  url "https://github.com/nojhan/liquidprompt/archive/v1.12.1.tar.gz"
-  sha256 "50d278ac16b62bdf9ea44f9421a1f4e467cc89122a2fee24693a4469616b866a"
+  url "https://github.com/nojhan/liquidprompt/archive/v2.1.2.tar.gz"
+  sha256 "f752f46595519befd1ad83eaa3605cfc05babd485250a0b46916d8eacabf4f26"
   license "AGPL-3.0-or-later"
   head "https://github.com/nojhan/liquidprompt.git", branch: "master"
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "407ac67632d4c74525162eedfbc1033ca4ea69ca70a8ce225531d09c35d195eb"
+  end
 
   def install
     share.install "liquidpromptrc-dist"
@@ -28,7 +30,7 @@ class Liquidprompt < Formula
 
   test do
     liquidprompt = "#{HOMEBREW_PREFIX}/share/liquidprompt"
-    output = shell_output("/bin/sh #{liquidprompt} 2>&1")
-    assert_match "add-zsh-hook: command not found", output
+    output = shell_output("/bin/bash -c '. #{liquidprompt} --no-activate; lp_theme --list'")
+    assert_match "default\n", output
   end
 end

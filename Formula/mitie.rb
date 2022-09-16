@@ -4,18 +4,20 @@ class Mitie < Formula
   url "https://github.com/mit-nlp/MITIE/archive/v0.7.tar.gz"
   sha256 "0830955e64c2a4cceab803884355f090cf8e9086e68ac5df43058f05c34697e8"
   license "BSL-1.0"
-  revision 2
-  head "https://github.com/mit-nlp/MITIE.git"
+  revision 3
+  head "https://github.com/mit-nlp/MITIE.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "49066ada52cbf94e095569f97b8d629f2e54b19fa4dfcffbc4ad12bf3728e656"
-    sha256 cellar: :any, big_sur:       "26424cf75f07bf9970c4a5ef979b33f9bffdbcf8b98bdda56759f7b49ed3757d"
-    sha256 cellar: :any, catalina:      "7190df4ed270f1ed0d6b09ea3410b673af9bf8de7349db5cc7c58a8596d10094"
-    sha256 cellar: :any, mojave:        "523dbdb69c94746e8e451c01a400897e294f414981bacc7c3933e3cefef590c5"
-    sha256 cellar: :any, high_sierra:   "36a3671f823322c4542af4c555ccfcc1f69ce7c50360f17903b0decc34ddb63e"
+    sha256 cellar: :any,                 arm64_monterey: "85090e5f3a58d0e1b4d809bb67813684bce137134f9d903dfeae192e4540ffe8"
+    sha256 cellar: :any,                 arm64_big_sur:  "ad562a270ddfb8ffc19c35fd3ec680a1152f3fc25d0bfa9d07f32ba49f563086"
+    sha256 cellar: :any,                 monterey:       "508dd4609e72647b3534466576df9e18a0717c9387cf68c9bbf14f3d8769f5f8"
+    sha256 cellar: :any,                 big_sur:        "1a3f80b1b4c26c82cd9b0110d244ffa40aa30933a8b92ecfc1a6bf1e1265480a"
+    sha256 cellar: :any,                 catalina:       "edf72d45db9f8b0772e21dd024b9f44a2ff40b926ae2c1662e394b9468c19863"
+    sha256 cellar: :any,                 mojave:         "4bf2422b5d421784cc2829fd5987132c89a82637c7d05a3a34b95568084c8457"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "474d1937760927929a73c3ebae48dbe3f7ee0f0cb2efff4eb43cbb397ce06679"
   end
 
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   resource "models-english" do
     url "https://downloads.sourceforge.net/project/mitie/binaries/MITIE-models-v0.2.tar.bz2"
@@ -25,15 +27,14 @@ class Mitie < Formula
   def install
     (share/"MITIE-models").install resource("models-english")
 
-    inreplace "mitielib/makefile", "libmitie.so", "libmitie.dylib"
+    inreplace "mitielib/makefile", "libmitie.so", "libmitie.dylib" if OS.mac?
     system "make", "mitielib"
     system "make"
 
     include.install Dir["mitielib/include/*"]
-    lib.install "mitielib/libmitie.dylib", "mitielib/libmitie.a"
+    lib.install "mitielib/#{shared_library("libmitie")}", "mitielib/libmitie.a"
 
-    xy = Language::Python.major_minor_version "python3"
-    (lib/"python#{xy}/site-packages").install "mitielib/mitie.py"
+    (prefix/Language::Python.site_packages("python3.10")).install "mitielib/mitie.py"
     pkgshare.install "examples", "sample_text.txt",
                      "sample_text.reference-output",
                      "sample_text.reference-output-relations"
@@ -41,8 +42,8 @@ class Mitie < Formula
   end
 
   test do
-    system ENV.cc, "-I#{include}", "-L#{lib}", "-lmitie",
-           pkgshare/"examples/C/ner/ner_example.c",
+    system ENV.cc, pkgshare/"examples/C/ner/ner_example.c",
+           "-I#{include}", "-L#{lib}", "-lmitie", "-lpthread",
            "-o", testpath/"ner_example"
     system "./ner_example", share/"MITIE-models/english/ner_model.dat",
            pkgshare/"sample_text.txt"

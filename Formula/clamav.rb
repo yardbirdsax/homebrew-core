@@ -1,10 +1,11 @@
 class Clamav < Formula
   desc "Anti-virus software"
   homepage "https://www.clamav.net/"
-  url "https://www.clamav.net/downloads/production/clamav-0.103.1.tar.gz"
-  mirror "https://fossies.org/linux/misc/clamav-0.103.1.tar.gz"
-  sha256 "7308c47b89b268af3b9f36140528927a49ff3e633a9c9c0aac2712d81056e257"
+  url "https://www.clamav.net/downloads/production/clamav-0.105.1.tar.gz"
+  mirror "https://fossies.org/linux/misc/clamav-0.105.1.tar.gz"
+  sha256 "d2bc16374db889a6e5a6ac40f8c6e700254a039acaa536885a09eeea4b8529f6"
   license "GPL-2.0-or-later"
+  head "https://github.com/Cisco-Talos/clamav-devel.git", branch: "main"
 
   livecheck do
     url "https://www.clamav.net/downloads"
@@ -12,24 +13,18 @@ class Clamav < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "819a822b63f106657c8e0374eddad592eda5aebaa608a16111578b8e5dac390c"
-    sha256 big_sur:       "ef79742b675d0b07d1cef974996a4647848ba2d2508c3f7a011d93090ae52e3a"
-    sha256 catalina:      "aeb895673034b67934ec56ab7bc91c49e6034c80c54c699966f2ed6064b0aba8"
-    sha256 mojave:        "d5e992c19a4104eea8a8cf17cd13f71e18a0484a35939a30f2aec534603bb5ac"
+    sha256 arm64_monterey: "6c9e5236fd4fc487e5c38df622694a334e8c5d176d56947ba87e17c4af18d92d"
+    sha256 arm64_big_sur:  "81fca3d2d734d723b269167c5624383612f53a1317d7f02e09f9a2ca7672b47d"
+    sha256 monterey:       "ebc6f714302bfc91b7f068e3558b2f1593c6fba7d96cd81e00df38a97e7deeb7"
+    sha256 big_sur:        "ee05ec3fc098bc5ad4ab216cc575ca35c117cc2b933e1b5ed570164074fd7f53"
+    sha256 catalina:       "b29973a04291285d23c984f59173276396b63de709b8ba69986ccf437ee46942"
+    sha256 x86_64_linux:   "63943c5d3d97b86635fb6ae095d2897591d05a1d599da583175d4b2eb84da343"
   end
 
-  head do
-    url "https://github.com/Cisco-Talos/clamav-devel.git"
-
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool" => :build
-  end
-
+  depends_on "cmake" => :build
   depends_on "pkg-config" => :build
+  depends_on "rust" => :build
   depends_on "json-c"
-  depends_on "libiconv"
-  depends_on "libtool"
   depends_on "openssl@1.1"
   depends_on "pcre2"
   depends_on "yara"
@@ -37,42 +32,29 @@ class Clamav < Formula
   uses_from_macos "bzip2"
   uses_from_macos "curl"
   uses_from_macos "libxml2"
+  uses_from_macos "ncurses"
   uses_from_macos "zlib"
+
+  on_macos do
+    depends_on "libiconv"
+  end
 
   skip_clean "share/clamav"
 
   def install
-    args = %W[
-      --disable-dependency-tracking
-      --disable-silent-rules
-      --prefix=#{prefix}
-      --libdir=#{lib}
-      --sysconfdir=#{etc}/clamav
-      --disable-zlib-vcheck
-      --with-llvm=no
-      --with-libiconv-prefix=#{Formula["libiconv"].opt_prefix}
-      --with-iconv=#{Formula["libiconv"].opt_prefix}
-      --with-libjson=#{Formula["json-c"].opt_prefix}
-      --with-openssl=#{Formula["openssl@1.1"].opt_prefix}
-      --with-pcre=#{Formula["pcre2"].opt_prefix}
+    args = std_cmake_args + %W[
+      -DAPP_CONFIG_DIRECTORY=#{etc}/clamav
+      -DENABLE_JSON_SHARED=ON
+      -DENABLE_STATIC_LIB=ON
+      -DENABLE_SHARED_LIB=ON
+      -DENABLE_EXAMPLES=OFF
+      -DENABLE_TESTS=OFF
+      -DENABLE_MILTER=OFF
     ]
 
-    on_macos do
-      args << "--with-zlib=#{MacOS.sdk_path_if_needed}/usr"
-      args << "--with-libbz2-prefix=#{MacOS.sdk_path_if_needed}/usr"
-      args << "--with-xml=#{MacOS.sdk_path_if_needed}/usr"
-    end
-    on_linux do
-      args << "--with-zlib=#{Formula["zlib"].opt_prefix}"
-      args << "--with-libbz2-prefix=#{Formula["bzip2"].opt_prefix}"
-      args << "--with-xml=#{Formula["libxml2"].opt_prefix}"
-      args << "--with-libcurl=#{Formula["curl"].opt_prefix}"
-    end
-
-    pkgshare.mkpath
-    system "autoreconf", "-fvi" if build.head?
-    system "./configure", *args
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build", *args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   def caveats

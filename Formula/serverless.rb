@@ -3,22 +3,35 @@ require "language/node"
 class Serverless < Formula
   desc "Build applications with serverless architectures"
   homepage "https://www.serverless.com/"
-  url "https://github.com/serverless/serverless/archive/v2.22.0.tar.gz"
-  sha256 "3c8b3c1bff0265d209820aa5199bd3471e458f19908721a89c1350fc7a426e28"
+  url "https://github.com/serverless/serverless/archive/v3.22.0.tar.gz"
+  sha256 "f1e0c486b3792ca10a152f339fff56dbda64eab39ece1e34eb89d5fb1c4d23ef"
   license "MIT"
+  head "https://github.com/serverless/serverless.git", branch: "main"
 
   bottle do
-    sha256 arm64_big_sur: "d69b1214efdd59a64de79087ce7e88848d95dbbcd9cfbd9d53552232f60061e5"
-    sha256 big_sur:       "6655bc381b9800459061209348fad1a84795a9f88364481365ca5a01125ece77"
-    sha256 catalina:      "2ec4b92e20f646e38695e7448d537885e6df52c031f7d3e4fb24dce2f8e3e3d4"
-    sha256 mojave:        "f5ac50d77b1bd2ff657eeb1a089fa8e9541d07a4ef36d25452833991aeab19fb"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "8e6eb3ef2d9fc9bf1cf36c79d5f497b7daee8a1a142a14759736a88e8f9ca37d"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "8e6eb3ef2d9fc9bf1cf36c79d5f497b7daee8a1a142a14759736a88e8f9ca37d"
+    sha256 cellar: :any_skip_relocation, monterey:       "6c188bd17235a4bf72e86bb158c367019dcc60e874c1a1430d8bc80ff40086da"
+    sha256 cellar: :any_skip_relocation, big_sur:        "6c188bd17235a4bf72e86bb158c367019dcc60e874c1a1430d8bc80ff40086da"
+    sha256 cellar: :any_skip_relocation, catalina:       "6c188bd17235a4bf72e86bb158c367019dcc60e874c1a1430d8bc80ff40086da"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d16ebb7b216bd9dbc1d78d11e29280ac79e29f1ec955b3e80342e910cad2f8d1"
   end
 
   depends_on "node"
 
   def install
     system "npm", "install", *Language::Node.std_npm_install_args(libexec)
-    bin.install_symlink Dir["#{libexec}/bin/*"]
+    bin.install_symlink Dir[libexec/"bin/*"]
+
+    # Delete incompatible Linux CPython shared library included in dependency package.
+    # Raise an error if no longer found so that the unused logic can be removed.
+    (libexec/"lib/node_modules/serverless/node_modules/@serverless/dashboard-plugin")
+      .glob("sdk-py/serverless_sdk/vendor/wrapt/_wrappers.cpython-*-linux-gnu.so")
+      .map(&:unlink)
+      .empty? && raise("Unable to find wrapt shared library to delete.")
+
+    # Replace universal binaries with their native slices
+    deuniversalize_machos libexec/"lib/node_modules/serverless/node_modules/fsevents/fsevents.node"
   end
 
   test do
@@ -32,7 +45,7 @@ class Serverless < Formula
     EOS
 
     system("#{bin}/serverless", "config", "credentials", "--provider", "aws", "--key", "aa", "--secret", "xx")
-    output = shell_output("#{bin}/serverless package")
-    assert_match "Serverless: Packaging service...", output
+    output = shell_output("#{bin}/serverless package 2>&1")
+    assert_match "Packaging homebrew-test for stage dev", output
   end
 end

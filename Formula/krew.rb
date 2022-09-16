@@ -2,16 +2,18 @@ class Krew < Formula
   desc "Package manager for kubectl plugins"
   homepage "https://sigs.k8s.io/krew/"
   url "https://github.com/kubernetes-sigs/krew.git",
-      tag:      "v0.4.0",
-      revision: "8bebb56d7295f361db3780fa18bd9f2f995ed48f"
+      tag:      "v0.4.3",
+      revision: "dbfefa58e3087bdd8eb1985a28f7caa7427c4e4d"
   license "Apache-2.0"
-  head "https://github.com/kubernetes-sigs/krew.git"
+  head "https://github.com/kubernetes-sigs/krew.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, big_sur:  "805ecc421849656067f79bb29078044ef16f4e7666bb3733754efddd5d541849"
-    sha256 cellar: :any_skip_relocation, catalina: "ab1fd5afe499a31d731cc9b4395d3ae71eb4774682b5295e8376611c52f8a262"
-    sha256 cellar: :any_skip_relocation, mojave:   "316b12ecb167df6a8cff3521d9ab093f874f1d49379ffd639a0bc1c77a9c8e01"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "93179328dd5beac3e977ab799d596925d927efa4420a6cb0950970386e4e8146"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b9585376236e8f86e158864ff610edeca3eb83ad5566fa4a2a09f3fc35d6fe88"
+    sha256 cellar: :any_skip_relocation, monterey:       "d814754adf0a451c529a745b5ddc6587c0057d8050294610f396f97271e23e42"
+    sha256 cellar: :any_skip_relocation, big_sur:        "286bae73781b3ced48cb18133afc6c3224dd15fef262dee1e17a53a8bed2dd6f"
+    sha256 cellar: :any_skip_relocation, catalina:       "9c95c5f27125a2edcd294310c83d01c5ecbe0e1bb456fa3cc57ba6a632987278"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3dbbeefb32e6340c061091a744b4d5e4c7573e96a3512b27064349f286a1976e"
   end
 
   depends_on "go" => :build
@@ -25,8 +27,8 @@ class Krew < Formula
 
     ldflags = %W[
       -w
-      -X sigs.k8s.io/krew/pkg/version.gitCommit=#{Utils.git_short_head(length: 8)}
-      -X sigs.k8s.io/krew/pkg/version.gitTag=v#{version}
+      -X sigs.k8s.io/krew/internal/version.gitCommit=#{Utils.git_short_head(length: 8)}
+      -X sigs.k8s.io/krew/internal/version.gitTag=v#{version}
     ]
 
     system "go", "build", "-o", "build", "-tags", "netgo",
@@ -41,6 +43,7 @@ class Krew < Formula
     system "#{bin}/kubectl-krew", "version"
     system "#{bin}/kubectl-krew", "update"
     system "#{bin}/kubectl-krew", "install", "ctx"
+    assert_match "v#{version}", shell_output("#{bin}/kubectl-krew version")
     assert_predicate testpath/"bin/kubectl-ctx", :exist?
   end
 end

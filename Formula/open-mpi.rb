@@ -1,9 +1,10 @@
 class OpenMpi < Formula
   desc "High performance message passing library"
   homepage "https://www.open-mpi.org/"
-  url "https://download.open-mpi.org/release/open-mpi/v4.0/openmpi-4.0.5.tar.bz2"
-  sha256 "c58f3863b61d944231077f344fe6b4b8fbb83f3d1bc93ab74640bf3e5acac009"
+  url "https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.4.tar.bz2"
+  sha256 "92912e175fd1234368c8730c03f4996fe5942e7479bb1d10059405e7f2b3930d"
   license "BSD-3-Clause"
+  revision 2
 
   livecheck do
     url :homepage
@@ -11,83 +12,68 @@ class OpenMpi < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "6134b45b6faa235377c5cd017b58393a0a124936c81a14da9902604671143ca8"
-    sha256 big_sur:       "2afe47eb2c9664599a1bf8687d0244a9b9067bc96e3de184cdee8e3110fa8012"
-    sha256 catalina:      "fd21d8d449c7fee6126f11994b6e0d12178b1eab55cbb17f99056d535cb1ace4"
-    sha256 mojave:        "f3a7dca683792a4fe866b62004351b1dae6acf2376609cf36bdc771d9e9104ef"
-    sha256 high_sierra:   "33d3cd119f7f7d7d3154d758cc0ad68ad513624c9a648c9b87d732ea6a8e6068"
+    sha256 arm64_monterey: "6fce4b7846d2ac61b339fed64109f83fbfe3fca5e29123d219c4aec7264b17b8"
+    sha256 arm64_big_sur:  "270edb8b3f965fabae4c6f25136fdd129072a0bb560127ed2a26eef4f7a05953"
+    sha256 monterey:       "7b119eb6403ba68bc7488400b743dfefb09162a8d094659110a23491782925f6"
+    sha256 big_sur:        "e8f418ade2643371972f22ea27dfd1283659b58efaac5e271916961845d00f6f"
+    sha256 catalina:       "340edd884d2c78cd6939de7bf859f501f77a3af469aad6a3e05fcee64ac32b7a"
+    sha256 x86_64_linux:   "07c71e5e4e4a6fae6bb0fb7ed19c4f50c434478438d6468df62b2ff328a15fcc"
   end
 
   head do
-    url "https://github.com/open-mpi/ompi.git"
+    url "https://github.com/open-mpi/ompi.git", branch: "main"
     depends_on "autoconf" => :build
     depends_on "automake" => :build
     depends_on "libtool" => :build
   end
 
-  # Regenerate for Big Sur due to configure issues
-  # https://github.com/open-mpi/ompi/issues/8218
-  if MacOS.version >= :big_sur
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool" => :build
-  end
-
-  depends_on "gcc"
+  depends_on "gcc" # for gfortran
   depends_on "hwloc"
   depends_on "libevent"
 
   conflicts_with "mpich", because: "both install MPI compiler wrappers"
 
   def install
-    if MacOS.version == :big_sur
-      # Fix for current GCC on Big Sur, which does not like 11 as version value
-      # (reported at https://github.com/iains/gcc-darwin-arm64/issues/31#issuecomment-750343944)
-      ENV["MACOSX_DEPLOYMENT_TARGET"] = "11.0"
-    else
-      # Otherwise libmpi_usempi_ignore_tkr gets built as a static library
-      ENV["MACOSX_DEPLOYMENT_TARGET"] = MacOS.version
-    end
+    # Otherwise libmpi_usempi_ignore_tkr gets built as a static library
+    ENV["MACOSX_DEPLOYMENT_TARGET"] = MacOS.version
 
     # Avoid references to the Homebrew shims directory
-    %w[
+    inreplace_files = %w[
       ompi/tools/ompi_info/param.c
-      orte/tools/orte-info/param.c
       oshmem/tools/oshmem_info/param.c
-      opal/mca/pmix/pmix3x/pmix/src/tools/pmix_info/support.c
-    ].each do |fname|
-      inreplace fname, /(OPAL|PMIX)_CC_ABSOLUTE/, "\"#{ENV.cc}\""
-    end
+    ]
 
-    %w[
-      ompi/tools/ompi_info/param.c
-      oshmem/tools/oshmem_info/param.c
-    ].each do |fname|
-      inreplace fname, "OMPI_CXX_ABSOLUTE", "\"#{ENV.cxx}\""
-    end
+    cxx = OS.linux? ? "g++" : ENV.cxx
+    inreplace inreplace_files, "OMPI_CXX_ABSOLUTE", "\"#{cxx}\""
+
+    inreplace_files << "orte/tools/orte-info/param.c" unless build.head?
+    inreplace_files << "opal/mca/pmix/pmix3x/pmix/src/tools/pmix_info/support.c" unless build.head?
+
+    cc = OS.linux? ? "gcc" : ENV.cc
+    inreplace inreplace_files, /(OPAL|PMIX)_CC_ABSOLUTE/, "\"#{cc}\""
 
     ENV.cxx11
+    ENV.runtime_cpu_detection
 
     args = %W[
-      --prefix=#{prefix}
-      --disable-dependency-tracking
       --disable-silent-rules
       --enable-ipv6
       --enable-mca-no-build=reachable-netlink
+      --sysconfdir=#{etc}
       --with-libevent=#{Formula["libevent"].opt_prefix}
       --with-sge
     ]
     args << "--with-platform-optimized" if build.head?
 
-    system "./autogen.pl", "--force" if build.head? || MacOS.version >= :big_sur
-    system "./configure", *args
+    system "./autogen.pl", "--force" if build.head?
+    system "./configure", *std_configure_args, *args
     system "make", "all"
     system "make", "check"
     system "make", "install"
 
     # Fortran bindings install stray `.mod` files (Fortran modules) in `lib`
     # that need to be moved to `include`.
-    include.install Dir["#{lib}/*.mod"]
+    include.install lib.glob("*.mod")
   end
 
   test do

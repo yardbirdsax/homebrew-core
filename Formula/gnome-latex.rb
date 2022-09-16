@@ -1,35 +1,49 @@
 class GnomeLatex < Formula
   desc "LaTeX editor for the GNOME desktop"
-  homepage "https://wiki.gnome.org/Apps/GNOME-LaTeX"
-  url "https://download.gnome.org/sources/gnome-latex/3.38/gnome-latex-3.38.0.tar.xz"
-  sha256 "a82a9fc6f056929ea18d6dffd121e71b2c21768808c86ef1f34da0f86e220d77"
+  homepage "https://gitlab.gnome.org/swilmet/gnome-latex"
+  url "https://gitlab.gnome.org/swilmet/gnome-latex.git",
+      tag:      "3.41.2",
+      revision: "1919ae4326505eb8834db3312e06fdab8caf6a09"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 arm64_big_sur: "8ea1216cd53e87eb4c9667c90e29cfc007f115129070ef1dd205f2a2480900f9"
-    sha256 big_sur:       "dc38c7827663f49f553996a757415dfe20d92c8c0dea83c462c887c8daf69f5f"
-    sha256 catalina:      "f1dbea254436194246d1ea3fcd47a5b08b394efb3a08f48a9a3decd85120ce90"
-    sha256 mojave:        "c8f5a18378b6a759f3f4614baedf693814b61da0dfecd2f0d8d6ad93bef3fa25"
-    sha256 high_sierra:   "7a9d3285f2457fecacc4e0840e32ac940b0e77041dd30839e6a7af7ad55453dd"
+    sha256 arm64_monterey: "45cb26496d4884a7ba463cd5ce28977e0f72116e7b40dcda9545bbcb44bcf11a"
+    sha256 arm64_big_sur:  "f452e0f94f155fffb2390ffd38d1f28b2c6c61163081d8ae8e86b57f07d6dcb6"
+    sha256 monterey:       "2979c8035dd7809e97bcc520f098e0b2af6081062f9505420f91fa48d08871f6"
+    sha256 big_sur:        "1e55c7ece5420a38bbe098e9cd708579deb2322a3a33722cbf63005d788894a5"
+    sha256 catalina:       "604adc337f113bb09396d0f6173608e2fc45d6573813c286bbd096ebcdfffbe8"
+    sha256 x86_64_linux:   "82ec9fe1be1351534758903717eaff522ddec1c672278f9b8b4d91d2940da12d"
   end
 
+  depends_on "appstream-glib" => :build
+  depends_on "autoconf" => :build
+  depends_on "autoconf-archive" => :build
+  depends_on "automake" => :build
   depends_on "gobject-introspection" => :build
+  depends_on "gtk-doc" => :build
   depends_on "intltool" => :build
   depends_on "itstool" => :build
   depends_on "pkg-config" => :build
   depends_on "vala" => :build
+  depends_on "yelp-tools" => :build
   depends_on "adwaita-icon-theme"
   depends_on "gnome-themes-standard"
   depends_on "gspell"
   depends_on "libgee"
   depends_on "tepl"
 
+  uses_from_macos "perl" => :build
+
   def install
-    system "./configure", "--disable-schemas-compile",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--disable-dconf-migration",
-                          "--prefix=#{prefix}"
+    # Needed by intltool (xml::parser)
+    ENV.prepend_path "PERL5LIB", "#{Formula["intltool"].libexec}/lib/perl5" unless OS.mac?
+
+    system "./autogen.sh", "--disable-schemas-compile",
+                           "--disable-dependency-tracking",
+                           "--disable-silent-rules",
+                           "--disable-code-coverage",
+                           "--disable-dconf-migration",
+                           "--prefix=#{prefix}"
     system "make", "install"
   end
 

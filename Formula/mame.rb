@@ -1,12 +1,12 @@
 class Mame < Formula
   desc "Multiple Arcade Machine Emulator"
   homepage "https://mamedev.org/"
-  # NOTE: Please keep these values in sync with rom-tools.rb when updating.
-  url "https://github.com/mamedev/mame/archive/mame0228.tar.gz"
-  version "0.228"
-  sha256 "1d8e6f20491492f8b15892ff958f9b067c48eb90cc2fc974b08bde297e657244"
+  url "https://github.com/mamedev/mame/archive/mame0247.tar.gz"
+  version "0.247"
+  sha256 "a2486d34b15f13c3d7028436f7da373d37c7fd47f34a2ea19ff48cf57daf29e1"
   license "GPL-2.0-or-later"
-  head "https://github.com/mamedev/mame.git"
+  revision 1
+  head "https://github.com/mamedev/mame.git", branch: "master"
 
   # MAME tags (and filenames) are formatted like `mame0226`, so livecheck will
   # report the version like `0226`. We work around this by matching the link
@@ -15,23 +15,25 @@ class Mame < Formula
   livecheck do
     url :stable
     strategy :github_latest
-    regex(%r{release-header.*?/releases/tag/mame[._-]?\d+(?:\.\d+)*["' >]>MAME v?(\d+(?:\.\d+)+)}im)
+    regex(/>\s*MAME v?(\d+(?:\.\d+)+)/im)
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "e691df3aecfbe3bd954bb67e9f77274a3294781d4c4b8b0db5c867fc1f5e88a3"
-    sha256 cellar: :any, big_sur:       "a4a2c392a16ddf14ab1890c56a51a5c99f33438bd0af9396ff3b51cf5b65e6f0"
-    sha256 cellar: :any, catalina:      "60bdbeb0fe470d57fbfbce0ec579b7c6a399506445137d8fdced4bb961d6e3af"
-    sha256 cellar: :any, mojave:        "997ec943f87a8026bcd7df415aaf48bfc56b5a9668093f9398e1f48dea4c165b"
+    sha256 cellar: :any,                 arm64_monterey: "87cc7b4537c460ef8fbb846db2b1cd4cc6c45afacaf4b5df32bc94ab74bcd62f"
+    sha256 cellar: :any,                 arm64_big_sur:  "342aa6e43bd542453a10b0f08ca867ffb478a80a7f15e0fddf889fa45d10431e"
+    sha256 cellar: :any,                 monterey:       "a1bff4e04fbc912ac3de1afd4c397293d84daebdb6666783a494bff7243a7ec1"
+    sha256 cellar: :any,                 big_sur:        "e1ae32f0ee5e6f731d324180cd0958d32725992216d6b588339119baa5e5dd80"
+    sha256 cellar: :any,                 catalina:       "e7e66b0e08e1cd9aefba954441dcc38ca4e52c306df9942c7cc8e2fdd1d74550"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9d43d9ee677f364615674028201b5c7cf283c5c2af3a6fe58bb4c2b85df5ef22"
   end
 
   depends_on "glm" => :build
   depends_on "pkg-config" => :build
-  depends_on "python@3.9" => :build
+  depends_on "python@3.10" => :build
   depends_on "rapidjson" => :build
   depends_on "sphinx-doc" => :build
   depends_on "flac"
-  depends_on "jpeg"
+  depends_on "jpeg-turbo"
   # Need C++ compiler and standard library support C++17.
   depends_on macos: :high_sierra
   depends_on "portaudio"
@@ -44,6 +46,15 @@ class Mame < Formula
   uses_from_macos "expat"
   uses_from_macos "zlib"
 
+  on_linux do
+    depends_on "pulseaudio"
+    depends_on "qt@5"
+    depends_on "sdl2_ttf"
+  end
+
+  fails_with gcc: "5"
+  fails_with gcc: "6"
+
   def install
     # Cut sdl2-config's invalid option.
     inreplace "scripts/src/osd/sdl.lua", "--static", ""
@@ -51,7 +62,7 @@ class Mame < Formula
     # Use bundled asio and lua instead of latest version.
     # https://github.com/mamedev/mame/issues/5721
     # https://github.com/mamedev/mame/issues/5349
-    system "make", "PYTHON_EXECUTABLE=#{Formula["python@3.9"].opt_bin}/python3",
+    system "make", "PYTHON_EXECUTABLE=#{Formula["python@3.10"].opt_bin}/python3.10",
                    "USE_LIBSDL=1",
                    "USE_SYSTEM_LIB_EXPAT=1",
                    "USE_SYSTEM_LIB_ZLIB=1",
@@ -66,7 +77,7 @@ class Mame < Formula
                    "USE_SYSTEM_LIB_RAPIDJSON=1",
                    "USE_SYSTEM_LIB_SQLITE3=1",
                    "USE_SYSTEM_LIB_UTF8PROC=1"
-    bin.install "mame64" => "mame"
+    bin.install "mame"
     cd "docs" do
       # We don't convert SVG files into PDF files, don't load the related extensions.
       inreplace "source/conf.py", "'sphinxcontrib.rsvgconverter',", ""

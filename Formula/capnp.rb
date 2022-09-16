@@ -1,10 +1,10 @@
 class Capnp < Formula
   desc "Data interchange format and capability-based RPC system"
   homepage "https://capnproto.org/"
-  url "https://capnproto.org/capnproto-c++-0.8.0.tar.gz"
-  sha256 "d1f40e47574c65700f0ec98bf66729378efabe3c72bc0cda795037498541c10d"
+  url "https://capnproto.org/capnproto-c++-0.10.2.tar.gz"
+  sha256 "7cd91a244cb330cda5b41f4904f94b61f39ba112835b31fa8c3764cedbed819f"
   license "MIT"
-  head "https://github.com/capnproto/capnproto.git"
+  head "https://github.com/capnproto/capnproto.git", branch: "master"
 
   livecheck do
     url "https://capnproto.org/install.html"
@@ -12,11 +12,12 @@ class Capnp < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "a1529dd1b1c1f9aa0ec59758868af1020a5e880bcde1fb886ba20077fc6bf279"
-    sha256 cellar: :any_skip_relocation, big_sur:       "d82d41c9039868bd86a5a3bff42307fea589ffcbc5629d95238e579dec65cbc2"
-    sha256 cellar: :any_skip_relocation, catalina:      "741c2079361cdb5881a60684190bc4aa98ff9cc6f8d29aa46880e809ac1b06c3"
-    sha256 cellar: :any_skip_relocation, mojave:        "f389012b8211b70af4fa7d2eed8db8ad399ef2bdc98e286fb57a4b1beb93dfe4"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "9c3beb8d8db3b372e4d2fd07d99a553fde6ff53824c6cfec82c3db41e212bc5b"
+    sha256 arm64_monterey: "082b9e9538d5edd7757b0365d2661862cbb0c72b8a673d90595b9bab82ac8a55"
+    sha256 arm64_big_sur:  "5e323e78ea4dcb77095c408bb66edcae2709f087225d40d5c3d49be64249ed9a"
+    sha256 monterey:       "c481ae927ef7c4fc42ded6c265e65d41a676abe459923d2265f5ea1af2ce0be8"
+    sha256 big_sur:        "fe5ea65e9885cf41986d70ca90f1e2ff9f8ffdd631d97047003af60889e8c7f6"
+    sha256 catalina:       "8fbf305bd1ee071768784f6f6797dc6116d2eda34d96aa2278b9cb2675c1230a"
+    sha256 x86_64_linux:   "9c647ac6b614b8a20aeb785c16ec9977231c05c0cfc13d0425b3beb9b749d15f"
   end
 
   depends_on "cmake" => :build

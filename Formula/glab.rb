@@ -1,29 +1,28 @@
 class Glab < Formula
   desc "Open-source GitLab command-line tool"
   homepage "https://glab.readthedocs.io/"
-  url "https://github.com/profclems/glab/archive/v1.14.0.tar.gz"
-  sha256 "927206802cda67f0b725d0ed2b355a67ab9eb560a9e8b8c6e4ca994d9aba3daa"
+  url "https://github.com/profclems/glab/archive/v1.22.0.tar.gz"
+  sha256 "4b700d46cf9ee8fe6268e7654326053f4366aa3e072b5c3f3d243930a6e89edc"
   license "MIT"
-  head "https://github.com/profclems/glab.git"
+  head "https://github.com/profclems/glab.git", branch: "trunk"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "775c3e023957dd12d19b02f1ba08b8c86edb03f2ebed88864701ed7849bd4335"
-    sha256 cellar: :any_skip_relocation, big_sur:       "74303c1e17dcaf2fa5a5f20fa9eb6be2078b0ab9553732bdf62b1db80cdaa55f"
-    sha256 cellar: :any_skip_relocation, catalina:      "0f8d551f3923620d64d425471f7adbf09f153ad13ca3975aef97f27aa8fe5306"
-    sha256 cellar: :any_skip_relocation, mojave:        "1e72168c56caa2c7109e33b690a501de48c32c08d54d6ae90751567c57db9af0"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "58a6efde41f754f75de93a2c6ddc50b888237f5a6d268cc22c375722972537a9"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "4fb720719b0cd88b52688b7298ef5b07b510d0eb0fd2b3067a7f3fe47303dc9c"
+    sha256 cellar: :any_skip_relocation, monterey:       "335d3798ad846544e68dfab75abdaedaf40397db17e5de76c9a5462c231285a0"
+    sha256 cellar: :any_skip_relocation, big_sur:        "1b384f05896c4cc28fc9e679549825792320c54bdf675293dffffb1a6c2717d1"
+    sha256 cellar: :any_skip_relocation, catalina:       "92114845aab1c15d5f52c0591d44508c28a4349a46e0f7669d5d551806155759"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3e105a8bb9694c9fd2569785a576265bf732c6a19ff8f1c42a430e8783b36d69"
   end
 
   depends_on "go" => :build
 
   def install
+    ENV["CGO_ENABLED"] = "1" if OS.mac?
+
     system "make", "GLAB_VERSION=#{version}"
     bin.install "bin/glab"
-    output = Utils.safe_popen_read({ "SHELL" => "bash" }, bin/"glab", "completion", "bash")
-    (bash_completion/"glab").write output
-    output = Utils.safe_popen_read({ "SHELL" => "zsh" }, bin/"glab", "completion", "zsh")
-    (zsh_completion/"_glab").write output
-    output = Utils.safe_popen_read({ "SHELL" => "fish" }, bin/"glab", "completion", "fish")
-    (fish_completion/"glab.fish").write output
+    generate_completions_from_executable(bin/"glab", "completion", "--shell")
   end
 
   test do

@@ -1,17 +1,18 @@
 class Openlibm < Formula
   desc "High quality, portable, open source libm implementation"
   homepage "https://openlibm.org"
-  url "https://github.com/JuliaMath/openlibm/archive/v0.7.4.tar.gz"
-  sha256 "eb585204d6c995691e5545ea4ffcb887c159bf05cc5ee1bbf92a6fcdde2fccae"
+  url "https://github.com/JuliaMath/openlibm/archive/v0.8.1.tar.gz"
+  sha256 "ba8a282ecd92d0033f5656bb20dfc6ea3fb83f90ba69291ac8f7beba42dcffcf"
+  license all_of: ["MIT", "ISC", "BSD-2-Clause"]
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "2046c2a9f7874150036e25091ea934377c7579f0396ae7570f4c2ff350bb6094"
-    sha256 cellar: :any, big_sur:       "efd441cb260e064ee213c0c7008c02baf6c552d4ea45afc11c6df26371032131"
-    sha256 cellar: :any, catalina:      "23ae6cbf040c349d0bab99cfe267f2a416c1a24a804724543687d748ab55cfaa"
-    sha256 cellar: :any, mojave:        "42e992c9bee0975fa22df4313c80180c08a772fe7b1345808a61c469b00e2044"
+    sha256 cellar: :any,                 arm64_monterey: "9b05e09f90c7be45091bb34aa339fdd8ae36e9de8463ba0844bc13940a9c71f4"
+    sha256 cellar: :any,                 arm64_big_sur:  "724ef933bb44a0bd8f884ccbb4bb2013b2b89af4cd1def67a411ae914ef622fd"
+    sha256 cellar: :any,                 monterey:       "821bb85640df061c0a49c079e06e7f932916c2b47bca228f61b3ed1401f17370"
+    sha256 cellar: :any,                 big_sur:        "fbaaaaee44ecd462b9b9cf94ebcf386bca16591b6a4be7985e479db98f18f280"
+    sha256 cellar: :any,                 catalina:       "7726b400040c12f35eb13cb88dd80444d09f82dce79ef9825b0fc864952f6c39"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9024f7a8469743a4ca9d4b13aa27254367ba4285447a6668f04da94b7d7971f0"
   end
-
-  keg_only :provided_by_macos
 
   def install
     lib.mkpath

@@ -1,9 +1,11 @@
 class Gh < Formula
   desc "GitHub command-line tool"
   homepage "https://github.com/cli/cli"
-  url "https://github.com/cli/cli/archive/v1.5.0.tar.gz"
-  sha256 "49c42a3b951b67e29bc66e054fedb90ac2519f7e1bfc5c367e82cb173e4bb056"
+  url "https://github.com/cli/cli/archive/v2.15.0.tar.gz"
+  sha256 "298dc4f6bcfd96b05f90cb5d6ad07c9fff4e5e26de45be18b525abdb5d69f345"
   license "MIT"
+
+  head "https://github.com/cli/cli.git", branch: "trunk"
 
   livecheck do
     url :stable
@@ -11,23 +13,26 @@ class Gh < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "46285720614f0a69645bd94265c5e1d798beaa92d41a6f3aabcf97f8747859a3"
-    sha256 cellar: :any_skip_relocation, big_sur:       "663bd535afe56f4d0cdd1a9677a1bcbf7f603805349120d4938e596beef65cfb"
-    sha256 cellar: :any_skip_relocation, catalina:      "0448e049f21a24a2ed9fe20bb5b5a5325b76570ea6faf78d50733954cc8cd715"
-    sha256 cellar: :any_skip_relocation, mojave:        "ae889bc195283a5bf49e887dd2ba521f4c36971170941c4d6105eb76b820c40f"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "d73bd2946361ad5b88d519e486c46b6ddf60ad1ec2e3176e51f403a66199aa52"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "bca5b3a851c3041edcb82b260caa18cd516d6fed19c8203d41a7e4011d18dc8d"
+    sha256 cellar: :any_skip_relocation, monterey:       "9e48affcac3f5fbcb78c8de2301cca7d31d80cc6a24a616aa347ab6fbeadbdf1"
+    sha256 cellar: :any_skip_relocation, big_sur:        "3cf8e07e9a32441cac9951ac0209d407daada6a09b6191fecedbc930fd20f9e2"
+    sha256 cellar: :any_skip_relocation, catalina:       "65d1390df89e35bcb9be4d264deb94824e5af57fcb5a73675206a669b05e7aec"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cd23b61a033d029ae6b9ea1feafd04fda17b771364e70dbe474c30f05b11ff6d"
   end
 
   depends_on "go" => :build
 
   def install
-    ENV["GH_VERSION"] = version.to_s
-    ENV["GO_LDFLAGS"] = "-s -w"
-    system "make", "bin/gh", "manpages"
+    with_env(
+      "GH_VERSION" => version.to_s,
+      "GO_LDFLAGS" => "-s -w -X main.updaterEnabled=cli/cli",
+    ) do
+      system "make", "bin/gh", "manpages"
+    end
     bin.install "bin/gh"
     man1.install Dir["share/man/man1/gh*.1"]
-    (bash_completion/"gh").write `#{bin}/gh completion -s bash`
-    (fish_completion/"gh.fish").write `#{bin}/gh completion -s fish`
-    (zsh_completion/"_gh").write `#{bin}/gh completion -s zsh`
+    generate_completions_from_executable(bin/"gh", "completion", "-s")
   end
 
   test do

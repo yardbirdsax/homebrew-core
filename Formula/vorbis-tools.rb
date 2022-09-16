@@ -1,19 +1,23 @@
 class VorbisTools < Formula
   desc "Ogg Vorbis CODEC tools"
   homepage "https://github.com/xiph/vorbis-tools"
-  url "https://downloads.xiph.org/releases/vorbis/vorbis-tools-1.4.2.tar.gz"
+  url "https://downloads.xiph.org/releases/vorbis/vorbis-tools-1.4.2.tar.gz", using: :homebrew_curl
+  mirror "https://ftp.osuosl.org/pub/xiph/releases/vorbis/vorbis-tools-1.4.2.tar.gz"
   sha256 "db7774ec2bf2c939b139452183669be84fda5774d6400fc57fde37f77624f0b0"
+  revision 1
 
   livecheck do
-    url "https://downloads.xiph.org/releases/vorbis/"
+    url "https://ftp.osuosl.org/pub/xiph/releases/vorbis/?C=M&O=D"
     regex(/href=.*?vorbis-tools[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "f6c6cc107f9c88f063f506dbf312602c4e9e61c80b5100aa77c6a3c7247eb7ee"
-    sha256 cellar: :any, big_sur:       "eabf92d09b16e16586caf87136e246da3acad99e772b763323c4b2dd05aa6d23"
-    sha256 cellar: :any, catalina:      "1d5caa7c22505a85eaa0a67930047b7d17786401b9c3376b67647502d4b056b5"
-    sha256 cellar: :any, mojave:        "469c4ff8079bd5a47d4aad1d06981660e6968facc25e542e54e505495261d8f1"
+    sha256 cellar: :any,                 arm64_monterey: "0bbda8f387e434f645cfab25de99e28e8331d38eaba4a88ca124994ec2c5f6fd"
+    sha256 cellar: :any,                 arm64_big_sur:  "5396b9e517cbb7fb7384e272affcce8b5a9ef263346611dfb068ed34be4988d8"
+    sha256 cellar: :any,                 monterey:       "32880efc56baaebc010f2e2b465852c9bad030cf8c4ddfceddb5961c4703872b"
+    sha256 cellar: :any,                 big_sur:        "ad1acc242f7976a700261ef8c914cf912a4bcd9970eca8009d949598648a16f6"
+    sha256 cellar: :any,                 catalina:       "04f820f7dfc6d2fe964b1e18e564728cbc4feb127b562bd788b80f7d40a23eab"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b137af1a327bf93e3922244bf03ab2eef1151838483b2e71e1e35c5254d32cc4"
   end
 
   depends_on "pkg-config" => :build
@@ -25,14 +29,7 @@ class VorbisTools < Formula
   uses_from_macos "curl"
 
   def install
-    args = %W[
-      --disable-debug
-      --disable-dependency-tracking
-      --disable-nls
-      --prefix=#{prefix}
-    ]
-
-    system "./configure", *args
+    system "./configure", *std_configure_args, "--disable-nls"
     system "make", "install"
   end
 

@@ -4,8 +4,8 @@ class Ledger < Formula
   url "https://github.com/ledger/ledger/archive/v3.2.1.tar.gz"
   sha256 "92bf09bc385b171987f456fe3ee9fa998ed5e40b97b3acdd562b663aa364384a"
   license "BSD-3-Clause"
-  revision 4
-  head "https://github.com/ledger/ledger.git"
+  revision 9
+  head "https://github.com/ledger/ledger.git", branch: "master"
 
   livecheck do
     url :stable
@@ -13,23 +13,34 @@ class Ledger < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "2606457bb4b8596b5502ce4a4f1e61d62e71fa29118987ff14eb6b7d26d81368"
-    sha256 big_sur:       "b65a9b4ec2be3cc44503122ec6dcb41d1101fa3425a64b197b08743fe3aaad84"
-    sha256 catalina:      "be65eaa4610eb98628f7c3abaf5582dd0ab145a991275e2550e48cebc313a012"
-    sha256 mojave:        "47990a19ee10042ffb198cb105cb9c56a11a3d8db606166f57a57c9a9c89620a"
+    sha256 cellar: :any,                 arm64_monterey: "101d38b9ad9bbee38049c084211f1d44b1fe2880e33c80350c0e16b8ab8dec34"
+    sha256 cellar: :any,                 arm64_big_sur:  "af728a87cae6e3cc0b0b9d1809665b7914af34dd7276bf53ae56b5e3bed685ee"
+    sha256 cellar: :any,                 monterey:       "a1388b6e16fc8ec03d26a29eb68863f828887a87df31ce8f6bb094527d81868a"
+    sha256 cellar: :any,                 big_sur:        "78ae068b488f4797d71f626837489a593d74224b89e085558a5e7c95b14441a4"
+    sha256 cellar: :any,                 catalina:       "9fe8c7132791596222ce22133bb3a194b4e59b00761616a2abab6f1e5909ca77"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2ed433809b3e7e9db34611bfab79ad6186b78dbce97da6a4e7f9ab55be343963"
   end
 
   depends_on "cmake" => :build
   depends_on "boost"
   depends_on "gmp"
   depends_on "mpfr"
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   uses_from_macos "groff"
+  uses_from_macos "libedit"
+
+  # Compatibility with Boost 1.76
+  # https://github.com/ledger/ledger/issues/2030
+  # https://github.com/ledger/ledger/pull/2036
+  patch do
+    url "https://github.com/ledger/ledger/commit/e60717ccd78077fe4635315cb2657d1a7f539fca.patch?full_index=1"
+    sha256 "edba1dd7bde707f510450db3197922a77102d5361ed7a5283eb546fbf2221495"
+  end
 
   def install
     ENV.cxx11
-    ENV.prepend_path "PATH", Formula["python@3.9"].opt_libexec/"bin"
+    ENV.prepend_path "PATH", Formula["python@3.10"].opt_libexec/"bin"
 
     args = %W[
       --jobs=#{ENV.make_jobs}

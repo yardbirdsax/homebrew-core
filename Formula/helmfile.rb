@@ -1,23 +1,29 @@
 class Helmfile < Formula
   desc "Deploy Kubernetes Helm Charts"
-  homepage "https://github.com/roboll/helmfile"
-  url "https://github.com/roboll/helmfile/archive/v0.138.4.tar.gz"
-  sha256 "8c6e014cfbf82f22d103098238bf9735eb62208bbfe2c16062aff8f79f6b4d24"
+  homepage "https://github.com/helmfile/helmfile"
+  url "https://github.com/helmfile/helmfile/archive/v0.145.5.tar.gz"
+  sha256 "a9e5038467f2ccab6a78e3398c3b8386837757a486f6d618dc75b28ab0c808df"
   license "MIT"
+  version_scheme 1
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "881e066e95f31f41d34f5ddd173c6e1e481b85c5b43fbacdc5e809306f599c15"
-    sha256 cellar: :any_skip_relocation, big_sur:       "8c2d21eb425afc90e6e2a624f48f44afb8b8334dad09187a77815736dc0235a3"
-    sha256 cellar: :any_skip_relocation, catalina:      "b6dc99c0c278beda6df52dbd2417f3554f55f728396d74cf9ecf6d17729c3f98"
-    sha256 cellar: :any_skip_relocation, mojave:        "4fece9e93961b306ae6c4cbf4027d21661de1fe6a92889f27509b916f75e6fb1"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "8b2c7a9140c12329d638344c43b1bb39574284400aeb259b53b418a6499f39e7"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "1f094d4bc89f3f0371198ce62c10d80bfb836319416cf45092c17427b6fa89fc"
+    sha256 cellar: :any_skip_relocation, monterey:       "f746f36cef873b8fdee38e80dc81d741ff9f494f2294559f46d6c292460abc6c"
+    sha256 cellar: :any_skip_relocation, big_sur:        "03773d172f97be151432ab9de24662bbe2f260b55cec304f271a691a143e3cac"
+    sha256 cellar: :any_skip_relocation, catalina:       "e4bccc8af039042385afdb4200cc738c57f6b5db820de945a6ff61cda611fe1b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b3682a8ac343e6373401283f13607d749a6d10d3ea1d1bf02c110fe6b7285e78"
   end
 
   depends_on "go" => :build
   depends_on "helm"
 
   def install
-    system "go", "build", "-ldflags", "-X github.com/roboll/helmfile/pkg/app/version.Version=v#{version}",
-             "-o", bin/"helmfile", "-v", "github.com/roboll/helmfile"
+    ldflags = %W[
+      -s -w
+      -X github.com/helmfile/helmfile/pkg/app/version.Version=v#{version}
+    ]
+    system "go", "build", *std_go_args(ldflags: ldflags)
   end
 
   test do

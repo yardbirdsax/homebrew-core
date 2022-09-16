@@ -1,15 +1,23 @@
 class MongoCxxDriver < Formula
   desc "C++ driver for MongoDB"
   homepage "https://github.com/mongodb/mongo-cxx-driver"
-  url "https://github.com/mongodb/mongo-cxx-driver/archive/r3.6.2.tar.gz"
-  sha256 "f50a1acb98a473f0850e2766dc7e84c05415dc63b1a2f851b77b12629ac14d62"
+  url "https://github.com/mongodb/mongo-cxx-driver/archive/r3.6.7.tar.gz"
+  sha256 "a9244d3117d4029a2f039dece242eef10e34502e4600e2afa968ab53589e6de7"
   license "Apache-2.0"
-  head "https://github.com/mongodb/mongo-cxx-driver.git"
+  head "https://github.com/mongodb/mongo-cxx-driver.git", branch: "master"
+
+  livecheck do
+    url :stable
+    regex(/^[rv]?(\d+(?:\.\d+)+)$/i)
+  end
 
   bottle do
-    sha256 cellar: :any, big_sur:  "e68f3e5c87021c8537656445b3641966eb1b03b36870d7d63795f75692b443a9"
-    sha256 cellar: :any, catalina: "c914c8eb18e5b84f6e1051abfd565db1824523b487463ed4c3b670014009a323"
-    sha256 cellar: :any, mojave:   "d257deef2474d068c1b7757aa9b2e7c1bb6259e15292c8b48e96487118a1c86a"
+    sha256 cellar: :any,                 arm64_monterey: "e953ef9f1244187c03e35b5c63cc56fe78a346b6961375883bfdb20882389ff3"
+    sha256 cellar: :any,                 arm64_big_sur:  "fe2c413af917d8fbc92cf070ac83de24056be996536f548a15e68378016da14a"
+    sha256 cellar: :any,                 monterey:       "58f58441db39bc316d2ff5cfedcdb4d3318c0319b90e8aeb415e72c0e4236fe0"
+    sha256 cellar: :any,                 big_sur:        "ae970fe199ed4e7231b1fa8415837b0ccb410773b553d6874d6fe678e1c889b5"
+    sha256 cellar: :any,                 catalina:       "89bfe3a25e19f9f35547b5c97f69d012d4bffa8a2197f309f64ba0f3f7cf5832"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ad20629b2d1cfc86305d17e7932e326bbfd8db3cec28c5a1fc676169cb785c28"
   end
 
   depends_on "cmake" => :build
@@ -25,7 +33,8 @@ class MongoCxxDriver < Formula
     system "cmake", ".", *std_cmake_args,
                         "-DBUILD_VERSION=#{version}",
                         "-DLIBBSON_DIR=#{mongo_c_prefix}",
-                        "-DLIBMONGOC_DIR=#{mongo_c_prefix}"
+                        "-DLIBMONGOC_DIR=#{mongo_c_prefix}",
+                        "-DCMAKE_INSTALL_RPATH=#{rpath}"
     system "make"
     system "make", "install"
   end

@@ -1,14 +1,19 @@
 class Rocksdb < Formula
   desc "Embeddable, persistent key-value store for fast storage"
   homepage "https://rocksdb.org/"
-  url "https://github.com/facebook/rocksdb/archive/v6.15.5.tar.gz"
-  sha256 "d7b994e1eb4dff9dfefcd51a63f86630282e1927fc42a300b93c573c853aa5d0"
+  url "https://github.com/facebook/rocksdb/archive/v7.5.3.tar.gz"
+  sha256 "c9f8cb3f14622a9bb2ead81093720d0660784352f7f53f44a990dc850a0caca1"
   license any_of: ["GPL-2.0-only", "Apache-2.0"]
+  head "https://github.com/facebook/rocksdb.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any, big_sur:  "aad14af99b39d155869bbb1f389b6da072890a531cd1e268aeb24ef911415a90"
-    sha256 cellar: :any, catalina: "e40e671dd9b9fe4ac37af9cb5845c085445ddc46dccadb523fa16fbbc9d8a539"
-    sha256 cellar: :any, mojave:   "189185a4b829e09cfb51fd9739f20b908bcc72b0a22327bc132c40a3b76fecbb"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "a45e2824164cf748ae2799ae7a196d9f4df8ee298bfe579b3920ce40964b6ab1"
+    sha256 cellar: :any,                 arm64_big_sur:  "182f94b13796657458252e3734b447ce197ed687aa42c41d1cfbca0f311786b3"
+    sha256 cellar: :any,                 monterey:       "5be246428cff223d30c43bb110705b3c220137a2565d592883ce3273f8e0905c"
+    sha256 cellar: :any,                 big_sur:        "d399e62721ee7b0f40d4512328fdfa6d1fd2ff6ae8ebb2e484a460901acca796"
+    sha256 cellar: :any,                 catalina:       "4dd27af61758492f21ca504df9de1969454d14163d8b38b93ee1f2d2ea9e1ff2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e1a7b73babf92242604fe5882a6ad731f9cb81229ee5520d48344b58e7a0ebe2"
   end
 
   depends_on "cmake" => :build
@@ -20,16 +25,13 @@ class Rocksdb < Formula
   uses_from_macos "bzip2"
   uses_from_macos "zlib"
 
-  # Add artifact suffix to shared library
-  # https://github.com/facebook/rocksdb/pull/7755
-  patch do
-    url "https://github.com/facebook/rocksdb/commit/98f3f3143007bcb5455105a05da7eeecc9cf53a0.patch?full_index=1"
-    sha256 "6fb59cd640ed8c39692855115b72e8aa8db50a7aa3842d53237e096e19f88fc1"
+  fails_with :gcc do
+    version "6"
+    cause "Requires C++17 compatible compiler. See https://github.com/facebook/rocksdb/issues/9388"
   end
 
   def install
-    ENV.cxx11
-    args = std_cmake_args + %w[
+    base_args = std_cmake_args + %W[
       -DPORTABLE=ON
       -DUSE_RTTI=ON
       -DWITH_BENCHMARK_TOOLS=OFF
@@ -38,11 +40,28 @@ class Rocksdb < Formula
       -DWITH_SNAPPY=ON
       -DWITH_ZLIB=ON
       -DWITH_ZSTD=ON
+      -DCMAKE_EXE_LINKER_FLAGS=-Wl,-rpath,#{rpath}
     ]
+
+    # build rocksdb_lite
+    lite_args = base_args + %w[
+      -DROCKSDB_LITE=ON
+      -DARTIFACT_SUFFIX=_lite
+      -DWITH_CORE_TOOLS=OFF
+      -DWITH_TOOLS=OFF
+    ]
+    mkdir "build_lite" do
+      system "cmake", "..", *lite_args
+      system "make", "install"
+    end
+    p = lib/"cmake/rocksdb/RocksDB"
+    ["Targets.cmake", "Targets-release.cmake"].each do |s|
+      File.rename "#{p}#{s}", "#{p}_Lite#{s}"
+    end
 
     # build regular rocksdb
     mkdir "build" do
-      system "cmake", "..", *args
+      system "cmake", "..", *base_args
       system "make", "install"
 
       cd "tools" do
@@ -55,18 +74,6 @@ class Rocksdb < Formula
         bin.install "rocksdb_undump"
       end
       bin.install "db_stress_tool/db_stress" => "rocksdb_stress"
-    end
-
-    # build rocksdb_lite
-    args += %w[
-      -DROCKSDB_LITE=ON
-      -DARTIFACT_SUFFIX=_lite
-      -DWITH_CORE_TOOLS=OFF
-      -DWITH_TOOLS=OFF
-    ]
-    mkdir "build_lite" do
-      system "cmake", "..", *args
-      system "make", "install"
     end
   end
 
@@ -83,12 +90,21 @@ class Rocksdb < Formula
     EOS
 
     extra_args = []
-    on_macos do
+    if OS.mac?
       extra_args << "-stdlib=libc++"
       extra_args << "-lstdc++"
     end
     system ENV.cxx, "test.cpp", "-o", "db_test", "-v",
-                                "-std=c++11",
+                                "-std=c++17",
+                                *extra_args,
+                                "-lz", "-lbz2",
+                                "-L#{lib}", "-lrocksdb",
+                                "-L#{Formula["snappy"].opt_lib}", "-lsnappy",
+                                "-L#{Formula["lz4"].opt_lib}", "-llz4",
+                                "-L#{Formula["zstd"].opt_lib}", "-lzstd"
+    system "./db_test"
+    system ENV.cxx, "test.cpp", "-o", "db_test_lite", "-v",
+                                "-std=c++17",
                                 *extra_args,
                                 "-lz", "-lbz2",
                                 "-L#{lib}", "-lrocksdb_lite",
@@ -96,7 +112,7 @@ class Rocksdb < Formula
                                 "-L#{Formula["snappy"].opt_lib}", "-lsnappy",
                                 "-L#{Formula["lz4"].opt_lib}", "-llz4",
                                 "-L#{Formula["zstd"].opt_lib}", "-lzstd"
-    system "./db_test"
+    system "./db_test_lite"
 
     assert_match "sst_dump --file=", shell_output("#{bin}/rocksdb_sst_dump --help 2>&1")
     assert_match "rocksdb_sanity_test <path>", shell_output("#{bin}/rocksdb_sanity_test --help 2>&1", 1)

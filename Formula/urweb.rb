@@ -3,13 +3,13 @@ class Urweb < Formula
   homepage "http://www.impredicative.com/ur/"
   url "https://github.com/urweb/urweb/releases/download/20200209/urweb-20200209.tar.gz"
   sha256 "ac3010c57f8d90f09f49dfcd6b2dc4d5da1cdbb41cbf12cb386e96e93ae30662"
-  revision 2
+  revision 6
 
   bottle do
-    sha256 big_sur:     "651f89a41cbaf3b06d775d56d6da32b50d36a2850985e762819f89e6701c36e6"
-    sha256 catalina:    "ea2ccdf37715d601fb22b301e9646d8a56bd408b88c8f83e2feda08d3695712c"
-    sha256 mojave:      "edfad2dea9f27c87d7a68396f50cbbf6d345edf6059abf555ad6c7d2d0bc2177"
-    sha256 high_sierra: "ccc6d329298c6d3f3f4ba7e67b8be51017b7f95dad00de35d63fe49c670f1ee2"
+    sha256 monterey:     "82624c39378509939cb3a3dac20dde40ff2db659b8c01d4e21616c3841cd9dd6"
+    sha256 big_sur:      "d7d9ea068bec51f020dbdf77e642ddb0ba5fc3bc79f694f9e1162c22fffc1074"
+    sha256 catalina:     "7cc49cd4e66b35b3b283a93af77e4ff4d2eb2482478888f645eb05889dde69a3"
+    sha256 x86_64_linux: "30b601aa8761349f8097b71ee619b3c517a63d2798a5f1ef233d6085ab8a3c80"
   end
 
   depends_on "autoconf" => :build
@@ -19,6 +19,18 @@ class Urweb < Formula
   depends_on "gmp"
   depends_on "icu4c"
   depends_on "openssl@1.1"
+
+  # Patch to fix build for icu4c 68.2
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/d7db3f02fe5dcd1f73c216efcb0bb79ac03a819f/urweb/icu4c68-2.patch"
+    sha256 "8ec1ec5bec95e9feece8ff4e9c0435ada0ba2edbe48439fb88af4d56adcf2b3e"
+  end
+
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+  end
 
   def install
     args = %W[

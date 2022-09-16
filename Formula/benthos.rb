@@ -1,15 +1,18 @@
 class Benthos < Formula
   desc "Stream processor for mundane tasks written in Go"
   homepage "https://www.benthos.dev"
-  url "https://github.com/Jeffail/benthos/archive/v3.39.0.tar.gz"
-  sha256 "282d24b989f69529c1ebc17efa81fa9b8f8df3158a25ea2c462aa5e64be1551c"
+  url "https://github.com/benthosdev/benthos/archive/v4.6.0.tar.gz"
+  sha256 "ab552ea0344d97735dd9b1882cb5bc9575f9a246b3fb67f0822357ab55243ebe"
   license "MIT"
+  head "https://github.com/benthosdev/benthos.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "b34e9ee43b15ec83a5a5ea37b71583c1f787dab76cfbe9c0e2a9e53b89c66712"
-    sha256 cellar: :any_skip_relocation, big_sur:       "92bd42cb16d1c9caa8e8d323c98aa329437b8fd974c4b28b1bfde42c54098bf4"
-    sha256 cellar: :any_skip_relocation, catalina:      "778a4e188c95ac9239f7a717b936426fd80051ea0527855822903c9ffc1536a6"
-    sha256 cellar: :any_skip_relocation, mojave:        "2117066a1d41b5d199647a7e52e356608e1b553406c6f006eafd8d0772488916"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "7b8c79b16f26f704ed0f8154f37329d4baf974009f50122ce2a4f52a0ebc4cd5"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "2cbfd3f1b89349261e0d6d7a1983ec4d6f6002a66fed1b9ab1dfa7403d6c80f9"
+    sha256 cellar: :any_skip_relocation, monterey:       "0ef478a445158cec320bd4401d166fff7a3487698c375fd5e7598d9c23bb9e45"
+    sha256 cellar: :any_skip_relocation, big_sur:        "b0e61cbcd817b556545ba697542abd36ee2c2a618d36e00f76650e93fda0064f"
+    sha256 cellar: :any_skip_relocation, catalina:       "4575621db43aa5a92158500e0e024e433ebe8f25cb66856ad8463c6e2cd2be28"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9795f554f3d5a6f4bd793359e566d352935691abfa24fce9ba689fe36dce3f61"
   end
 
   depends_on "go" => :build
@@ -29,17 +32,14 @@ class Benthos < Formula
       logger:
         level: ERROR
       input:
-        type: file
         file:
-          path: ./sample.txt
+          paths: [ ./sample.txt ]
       pipeline:
         threads: 1
         processors:
-         - type: decode
-           decode:
-             scheme: base64
+         - bloblang: 'root = content().decode("base64")'
       output:
-        type: stdout
+        stdout: {}
     EOS
     output = shell_output("#{bin}/benthos -c test_pipeline.yaml")
     assert_match "Benthos rocks!", output.strip

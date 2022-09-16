@@ -1,22 +1,36 @@
 class Kcgi < Formula
   desc "Minimal CGI and FastCGI library for C/C++"
-  homepage "https://kristaps.bsd.lv/kcgi"
-  url "https://kristaps.bsd.lv/kcgi/snapshots/kcgi-0.12.3.tgz"
-  sha256 "96b869f50799c245dc25946b160f1dfa0c321eaaf14a1b63e28e58475edee112"
+  homepage "https://kristaps.bsd.lv/kcgi/"
+  url "https://kristaps.bsd.lv/kcgi/snapshots/kcgi-0.13.0.tgz"
+  sha256 "d886e5700f5ec72b00cb668e9f06b7b3906b6ccdc5bab4c89e436d4cc4c0c7a1"
   license "ISC"
 
+  livecheck do
+    url "https://kristaps.bsd.lv/kcgi/snapshots/"
+    regex(/href=.*?kcgi[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
+
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "3fc4230160aa06daffdf7ecf1d163c7ef51f251f8a0af41895dce2758e17d8ec"
-    sha256 cellar: :any_skip_relocation, big_sur:       "9d3c70c055debc2d11e7bbd7b5df4730e22c59d5476a937c55283c4925d29799"
-    sha256 cellar: :any_skip_relocation, catalina:      "0f50618443011bede00b008698b0fa954660771e0970dd744d625ffca9295095"
-    sha256 cellar: :any_skip_relocation, mojave:        "27eb935afbc082aee20734a400d229f96d24a54a0e703fb2dc251923852a0ea0"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "94328c333800419711f54bb6bb199c632e8dd665dd04f8fdac22d54a2391c2fa"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "477a66993f541e9b595996d577c766c5eb205730b97885853322b32bb3d66285"
+    sha256 cellar: :any_skip_relocation, monterey:       "d8559957ace2184733fa9d74ebee348137efa4093e6f07b5c907cc924aaa1532"
+    sha256 cellar: :any_skip_relocation, big_sur:        "aea0950090e27a079ea4f104a726676c13f01de6c56284b2f98e8bfd1a208e21"
+    sha256 cellar: :any_skip_relocation, catalina:       "de0d79ace2d35397df1fa1e8d7e09128372d9c7989992675ae835d2d21a502e8"
+    sha256 cellar: :any_skip_relocation, mojave:         "a4779378456da9d3887e45136c69df85d47bef12d57b7f8903f840f4c2b12002"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1dbc844befbf8fcff4b08055dd7c9964ece3e846b6d0bbd6282663ebd89a6ff4"
   end
 
   depends_on "bmake" => :build
 
+  on_linux do
+    depends_on "libseccomp"
+  end
+
   def install
     system "./configure", "MANDIR=#{man}",
                           "PREFIX=#{prefix}"
+    # Uncomment CPPFLAGS to enable libseccomp support on Linux, as instructed to in Makefile.
+    inreplace "Makefile", "#CPPFLAGS", "CPPFLAGS" unless OS.mac?
     system "bmake"
     system "bmake", "install"
   end

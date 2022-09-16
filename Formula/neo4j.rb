@@ -1,8 +1,8 @@
 class Neo4j < Formula
   desc "Robust (fully ACID) transactional property graph database"
   homepage "https://neo4j.com/"
-  url "https://neo4j.com/artifact.php?name=neo4j-community-4.2.3-unix.tar.gz"
-  sha256 "319edc1d6eed094b0e53b27491df2cbb0cbd10fce546a981e871aa06612765ce"
+  url "https://neo4j.com/artifact.php?name=neo4j-community-4.4.11-unix.tar.gz"
+  sha256 "28810daac5de4a5d5b77ce2da7d7c3da4c5ccf13288bad885b833c35b96100c8"
   license "GPL-3.0-or-later"
 
   livecheck do
@@ -11,7 +11,9 @@ class Neo4j < Formula
           |href=.*?release=v?(\d+(?:\.\d+)+)[^"' >]+edition=community/ix)
   end
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "73bc7b410291367f0e77f403bd3fb49c118a2ff828afbabf9030a9a98dbce383"
+  end
 
   depends_on "openjdk@11"
 
@@ -45,34 +47,12 @@ class Neo4j < Formula
     (var/"neo4j").mkpath
   end
 
-  plist_options manual: "neo4j start"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>KeepAlive</key>
-          <false/>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_bin}/neo4j</string>
-            <string>console</string>
-          </array>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>WorkingDirectory</key>
-          <string>#{var}</string>
-          <key>StandardErrorPath</key>
-          <string>#{var}/log/neo4j.log</string>
-          <key>StandardOutPath</key>
-          <string>#{var}/log/neo4j.log</string>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_bin/"neo4j", "console"]
+    keep_alive false
+    working_dir var
+    log_path var/"log/neo4j.log"
+    error_log_path var/"log/neo4j.log"
   end
 
   test do
@@ -80,6 +60,6 @@ class Neo4j < Formula
     ENV["NEO4J_LOG"] = testpath/"libexec/data/log/neo4j.log"
     ENV["NEO4J_PIDFILE"] = testpath/"libexec/data/neo4j-service.pid"
     mkpath testpath/"libexec/data/log"
-    assert_match /Neo4j .*is not running/i, shell_output("#{bin}/neo4j status", 3)
+    assert_match(/Neo4j .*is not running/i, shell_output("#{bin}/neo4j status", 3))
   end
 end

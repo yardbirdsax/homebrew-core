@@ -1,19 +1,18 @@
 class RangeV3 < Formula
   desc "Experimental range library for C++14/17/20"
   homepage "https://ericniebler.github.io/range-v3/"
-  url "https://github.com/ericniebler/range-v3/archive/0.11.0.tar.gz"
-  sha256 "376376615dbba43d3bef75aa590931431ecb49eb36d07bb726a19f680c75e20c"
+  url "https://github.com/ericniebler/range-v3/archive/0.12.0.tar.gz"
+  sha256 "015adb2300a98edfceaf0725beec3337f542af4915cec4d0b89fa0886f4ba9cb"
   license "BSL-1.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "2500d54ef2231b737505f3cad48f4a3ffb996b3941b8cbee4f8e2b1a44692aec"
-    sha256 cellar: :any_skip_relocation, big_sur:       "f22133b9d6ec765bef17f0ad8a81796ceafff1067954eb46a019b63e6aaa4f91"
-    sha256 cellar: :any_skip_relocation, catalina:      "bffbe0872b344db9b7838d3a63b10e95df57385d26bfaeffc4da5a3d940893c6"
-    sha256 cellar: :any_skip_relocation, mojave:        "bffbe0872b344db9b7838d3a63b10e95df57385d26bfaeffc4da5a3d940893c6"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "bffbe0872b344db9b7838d3a63b10e95df57385d26bfaeffc4da5a3d940893c6"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, all: "02f3ca79cf8dbd85b63afb67fbecc0f0e6b753754d20dabffe444c311e132574"
   end
 
   depends_on "cmake" => :build
+
+  fails_with gcc: "5"
 
   def install
     system "cmake", ".",
@@ -37,8 +36,10 @@ class RangeV3 < Formula
         std::cout << std::endl;
       }
     EOS
-    system ENV.cc, "-std=c++14", "-stdlib=libc++", "-lc++",
-                   "-o", "test", "test.cpp"
+    stdlib_ldflag = OS.mac? ? "-lc++" : "-lstdc++"
+    flags = [stdlib_ldflag]
+    flags << "-stdlib=libc++" if OS.mac?
+    system ENV.cc, "test.cpp", "-std=c++14", *flags, "-o", "test"
     assert_equal "h e l l o \n", shell_output("./test")
   end
 end

@@ -3,41 +3,40 @@ class Icemon < Formula
   homepage "https://github.com/icecc/icemon"
   url "https://github.com/icecc/icemon/archive/v3.3.tar.gz"
   sha256 "3caf14731313c99967f6e4e11ff261b061e4e3d0c7ef7565e89b12e0307814ca"
-  license "GPL-2.0"
+  license "GPL-2.0-or-later"
+  revision 1
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "a975fb1f42d8a4f3b854f435998ea86629f275bce32ec9d66d49554d3677cc8d"
-    sha256 cellar: :any, big_sur:       "52c53c5f13f2d667d910b7d75701aaaa5270168194e0468fd8daf581185c9791"
-    sha256 cellar: :any, catalina:      "4a5b08e5bc831130b26e21e81456c56b01f3ca391ff822785fe4b2a9f005132e"
-    sha256 cellar: :any, mojave:        "0752b2d25bb1371bf42fd8a049b6c10d6e289d74cf6d9409dd9b268a4da70722"
-    sha256 cellar: :any, high_sierra:   "785d0af0e6f9900aa7bd1c60309385da28dee75380dd47a449286dae7e6c3df2"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "ddd8e4ef2a9f056c9b1ea46968ce4e69b281816ef9c405514164d2ca65e4e61c"
+    sha256 cellar: :any,                 arm64_big_sur:  "f6c322e1fbdd9f73d1a91dfd1e546f55b617cf9dbde7e22283a288a0b5013ec9"
+    sha256 cellar: :any,                 monterey:       "a1f66afcc9a18f14e87f6f3e631f1372f7b7d244b642d5f7f05da155d8710b06"
+    sha256 cellar: :any,                 big_sur:        "f691df436bfddef842f8e64a3b5272b9be0d3faa902a0c8b7d6a1f940445c080"
+    sha256 cellar: :any,                 catalina:       "dbbc9d249e23f8d6fcb3cdab7f8ff0a981134a4b7d3280355748d0b74a19c395"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5f6c890302532ee361d184142ec1153513e8d5be413c2479d2b9fc4146137b43"
   end
 
   depends_on "cmake" => :build
+  depends_on "extra-cmake-modules" => :build
   depends_on "pkg-config" => :build
   depends_on "sphinx-doc" => :build
   depends_on "icecream"
   depends_on "lzo"
-  depends_on "qt"
+  depends_on "qt@5"
 
-  resource "ecm" do
-    url "https://github.com/KDE/extra-cmake-modules/archive/v5.62.0.tar.gz"
-    sha256 "b3da80738ec793e8052819c53464244ff04a0705d92e8143b11d1918df9e970b"
-  end
+  fails_with gcc: "5"
 
   def install
-    resource("ecm").stage do
-      cmake_args = std_cmake_args.reject { |s| s["CMAKE_INSTALL_PREFIX"] }
-      system "cmake", ".",
-        "-DCMAKE_INSTALL_PREFIX=#{buildpath}/ecm",
-        *cmake_args
-      system "make", "install"
-    end
-    system "cmake", ".", "-DECM_DIR=ecm/share/ECM/cmake", *std_cmake_args
+    system "cmake", ".", "-DECM_DIR=#{Formula["extra-cmake-modules"].opt_share}/ECM/cmake", *std_cmake_args
     system "make", "install"
   end
 
   test do
-    system "#{bin}/icemon", "--version"
+    if OS.mac?
+      system "#{bin}/icemon", "--version"
+    else
+      assert_match("qt.qpa.xcb: could not connect to display",
+                         shell_output("#{bin}/icemon --version 2>&1", 134))
+    end
   end
 end

@@ -1,21 +1,24 @@
 class Lf < Formula
   desc "Terminal file manager"
   homepage "https://godoc.org/github.com/gokcehan/lf"
-  url "https://github.com/gokcehan/lf/archive/r20.tar.gz"
-  sha256 "b0d755e255d48229c14b7ec5f86788c6fc96df1f6859f677b313fd9deb856398"
+  url "https://github.com/gokcehan/lf/archive/r27.tar.gz"
+  sha256 "cdd132e33387423ef9f9448e21d3f1e5c9a5319b34fdfb53cb5f49351ebac005"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "76532aef2662851d91c21fec4e461f59d7e5ff34c29a1932b67a736df63614b6"
-    sha256 cellar: :any_skip_relocation, big_sur:       "97eaf299413c09cbce0467da36ab94b572686b677bd29875280f007f8d02a59b"
-    sha256 cellar: :any_skip_relocation, catalina:      "91f1f834f8c148b7672013ef1daf2b622d98fc436d1456c7de046a0a999c0cb1"
-    sha256 cellar: :any_skip_relocation, mojave:        "12783fd218c49b0c221b7ab2bb1caebfbb55628441d147642c08f1467aa5dda2"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "553d6cd7611f20d4289169c789da8547455cac8f908dce4e042c13d169bd9e05"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b132e93f46cec73de1f3ac8432adf1cc88caf97e9e5ced9a89b562cade40f956"
+    sha256 cellar: :any_skip_relocation, monterey:       "d80101f720ccf3999990517874f3faf1fd86fae17f8bfc4e8a1eb4508a981859"
+    sha256 cellar: :any_skip_relocation, big_sur:        "eb8e3ec6c981fbfd667eedb21ee77dbcb36d68f9162cd2d9de7599b4a4131093"
+    sha256 cellar: :any_skip_relocation, catalina:       "5b6b86a2e7e36528a2dd32647fe5d3a9a68d542f953aea319386e51557e5a25b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "83b9d1b1eed42aeecd6b4d94e41277c89b8a09ff991d95374cf9da67efc99a18"
   end
 
-  depends_on "go" => :build
+  # Bump to 1.18 on the next release.
+  depends_on "go@1.17" => :build
 
   def install
-    system "go", "build", *std_go_args, "-ldflags", "-s -w -X main.gVersion=#{version}"
+    system "go", "build", *std_go_args(ldflags: "-s -w -X main.gVersion=#{version}")
     man1.install "lf.1"
     zsh_completion.install "etc/lf.zsh" => "_lf"
     fish_completion.install "etc/lf.fish"

@@ -1,10 +1,10 @@
 class Qjackctl < Formula
   desc "Simple Qt application to control the JACK sound server daemon"
   homepage "https://qjackctl.sourceforge.io/"
-  url "https://downloads.sourceforge.net/project/qjackctl/qjackctl/0.9.0/qjackctl-0.9.0.tar.gz"
-  sha256 "5196c5c01b7948c1a8ca37cd3198a7f0fe095a99a34a67086abd3466855b4abd"
+  url "https://downloads.sourceforge.net/project/qjackctl/qjackctl/0.9.7/qjackctl-0.9.7.tar.gz"
+  sha256 "524843618152070c90a40a18d0e9a16e784424ce54231aff5c0ced12f2769080"
   license "GPL-2.0-or-later"
-  head "https://git.code.sf.net/p/qjackctl/code.git"
+  head "https://git.code.sf.net/p/qjackctl/code.git", branch: "master"
 
   livecheck do
     url :stable
@@ -12,31 +12,42 @@ class Qjackctl < Formula
   end
 
   bottle do
-    sha256 big_sur:  "2b1d7e384d27c5a4a0efebeaf17c4d537bd0b54e3a559858974fc202e2bc74eb"
-    sha256 catalina: "5a5eebb3680306820a64891b9eaf06fdb9fc0f7769ed7f870fd682ab41de718e"
-    sha256 mojave:   "96b34130264ef5bd30bd1c8cc4ac4bb149041df187daacf6fa687f5221bdb103"
+    rebuild 1
+    sha256 arm64_monterey: "0f3e64ef2b94a5e8d58c837b6fcd60a788977ff00f847bd9e8379e7303308bb8"
+    sha256 arm64_big_sur:  "e987344fe0fbd559ac3ece1aa750932051f87eb345242e37b202d95ea1fe8431"
+    sha256 monterey:       "c06b8e8e299414b51a498812d61a5200e80903184eb01136acf7ee7eca7038b8"
+    sha256 big_sur:        "87baabe3f3790a992f9309d9f877efd74dd76c3f03df7b6dead6199100141e90"
+    sha256 catalina:       "b2ead9c2ef60464193f4d1b1d32454024d5f4fbd8c712d56c1cea2c2bb780340"
+    sha256 x86_64_linux:   "18e9599c50eea0ed17ea7b01f1c0cc1bfadc04403e06b85f9d2a99d61be4d9ae"
   end
 
-  depends_on "pkg-config" => :build
+  depends_on "cmake" => :build
   depends_on "jack"
   depends_on "qt"
 
-  def install
-    ENV.cxx11
-    system "./configure", "--disable-debug",
-                          "--disable-dbus",
-                          "--disable-portaudio",
-                          "--disable-xunique",
-                          "--prefix=#{prefix}",
-                          "--with-jack=#{Formula["jack"].opt_prefix}",
-                          "--with-qt=#{Formula["qt"].opt_prefix}"
+  fails_with gcc: "5"
 
-    system "make", "install"
-    prefix.install bin/"qjackctl.app"
-    bin.install_symlink prefix/"qjackctl.app/Contents/MacOS/qjackctl"
+  def install
+    args = std_cmake_args + %w[
+      -DCONFIG_DBUS=OFF
+      -DCONFIG_PORTAUDIO=OFF
+      -DCONFIG_XUNIQUE=OFF
+    ]
+
+    system "cmake", *args
+    system "cmake", "--build", "."
+    system "cmake", "--install", "."
+
+    if OS.mac?
+      prefix.install bin/"qjackctl.app"
+      bin.install_symlink prefix/"qjackctl.app/Contents/MacOS/qjackctl"
+    end
   end
 
   test do
-    assert_match version.to_s, shell_output("#{bin}/qjackctl --version 2>&1", 1)
+    # Set QT_QPA_PLATFORM to minimal to avoid error "qt.qpa.xcb: could not connect to display"
+    ENV["QT_QPA_PLATFORM"] = "minimal" if OS.linux? && ENV["HOMEBREW_GITHUB_ACTIONS"]
+
+    assert_match version.to_s, shell_output("#{bin}/qjackctl --version 2>&1")
   end
 end

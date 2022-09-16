@@ -1,9 +1,10 @@
 class Freeciv < Formula
   desc "Free and Open Source empire-building strategy game"
   homepage "http://freeciv.org"
-  url "https://downloads.sourceforge.net/project/freeciv/Freeciv%202.6/2.6.3/freeciv-2.6.3.tar.bz2"
-  sha256 "77432e027557a9eb407dac730ae9810ee172abe37111deb017fe72b8183ff8d1"
+  url "https://downloads.sourceforge.net/project/freeciv/Freeciv%203.0/3.0.3/freeciv-3.0.3.tar.xz"
+  sha256 "13215adc96be9f2894d5f3a12c78b8ebb9ae06ecdab25fe6bb1794f6e6d2b61b"
   license "GPL-2.0-or-later"
+  revision 1
 
   livecheck do
     url :stable
@@ -11,10 +12,12 @@ class Freeciv < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "b32f1d068dac64d037bb4784d1bfe2f3d88801d45395647b46e83e9352428e97"
-    sha256 big_sur:       "57f0a07826b7fa224a79eda88041375d21fcd2787ab57bca311542da278da5a6"
-    sha256 catalina:      "c46864366282e6b626a787e45453f539c3604c334a84326a0c8cc4ab2511e7dd"
-    sha256 mojave:        "287706ed5964b4959c16017e641afe30e0348fd4840e9516525bceeb49ffa8d4"
+    sha256 arm64_monterey: "f3c319b041d5a5f81693f83b1e87e8519a1fe4a7e987492b63dcb6ab74b81781"
+    sha256 arm64_big_sur:  "d3340ac8da9a72f397d7d0c9a24f44bec3d4c0e8bf5de2e8fc06bcaa8d486816"
+    sha256 monterey:       "77fcaee302c90de1abf52a93d214e20625170b1276ee383723becaf4e41c6223"
+    sha256 big_sur:        "ed32f919ad2fbd1a982a05682bd0bfdd08ecfd7032896b2b13976d320d6f47be"
+    sha256 catalina:       "0d8d998a767905ce2d62f153d8fbc7ae96e88a80351432a34dc9ead21284e119"
+    sha256 x86_64_linux:   "48fab150b4422cfc6065220546490459b19211b8e9aa14beb51d4c6923109ec3"
   end
 
   head do
@@ -27,6 +30,7 @@ class Freeciv < Formula
   end
 
   depends_on "pkg-config" => :build
+  depends_on "adwaita-icon-theme"
   depends_on "atk"
   depends_on "cairo"
   depends_on "freetype"
@@ -40,10 +44,10 @@ class Freeciv < Formula
   depends_on "readline"
   depends_on "sdl2"
   depends_on "sdl2_mixer"
+  depends_on "sqlite" # try to change to uses_from_macos after python is not a dependency
 
   uses_from_macos "bzip2"
   uses_from_macos "curl"
-  uses_from_macos "libiconv"
   uses_from_macos "zlib"
 
   def install
@@ -57,6 +61,7 @@ class Freeciv < Formula
       --disable-sdltest
       --disable-sdl2test
       --disable-sdl2framework
+      --enable-client=gtk3.22
       --enable-fcdb=sqlite3
       --prefix=#{prefix}
       --with-readline=#{Formula["readline"].opt_prefix}
@@ -76,7 +81,7 @@ class Freeciv < Formula
 
   test do
     system bin/"freeciv-manual"
-    assert_predicate testpath/"classic6.mediawiki", :exist?
+    assert_predicate testpath/"civ2civ36.mediawiki", :exist?
 
     fork do
       system bin/"freeciv-server", "-l", testpath/"test.log"

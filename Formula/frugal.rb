@@ -1,29 +1,23 @@
 class Frugal < Formula
   desc "Cross language code generator for creating scalable microservices"
   homepage "https://github.com/Workiva/frugal"
-  url "https://github.com/Workiva/frugal/archive/v3.13.1.tar.gz"
-  sha256 "d71b48ba6834b62ae5f52b7f50cd768af5a483283c0deed043ff4c6dde3f2344"
+  url "https://github.com/Workiva/frugal/archive/v3.16.3.tar.gz"
+  sha256 "dc72ac8609bfadacb2610b3c5683318c3a30201098f486417f11d72fae55ee1d"
   license "Apache-2.0"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "318f2abc0180a6145d07df9eb38392d188ce73941b48a69f8327d073912c05c1"
-    sha256 cellar: :any_skip_relocation, big_sur:       "b5091ce489760e134a319e1fd95876074e2570aa6df5ab4a5162c04917bf172e"
-    sha256 cellar: :any_skip_relocation, catalina:      "a29e67a857b219d854cca711dd47b7bf3a0c8762b57512334fbed946ff74a6d0"
-    sha256 cellar: :any_skip_relocation, mojave:        "5e2e9a28e4bfea849d62a88a309082f8ec1c40a6f7db6b68df0ebde1f88aec21"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "4992794514907538d774db052c783ae0e392c6466a0a7bb4341e5d8846b7adc0"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "4992794514907538d774db052c783ae0e392c6466a0a7bb4341e5d8846b7adc0"
+    sha256 cellar: :any_skip_relocation, monterey:       "2a6d1d8ff2e2ea10e40d9a16459e55647fb7b4fbc13157e89d7455f4cc2d4299"
+    sha256 cellar: :any_skip_relocation, big_sur:        "2a6d1d8ff2e2ea10e40d9a16459e55647fb7b4fbc13157e89d7455f4cc2d4299"
+    sha256 cellar: :any_skip_relocation, catalina:       "2a6d1d8ff2e2ea10e40d9a16459e55647fb7b4fbc13157e89d7455f4cc2d4299"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d0c26b137ac366ce68d16b82e4b763574eebac4fd73e117051029bc70fb3c922"
   end
 
-  depends_on "glide" => :build
   depends_on "go" => :build
 
   def install
-    ENV["GOPATH"] = buildpath
-    ENV["GO111MODULE"] = "auto"
-    (buildpath/"src/github.com/Workiva/frugal").install buildpath.children
-    cd "src/github.com/Workiva/frugal" do
-      system "glide", "install"
-      system "go", "build", *std_go_args
-    end
+    system "go", "build", *std_go_args(ldflags: "-s -w")
   end
 
   test do

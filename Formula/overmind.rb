@@ -1,20 +1,22 @@
 class Overmind < Formula
   desc "Process manager for Procfile-based applications and tmux"
   homepage "https://github.com/DarthSim/overmind"
-  url "https://github.com/DarthSim/overmind/archive/v2.2.0.tar.gz"
-  sha256 "6c24fd91167f0fd35c60275f1cea9998c1ffab88a6b699731bf88f4e54f23d48"
+  url "https://github.com/DarthSim/overmind/archive/v2.3.0.tar.gz"
+  sha256 "a9fe0efc94b72ca11003940145ca4d48a8af32e5e9593d1a53757dd2eccacbb2"
   license "MIT"
-  head "https://github.com/DarthSim/overmind.git"
+  head "https://github.com/DarthSim/overmind.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "b2b0ee512f0512b1f8c720341d903f672356ec17c5548e7065c85aa87d80a249"
-    sha256 cellar: :any_skip_relocation, big_sur:       "756aeec8ddea0b78c4159ddfe851b1db8e5e9baa0c9726134fc0db73dd34e991"
-    sha256 cellar: :any_skip_relocation, catalina:      "dd22cafb2c5437c5e33ea1d7354b6477f743adb23393b9f0c8794cd2ae8ff213"
-    sha256 cellar: :any_skip_relocation, mojave:        "cdb7478361214b56df089ea7038c4747a2430defc6af864c66fe95796a3b5ce6"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "5304546181f4a8da0604296b277000c16143862a11def6b48cab969e2a34ee62"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "4841af6b8c882b52029d7c7a58bc0d5534bfb7f53f1b33b76d980f6197db954b"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b96582ea0b7adb01d40b4429beaac118bb090bb856f3579a9a63c100cbc00546"
+    sha256 cellar: :any_skip_relocation, monterey:       "ad3705236fde66360596bee1567ba806420d5b215a0ce51d206679ba360583ac"
+    sha256 cellar: :any_skip_relocation, big_sur:        "5a1f67aff79d61c0ba2b46fa108ba1fdd8bf35252e897c9b81e54fa66c6d1b79"
+    sha256 cellar: :any_skip_relocation, catalina:       "281b468e00c93a48d08a2288365a86cf3c4726ce9ab26777c07e903895c503d3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "162e1a133b3a55c485c8149a375b442bc3e01ef1306f7f28fab381f7559225d7"
   end
 
-  depends_on "go" => :build
+  # Bump to 1.18 on the next release, if possible.
+  depends_on "go@1.17" => :build
   depends_on "tmux"
 
   def install
@@ -25,7 +27,7 @@ class Overmind < Formula
   test do
     expected_message = "overmind: open ./Procfile: no such file or directory"
     assert_match expected_message, shell_output("#{bin}/overmind start 2>&1", 1)
-    (testpath/"Procfile").write("test: echo 'test message'")
+    (testpath/"Procfile").write("test: echo 'test message'; sleep 1")
     expected_message = "test message"
     assert_match expected_message, shell_output("#{bin}/overmind start")
   end

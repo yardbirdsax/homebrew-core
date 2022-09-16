@@ -1,22 +1,24 @@
 class Babl < Formula
   desc "Dynamic, any-to-any, pixel format translation library"
   homepage "https://www.gegl.org/babl/"
-  url "https://download.gimp.org/pub/babl/0.1/babl-0.1.84.tar.xz"
-  sha256 "e7e38b8441f77feb9dc8231cb434a86190a21f2f3692c281457e99d35e9c34ea"
+  url "https://download.gimp.org/pub/babl/0.1/babl-0.1.96.tar.xz"
+  sha256 "33673fe459a983f411245a49f81fd7f1966af1ea8eca9b095a940c542b8545f6"
   license "LGPL-3.0-or-later"
   # Use GitHub instead of GNOME's git. The latter is unreliable.
-  head "https://github.com/GNOME/babl.git"
+  head "https://github.com/GNOME/babl.git", branch: "master"
 
   livecheck do
     url "https://download.gimp.org/pub/babl/0.1/"
-    regex(/href=.*?babl[._-]v?(\d+(?:\.\d+)*)\.t/i)
+    regex(/href=.*?babl[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 arm64_big_sur: "799c80b4b2e5cbefa44a2e8113d9a910a74f4d5a729e4792f1514dcd6bd77763"
-    sha256 big_sur:       "2cf2c6915f2d08e32469348694eca72ad8fb994d7c8aa8fff02f8cb5e46d4216"
-    sha256 catalina:      "0529257e189f0f9db5b2def58ae19e3097b5845147b49e74f5baec9a39b18e11"
-    sha256 mojave:        "f28c8bd67641d91920281e7f7774ddf9c34fb97f341f689efab4858cb858c9ab"
+    sha256                               arm64_monterey: "64c8b2c66d553f2b0de3e8daf1a42ca9801b3ee25a07a1c19a9fc27f6c28b913"
+    sha256                               arm64_big_sur:  "4a7ffd11316c9c16c594a10bda037db29c5dedb9b5bb6110a05fe4f95e4c89fe"
+    sha256                               monterey:       "75a5d52d2d35b7cbf9d64d1265c423dcc067cd64943b1f6f7228c6bf8e005770"
+    sha256                               big_sur:        "968dcf8b7dc248ddf031bf18e6df7f4c0928415ce9ab80bfa64dac476b1005cd"
+    sha256                               catalina:       "271e7ae1cac571441212d26cf2e0f7498e9dfb6990a5f22da569ba7d74835bdb"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c92381d3869a38879f1a95351a9ae5e880d9813ac4a237f532879decd23ad70b"
   end
 
   depends_on "glib" => :build # for gobject-introspection
@@ -47,7 +49,7 @@ class Babl < Formula
         return 0;
       }
     EOS
-    system ENV.cc, "-I#{include}/babl-0.1", "-L#{lib}", "-lbabl-0.1", testpath/"test.c", "-o", "test"
+    system ENV.cc, "-I#{include}/babl-0.1", testpath/"test.c", "-L#{lib}", "-lbabl-0.1", "-o", "test"
     system testpath/"test"
   end
 end

@@ -1,15 +1,18 @@
 class Pdftilecut < Formula
   desc "Sub-divide a PDF page(s) into smaller pages so you can print them"
   homepage "https://github.com/oxplot/pdftilecut"
-  url "https://github.com/oxplot/pdftilecut/archive/v0.4.tar.gz"
-  sha256 "8a75a0d2e196d156bca4dc006f84c9b7730f20be8c0fc2c90521c538aa627188"
+  url "https://github.com/oxplot/pdftilecut/archive/v0.6.tar.gz"
+  sha256 "fd2383ee0d0acfa56cf6e80ac62881bd6dda4555adcd7f5a397339e7d3eca9ac"
   license "BSD-3-Clause"
+  revision 1
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "a36f6efee23fc0af788bdef8017bcfee5b0fa25031541a499508f4942d743083"
-    sha256 cellar: :any, big_sur:       "e9cd816b6b435a80e0860b9a3d4e62aea35e85bbb6df82ba9308c4b8c10245d1"
-    sha256 cellar: :any, catalina:      "015c4f2b9481772318dabbf7f8cb5aa0640e46781d7cd7ef5cfc9f33b91afb79"
-    sha256 cellar: :any, mojave:        "59229d726c29240bd14240e9011bfc1ec731ffcef8e52373c5a720649e6cacb7"
+    sha256 cellar: :any,                 arm64_monterey: "d8c459893d9b12984b346151d7828373281c6d69d26e4a60408b0b74712b4df9"
+    sha256 cellar: :any,                 arm64_big_sur:  "a0d25973d0b0900b2e6eba4e4044d8b737bcf7facb00d948ea6d0bc0b41d0da7"
+    sha256 cellar: :any,                 monterey:       "f3c41dc7753dabb9490068cab06ed59371ebf80a191bd6e653226febce0c8630"
+    sha256 cellar: :any,                 big_sur:        "2bd8e248aab7550cbad72405e4ccc05b692fe8ccf99736076fd881212e315664"
+    sha256 cellar: :any,                 catalina:       "23256aed8e1c3c2951ee5853b79e4c3d9eee84002680a6f7b24dc0c686fb0117"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6e750163fd2c39d4aac21c23952e8de9f28065d512d7da752690f96e9303de0f"
   end
 
   depends_on "go" => :build

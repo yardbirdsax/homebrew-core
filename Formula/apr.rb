@@ -5,18 +5,22 @@ class Apr < Formula
   mirror "https://archive.apache.org/dist/apr/apr-1.7.0.tar.bz2"
   sha256 "e2e148f0b2e99b8e5c6caa09f6d4fb4dd3e83f744aa72a952f94f5a14436f7ea"
   license "Apache-2.0"
-  revision 2
+  revision 3
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "d8adb33071a6a845ff928b6166377dea6de5b642b412042002386416354932b9"
-    sha256 cellar: :any, big_sur:       "d9a9554a726ec60e124055a55747e6e7f4cff6310955d6340be340ac053ac097"
-    sha256 cellar: :any, catalina:      "3f5c1fa8f17715291ce9f66cf4eb4f518ac1aa856c485f0157036459ad63792c"
-    sha256 cellar: :any, mojave:        "4627416a5d9c651d2d4fbb7faa639d6f7a89c7c0558576eeac1f17a81a17f3bd"
+    sha256 cellar: :any,                 arm64_monterey: "02e6b44b3284fa471cce15592a8666356f8d43b256bb08b391efbd521eddedd0"
+    sha256 cellar: :any,                 arm64_big_sur:  "26736a76f4ad71f17a1a5068bbe0a1bfa2c48e26622d3ed959f3ce42165ddd0c"
+    sha256 cellar: :any,                 monterey:       "365d71d8598761991d7c37831d11a4d355a5dc007863e5a677afd39d664d8351"
+    sha256 cellar: :any,                 big_sur:        "e397174ca8509867732b3b39bd3620288d84504584320355c9b1d85df0350e9a"
+    sha256 cellar: :any,                 catalina:       "ee9d9b6e5bb722c31ffac5ea0d2497f65feae2e69d73cafa44d63c99312d373d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9166ca46f30bc3f48b1087f107370800bb97ed74493cca5fc887b66ebc4c481b"
   end
 
   keg_only :provided_by_macos, "Apple's CLT provides apr"
 
-  depends_on "autoconf" => :build
+  depends_on "autoconf@2.69" => :build
+
+  uses_from_macos "libxcrypt"
 
   on_linux do
     depends_on "util-linux"
@@ -36,9 +40,11 @@ class Apr < Formula
     sha256 "24189d95ab1e9523d481694859b277c60ca29bfec1300508011794a78dfed127"
   end
 
-  def install
-    ENV["SED"] = "sed" # prevent libtool from hardcoding sed path from superenv
+  # Fix -flat_namespace being used on Big Sur and later.
+  # We patch `libtool.m4` directly because we call `autoconf`.
+  patch :DATA
 
+  def install
     # https://bz.apache.org/bugzilla/show_bug.cgi?id=57359
     # The internal libtool throws an enormous strop if we don't do...
     ENV.deparallelize
@@ -46,28 +52,24 @@ class Apr < Formula
     # Needed to apply the patch.
     system "autoconf"
 
-    # Stick it in libexec otherwise it pollutes lib with a .exp file.
-    system "./configure", "--prefix=#{libexec}"
+    system "./configure", *std_configure_args
     system "make", "install"
-    bin.install_symlink Dir["#{libexec}/bin/*"]
-    lib.install_symlink Dir["#{libexec}/lib/*.a"]
-    lib.install_symlink Dir["#{libexec}/lib/#{shared_library("*")}"]
-    (lib/"pkgconfig").install_symlink Dir["#{libexec}/lib/pkgconfig/*"]
-    (include/"apr-#{version.major}").install_symlink Dir["#{libexec}/include/apr-#{version.major}/*.h"]
 
-    rm Dir[libexec/"lib/*.la"]
+    # Install symlinks so that linkage doesn't break for reverse dependencies.
+    # Remove at version/revision bump from version 1.7.0 revision 2.
+    (libexec/"lib").install_symlink lib.glob(shared_library("*"))
+
+    rm lib.glob("*.{la,exp}")
 
     # No need for this to point to the versioned path.
-    inreplace libexec/"bin/apr-#{version.major}-config", libexec, opt_libexec
+    inreplace bin/"apr-#{version.major}-config", prefix, opt_prefix
 
-    on_linux do
-      # Avoid references to the Homebrew shims directory
-      inreplace libexec/"build-#{version.major}/libtool", HOMEBREW_SHIMS_PATH/"linux/super/", "/usr/bin/"
-    end
+    # Avoid references to the Homebrew shims directory
+    inreplace prefix/"build-#{version.major}/libtool", Superenv.shims_path, "/usr/bin" if OS.linux?
   end
 
   test do
-    assert_match opt_libexec.to_s, shell_output("#{bin}/apr-#{version.major}-config --prefix")
+    assert_match opt_prefix.to_s, shell_output("#{bin}/apr-#{version.major}-config --prefix")
     (testpath/"test.c").write <<~EOS
       #include <stdio.h>
       #include <apr-#{version.major}/apr_version.h>
@@ -80,3 +82,30 @@ class Apr < Formula
     assert_equal version.to_s, shell_output("./test")
   end
 end
+
+__END__
+diff --git a/build/libtool.m4 b/build/libtool.m4
+index e86a682..c1c342f 100644
+--- a/build/libtool.m4
++++ b/build/libtool.m4
+@@ -1067,16 +1067,11 @@ _LT_EOF
+       _lt_dar_allow_undefined='$wl-undefined ${wl}suppress' ;;
+     darwin1.*)
+       _lt_dar_allow_undefined='$wl-flat_namespace $wl-undefined ${wl}suppress' ;;
+-    darwin*) # darwin 5.x on
+-      # if running on 10.5 or later, the deployment target defaults
+-      # to the OS version, if on x86, and 10.4, the deployment
+-      # target defaults to 10.4. Don't you love it?
+-      case ${MACOSX_DEPLOYMENT_TARGET-10.0},$host in
+-	10.0,*86*-darwin8*|10.0,*-darwin[[91]]*)
+-	  _lt_dar_allow_undefined='$wl-undefined ${wl}dynamic_lookup' ;;
+-	10.[[012]][[,.]]*)
++    darwin*)
++      case ${MACOSX_DEPLOYMENT_TARGET},$host in
++	10.[[012]],*|,*powerpc*)
+ 	  _lt_dar_allow_undefined='$wl-flat_namespace $wl-undefined ${wl}suppress' ;;
+-	10.*)
++	*)
+ 	  _lt_dar_allow_undefined='$wl-undefined ${wl}dynamic_lookup' ;;
+       esac
+     ;;

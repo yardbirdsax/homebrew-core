@@ -1,18 +1,18 @@
 class RiemannClient < Formula
   desc "C client library for the Riemann monitoring system"
-  homepage "https://github.com/algernon/riemann-c-client"
-  url "https://github.com/algernon/riemann-c-client/archive/riemann-c-client-1.10.4.tar.gz"
-  sha256 "334874f0b9a507a8abbc7138df719cba4f28f12c02c39d5e55090b8edb86f9d2"
-  license "LGPL-3.0"
-  revision 1
-  head "https://github.com/algernon/riemann-c-client.git"
+  homepage "https://git.madhouse-project.org/algernon/riemann-c-client"
+  url "https://git.madhouse-project.org/algernon/riemann-c-client/archive/riemann-c-client-2.1.0.tar.gz"
+  sha256 "e1a4439ee23f4557d7563a88c67044d50c384641cf160d95114480404c547085"
+  license "LGPL-3.0-or-later"
+  head "https://git.madhouse-project.org/algernon/riemann-c-client.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "0d4d437c6d0f17a436d78d7d0a31e2031e049a3a4d822a72bbb587da6f65d25b"
-    sha256 cellar: :any, big_sur:       "d0fc546788b990e07850b71d51326cfa79fbdb753415acccf21d85239931831b"
-    sha256 cellar: :any, catalina:      "3227f7774fb1ff0e7daeb4b8c75c0e976a928593b85a8ef2726542ef3bab634b"
-    sha256 cellar: :any, mojave:        "1a11eb37bbb1021c3aee0e2e5173dba58fb48172418cf632e76811f08483a39d"
-    sha256 cellar: :any, high_sierra:   "245fe4d845c711bc9d1b99f0697d1cb98811633a608c62f415a4e2c0f05ebd1a"
+    sha256 cellar: :any,                 arm64_monterey: "304cf14a65977bdf52fd553dc7c9b9ecdad0e34dcf7ba3d26d4d415154439001"
+    sha256 cellar: :any,                 arm64_big_sur:  "6bb8a167fd979ed2d95b77d2fa5802454c42fce025070bd262925425f41fc6fa"
+    sha256 cellar: :any,                 monterey:       "86f04b64fd3ef3984698c0587bb8944907856d876fb9b2855b4564dc3efd84d2"
+    sha256 cellar: :any,                 big_sur:        "f724a20b8eb444be7c01ecf3467eb0b57d8896b9dcebb3a09926e98bbfb4fdd7"
+    sha256 cellar: :any,                 catalina:       "0a92ea87867b322edda329832975bd269f4baf18319b4a256f36bf24f09ed19c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "eb6ad40b5c2ec40cc9d3894ef3de12fa8cd3a612e22a6e58b58178e5792187fd"
   end
 
   depends_on "autoconf" => :build

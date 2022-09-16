@@ -1,21 +1,22 @@
 class OpusTools < Formula
   desc "Utilities to encode, inspect, and decode .opus files"
   homepage "https://www.opus-codec.org"
-  url "https://archive.mozilla.org/pub/opus/opus-tools-0.2.tar.gz"
+  url "https://archive.mozilla.org/pub/opus/opus-tools-0.2.tar.gz", using: :homebrew_curl
   sha256 "b4e56cb00d3e509acfba9a9b627ffd8273b876b4e2408642259f6da28fa0ff86"
   license "BSD-2-Clause"
+  revision 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any, arm64_big_sur: "33c1b089709532f82978e0f0fade8bbbf0c56ef07c81d7d22f8e8b649d0c72ca"
-    sha256 cellar: :any, big_sur:       "437d89ccde33e47708506a235fd68e2a3745d7848498dd1ce72e8c77a1e74dcc"
-    sha256 cellar: :any, catalina:      "964b3493cffeb5e32411c7a34e1813e8e83e940419aca39f50be7db9b0c8fab2"
-    sha256 cellar: :any, mojave:        "c4059aca471c3b1ec384323c1c801b844a2d2b61f17434ebc43c0accffde9f9b"
-    sha256 cellar: :any, high_sierra:   "0f8828cf6044f2d7b0cac9c591295b420244e8f086dc0afae9ae5420e6be7cb9"
+    sha256 cellar: :any,                 arm64_monterey: "35645fc571599ef38123e90bb45de43ac7b7d088ba2c755dccc498655d7b2820"
+    sha256 cellar: :any,                 arm64_big_sur:  "9e795afea16e37e7ad109653a68b4eb4a3c267bf19ee0d9c691854b398aaa79f"
+    sha256 cellar: :any,                 monterey:       "c50e81f56f1498244a3293d1cb3373c3a53b296b82e8be0d2c1ae09d0b398012"
+    sha256 cellar: :any,                 big_sur:        "5129aef8463b74eebc1e8f0535a6eaf7013b0e29a270c4cbbd2a9cb452afdef6"
+    sha256 cellar: :any,                 catalina:       "9fc7ca7376b88a6c0fbbb0418b0442913783203d8b0aac4c6ea8e95c09c1f7f0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2ccd10e6c8436925ccbaa9dda69314fc2f5c243c6a3205dfe62885216de67bd7"
   end
 
   head do
-    url "https://gitlab.xiph.org/xiph/opus-tools.git"
+    url "https://gitlab.xiph.org/xiph/opus-tools.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -31,8 +32,7 @@ class OpusTools < Formula
 
   def install
     system "./autogen.sh" if build.head?
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
+    system "./configure", *std_configure_args
     system "make", "install"
   end
 

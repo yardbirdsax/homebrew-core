@@ -1,25 +1,30 @@
 class Bluepill < Formula
   desc "Testing tool for iOS that runs UI tests using multiple simulators"
-  homepage "https://github.com/linkedin/bluepill"
-  url "https://github.com/linkedin/bluepill.git",
-      tag:      "v5.6.0",
-      revision: "ca19302bfbc48e1cf0ccf28eaad431abc6f78582"
+  homepage "https://github.com/MobileNativeFoundation/bluepill"
+  url "https://github.com/MobileNativeFoundation/bluepill.git",
+      tag:      "v5.8.1",
+      revision: "2dfc0a965ab564d015a2a0f00be89edf53c0f256"
   license "BSD-2-Clause"
-  head "https://github.com/linkedin/bluepill.git"
+  head "https://github.com/MobileNativeFoundation/bluepill.git", branch: "master"
 
+  # Typically the preceding `v` is optional in livecheck regexes but we need it
+  # to be required here to omit older versions that break version comparison
+  # (e.g., 9.0.0). Note: We don't use the `GithubLatest` strategy here because
+  # the "latest" version is sometimes incorrect.
   livecheck do
     url :stable
-    strategy :github_latest
+    regex(/^v(\d+(?:\.\d+)+)$/i)
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "2f6fb626e74027dfa8cdc9a03f66e97d6034e4e32edfe327e544f0cd0abb8ed8"
-    sha256 cellar: :any_skip_relocation, big_sur:       "74d6f5f15513a23c60a9a6fb0c1e8d6e01b74d73466821b66891a0402e10c4f7"
-    sha256 cellar: :any_skip_relocation, catalina:      "c05dba48f83e600ea0104f1edc4dd5b88017fe9ee487544bd4f78b61e2f4154b"
-    sha256 cellar: :any_skip_relocation, mojave:        "4459ee11cb00af2e0ae2aab7052a442cfde2a4b63d78abfc333df8b8b6e6badc"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur: "5fdf4a0439be240af92600dfd6b22accd2e66a2615fd3039e44622d545701616"
+    sha256 cellar: :any_skip_relocation, big_sur:       "27d44ba07c149043b52f823607f63a10f16b7d94066c93ac57f1aed756e25d74"
+    sha256 cellar: :any_skip_relocation, catalina:      "e3fb55552964c2544ffafd63050d0c82463dc98ee4742d761d843272a69fc0a9"
+    sha256 cellar: :any_skip_relocation, mojave:        "9926fb42710ce7c6067603a51520b66941b3b86e4827e7e7b63ae73db460ee05"
   end
 
   depends_on xcode: ["11.2", :build]
+  depends_on :macos
 
   def install
     xcodebuild "-workspace", "Bluepill.xcworkspace",

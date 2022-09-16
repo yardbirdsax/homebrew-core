@@ -1,8 +1,8 @@
 class GstEditingServices < Formula
   desc "GStreamer Editing Services"
   homepage "https://gstreamer.freedesktop.org/modules/gst-editing-services.html"
-  url "https://gstreamer.freedesktop.org/src/gst-editing-services/gst-editing-services-1.18.3.tar.xz"
-  sha256 "8ae139b13b1646a20ba63b0b90877d35813e24cd87642d325e751fc7cb175e20"
+  url "https://gstreamer.freedesktop.org/src/gst-editing-services/gst-editing-services-1.20.3.tar.xz"
+  sha256 "5fd896de69fbe24421eb6b0ff8d2f8b4c3cba3f3025ceacd302172f39a8abaa2"
   license "LGPL-2.0-or-later"
 
   livecheck do
@@ -11,10 +11,12 @@ class GstEditingServices < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "b0174087dfb2d530285b40273cbbb6cb74d2ea2a42d3bc8a7cbda4f71b902d50"
-    sha256 big_sur:       "ed53b867be2572ec44bc8fd01995ed827203b78d4fb18864d7ae8248106a790c"
-    sha256 catalina:      "5d86ceb3e5cc751f88b06cc2e784adb700999721cae2056f3ec3d08abca33783"
-    sha256 mojave:        "550f8a907c10cf7318bb5f4dbd486d3a34a1838bb0d7b5e2bc02f03025432b89"
+    sha256 cellar: :any, arm64_monterey: "0e0782fb99977a997dc512e68c6753bd5b348462679d6beb0185975a9ad2d822"
+    sha256 cellar: :any, arm64_big_sur:  "6a0a76f1c9601665bda8ffbac2fc37eef71acfebf8884a58454ede33cf3020a0"
+    sha256 cellar: :any, monterey:       "f6d89657b9c533f08d9ab00273b54957c266e592d857e3eecbf408123b33bd88"
+    sha256 cellar: :any, big_sur:        "be1b326db4a4a5da6845c2c32917fd151c26a1dfe61ef2d929233b745aa86e5f"
+    sha256 cellar: :any, catalina:       "e9804be1d11e5b1c271a063ef339ce1fb4945bbed123202e4d972c1021437bf8"
+    sha256               x86_64_linux:   "d187865c5bcff799a19728bf926924604501e664f486f72705d2daf17398428f"
   end
 
   depends_on "gobject-introspection" => :build
@@ -24,11 +26,21 @@ class GstEditingServices < Formula
   depends_on "gst-plugins-base"
   depends_on "gstreamer"
 
+  uses_from_macos "flex" => :build
+
+  on_linux do
+    depends_on "json-glib"
+  end
+
   def install
     args = std_meson_args + %w[
       -Dintrospection=enabled
       -Dtests=disabled
+      -Dvalidate=disabled
     ]
+    # https://gitlab.freedesktop.org/gstreamer/gst-editing-services/-/issues/114
+    # https://github.com/Homebrew/homebrew-core/pull/84906
+    args << "-Dpython=disabled"
 
     mkdir "build" do
       system "meson", *args, ".."

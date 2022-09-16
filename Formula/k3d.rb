@@ -1,8 +1,9 @@
 class K3d < Formula
-  desc "Little helper to run Rancher Lab's k3s in Docker"
+  desc "Little helper to run CNCF's k3s in Docker"
   homepage "https://k3d.io"
-  url "https://github.com/rancher/k3d/archive/v4.1.1.tar.gz"
-  sha256 "17ac775eb6d20ad63104962d0b34036fd4251feef5309cf8e9ae642748a7b7ec"
+  url "https://github.com/k3d-io/k3d.git",
+    tag:      "v5.4.6",
+    revision: "f6838597ddf1cab5bcdb391f883748c6e4d69b48"
   license "MIT"
 
   livecheck do
@@ -11,32 +12,36 @@ class K3d < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "88dc81dc37746ca7a557528f63d6fed8d4311d6e67a3286a15a4a9b174579479"
-    sha256 cellar: :any_skip_relocation, big_sur:       "f66603add4aad6c75876ab316b60372eca3b14935c9a53f6b410f87d56694c23"
-    sha256 cellar: :any_skip_relocation, catalina:      "844eec296826a293b089aaa0c7d6903bae546c4e2fc58aca8ae7b849fddf8a3b"
-    sha256 cellar: :any_skip_relocation, mojave:        "7073106598763da966b3c734dd74a20ac40aafa83d38b1c59915b114832a4ae4"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "588d17cc7f9f064c55a39971ef17d19718bd7b0f96271a119e277372277c3175"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "43ba3973c5ef2b3f7263a21593ad118676c0191b87bb4cda263567f8f44dab68"
+    sha256 cellar: :any_skip_relocation, monterey:       "61056bb1b12548a2eebe84a69d25c2daee8b264af7c62f192903b320d27f7f00"
+    sha256 cellar: :any_skip_relocation, big_sur:        "d52673edb9907ae737223b24e59d6285d28658b13f0f8fbb4c3bbb3162344709"
+    sha256 cellar: :any_skip_relocation, catalina:       "83e7f2aaaf59b6454099d73ae4229bf04dfd7871e056e2956ecedafae9669395"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d42eda8fc36ae8871f9cffffd09bca6a9357ee12f3dc42224c24a03fd7fd15d2"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build",
-           "-mod", "vendor",
-           "-ldflags", "-s -w -X github.com/rancher/k3d/v#{version.major}/version.Version=v#{version}"\
-           " -X github.com/rancher/k3d/v#{version.major}/version.K3sVersion=latest",
-           "-trimpath", "-o", bin/"k3d"
+    require "net/http"
+    uri = URI("https://update.k3s.io/v1-release/channels")
+    resp = Net::HTTP.get(uri)
+    resp_json = JSON.parse(resp)
+    k3s_version = resp_json["data"].find { |channel| channel["id"]=="stable" }["latest"].sub("+", "-")
 
-    # Install bash completion
-    output = Utils.safe_popen_read("#{bin}/k3d", "completion", "bash")
-    (bash_completion/"k3d").write output
+    ldflags = %W[
+      -s -w
+      -X github.com/k3d-io/k3d/v#{version.major}/version.Version=v#{version}
+      -X github.com/k3d-io/k3d/v#{version.major}/version.K3sVersion=#{k3s_version}
+    ]
 
-    # Install zsh completion
-    output = Utils.safe_popen_read("#{bin}/k3d", "completion", "zsh")
-    (zsh_completion/"_k3d").write output
+    system "go", "build", "-mod=readonly", *std_go_args(ldflags: ldflags)
+
+    generate_completions_from_executable(bin/"k3d", "completion")
   end
 
   test do
-    assert_match "k3d version v#{version}\nk3s version latest (default)", shell_output("#{bin}/k3d --version")
+    assert_match "k3d version v#{version}", shell_output("#{bin}/k3d version")
     # Either docker is not present or it is, where the command will fail in the first case.
     # In any case I wouldn't expect a cluster with name 6d6de430dbd8080d690758a4b5d57c86 to be present
     # (which is the md5sum of 'homebrew-failing-test')

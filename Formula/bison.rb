@@ -2,17 +2,20 @@ class Bison < Formula
   desc "Parser generator"
   homepage "https://www.gnu.org/software/bison/"
   # X.Y.9Z are beta releases that sometimes get accidentally uploaded to the release FTP
-  url "https://ftp.gnu.org/gnu/bison/bison-3.7.5.tar.xz"
-  mirror "https://ftpmirror.gnu.org/bison/bison-3.7.5.tar.xz"
-  sha256 "e8c53bc5bc396d636622d0f25e31ca92fd53f00b09629f13ef540d564a6b31ab"
+  url "https://ftp.gnu.org/gnu/bison/bison-3.8.2.tar.xz"
+  mirror "https://ftpmirror.gnu.org/bison/bison-3.8.2.tar.xz"
+  sha256 "9bba0214ccf7f1079c5d59210045227bcf619519840ebfa80cd3849cff5a5bf2"
   license "GPL-3.0-or-later"
   version_scheme 1
 
   bottle do
-    sha256 arm64_big_sur: "7717d17b5ebca46f673d4ba2eb5626c7a726c3e6203db10d0bf21185356841b6"
-    sha256 big_sur:       "b0f383e37c2e1e4bb14b654b07e96e8da7a01bd19b4c41cd5d2d88198dabff90"
-    sha256 catalina:      "b4128068b3902c2f98a3a3d25d19ff63daf61449dfb21146d5b117a34b38a4ef"
-    sha256 mojave:        "c9e6a12dd08f5a956d67e18294d49bc50803bc58decd4a0fb234e0606042e0fa"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "78ce4e93936c37005e944b21e4b4d305725bc66f6c675acf2eb13cf72bac01cc"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "fb649b4e0b071ccfdce51193942366e894fb08be9798109eb718fb323369509e"
+    sha256 cellar: :any_skip_relocation, monterey:       "feb2484898408e8fb2008f4c0ff39042bffb026ea4463d33fd0dfb5952895f1c"
+    sha256 cellar: :any_skip_relocation, big_sur:        "a4fa1a0bf3245d8ef6a0d24d35df5222269174a02408784d870e4a882434712d"
+    sha256 cellar: :any_skip_relocation, catalina:       "5a79db63b8a10bc6211ed6a9dcef6df91c26d9fe3420047c285960dede637ea5"
+    sha256 cellar: :any_skip_relocation, mojave:         "4b51739abc4ac54df710147848eb0cd12ff32bc0b86b9112d0de378a74273328"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d708c29c7e44f28a4fa77d353ff7adfbe673b31cef6f24c3c384a03ba01b3608"
   end
 
   keg_only :provided_by_macos
@@ -21,8 +24,11 @@ class Bison < Formula
 
   def install
     system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
-    system "make", "install"
+                          "--enable-relocatable",
+                          "--prefix=/output",
+                          "M4=m4"
+    system "make", "install", "DESTDIR=#{buildpath}"
+    prefix.install Dir["#{buildpath}/output/*"]
   end
 
   test do

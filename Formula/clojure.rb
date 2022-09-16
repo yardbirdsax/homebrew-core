@@ -1,8 +1,8 @@
 class Clojure < Formula
   desc "Dynamic, general-purpose programming language"
   homepage "https://clojure.org"
-  url "https://download.clojure.org/install/clojure-tools-1.10.2.774.tar.gz"
-  sha256 "17136fb255502774ce9d64774f2ff0e735790990d0df39ace935df335345727c"
+  url "https://download.clojure.org/install/clojure-tools-1.11.1.1155.tar.gz"
+  sha256 "6e5caaebdc20cee84460a6d378437db7a4f877b445d53a11cb246eac044cc727"
   license "EPL-1.0"
   version_scheme 1
 
@@ -11,7 +11,9 @@ class Clojure < Formula
     regex(/url ".*?clojure-tools-v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "caac1b5e210beb0e248675902e149bbfec86308262c177c5a76b066a78e83bfe"
+  end
 
   depends_on "openjdk"
   depends_on "rlwrap"

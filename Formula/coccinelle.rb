@@ -2,10 +2,11 @@ class Coccinelle < Formula
   desc "Program matching and transformation engine for C code"
   homepage "http://coccinelle.lip6.fr/"
   url "https://github.com/coccinelle/coccinelle.git",
-      tag:      "1.0.8",
-      revision: "d678c34afc0cfb479ad34f2225c57b1b8d3ebeae"
-  license "GPL-2.0"
-  head "https://github.com/coccinelle/coccinelle.git"
+      tag:      "1.1.1",
+      revision: "5444e14106ff17404e63d7824b9eba3c0e7139ba"
+  license "GPL-2.0-only"
+  revision 1
+  head "https://github.com/coccinelle/coccinelle.git", branch: "master"
 
   livecheck do
     url :stable
@@ -13,25 +14,45 @@ class Coccinelle < Formula
   end
 
   bottle do
-    sha256 cellar: :any, big_sur:     "b05ace46f798c6abdd47fd764b52575d119b67c65b64a7257fff378fd6ca73ca"
-    sha256 cellar: :any, catalina:    "cc2f0b1ff9f45f48c91f136b1b88ac6c7d2e34b475d77d1c0e418f1a47e691b2"
-    sha256 cellar: :any, mojave:      "6dd3d84d54e00d9d7ce4b27f1693d266120221bd98c99d7988a58c802c26fab3"
-    sha256 cellar: :any, high_sierra: "c50aae7af14976966f3d3232ac89b4b2fb45753765e07377a39daf9aaeb22960"
+    sha256 arm64_monterey: "6d709b2576f84260edf15ed3a6c4e4b4e0cc73bde3819f9d9085f964c761b155"
+    sha256 arm64_big_sur:  "43e22010b8b1f3bf93817d161e2d0e96d907f4a38972d27f91d0231042f70860"
+    sha256 monterey:       "9e00a25cc6afe398d4a5ae42300bacd883bf1f570e6c1523ffb43bd3d330ae30"
+    sha256 big_sur:        "270fe7690278277362ebf04707665ae41e3831c21e33d945408f2e7d9737669e"
+    sha256 catalina:       "27b442146b362f44848997fa840389ff9df05317e915147d289a74e1ef4c5a68"
+    sha256 x86_64_linux:   "29a0aeaeb102990cac27cdc3ecc713f2af6366f38c5d3cefb520ef70dcd2fa84"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "hevea" => :build
+  depends_on "ocaml-findlib" => :build
   depends_on "opam" => :build
+  depends_on "pkg-config" => :build
   depends_on "ocaml"
+  depends_on "pcre"
+
+  uses_from_macos "unzip" => :build
+
+  # Bootstap resource for Ocaml 4.12 compatibility.
+  # Remove when Coccinelle supports Ocaml 4.12 natively
+  resource "stdcompat" do
+    url "https://github.com/thierry-martinez/stdcompat/releases/download/v15/stdcompat-15.tar.gz"
+    sha256 "5e746f68ffe451e7dabe9d961efeef36516b451f35a96e174b8f929a44599cf5"
+  end
 
   def install
+    resource("stdcompat").stage do
+      system "./configure", "--prefix=#{buildpath}/bootstrap"
+      ENV.deparallelize { system "make" }
+      system "make", "install"
+    end
+    ENV.prepend_path "OCAMLPATH", buildpath/"bootstrap/lib"
+
     Dir.mktmpdir("opamroot") do |opamroot|
       ENV["OPAMROOT"] = opamroot
       ENV["OPAMYES"] = "1"
       ENV["OPAMVERBOSE"] = "1"
       system "opam", "init", "--no-setup", "--disable-sandboxing"
-      system "opam", "install", "ocamlfind"
       system "./autogen"
       system "opam", "config", "exec", "--", "./configure",
                             "--disable-dependency-tracking",
@@ -39,7 +60,8 @@ class Coccinelle < Formula
                             "--enable-ocaml",
                             "--enable-opt",
                             "--with-pdflatex=no",
-                            "--prefix=#{prefix}"
+                            "--prefix=#{prefix}",
+                            "--libdir=#{lib}"
       ENV.deparallelize
       system "opam", "config", "exec", "--", "make"
       system "make", "install"

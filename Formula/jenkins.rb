@@ -1,13 +1,17 @@
 class Jenkins < Formula
   desc "Extendable open source continuous integration server"
-  homepage "https://jenkins.io/"
-  url "http://mirrors.jenkins.io/war/2.278/jenkins.war"
-  sha256 "c0a477ece3651819346a76ae86382dc32309510ceb3f2f6713a5a4cf4f046957"
+  homepage "https://www.jenkins.io/"
+  url "https://get.jenkins.io/war/2.368/jenkins.war"
+  sha256 "9a50caf570b448f4528ca94df0e54099c4ee7b23d492f796f2d9ddda2a72b794"
   license "MIT"
 
   livecheck do
-    url :head
-    regex(/^jenkins[._-]v?(\d+(?:\.\d+)+)$/i)
+    url "https://www.jenkins.io/download/"
+    regex(%r{href=.*?/war/v?(\d+(?:\.\d+)+)/jenkins\.war}i)
+  end
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "9b63fb51f116cdb4634b718087c899b5a1b0c1ecb62250640d05801677d6a73a"
   end
 
   head do
@@ -15,19 +19,19 @@ class Jenkins < Formula
     depends_on "maven" => :build
   end
 
-  bottle :unneeded
-
-  depends_on "openjdk@11"
+  depends_on "openjdk@17"
 
   def install
     if build.head?
       system "mvn", "clean", "install", "-pl", "war", "-am", "-DskipTests"
     else
-      system "#{Formula["openjdk@11"].opt_bin}/jar", "xvf", "jenkins.war"
+      system "#{Formula["openjdk@17"].opt_bin}/jar", "xvf", "jenkins.war"
     end
     libexec.install Dir["**/jenkins.war", "**/cli-#{version}.jar"]
-    bin.write_jar_script libexec/"jenkins.war", "jenkins", java_version: "11"
-    bin.write_jar_script libexec/"cli-#{version}.jar", "jenkins-cli", java_version: "11"
+    bin.write_jar_script libexec/"jenkins.war", "jenkins", java_version: "17"
+    bin.write_jar_script libexec/"cli-#{version}.jar", "jenkins-cli", java_version: "17"
+
+    (var/"log/jenkins").mkpath
   end
 
   def caveats
@@ -36,30 +40,11 @@ class Jenkins < Formula
     EOS
   end
 
-  plist_options manual: "jenkins"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{Formula["openjdk@11"].opt_bin}/java</string>
-            <string>-Dmail.smtp.starttls.enable=true</string>
-            <string>-jar</string>
-            <string>#{opt_libexec}/jenkins.war</string>
-            <string>--httpListenAddress=127.0.0.1</string>
-            <string>--httpPort=8080</string>
-          </array>
-          <key>RunAtLoad</key>
-          <true/>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_bin/"jenkins", "--httpListenAddress=127.0.0.1", "--httpPort=8080"]
+    keep_alive true
+    log_path var/"log/jenkins/output.log"
+    error_log_path var/"log/jenkins/error.log"
   end
 
   test do
@@ -73,6 +58,6 @@ class Jenkins < Formula
     sleep 60
 
     output = shell_output("curl localhost:#{port}/")
-    assert_match /Welcome to Jenkins!|Unlock Jenkins|Authentication required/, output
+    assert_match(/Welcome to Jenkins!|Unlock Jenkins|Authentication required/, output)
   end
 end

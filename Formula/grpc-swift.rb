@@ -1,26 +1,33 @@
 class GrpcSwift < Formula
   desc "Swift language implementation of gRPC"
   homepage "https://github.com/grpc/grpc-swift"
-  url "https://github.com/grpc/grpc-swift/archive/0.11.0.tar.gz"
-  sha256 "82e0a3d8fe2b9ee813b918e1a674f5a7c6dc024abe08109a347b686db6e57432"
+  url "https://github.com/grpc/grpc-swift/archive/1.10.0.tar.gz"
+  sha256 "cce2d04a26ab8c606d2da1f3cf732e96e6e68a7e373a4a441b68e0c45755755d"
   license "Apache-2.0"
-  revision 1
-  head "https://github.com/grpc/grpc-swift.git"
+  head "https://github.com/grpc/grpc-swift.git", branch: "main"
 
-  bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "e739583a67354478a9f950375763d41080698e74aeee0d0195773ac7ca383096"
-    sha256 cellar: :any_skip_relocation, big_sur:       "a0be8359b1b6052cc554f3a9b672162eed4ab6e7e20928c424c0916d110e286f"
-    sha256 cellar: :any_skip_relocation, catalina:      "5a13e8a2f8e6111ceb163fd1aac8810a278f32317ebffb3563d5860a9a510db2"
-    sha256 cellar: :any_skip_relocation, mojave:        "0311e7d2eb0f1c5569fd51732dd7e9e917423bcad57e651d4d8a5c468168a55a"
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
-  depends_on xcode: ["10.0", :build]
+  bottle do
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "ecb8e76fe49315d53c5083f8e796983f7e9ba00620dce293784488fb1a8f7846"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "881c6365a2169a55580a0c07ca2b9f210e77ad9fa3c421528d02d633e3156abe"
+    sha256 cellar: :any_skip_relocation, monterey:       "e89beff013b4dcfa1d1b638aacff1c78538970c6d6d2308d8eee390c366137db"
+    sha256 cellar: :any_skip_relocation, big_sur:        "b123453d2d7dac94fefff62a3909e3baefb1566402d8e0839e8bac8bacf35168"
+    sha256                               x86_64_linux:   "69d9ff6d1500f7287b22f5cb89edfe6425760a1b97aac0fcd93cc3219dbe5a07"
+  end
+
+  depends_on xcode: ["12.5", :build]
   depends_on "protobuf"
   depends_on "swift-protobuf"
 
+  uses_from_macos "swift"
+
   def install
-    system "swift", "build", "--disable-sandbox", "-c", "release", "--product", "protoc-gen-swiftgrpc"
-    bin.install ".build/release/protoc-gen-swiftgrpc"
+    system "swift", "build", "--disable-sandbox", "-c", "release", "--product", "protoc-gen-grpc-swift"
+    bin.install ".build/release/protoc-gen-grpc-swift"
   end
 
   test do
@@ -39,7 +46,7 @@ class GrpcSwift < Formula
         string text = 1;
       }
     EOS
-    system Formula["protobuf"].opt_bin/"protoc", "echo.proto", "--swiftgrpc_out=."
+    system Formula["protobuf"].opt_bin/"protoc", "echo.proto", "--grpc-swift_out=."
     assert_predicate testpath/"echo.grpc.swift", :exist?
   end
 end

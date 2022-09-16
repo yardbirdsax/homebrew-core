@@ -1,18 +1,22 @@
 class Skopeo < Formula
   desc "Work with remote images registries"
   homepage "https://github.com/containers/skopeo"
-  url "https://github.com/containers/skopeo/archive/v1.2.1.tar.gz"
-  sha256 "aed062afdd9aed305679294a0c238d0f39b8a206084db1c6e6aa3b1e20c71be8"
+  url "https://github.com/containers/skopeo/archive/v1.9.2.tar.gz"
+  sha256 "9a321ba75f213e5c46cba7f92073c2437137a56d3140c9ab6e723fb92890f9d0"
   license "Apache-2.0"
 
   bottle do
-    sha256 arm64_big_sur: "60d53a7cdfb3689978431c0f560f24cc3f5ceeb253126a9c51cd8dd514f67008"
-    sha256 big_sur:       "8bf7c0f95cb46b1e08a5e921ef687cb1b9265579ba5f61467b3adfafb59de92a"
-    sha256 catalina:      "50fb3b2b4fac5709d1da6f16e301409508309ce76d6e4172b95f8096c780adc0"
-    sha256 mojave:        "e85ad513454aa5e19b2aae6f3fc4166961295eb0993cd0a9487c65fa3e98d296"
+    rebuild 1
+    sha256 arm64_monterey: "72324aa27b72c3c0912001b1ba835bb8b61e59d40da9ed8dd2deb95cc7bdaa40"
+    sha256 arm64_big_sur:  "0303305a065ebbba53c901c1c742d5274b0e0e5b4637a884cb0c3d3e22dfac55"
+    sha256 monterey:       "914444a0a8e10bed99c24d64cb433d00b797581377d945ca043fb2e4e7b3ae2e"
+    sha256 big_sur:        "23cdf4566553fd854236e62bc4bf34d4977bb2616f12f4f1c161d4bdd883496b"
+    sha256 catalina:       "68326240fa8f8afd691241f15eea76e2293fe30a9f8cb3f785782e0aadb96c4c"
+    sha256 x86_64_linux:   "e574c8b6e799e08f28f744308d4a24e6a950537ab614ecd683ea226f25085d5f"
   end
 
   depends_on "go" => :build
+  depends_on "go-md2man" => :build
   depends_on "gpgme"
 
   on_linux do
@@ -23,7 +27,7 @@ class Skopeo < Formula
   def install
     ENV["CGO_ENABLED"] = "1"
     ENV.append "CGO_FLAGS", ENV.cppflags
-    ENV.append "CGO_FLAGS", Utils.safe_popen_read("#{Formula["gpgme"].bin}/gpgme-config", "--cflags")
+    ENV.append "CGO_FLAGS", Utils.safe_popen_read(Formula["gpgme"].opt_bin/"gpgme-config", "--cflags")
 
     buildtags = [
       "containers_image_ostree_stub",
@@ -32,21 +36,22 @@ class Skopeo < Formula
       Utils.safe_popen_read("hack/libdm_tag.sh").chomp,
     ].uniq.join(" ")
 
-    ldflags = [
-      "-X main.gitCommit=",
-      "-X github.com/containers/image/v5/docker.systemRegistriesDirPath=#{etc/"containers/registries.d"}",
-      "-X github.com/containers/image/v5/internal/tmpdir.unixTempDirForBigFiles=/var/tmp",
-      "-X github.com/containers/image/v5/signature.systemDefaultPolicyPath=#{etc/"containers/policy.json"}",
-      "-X github.com/containers/image/v5/pkg/sysregistriesv2.systemRegistriesConfPath=" \
-                                            "#{etc/"containers/registries.conf"}",
-    ].join(" ")
+    ldflag_prefix = "github.com/containers/image/v5"
+    ldflags = %W[
+      -X main.gitCommit=
+      -X #{ldflag_prefix}/docker.systemRegistriesDirPath=#{etc}/containers/registries.d
+      -X #{ldflag_prefix}/internal/tmpdir.unixTempDirForBigFiles=/var/tmp
+      -X #{ldflag_prefix}/signature.systemDefaultPolicyPath=#{etc}/containers/policy.json
+      -X #{ldflag_prefix}/pkg/sysregistriesv2.systemRegistriesConfPath=#{etc}/containers/registries.conf
+    ]
 
-    system "go", "build", "-tags", buildtags, "-ldflags", ldflags, *std_go_args, "./cmd/skopeo"
+    system "go", "build", "-tags", buildtags, *std_go_args(ldflags: ldflags), "./cmd/skopeo"
+    system "make", "PREFIX=#{prefix}", "GOMD2MAN=go-md2man", "install-docs"
 
     (etc/"containers").install "default-policy.json" => "policy.json"
     (etc/"containers/registries.d").install "default.yaml"
 
-    bash_completion.install "completions/bash/skopeo"
+    generate_completions_from_executable(bin/"skopeo", "completion")
   end
 
   test do
@@ -56,7 +61,7 @@ class Skopeo < Formula
 
     # https://github.com/Homebrew/homebrew-core/pull/47766
     # https://github.com/Homebrew/homebrew-core/pull/45834
-    assert_match /Invalid destination name test: Invalid image name .+, expected colon-separated transport:reference/,
-                 shell_output("#{bin}/skopeo copy docker://alpine test 2>&1", 1)
+    assert_match(/Invalid destination name test: Invalid image name .+, expected colon-separated transport:reference/,
+                 shell_output("#{bin}/skopeo copy docker://alpine test 2>&1", 1))
   end
 end

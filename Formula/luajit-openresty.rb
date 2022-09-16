@@ -1,17 +1,30 @@
 class LuajitOpenresty < Formula
   desc "OpenResty's Branch of LuaJIT 2"
   homepage "https://github.com/openresty/luajit2"
-  url "https://github.com/openresty/luajit2/archive/v2.1-20201229.tar.gz"
-  sha256 "4275bf97356d713826e7195d1c330568b6089ff1fd4c6954f998e0f60a2baa30"
+  url "https://github.com/openresty/luajit2/archive/refs/tags/v2.1-20220915.tar.gz"
+  sha256 "a6104d4fa342d864ae00cb3313b07091af02dc61294b1d8fce1e17779998b497"
   license "MIT"
-  revision 1
+  version_scheme 1
   head "https://github.com/openresty/luajit2.git", branch: "v2.1-agentzh"
 
+  # The latest LuaJIT release is unstable (2.1.0-beta3, from 2017-05-01) and
+  # OpenResty is making releases using the latest LuaJIT Git commits. With this
+  # in mind, the regex below is very permissive and will match any tags
+  # starting with a numeric version, ensuring that we match unstable versions.
+  # We should consider restricting the regex to stable versions if it ever
+  # becomes feasible in the future.
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:[.-]\d+)+[^{}]*)/i)
+  end
+
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "d9700884c04219e458886ba68abdfc980a5ba40cdc073edb2ac70e63a4283e26"
-    sha256 cellar: :any, big_sur:       "969786cd904fce0a2ec3cdeba2348603d767fff7b8a954194228ff05e151518d"
-    sha256 cellar: :any, catalina:      "f6c7e24c8ba0faaeb9b831851c50175c942acccb2c916127e409214edd5bbf7d"
-    sha256 cellar: :any, mojave:        "3efbb3a071c3ec6a2a9bdb9aa3724a1c8f36634e8377a27751b89d1c26e40fe8"
+    sha256 cellar: :any,                 arm64_monterey: "f0c9437a16aa8a274bd9730d48459dcb5604968e24f899db25d3bb3c714d36f2"
+    sha256 cellar: :any,                 arm64_big_sur:  "edad4431c0d4966b8a6b2b1224d09d4aef59616dc31abff7573d6088a7ce52fa"
+    sha256 cellar: :any,                 monterey:       "399ad9f89123000e5882cab46c65ffb70d2c93727ebec313f81d7d9d07f30ca7"
+    sha256 cellar: :any,                 big_sur:        "24881920f33cf53d1fc65680b757fb2679408a730bb591fa94a9ccf5b954c1ee"
+    sha256 cellar: :any,                 catalina:       "166be848fc4413a3c2b7d43aba43492354421c18e84f1fa7dfe9f800010b4188"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8dd932ebb29d3bce24d1212db7e4d20201115ed0517669031f0210e826ba8ec8"
   end
 
   keg_only "it conflicts with the LuaJIT formula"

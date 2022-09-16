@@ -1,15 +1,17 @@
 class GdkPixbuf < Formula
   desc "Toolkit for image loading and pixel buffer manipulation"
   homepage "https://gtk.org"
-  url "https://download.gnome.org/sources/gdk-pixbuf/2.42/gdk-pixbuf-2.42.2.tar.xz"
-  sha256 "83c66a1cfd591d7680c144d2922c5955d38b4db336d7cd3ee109f7bcf9afef15"
+  url "https://download.gnome.org/sources/gdk-pixbuf/2.42/gdk-pixbuf-2.42.9.tar.xz"
+  sha256 "28f7958e7bf29a32d4e963556d241d0a41a6786582ff6a5ad11665e0347fc962"
   license "LGPL-2.1-or-later"
 
   bottle do
-    sha256 arm64_big_sur: "f5ba72b880262c20ef7fd5fd21232662b0b9d76d40c51b1f574483b63b1fb886"
-    sha256 big_sur:       "30685ea260245bc1a4e6c5e3b1301f7b603e64c98a83386e1b71515787e1a130"
-    sha256 catalina:      "fe5c2b2bc7a942a6cab4d091be0c9f88703919cc75b6ec92d51ef0ed24ebcdbc"
-    sha256 mojave:        "a76668fe271e79d4a74ed56657130dda2012c4cf78e9d7e5c417f010ca35ad8c"
+    sha256 arm64_monterey: "4334da20455e617c5f1f57946a00fc38e8fea1209fef3a71e445bc2c7f9c38d0"
+    sha256 arm64_big_sur:  "88eff9d23c848e9ac08e0942aec394764f11d92594b7396dfa56fbda186ab298"
+    sha256 monterey:       "9264fc9ee4225861eb92af4e7975b8d5b1d1d4c3ac7688f995409dd675c6699e"
+    sha256 big_sur:        "71b86b2e14a8dbc7d6e8266547fadfd545aead3b7351df3b7c63ebc35b8c02e6"
+    sha256 catalina:       "12b0f0f5e221b3b5f4cb8f0d37c7070dabefe944c53680dd8cfa6e449cebd55b"
+    sha256 x86_64_linux:   "35e1c0a98e6035a693dedb9212165dc0d557941b7d72dad0d6a4594b72eb4709"
   end
 
   depends_on "gobject-introspection" => :build
@@ -17,7 +19,7 @@ class GdkPixbuf < Formula
   depends_on "ninja" => :build
   depends_on "pkg-config" => :build
   depends_on "glib"
-  depends_on "jpeg"
+  depends_on "jpeg-turbo"
   depends_on "libpng"
   depends_on "libtiff"
 
@@ -42,22 +44,19 @@ class GdkPixbuf < Formula
               "-DGDK_PIXBUF_LIBDIR=\"@0@\"'.format(gdk_pixbuf_libdir)",
               "-DGDK_PIXBUF_LIBDIR=\"@0@\"'.format('#{HOMEBREW_PREFIX}/lib')"
 
-    args = std_meson_args + %w[
-      -Dx11=false
-      -Ddocs=false
-      -Dgir=true
-      -Drelocatable=false
-      -Dnative_windows_loaders=false
-      -Dinstalled_tests=false
-      -Dman=false
-    ]
-
     ENV["DESTDIR"] = "/"
-    mkdir "build" do
-      system "meson", *args, ".."
-      system "ninja", "-v"
-      system "ninja", "install"
-    end
+    system "meson", *std_meson_args, "build",
+                    "-Drelocatable=false",
+                    "-Dnative_windows_loaders=false",
+                    "-Dinstalled_tests=false",
+                    "-Dman=false",
+                    "-Dgtk_doc=false",
+                    "-Dpng=enabled",
+                    "-Dtiff=enabled",
+                    "-Djpeg=enabled",
+                    "-Dintrospection=enabled"
+    system "meson", "compile", "-C", "build", "-v"
+    system "meson", "install", "-C", "build"
 
     # Other packages should use the top-level modules directory
     # rather than dumping their files into the gdk-pixbuf keg.
@@ -107,8 +106,8 @@ class GdkPixbuf < Formula
       -lgdk_pixbuf-2.0
       -lglib-2.0
       -lgobject-2.0
-      -lintl
     ]
+    flags << "-lintl" if OS.mac?
     system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"
   end

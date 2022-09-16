@@ -1,74 +1,85 @@
 class Arangodb < Formula
   desc "Multi-Model NoSQL Database"
   homepage "https://www.arangodb.com/"
-  url "https://download.arangodb.com/Source/ArangoDB-3.7.6.tar.gz"
-  sha256 "f9ca141e8535f9f40ec1c61d5f132122db100055057146a2cb8275f30e851426"
+  url "https://download.arangodb.com/Source/ArangoDB-3.9.2.tar.bz2"
+  sha256 "35ac1678b91c0cc448454ef3a76637682d095328570674a5765ae5d060c5721b"
   license "Apache-2.0"
-  revision 1
   head "https://github.com/arangodb/arangodb.git", branch: "devel"
 
+  livecheck do
+    url "https://www.arangodb.com/download-major/source/"
+    regex(/href=.*?ArangoDB[._-]v?(\d+(?:\.\d+)+)(-\d+)?\.t/i)
+  end
+
   bottle do
-    sha256 big_sur:  "135d6152a7c4a3ba7ec9e7d96f3808d448ed961faf83ab6ae994f07a3717b1b4"
-    sha256 catalina: "73aff6b8ab99cae8b62e3f5d6986f8886fce0b14864eba91440fe4b73fe832f4"
-    sha256 mojave:   "d3454eefc88b685a469284dc3135a87d2d530431e962def0a7da93cc5b1a5f9c"
+    sha256 monterey:     "6ce88863c3d64b6e0f80157b81ccada705ba6a364ee8ff827e46f63df16b3b10"
+    sha256 big_sur:      "e38065e33bd2ee3eee533bcde177f1ce0c3dfd7c8857f678fe73d4e2e8fcec75"
+    sha256 catalina:     "5420623e77cc3c4dd8c272a791ce8d102d46fdceeea983104f2443a6b2cb95c8"
+    sha256 x86_64_linux: "8c311faac036bab8fc2acee10adf136275ccbf5c976795fadae2b08adaefffaf"
   end
 
   depends_on "ccache" => :build
   depends_on "cmake" => :build
-  depends_on "go@1.13" => :build
-  depends_on "python@3.9" => :build
+  depends_on "go@1.17" => :build
+  depends_on "python@3.10" => :build
   depends_on macos: :mojave
   depends_on "openssl@1.1"
+
+  on_linux do
+    depends_on "gcc"
+  end
+
+  fails_with gcc: "5"
 
   # the ArangoStarter is in a separate github repository;
   # it is used to easily start single server and clusters
   # with a unified CLI
   resource "starter" do
     url "https://github.com/arangodb-helper/arangodb.git",
-        tag:      "0.14.18",
-        revision: "79c60473bf243f2ea77c33f9cee032fd0696cde4"
+        tag:      "0.15.4",
+        revision: "ed743d2293efd763309f3ba0a1ba6fb68ac4a41a"
+  end
+
+  # Fix compilation with Apple clang 13.1.6, remove in next release
+  patch do
+    url "https://github.com/arangodb/arangodb/commit/fd43fbc27.patch?full_index=1"
+    sha256 "0298670362e04ec0870f6b7032dff83bfcdf9a04f2fa4763ce5186d4e10a3abb"
   end
 
   def install
-    on_macos do
-      ENV["MACOSX_DEPLOYMENT_TARGET"] = MacOS.version
-    end
+    ENV["MACOSX_DEPLOYMENT_TARGET"] = MacOS.version if OS.mac?
 
     resource("starter").stage do
       ENV["GO111MODULE"] = "on"
       ENV["DOCKERCLI"] = ""
-      system "make", "deps"
       ldflags = %W[
         -s -w
         -X main.projectVersion=#{resource("starter").version}
         -X main.projectBuild=#{Utils.git_head}
       ]
-      system "go", "build", *std_go_args, "-ldflags", ldflags.join(" "), "github.com/arangodb-helper/arangodb"
+      system "go", "build", *std_go_args(ldflags: ldflags), "github.com/arangodb-helper/arangodb"
     end
 
-    mkdir "build" do
-      openssl = Formula["openssl@1.1"]
-      args = std_cmake_args + %W[
-        -DHOMEBREW=ON
-        -DCMAKE_BUILD_TYPE=RelWithDebInfo
-        -DUSE_MAINTAINER_MODE=Off
-        -DUSE_JEMALLOC=Off
-        -DCMAKE_SKIP_RPATH=On
-        -DOPENSSL_USE_STATIC_LIBS=On
-        -DCMAKE_LIBRARY_PATH=#{openssl.opt_lib}
-        -DOPENSSL_ROOT_DIR=#{openssl.opt_lib}
-        -DCMAKE_OSX_DEPLOYMENT_TARGET=#{MacOS.version}
-        -DTARGET_ARCHITECTURE=nehalem
-        -DUSE_CATCH_TESTS=Off
-        -DUSE_GOOGLE_TESTS=Off
-        -DCMAKE_INSTALL_LOCALSTATEDIR=#{var}
-      ]
+    openssl = Formula["openssl@1.1"]
+    args = std_cmake_args + %W[
+      -DHOMEBREW=ON
+      -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      -DUSE_MAINTAINER_MODE=Off
+      -DUSE_JEMALLOC=Off
+      -DCMAKE_LIBRARY_PATH=#{openssl.opt_lib}
+      -DOPENSSL_ROOT_DIR=#{openssl.opt_lib}
+      -DCMAKE_OSX_DEPLOYMENT_TARGET=#{MacOS.version}
+      -DUSE_CATCH_TESTS=Off
+      -DUSE_GOOGLE_TESTS=Off
+      -DCMAKE_INSTALL_LOCALSTATEDIR=#{var}
+    ]
+    args << "-DTARGET_ARCHITECTURE=nehalem" if build.bottle? && Hardware::CPU.intel?
 
-      ENV["V8_CXXFLAGS"] = "-O3 -g -fno-delete-null-pointer-checks" if ENV.compiler == "gcc-6"
+    ENV["V8_CXXFLAGS"] = "-O3 -g -fno-delete-null-pointer-checks" if ENV.compiler == "gcc-6"
 
-      system "cmake", "..", *args
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build", *args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   def post_install
@@ -83,25 +94,9 @@ class Arangodb < Formula
     EOS
   end
 
-  plist_options manual: "#{HOMEBREW_PREFIX}/opt/arangodb/sbin/arangod"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>KeepAlive</key>
-          <true/>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>Program</key>
-          <string>#{opt_sbin}/arangod</string>
-          <key>RunAtLoad</key>
-          <true/>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run opt_sbin/"arangod"
+    keep_alive true
   end
 
   test do
@@ -117,8 +112,8 @@ class Arangodb < Formula
               "--server.arangod", "#{sbin}/arangod",
               "--server.js-dir", "#{share}/arangodb3/js") do |r, _, pid|
       loop do
-        available = IO.select([r], [], [], 60)
-        assert_not_equal available, nil
+        available = r.wait_readable(60)
+        refute_equal available, nil
 
         line = r.readline.strip
         ohai line

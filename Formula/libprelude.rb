@@ -4,21 +4,36 @@ class Libprelude < Formula
   url "https://www.prelude-siem.org/attachments/download/1395/libprelude-5.2.0.tar.gz"
   sha256 "187e025a5d51219810123575b32aa0b40037709a073a775bc3e5a65aa6d6a66e"
   license "GPL-2.0-or-later"
+  revision 2
+
+  livecheck do
+    url "https://www.prelude-siem.org/projects/prelude/files"
+    regex(/href=.*?libprelude[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
 
   bottle do
-    sha256 arm64_big_sur: "7b7bd68152744ba511e577cbba513e86155f0b9734ed54591a462482d94c5679"
-    sha256 big_sur:       "6917b8d5d3ff58f90327fb818d920de6aea2b5ae78043f00368e3b927fd6ddcd"
-    sha256 catalina:      "6e8f95a1d163f021c7f6a7e09b92b9f695edd8de41e787dcbcafc87781380980"
-    sha256 mojave:        "0bb4d2090cb2f2aa0acb868402232a725e1ad51ead0786988bf1628a94491dde"
+    sha256 arm64_monterey: "7af71434befcd84ab6e66bc6d355942a81ff492bf732d53b23babd98afd4e045"
+    sha256 arm64_big_sur:  "0b66c24df4c249e9038f6673ddbd3c813659798e957da9d6c1bfd9fdb67a8316"
+    sha256 monterey:       "9284d8e1a805d7ef1332b2c9d040b8ccc30cdc0b8eb83085d7a4d24811c2a922"
+    sha256 big_sur:        "c52daf8e1e41fb0ad7123761ecc4fb3f9e059a96a6440baba997e0cd2812be59"
+    sha256 catalina:       "42af699d24654a53f69b6eedf42c71fa7ce87f6ee9c2f72d60e5e8bb7c1e4fde"
+    sha256 x86_64_linux:   "7f78270bd579bc35cebe47ffbfe3cb26723f1360edca8482affe7b7ea21904bc"
   end
 
   depends_on "libtool" => :build
   depends_on "pkg-config" => :build
   depends_on "gnutls"
   depends_on "libgpg-error"
-  depends_on "python@3.8"
+  depends_on "python@3.10"
 
   def install
+    python3 = "python3.10"
+    # Work around Homebrew's "prefix scheme" patch which causes non-pip installs
+    # to incorrectly try to write into HOMEBREW_PREFIX/lib since Python 3.10.
+    inreplace "bindings/python/Makefile.in",
+              "--prefix @prefix@",
+              "\\0 --install-lib=#{prefix/Language::Python.site_packages(python3)}"
+
     ENV["HAVE_CXX"] = "yes"
     args = %W[
       --disable-dependency-tracking
@@ -29,7 +44,7 @@ class Libprelude < Formula
       --without-perl
       --without-swig
       --without-python2
-      --with-python3=#{Formula["python@3.8"].opt_bin/"python3"}
+      --with-python3=#{python3}
       --with-libgnutls-prefix=#{Formula["gnutls"].opt_prefix}
     ]
 
@@ -53,7 +68,7 @@ class Libprelude < Formula
         }
       }
     EOS
-    system ENV.cc, "-L#{lib}", "-lprelude", "test.c", "-o", "test"
+    system ENV.cc, "test.c", "-L#{lib}", "-lprelude", "-o", "test"
     system "./test"
   end
 end

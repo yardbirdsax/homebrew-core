@@ -1,31 +1,24 @@
 class Miller < Formula
   desc "Like sed, awk, cut, join & sort for name-indexed data such as CSV"
   homepage "https://github.com/johnkerl/miller"
-  url "https://github.com/johnkerl/miller/releases/download/v5.10.0/mlr-5.10.0.tar.gz"
-  sha256 "1e964a97ee0333a57966a2e8d1913aebc28875e9bee3effbbc51506ca5389200"
+  url "https://github.com/johnkerl/miller/releases/download/v6.4.0/miller-6.4.0.tar.gz"
+  sha256 "20a8687a0c5b5fedf4fc3a794ef1cee7e9872e87476e1f24bde8de25799f8c51"
   license "BSD-2-Clause"
-  head "https://github.com/johnkerl/miller.git"
+  head "https://github.com/johnkerl/miller.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "6549e28916d341df56a77990fdd06aa3120821447d12614e233b60b6019b4343"
-    sha256 cellar: :any_skip_relocation, big_sur:       "5b19f1751ba3d39d94c371443583a2fd53b035e93c4ffdd8432e6c978ba43601"
-    sha256 cellar: :any_skip_relocation, catalina:      "d806164692bbe7077e28e8deb819c24ab3e7ba0794ffa6073654e54d32538649"
-    sha256 cellar: :any_skip_relocation, mojave:        "bceb6b1ff93c9bb4b11a38af1ce4b4c06f3a572e06f0f8132a9b0799a1caa3e3"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "e8a075f599c7d6a2f0ce13d802e47e9d4d59134cd93b598b09eb0473128fe7d9"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "62d9c454310272bd9c0df8b30ae7022471348012d6381024ae83a5f7f0cec250"
+    sha256 cellar: :any_skip_relocation, monterey:       "ed9eb29e632e431dda2df12ca7fb4455f497a3c82fe4fe669620c2472fddea97"
+    sha256 cellar: :any_skip_relocation, big_sur:        "76478dd9ec9682086846c7818b863c4dfdef97c0ef5af409ec586d638ceacf1d"
+    sha256 cellar: :any_skip_relocation, catalina:       "863621c64345cbe99cd55f536f3a60a2b82f11c5bfe426d75b938a85c9b21698"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "703ae98f955923ebf40485811b7d7e1b26c7ca028e25e2152fb0192af4124612"
   end
 
-  depends_on "autoconf" => :build
-  depends_on "automake" => :build
-  depends_on "libtool" => :build
-
-  uses_from_macos "flex" => :build
+  depends_on "go" => :build
 
   def install
-    # Profiling build fails with Xcode 11, remove it
-    inreplace "c/Makefile.am", /noinst_PROGRAMS=\s*mlrg/, ""
-    system "autoreconf", "-fvi"
-
-    system "./configure", "--prefix=#{prefix}", "--disable-silent-rules",
-                          "--disable-dependency-tracking"
+    system "./configure", "--prefix=#{prefix}"
     system "make"
     system "make", "install"
   end
@@ -37,6 +30,6 @@ class Miller < Formula
       4,5,6
     EOS
     output = pipe_output("#{bin}/mlr --csvlite cut -f a test.csv")
-    assert_match /a\n1\n4\n/, output
+    assert_match "a\n1\n4\n", output
   end
 end

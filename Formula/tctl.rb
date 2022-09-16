@@ -1,21 +1,25 @@
 class Tctl < Formula
   desc "Temporal CLI (tctl)"
   homepage "https://temporal.io/"
-  url "https://github.com/temporalio/temporal/archive/v1.6.3.tar.gz"
-  sha256 "95c5955511024610cd71c56c167497fc1eccd1f0ea4ebe7643f6153acdf76d10"
+  url "https://github.com/temporalio/tctl/archive/v1.16.2.tar.gz"
+  sha256 "30c7bed35360601bfe383936c67b11e003c9a409b177c3eb2e78d5884b720182"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "e4f69110a40dffd2031ac1f390dd2cbddf9ba90d9128b15e8b05c69b39d883d7"
-    sha256 cellar: :any_skip_relocation, big_sur:       "b8f9411009a0d558cdd33c6d9ae389e16b13db22ebff1b25aefa81ece08e4a4f"
-    sha256 cellar: :any_skip_relocation, catalina:      "e64636698c15db730d04618bf2fe78756bf0a4be0dce3a4af85b8f9bb62cd471"
-    sha256 cellar: :any_skip_relocation, mojave:        "c39f56bf3f4509057595019081a639f6e7f03c9884bc89bac89d4bacb76001f0"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "61008702b5c27f8f463ec05837dac57b7f0b8287732d6a01a3e767155870c82d"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "3a09cd6068e1b77e03287750b1e304b2655cc7d5c540e586d0c31fc6e78a07d4"
+    sha256 cellar: :any_skip_relocation, monterey:       "e40b7b4e237a3aeab34716a0026e2130ed7be7134fe5c82246cda2cac3d979e9"
+    sha256 cellar: :any_skip_relocation, big_sur:        "a5180190623183f8dbacfc2912b0495856399c258c63bafec7f1774b9192e910"
+    sha256 cellar: :any_skip_relocation, catalina:       "91e6e1fc848b1fb28cdc06404633ae18e0589ee68bc7cdc15ef0180d4dea88d0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "24bca761a43819b52c4a90768ae37f7180533c8acf7d1e36b19ce012e6bd16ab"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", *std_go_args, "-ldflags", "-s -w", "./cmd/tools/cli/main.go"
+    system "go", "build", *std_go_args(ldflags: "-s -w"), "./cmd/tctl/main.go"
+    system "go", "build", *std_go_args(ldflags: "-s -w"), "-o", bin/"tctl-authorization-plugin",
+      "./cmd/plugins/tctl-authorization-plugin/main.go"
   end
 
   test do

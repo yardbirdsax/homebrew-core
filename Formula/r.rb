@@ -1,10 +1,10 @@
 class R < Formula
   desc "Software environment for statistical computing"
   homepage "https://www.r-project.org/"
-  url "https://cran.r-project.org/src/base/R-4/R-4.0.3.tar.gz"
-  sha256 "09983a8a78d5fb6bc45d27b1c55f9ba5265f78fa54a55c13ae691f87c5bb9e0d"
+  url "https://cran.r-project.org/src/base/R-4/R-4.2.1.tar.gz"
+  sha256 "4d52db486d27848e54613d4ee977ad952ec08ce17807e1b525b10cd4436c643f"
   license "GPL-2.0-or-later"
-  revision 2
+  revision 3
 
   livecheck do
     url "https://cran.rstudio.com/banner.shtml"
@@ -12,22 +12,37 @@ class R < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "67c3d8b4f5adcfe3da2651c5f300b56a2129130db579c65eda952023ef305849"
-    sha256 big_sur:       "d3859bfc06a1cac65a60a43f105aec2b3c2ebdb465b69eb6988a4686eefd0819"
-    sha256 catalina:      "057a9e1fafd85ec2f65ecbfb651f6299cbbaab630158d6cf6d1057b43f7b9f29"
-    sha256 mojave:        "ffffeb9ad7f2892187d26fde97bc8f47ba4b27bf95ea8bcc1ce43a09771f7d51"
+    sha256 arm64_monterey: "7d90e7cbd5a955e347c0fc16410227cec47ed6af91c61f8b6dd2d90e9bf847a4"
+    sha256 arm64_big_sur:  "7d5efc990ccfb505c65485da128d291f0892f5a3e84035090694d62e211593cb"
+    sha256 monterey:       "1194f600e6a48c48b4aaaa3f8cf1521f6f5619a2d8536c52df807e1236d1fe22"
+    sha256 big_sur:        "ebbc3a32a6c4820397036ad4eb72dce880f17d9d8c6d7691f1c071692fe4a68c"
+    sha256 catalina:       "b52ed1a424220a750954876a2740030324c377375da59f54dc4ed08ca16c99d3"
+    sha256 x86_64_linux:   "013c967a31390c789f25006d6cf0f6463a9a858f00fe5b0bc08a103f2ed795e5"
   end
 
   depends_on "pkg-config" => :build
+  depends_on "cairo"
   depends_on "gcc" # for gfortran
   depends_on "gettext"
-  depends_on "jpeg"
+  depends_on "jpeg-turbo"
   depends_on "libpng"
   depends_on "openblas"
   depends_on "pcre2"
   depends_on "readline"
   depends_on "tcl-tk"
   depends_on "xz"
+
+  uses_from_macos "curl"
+  uses_from_macos "icu4c"
+  uses_from_macos "libffi", since: :catalina
+
+  on_linux do
+    depends_on "libice"
+    depends_on "libtirpc"
+    depends_on "libx11"
+    depends_on "libxt"
+    depends_on "pango"
+  end
 
   # needed to preserve executable permissions on files without shebangs
   skip_clean "lib/R/bin", "lib/R/doc"
@@ -40,16 +55,34 @@ class R < Formula
     args = [
       "--prefix=#{prefix}",
       "--enable-memory-profiling",
-      "--without-cairo",
-      "--without-x",
       "--with-tcl-config=#{Formula["tcl-tk"].opt_lib}/tclConfig.sh",
       "--with-tk-config=#{Formula["tcl-tk"].opt_lib}/tkConfig.sh",
-      "--with-aqua",
       "--with-blas=-L#{Formula["openblas"].opt_lib} -lopenblas",
       "--enable-R-shlib",
-      "SED=/usr/bin/sed", # don't remember Homebrew's sed shim
       "--disable-java",
+      "--with-cairo",
+      # This isn't necessary to build R, but it's saved in Makeconf
+      # and helps CRAN packages find gfortran when Homebrew may not be
+      # in PATH (e.g. under RStudio, launched from Finder)
+      "FC=#{Formula["gcc"].opt_bin}/gfortran",
     ]
+
+    if OS.mac?
+      args << "--without-x"
+      args << "--with-aqua"
+    else
+      args << "--libdir=#{lib}" # avoid using lib64 on CentOS
+
+      # Avoid references to homebrew shims
+      args << "LD=ld"
+
+      # If LDFLAGS contains any -L options, configure sets LD_LIBRARY_PATH to
+      # search those directories. Remove -LHOMEBREW_PREFIX/lib from LDFLAGS.
+      ENV.remove "LDFLAGS", "-L#{HOMEBREW_PREFIX}/lib"
+
+      ENV.append "CPPFLAGS", "-I#{Formula["libtirpc"].opt_include}/tirpc"
+      ENV.append "LDFLAGS", "-L#{Formula["libtirpc"].opt_lib}"
+    end
 
     # Help CRAN packages find gettext and readline
     ["gettext", "readline", "xz"].each do |f|
@@ -83,8 +116,10 @@ class R < Formula
     lib.install_symlink Dir[r_home/"lib/*"]
 
     # avoid triggering mandatory rebuilds of r when gcc is upgraded
+    check_replace = OS.mac?
     inreplace lib/"R/etc/Makeconf", Formula["gcc"].prefix.realpath,
-                                    Formula["gcc"].opt_prefix
+                                    Formula["gcc"].opt_prefix,
+                                    check_replace
   end
 
   def post_install
@@ -97,12 +132,20 @@ class R < Formula
 
   test do
     assert_equal "[1] 2", shell_output("#{bin}/Rscript -e 'print(1+1)'").chomp
-    assert_equal ".dylib", shell_output("#{bin}/R CMD config DYLIB_EXT").chomp
-    assert_equal "[1] \"aqua\"",
-                 shell_output("#{bin}/Rscript -e 'library(tcltk)' -e 'tclvalue(.Tcl(\"tk windowingsystem\"))'").chomp
+    assert_equal shared_library(""), shell_output("#{bin}/R CMD config DYLIB_EXT").chomp
+    system bin/"Rscript", "-e", "if(!capabilities('cairo')) stop('cairo not available')"
 
     system bin/"Rscript", "-e", "install.packages('gss', '.', 'https://cloud.r-project.org')"
     assert_predicate testpath/"gss/libs/gss.so", :exist?,
                      "Failed to install gss package"
+
+    winsys = "[1] \"aqua\""
+    if OS.linux?
+      return if ENV["HOMEBREW_GITHUB_ACTIONS"]
+
+      winsys = "[1] \"x11\""
+    end
+    assert_equal winsys,
+                 shell_output("#{bin}/Rscript -e 'library(tcltk)' -e 'tclvalue(.Tcl(\"tk windowingsystem\"))'").chomp
   end
 end

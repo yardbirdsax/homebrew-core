@@ -14,10 +14,13 @@ class Apollo < Formula
     sha256 cellar: :any_skip_relocation, catalina:      "81b2a6a1110da6cf58c6725eb6e2c331668fa39d01644e0a754a2eb9241fdccd"
     sha256 cellar: :any_skip_relocation, mojave:        "81b2a6a1110da6cf58c6725eb6e2c331668fa39d01644e0a754a2eb9241fdccd"
     sha256 cellar: :any_skip_relocation, high_sierra:   "81b2a6a1110da6cf58c6725eb6e2c331668fa39d01644e0a754a2eb9241fdccd"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:  "1978b717fd23a11b86f8fae8608aadf8d2a1bf41570c70e3dfe7b9051562e476"
+    sha256 cellar: :any_skip_relocation, all:           "1978b717fd23a11b86f8fae8608aadf8d2a1bf41570c70e3dfe7b9051562e476"
   end
 
   # https://github.com/apache/activemq-apollo/commit/049d68bf3f94cdf62ded5426d3cad4ef3e3c56ca
-  deprecate! date: "2019-03-11", because: :deprecated_upstream
+  # Deprecation added 2020-11-19 / deprecated since 2019-03-11
+  disable! date: "2022-06-08", because: :deprecated_upstream
 
   depends_on "openjdk"
 
@@ -51,30 +54,10 @@ class Apollo < Formula
     EOS
   end
 
-  plist_options manual: "#{HOMEBREW_PREFIX}/var/apollo/bin/apollo-broker run"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>KeepAlive</key>
-          <true/>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{var}/apollo/bin/apollo-broker</string>
-            <string>run</string>
-          </array>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>WorkingDirectory</key>
-          <string>#{var}/apollo</string>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run [var/"apollo/bin/apollo-broker", "run"]
+    working_dir var/"apollo"
+    keep_alive true
   end
 
   test do

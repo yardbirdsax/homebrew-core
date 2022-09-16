@@ -1,19 +1,23 @@
 class Publish < Formula
   desc "Static site generator for Swift developers"
   homepage "https://github.com/JohnSundell/Publish"
-  url "https://github.com/JohnSundell/Publish/archive/0.7.0.tar.gz"
-  sha256 "71ab0609567c2929639b919e5c52f5a8d02cacd35c9ba4de32c5c992ee49cd33"
+  url "https://github.com/JohnSundell/Publish/archive/0.9.0.tar.gz"
+  sha256 "e098a48e8763d3aef9abd1a673b8b28b4b35f8dbad15218125e18461104874ca"
   license "MIT"
-  head "https://github.com/JohnSundell/Publish.git"
+  head "https://github.com/JohnSundell/Publish.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "dfa8cf3fdcdf4cdb847d3238c645db2ef8895cd1c8b871f5497b35e6031a289e"
-    sha256 cellar: :any_skip_relocation, big_sur:       "a627b7ae09db7019e5940f4d2d7c78b5a44b651f80634b4eb98055a7902342d9"
-    sha256 cellar: :any_skip_relocation, catalina:      "08f17da7227cb766787838cb6c1d53ac0498cbde6245da0470f8379e84b476aa"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "867ee726868a7549be1a54c8c9219381b20503473d815843234e79172c2d8721"
+    sha256 cellar: :any_skip_relocation, monterey:       "596dded5de263f2e792564d00b7ad6df19100e3679a3a45638f3778e0972a5df"
+    sha256                               x86_64_linux:   "2c34e93726662d9416d7635aa995303cd0bd0cafb56c687b7b0c9ba9c7678a95"
   end
 
   # https://github.com/JohnSundell/Publish#system-requirements
-  depends_on xcode: ["11.4", :build]
+  depends_on xcode: ["12.5", :build]
+  # missing `libswift_Concurrency.dylib` on big_sur`
+  depends_on macos: :monterey
+
+  uses_from_macos "swift"
 
   def install
     system "swift", "build", "--disable-sandbox", "-c", "release"

@@ -2,8 +2,8 @@ class Onnxruntime < Formula
   desc "Cross-platform, high performance scoring engine for ML models"
   homepage "https://github.com/microsoft/onnxruntime"
   url "https://github.com/microsoft/onnxruntime.git",
-      tag:      "v1.6.0",
-      revision: "718ca7f92085bef4b19b1acc71c1e1f3daccde94"
+      tag:      "v1.12.1",
+      revision: "70481649e3c2dba0f0e1728d15a00e440084a217"
   license "MIT"
 
   livecheck do
@@ -13,28 +13,31 @@ class Onnxruntime < Formula
 
   bottle do
     rebuild 1
-    sha256 cellar: :any, arm64_big_sur: "9f3e990083162dcee2d6162833ad33093565629ef5a6be16207c130f04424a03"
-    sha256 cellar: :any, big_sur:       "d7883b8f973ba719e20283677ee50d42f64157217477adc22d54c6fbf0501a91"
-    sha256 cellar: :any, catalina:      "5482c3326db23684cae036c35d311d21e9828fa7324646a3eb29cafd1390cf08"
-    sha256 cellar: :any, mojave:        "61a7101bc2a72943b88fd82aab691ad5dabb58798ac55807b6c8b9c88dfd4c94"
+    sha256 cellar: :any,                 arm64_monterey: "0dca715030695599f96a784b2e7cd56bb189c99cbe83f7d7fa9c1caaebc63072"
+    sha256 cellar: :any,                 arm64_big_sur:  "e5a5db78d8830c8bbe53cefd70ff5b988a74b3ae1be76190587459d8e749309b"
+    sha256 cellar: :any,                 monterey:       "950ab910aaf6cfd3a12ca739f989c03620a864d4a6f2ac2dc43baeeed7a5da24"
+    sha256 cellar: :any,                 big_sur:        "4c3abe9c82c7476defcb08471dce2260e32d1ecbed5c12bada7d81be07ca19aa"
+    sha256 cellar: :any,                 catalina:       "8d18e8779b2d180a50b79e0558aaedbaadb8a0cb2286c4968cf6318ed8f4fe83"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6fcb18d068f4de34c67fa43666d77a5e5917d12d5c0e3a01043e6641c3387504"
   end
 
   depends_on "cmake" => :build
-  depends_on "python@3.9" => :build
+  depends_on "python@3.10" => :build
+
+  fails_with gcc: "5" # GCC version < 7 is no longer supported
 
   def install
     cmake_args = %W[
       -Donnxruntime_RUN_ONNX_TESTS=OFF
       -Donnxruntime_GENERATE_TEST_REPORTS=OFF
-      -DPYTHON_EXECUTABLE=#{Formula["python@3.9"].opt_bin}/python3
+      -DPYTHON_EXECUTABLE=#{which("python3.10")}
       -Donnxruntime_BUILD_SHARED_LIB=ON
       -Donnxruntime_BUILD_UNIT_TESTS=OFF
     ]
 
-    mkdir "build" do
-      system "cmake", "../cmake", *std_cmake_args, *cmake_args
-      system "make", "install"
-    end
+    system "cmake", "-S", "cmake", "-B", "build", *cmake_args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
@@ -47,8 +50,8 @@ class Onnxruntime < Formula
         return 0;
       }
     EOS
-    system ENV.cc, "-I#{include}", "-L#{lib}", "-lonnxruntime",
-           testpath/"test.c", "-o", testpath/"test"
+    system ENV.cc, "-I#{include}", testpath/"test.c",
+           "-L#{lib}", "-lonnxruntime", "-o", testpath/"test"
     assert_equal version, shell_output("./test").strip
   end
 end

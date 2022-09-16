@@ -1,12 +1,12 @@
 class Lammps < Formula
   desc "Molecular Dynamics Simulator"
   homepage "https://lammps.sandia.gov/"
-  url "https://github.com/lammps/lammps/archive/stable_29Oct2020.tar.gz"
+  url "https://github.com/lammps/lammps/archive/refs/tags/stable_23Jun2022.tar.gz"
   # lammps releases are named after their release date. We transform it to
   # YYYY-MM-DD (year-month-day) so that we get a sane version numbering.
   # We only track stable releases as announced on the LAMMPS homepage.
-  version "2020-10-29"
-  sha256 "759705e16c1fedd6aa6e07d028cc0c78d73c76b76736668420946a74050c3726"
+  version "20220623"
+  sha256 "d27ede095c9f00cd13a26f967a723d07cf8f4df65c700ed73573577bc173d5ce"
   license "GPL-2.0-only"
 
   # The `strategy` block below is used to massage upstream tags into the
@@ -14,58 +14,62 @@ class Lammps < Formula
   # to be able to do proper `Version` comparison.
   livecheck do
     url :stable
-    regex(%r{href=.*?/tag/stable[._-](\d{1,2}\w+\d{2,4})["' >]}i)
-    strategy :github_latest do |page, regex|
-      date_str = page[regex, 1]
-      date_str.present? ? Date.parse(date_str).to_s : []
+    regex(/^stable[._-](\d{1,2}\w+\d{2,4})(?:[._-](update\d*))?$/i)
+    strategy :git do |tags, regex|
+      tags.map do |tag|
+        match = tag.match(regex)
+        next if match.blank? || match[1].blank?
+
+        date_str = Date.parse(match[1]).strftime("%Y%m%d")
+        match[2].present? ? "#{date_str}-#{match[2]}" : date_str
+      end
     end
   end
 
   bottle do
-    sha256 big_sur:  "9bd87a2b72f291229de3d436f8fc7b0706ab5fc245587936943284287457d1c0"
-    sha256 catalina: "4cb389466954f5fdafc8a05a06eff9c8a17886b69e2ea6cc38c55cf3912980d0"
-    sha256 mojave:   "e1ef047d6c3155e5a8bb704a5f141beb7427194c61e6d16885610bdfd20ecf5c"
+    sha256 cellar: :any,                 arm64_monterey: "92210ab28f759a0190f750278c6d46e26da078db0aadb6bf49a0a50f04dcb07e"
+    sha256 cellar: :any,                 arm64_big_sur:  "a8aa255ed46e262bd98a79b4ef0b1d9d55cab432f839c7716d7562dfce1d80ed"
+    sha256 cellar: :any,                 monterey:       "da50b59f56062691df4b64b295e14478d95cef546f19d7b33a9dd53680b48437"
+    sha256 cellar: :any,                 big_sur:        "3074f43e948a6fd92ee8daa060eba4430ed863339c51586a7ba11b6c3f0cdaf5"
+    sha256 cellar: :any,                 catalina:       "6e678d1316c2c8f4b078d87ac5496c29547acedc5c93b8d66a536c15a8e8c686"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f03c890bfb34d0398c07ae16e3ab9f99793e206d4a77744094a3f8fb72a7f08a"
   end
 
+  depends_on "cmake" => :build
   depends_on "pkg-config" => :build
   depends_on "fftw"
   depends_on "gcc" # for gfortran
-  depends_on "jpeg"
+  depends_on "jpeg-turbo"
   depends_on "kim-api"
   depends_on "libpng"
   depends_on "open-mpi"
 
+  on_macos do
+    depends_on "libomp"
+  end
+
   def install
-    ENV.cxx11
-
-    # Disable some packages for which we do not have dependencies, that are
-    # deprecated or require too much configuration.
-    disabled_packages = %w[gpu kokkos latte mscg message mpiio poems python voronoi]
-
     %w[serial mpi].each do |variant|
-      cd "src" do
-        system "make", "clean-all"
-        system "make", "yes-standard"
-
-        disabled_packages.each do |package|
-          system "make", "no-#{package}"
-        end
-
-        system "make", variant,
-                       "LMP_INC=-DLAMMPS_GZIP",
-                       "FFT_INC=-DFFT_FFTW3 -I#{Formula["fftw"].opt_include}",
-                       "FFT_PATH=-L#{Formula["fftw"].opt_lib}",
-                       "FFT_LIB=-lfftw3",
-                       "JPG_INC=-DLAMMPS_JPEG -I#{Formula["jpeg"].opt_include} " \
-                       "-DLAMMPS_PNG -I#{Formula["libpng"].opt_include}",
-                       "JPG_PATH=-L#{Formula["jpeg"].opt_lib} -L#{Formula["libpng"].opt_lib}",
-                       "JPG_LIB=-ljpeg -lpng"
-
-        bin.install "lmp_#{variant}"
-      end
+      system "cmake", "-S", "cmake", "-B", "build_#{variant}",
+                      "-C", "cmake/presets/all_on.cmake",
+                      "-C", "cmake/presets/nolib.cmake",
+                      "-DPKG_INTEL=no",
+                      "-DPKG_KIM=yes",
+                      "-DLAMMPS_MACHINE=#{variant}",
+                      "-DBUILD_MPI=#{(variant == "mpi") ? "yes" : "no"}",
+                      "-DBUILD_OMP=#{(variant == "serial") ? "no" : "yes"}",
+                      "-DBUILD_SHARED_LIBS=yes",
+                      "-DFFT=FFTW3",
+                      "-DWITH_GZIP=yes",
+                      "-DWITH_JPEG=yes",
+                      "-DWITH_PNG=yes",
+                      "-DCMAKE_INSTALL_RPATH=#{rpath}",
+                      *std_cmake_args
+      system "cmake", "--build", "build_#{variant}"
+      system "cmake", "--install", "build_#{variant}"
     end
 
-    pkgshare.install(%w[doc potentials tools bench examples])
+    pkgshare.install %w[doc tools bench examples]
   end
 
   test do

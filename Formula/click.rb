@@ -1,21 +1,33 @@
 class Click < Formula
   desc "Command-line interactive controller for Kubernetes"
   homepage "https://github.com/databricks/click"
-  url "https://github.com/databricks/click/archive/v0.5.3.tar.gz"
-  sha256 "68feaa0d2a0c5b3a110eedd393949a89d6f80583eb25289161c0b91714097bed"
+  url "https://github.com/databricks/click/archive/v0.6.1.tar.gz"
+  sha256 "2c424337fe760868ade72a96edf22113ad485cf0552f2c38f8259e80eb05e7ba"
   license "Apache-2.0"
-  head "https://github.com/databricks/click.git"
+  head "https://github.com/databricks/click.git", branch: "master"
+
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, big_sur:     "910783b8fcee53ee4e4773e7aec55599906c8f5dfde6cc4773c127f180229d5d"
-    sha256 cellar: :any_skip_relocation, catalina:    "6bced21af1d4a16b96986fccbab5781f1aae9d9816ce12fdbb299f70b8711229"
-    sha256 cellar: :any_skip_relocation, mojave:      "7ac283d05682f3cf9698b324fc749c7a3281048e3789ab0af61f01c649eebf7d"
-    sha256 cellar: :any_skip_relocation, high_sierra: "e1b015903b819bc7f0bde965ca968457f2cac039001abc040ed9652e642fabe7"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "6018a93852c7b6c6ae53f2a3455204097ebec31a91ca05dfffacb2225dedda0b"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "73605f74a8092b5f43b7586ac4378dd69171fd893d4b5beae6ccfdbe060774a7"
+    sha256 cellar: :any_skip_relocation, monterey:       "aa42b7e95d2d152980c34fd99b97d4a3dcf6672eaf1637a4fb6bf0328d942317"
+    sha256 cellar: :any_skip_relocation, big_sur:        "ac5c6c86904815ded47f80fe83eec3b45855be124440654bf6f0280f9debaf2e"
+    sha256 cellar: :any_skip_relocation, catalina:       "08087704f1006723aa1be837898c210715ff3399feef94b8138611a097858eb5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "bbb77229d9f818ca7ba63e9a266caf69d2c745e8603acf03e52d88d3e0ce2e67"
   end
 
   depends_on "rust" => :build
 
   uses_from_macos "expect" => :test
+
+  on_linux do
+    depends_on "pkg-config" => :build
+    depends_on "openssl@1.1"
+  end
 
   def install
     system "cargo", "install", *std_cargo_args

@@ -1,9 +1,10 @@
 class Mono < Formula
   desc "Cross platform, open source .NET development framework"
   homepage "https://www.mono-project.com/"
-  url "https://download.mono-project.com/sources/mono/mono-6.12.0.107.tar.xz"
-  sha256 "61f3cd629f8e99371c6b47c1f8d96b8ac46d9e851b5531eef20cdf9ab60d2a5f"
+  url "https://download.mono-project.com/sources/mono/mono-6.12.0.122.tar.xz"
+  sha256 "29c277660fc5e7513107aee1cbf8c5057c9370a4cdfeda2fc781be6986d89d23"
   license "MIT"
+  revision 1
 
   livecheck do
     url "https://www.mono-project.com/download/stable/"
@@ -11,20 +12,20 @@ class Mono < Formula
   end
 
   bottle do
-    sha256 big_sur:  "cc88ee58cc672b0eed70bff3fc8cd7bdc7ea219f0c95e1129193b188edff34dc"
-    sha256 catalina: "5180d906bcffc14c55bb32298b6bae70f3f0aec49777f92f8926ec2fc80d2d10"
-    sha256 mojave:   "a32daf667d9507ede278e478d4060a7fff234d3720e1382819310c0903626a2a"
+    sha256 monterey: "6b1245459ebdd01ad9346be8fed038eeb6dd42e3407212c2b971927dde3b80df"
+    sha256 big_sur:  "e9382010f5f96504a354f6328339a1a2339a327fa70cfc58f60cc3fc8a3970fb"
+    sha256 catalina: "c9d98a348a207121c203e4089d292785695b630b9c78db7688381368a81575c2"
   end
 
   depends_on "cmake" => :build
   depends_on "pkg-config" => :build
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   uses_from_macos "unzip" => :build
 
   conflicts_with "xsd", because: "both install `xsd` binaries"
   conflicts_with cask: "mono-mdk"
-  conflicts_with cask: "mono-mdk-for-visual-studio"
+  conflicts_with cask: "homebrew/cask-versions/mono-mdk-for-visual-studio"
 
   # xbuild requires the .exe files inside the runtime directories to
   # be executable
@@ -66,29 +67,23 @@ class Mono < Formula
   # https://github.com/mono/mono/blob/mono-#{version}/packaging/MacSDK/msbuild.py
   resource "msbuild" do
     url "https://github.com/mono/msbuild.git",
-        revision: "db750f72af92181ec860b5150b40140583972c22"
-
-    # Remove in next release
-    # https://github.com/dotnet/msbuild/issues/6041
-    # https://github.com/dotnet/msbuild/pull/5381
-    patch do
-      url "https://github.com/mono/msbuild/commit/e2e4dfee543269ccb0a459263985b1c993feacec.patch?full_index=1"
-      sha256 "b64e93fbe1f5a5b8bcdb46ddd7d51a714f0e671b1b8ce2d1c2a0b80710ecb293"
-    end
-    patch do
-      url "https://github.com/mono/msbuild/commit/509c3190cf77be9422bddfad30b89e158f6229c3.patch?full_index=1"
-      sha256 "cf5fc342319cc1cb3b7bff02ec7d7d69af07f2777cf5b1910274d757cb14d92a"
-    end
-    patch do
-      url "https://github.com/mono/msbuild/commit/70bf6710473a2b6ffe363ea588f7b3ab87682a8d.patch?full_index=1"
-      sha256 "630b4187e882c162cd09e14f16ef2cca29b588dbea71bc444d925e5ef3f8f067"
-    end
+        revision: "70bf6710473a2b6ffe363ea588f7b3ab87682a8d"
   end
+
+  # Remove use of -flat_namespace. Upstreamed at
+  # https://github.com/mono/mono/pull/21257
+  patch :DATA
 
   # Temporary patch remove in the next mono release
   patch do
     url "https://github.com/mono/mono/commit/3070886a1c5e3e3026d1077e36e67bd5310e0faa.patch?full_index=1"
     sha256 "b415d632ced09649f1a3c1b93ffce097f7c57dac843f16ec0c70dd93c9f64d52"
+  end
+
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
   end
 
   def install
@@ -203,3 +198,18 @@ class Mono < Formula
     system bin/"msbuild", "test.fsproj"
   end
 end
+
+__END__
+diff --git a/mono/profiler/Makefile.in b/mono/profiler/Makefile.in
+index 48bcfad..58273a5 100644
+--- a/mono/profiler/Makefile.in
++++ b/mono/profiler/Makefile.in
+@@ -647,7 +647,7 @@ glib_libs = $(top_builddir)/mono/eglib/libeglib.la
+ #
+ # See: https://bugzilla.xamarin.com/show_bug.cgi?id=57011
+ @DISABLE_LIBRARIES_FALSE@@DISABLE_PROFILER_FALSE@@ENABLE_COOP_SUSPEND_FALSE@@HOST_WIN32_FALSE@check_targets = run-test
+-@BITCODE_FALSE@@HOST_DARWIN_TRUE@prof_ldflags = -Wl,-undefined -Wl,suppress -Wl,-flat_namespace
++@BITCODE_FALSE@@HOST_DARWIN_TRUE@prof_ldflags = -Wl,-undefined -Wl,dynamic_lookup
+ 
+ # On Apple hosts, we want to allow undefined symbols when building the
+ # profiler modules as, just like on Linux, we don't link them to libmono,

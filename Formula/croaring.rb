@@ -1,26 +1,27 @@
 class Croaring < Formula
   desc "Roaring bitmaps in C (and C++)"
   homepage "https://roaringbitmap.org"
-  url "https://github.com/RoaringBitmap/CRoaring/archive/v0.2.66.tar.gz"
-  sha256 "df98bd8f6ff09097ada529a004af758ff4d33faf6a06fadf8fad9a6533afc241"
+  url "https://github.com/RoaringBitmap/CRoaring/archive/v0.7.1.tar.gz"
+  sha256 "77faa22b8c1226c9a7bdbca2dbb9c73ea6db9e98db9bfbb6391996cfa7a93d17"
   license "Apache-2.0"
-  head "https://github.com/RoaringBitmap/CRoaring.git"
+  head "https://github.com/RoaringBitmap/CRoaring.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "7d95a68b3c0ea2bf0e538bdc34293e4dedd08ad0a2b8fa1e991e4e9e8615cb98"
-    sha256 cellar: :any, big_sur:       "e586a64b1397c4e93e5dd19a15cf3e36b0bc6c51c2a0245579d4eb690e162125"
-    sha256 cellar: :any, catalina:      "755fadb67394a7b031626671412623348a561e290d379592b8c2925aa4e1f671"
-    sha256 cellar: :any, mojave:        "b70622cb9515f3702faa0cf8f60a26c5e7481399d1a244a5217bffdf1ab269d3"
-    sha256 cellar: :any, high_sierra:   "aee7d4e0440e29a2a27694bac0326758590bd36d86254de1888e4044b0de576e"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "39a8ce9e02fb80f493a9d3f9508c0540b5be859d2650344d06fc3cbdde3d6dc5"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "bbbc75636ef31fd11d72f66755d27afd1210c462f507061c67b4f5ae8e605544"
+    sha256 cellar: :any_skip_relocation, monterey:       "939cbe4d43a0a990c1920bccf8c77e309a34b8c8ec887ea5fecf52f6421efd85"
+    sha256 cellar: :any_skip_relocation, big_sur:        "37c86ee614fc151c248eecf33b5fb25f2990c52c858465bd5d910012418f12a6"
+    sha256 cellar: :any_skip_relocation, catalina:       "f8d9b2dbf807ad2b899315f9c449a8a8ca1c6c9c46acd3de8ed4e03d5979ba9a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9274807fde9ca104914b8a17f90ae262eeeeaccebb797c4b554456cf527ff084"
   end
 
   depends_on "cmake" => :build
 
   def install
-    system "cmake", ".", *std_cmake_args
+    system "cmake", ".", *std_cmake_args, "-DENABLE_ROARING_TESTS=OFF"
     system "make", "install"
     system "make", "clean"
-    system "cmake", ".", "-DROARING_BUILD_STATIC=ON", *std_cmake_args
+    system "cmake", ".", *std_cmake_args, "-DROARING_BUILD_STATIC=ON"
     system "make"
     lib.install "src/libroaring.a"
   end

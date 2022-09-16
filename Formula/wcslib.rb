@@ -1,21 +1,22 @@
 class Wcslib < Formula
   desc "Library and utilities for the FITS World Coordinate System"
   homepage "https://www.atnf.csiro.au/people/mcalabre/WCS/"
-  url "https://www.atnf.csiro.au/pub/software/wcslib/wcslib-7.3.tar.bz2"
-  sha256 "4b01cf425382a26ca4f955ed6841a5f50c55952a2994367f8e067e4183992961"
+  url "https://www.atnf.csiro.au/pub/software/wcslib/wcslib-7.12.tar.bz2"
+  sha256 "9cf8de50e109a97fa04511d4111e8d14bd0a44077132acf73e6cf0029fe96bd4"
   license "GPL-3.0-or-later"
 
   livecheck do
     url :homepage
-    regex(/href=.*?wcslib\.t.+?WCSLIB v?(\d+(?:\.\d+)+)</im)
+    regex(/href=.*?wcslib[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "c733b73fe01c146992c2fa05865c631907c61cbc26e5c66980471441c5c7910f"
-    sha256 cellar: :any, big_sur:       "14760499e809a0b5878d03b2f22f15975906fea80bb63b173a35c67645c3654a"
-    sha256 cellar: :any, catalina:      "a0e15ea5ee23106c24960feed0c7dad6762d8e75cb9d42445c197fb38f079965"
-    sha256 cellar: :any, mojave:        "d8b3561a7e87031d7d6f8042af1c75f21663874921da17d5061d3ffe558263f1"
-    sha256 cellar: :any, high_sierra:   "941ce001ceb21e53dc6af78e8e09ebc52a24b57efcd51c009f8416789674f8ee"
+    sha256 cellar: :any,                 arm64_monterey: "f418a0c421237a184ea92462338644f6f60a3065815bed980118d13dfaacf45c"
+    sha256 cellar: :any,                 arm64_big_sur:  "106c631c29a069fc17e4648807c308414765a88b838dac66fed25997d2265aa4"
+    sha256 cellar: :any,                 monterey:       "eb4b9167d77c897c36d72e919976ae99da5793d8df33ff457c6d01efa6b2d739"
+    sha256 cellar: :any,                 big_sur:        "989da78f103e6d0b9b0f933b688614f09a7809ee0a5fdbb5939c94b96556e5d8"
+    sha256 cellar: :any,                 catalina:       "a7fee6167237f971ca2b474dbc774b8a4c72c50e402ff3dcd329841192c4bc19"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f34302a5f97870b9a5db747c965a47fd17bef5545a6caf96bac06fa45d4c497b"
   end
 
   depends_on "cfitsio"
@@ -32,7 +33,7 @@ class Wcslib < Formula
   end
 
   test do
-    piped = "SIMPLE  =" + " "*20 + "T / comment" + " "*40 + "END" + " "*2797
+    piped = "SIMPLE  =" + (" "*20) + "T / comment" + (" "*40) + "END" + (" "*2797)
     pipe_output("#{bin}/fitshdr", piped, 0)
   end
 end

@@ -1,10 +1,10 @@
 class Goaccess < Formula
   desc "Log analyzer and interactive viewer for the Apache Webserver"
   homepage "https://goaccess.io/"
-  url "https://tar.goaccess.io/goaccess-1.4.5.tar.gz"
-  sha256 "c4820e781f75d9446f6b1be5fc8d11c6ec94a47fa8dd523001698c589f46c1ba"
+  url "https://tar.goaccess.io/goaccess-1.6.3.tar.gz"
+  sha256 "d95646c42af02ece2e246a1aa21452445fd18abe45d4a7dcbbc8394a8c4aeaa8"
   license "MIT"
-  head "https://github.com/allinurl/goaccess.git"
+  head "https://github.com/allinurl/goaccess.git", branch: "master"
 
   livecheck do
     url "https://goaccess.io/download"
@@ -12,10 +12,12 @@ class Goaccess < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "86ac282b906c3e61ba7c9992d1078f7cd4ded1f6fd9873067b1b2d537e53a18e"
-    sha256 big_sur:       "52b359d311d28cb204d7a7cb3ab57e2290749884561a3969aa0905d70a6be533"
-    sha256 catalina:      "08a281a0004d03f7bc2fc11615c22760d86b458e9867a5df581a909e39debfcc"
-    sha256 mojave:        "0661c642a2b0c5fb49972b65678c29f2c7e29dabd4f5f3e72d965b96c0a018ea"
+    sha256 arm64_monterey: "332f33cde730aeae95da43480181178c07e43b2a67dc1277adecf4a8db7e880a"
+    sha256 arm64_big_sur:  "153953944816c72591488c7a4370cbc4d65b503627bd63785d5bcee9453afdc8"
+    sha256 monterey:       "e8a26915d08a88212a79c577afb3db8adc80ab3262e9007c3b3d2c3a39a66a25"
+    sha256 big_sur:        "0a1ae77b5813df6c04b97bd3c0eea71ae99401ec3ddb4d39062caaee67faba6d"
+    sha256 catalina:       "f4f43c065d2c5e7c348ce3a37df5ed3ef2ad35c04b779771061908ab181503b5"
+    sha256 x86_64_linux:   "bf3b69dc7213f037cb3d5f4993d0c759b9f4acd6d3309ec4044bc759a4f6e59f"
   end
 
   depends_on "autoconf" => :build

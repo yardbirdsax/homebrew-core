@@ -1,17 +1,29 @@
 class Ilmbase < Formula
   desc "OpenEXR ILM Base libraries (high dynamic-range image file format)"
   homepage "https://www.openexr.com/"
-  # NOTE: Please keep these values in sync with openexr.rb when updating.
-  url "https://github.com/openexr/openexr/archive/v2.5.4.tar.gz"
-  sha256 "dba19e9c6720c6f64fbc8b9d1867eaa75da6438109b941eefdc75ed141b6576d"
+  url "https://github.com/AcademySoftwareFoundation/openexr/archive/v2.5.8.tar.gz"
+  sha256 "db261a7fcc046ec6634e4c5696a2fc2ce8b55f50aac6abe034308f54c8495f55"
   license "BSD-3-Clause"
 
-  bottle do
-    sha256 arm64_big_sur: "e00555535d8beaf7bdc54686c4841072f934460cd2c2326c73a142cd0a642a5e"
-    sha256 big_sur:       "96c25377e22df725dff159ed26a7664448e7ba4a7fd90924532b1ed67c1c76c2"
-    sha256 catalina:      "dc14e8650e42b22189ce338e9c8593dd29a81c68d1a915e104651a97b3f1f7ab"
-    sha256 mojave:        "5f64d530a2162ca1a7b042704f0ba38de1b9efde4742ee76cbde3172af7612ac"
+  livecheck do
+    url :stable
+    regex(/^v?(2(?:\.\d+)+)$/i)
   end
+
+  bottle do
+    sha256 cellar: :any,                 arm64_monterey: "398bd979380275b9c0db5577df3a5d334e1d9d94022479f8677b5871998231cd"
+    sha256 cellar: :any,                 arm64_big_sur:  "d616fac56b2bb43a3fdbfcd7f02cd25afae16e90b004fead3f45e69100bc00f5"
+    sha256 cellar: :any,                 monterey:       "d7be04686035d70c27ce4b4bba6d03cb1c0c2ea9bd6b39b889d1d0f5ef2744a3"
+    sha256 cellar: :any,                 big_sur:        "bdf07479c3091736bacc2084f4559453278303432233e911c5f68e3861b56fab"
+    sha256 cellar: :any,                 catalina:       "604258f3462b62c34dd27ea064097da000e558e4db3d5cc68746aa8a7ab69e52"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c12083e35dab46f88283fc50b6cb1b93c595db07102814e0effef211f669a968"
+  end
+
+  keg_only "ilmbase conflicts with `openexr` and `imath`"
+
+  # https://github.com/AcademySoftwareFoundation/openexr/pull/929
+  # Commented out while this formula still has dependents.
+  # deprecate! date: "2021-04-05", because: :unsupported
 
   depends_on "cmake" => :build
 

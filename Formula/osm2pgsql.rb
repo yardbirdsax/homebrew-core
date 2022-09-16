@@ -1,25 +1,28 @@
 class Osm2pgsql < Formula
   desc "OpenStreetMap data to PostgreSQL converter"
   homepage "https://osm2pgsql.org"
-  url "https://github.com/openstreetmap/osm2pgsql/archive/1.4.1.tar.gz"
-  sha256 "33c4817dceed99764b089ead0e8e2f67c4c6675e761772339b635800970e66e2"
+  url "https://github.com/openstreetmap/osm2pgsql/archive/1.7.0.tar.gz"
+  sha256 "0f722baf0f04eda387d934d86228aae07d848993900db6b9e7ab312c91fd84e5"
   license "GPL-2.0-only"
-  revision 1
-  head "https://github.com/openstreetmap/osm2pgsql.git"
+  head "https://github.com/openstreetmap/osm2pgsql.git", branch: "master"
 
   bottle do
-    sha256 big_sur:  "639cf61fb8a546f66ca7edc840156f1eb7c5544244e984ab9482b7ab20d0a8f9"
-    sha256 catalina: "558cf99448c7c80aec0356cfd0addbf5c6eeb5457c5c10a09eef9ee8ea3cdff2"
-    sha256 mojave:   "b7b04dcd4f31b4b1a4765752f2cc484b64d6e4b6bd10b66d8d47734ad44a3f68"
+    sha256 arm64_monterey: "77819439477d8223a3bb0b1289e45f28d7e5d548dbf4670e3365de6cc3ade306"
+    sha256 arm64_big_sur:  "1c8c5486a45a7507c6e20e505d59ed338be32414ae8938ac9bed38606bbab76d"
+    sha256 monterey:       "093c11ed82bf2bdc76f66149ef47721687a600ea3330bb4828118c16f8d07d7f"
+    sha256 big_sur:        "abfc6b1a9f834feef34bef6dfa3c5332e445be238916992e90adeac3e0e5f28a"
+    sha256 catalina:       "563cc7be1efeeba1f8426138c11fa20a3ce1ec381952d4a975181767395d77f6"
   end
 
   depends_on "cmake" => :build
   depends_on "lua" => :build
   depends_on "boost"
   depends_on "geos"
-  depends_on "luajit-openresty"
-  depends_on "postgresql"
+  depends_on "libpq"
+  depends_on "luajit"
   depends_on "proj"
+
+  uses_from_macos "expat"
 
   def install
     # This is essentially a CMake disrespects superenv problem
@@ -28,19 +31,14 @@ class Osm2pgsql < Formula
     inreplace "cmake/FindLua.cmake", /set\(LUA_VERSIONS5( \d\.\d)+\)/,
                                      "set(LUA_VERSIONS5 #{lua_version})"
 
-    # Use Proj 6.0.0 compatibility headers
-    # https://github.com/openstreetmap/osm2pgsql/issues/922
-    # and https://github.com/osmcode/libosmium/issues/277
-    ENV.append_to_cflags "-DACCEPT_USE_OF_DEPRECATED_PROJ_API_H"
-
     mkdir "build" do
-      system "cmake", "-DWITH_LUAJIT=ON", "..", *std_cmake_args
+      system "cmake", "-DWITH_LUAJIT=ON", "-DUSE_PROJ_LIB=6", "..", *std_cmake_args
       system "make", "install"
     end
   end
 
   test do
-    assert_match "Connecting to database failed: could not connect to server",
+    assert_match "Connecting to database failed: connection to server",
                  shell_output("#{bin}/osm2pgsql /dev/null 2>&1", 1)
   end
 end

@@ -1,16 +1,18 @@
 class Vnstat < Formula
   desc "Console-based network traffic monitor"
   homepage "https://humdi.net/vnstat/"
-  url "https://humdi.net/vnstat/vnstat-2.6.tar.gz"
-  sha256 "89276e0a7281943edb554b874078278ad947dc312938a2451e03eb80679f7ff7"
-  license "GPL-2.0"
-  head "https://github.com/vergoh/vnstat.git"
+  url "https://humdi.net/vnstat/vnstat-2.9.tar.gz"
+  sha256 "11a21475dea91706500aba7c63e24126703fd01f13b1f3acdf92baa5aead9dc7"
+  license "GPL-2.0-only"
+  head "https://github.com/vergoh/vnstat.git", branch: "master"
 
   bottle do
-    sha256 big_sur:     "f2927c9530127989258ee417145dc37f3bb958086724c143051f4d9c5b93e7d1"
-    sha256 catalina:    "c4087b24e69aa3bbf9ccb7f58ca3d942bc3403bcfff47df7657cac00e8c9fc75"
-    sha256 mojave:      "795d67ae3e4d0f8683ee0812d29a4205aab38a2f453a09cd714adac7f00aaea8"
-    sha256 high_sierra: "5e873fe1cb03aecfc02e0a5224f2fa222ef9e3f2a2e8a007a031cf4a1f9cf3ee"
+    sha256 arm64_monterey: "a9d126ced5b400cfd9fdd67762f0abb7b68d484168eb1d376de589e26401cafb"
+    sha256 arm64_big_sur:  "9c449b01cc80fcdffad166dd457f08cd5060a4ebbd40d4f947c4abb401b6084a"
+    sha256 monterey:       "bba4e7167e3d1ae02c828a3a5cc561b98f3915aa2b4d058300d62414f7d446cc"
+    sha256 big_sur:        "095e49284800aa41b7cd7808b902a1b451c302c1a4bea0b4a41d93c3de0ede2f"
+    sha256 catalina:       "f6f4328d86add848e05f6a14a59844bb8a32fabc1f9b77cccd86958eba2ffc83"
+    sha256 x86_64_linux:   "8d8dd227883a9cdfcf31b7a8bd6478bef463fc2efb03d162ca643e293c8ac03a"
   end
 
   depends_on "gd"
@@ -23,7 +25,9 @@ class Vnstat < Formula
       s.gsub! "/etc/vnstat.conf", "#{etc}/vnstat.conf", false
       s.gsub! "/var/", "#{var}/", false
       s.gsub! "var/lib", "var/db", false
-      s.gsub! "\"eth0\"", "\"en0\"", false
+      # https://github.com/Homebrew/homebrew-core/pull/84695#issuecomment-913043888
+      # network interface difference between macos and linux
+      s.gsub! "\"eth0\"", "\"en0\"", false if OS.mac?
     end
 
     system "./configure", "--disable-dependency-tracking",
@@ -47,39 +51,19 @@ class Vnstat < Formula
     EOS
   end
 
-  plist_options startup: true, manual: "#{HOMEBREW_PREFIX}/opt/vnstat/bin/vnstatd --nodaemon --config #{HOMEBREW_PREFIX}/etc/vnstat.conf"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_bin}/vnstatd</string>
-            <string>--nodaemon</string>
-            <string>--config</string>
-            <string>#{etc}/vnstat.conf</string>
-          </array>
-          <key>KeepAlive</key>
-          <true/>
-          <key>RunAtLoad</key>
-          <true/>
-          <key>WorkingDirectory</key>
-          <string>#{var}</string>
-          <key>ProcessType</key>
-          <string>Background</string>
-        </dict>
-      </plist>
-    EOS
+  plist_options startup: true
+  service do
+    run [opt_bin/"vnstatd", "--nodaemon", "--config", etc/"vnstat.conf"]
+    keep_alive true
+    working_dir var
+    process_type :background
   end
 
   test do
     cp etc/"vnstat.conf", testpath
-    inreplace "vnstat.conf", "/usr/local/var", testpath/"var"
+    inreplace "vnstat.conf", var, testpath/"var"
+    inreplace "vnstat.conf", ";Interface", "Interface"
+    inreplace "vnstat.conf", ";DatabaseDir", "DatabaseDir"
     (testpath/"var/db/vnstat").mkpath
 
     begin

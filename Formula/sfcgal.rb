@@ -1,17 +1,19 @@
 class Sfcgal < Formula
   desc "C++ wrapper library around CGAL"
   homepage "http://sfcgal.org/"
-  url "https://gitlab.com/Oslandia/SFCGAL/-/archive/v1.3.9/SFCGAL-v1.3.9.tar.gz"
-  sha256 "2451cb6df24853c7e59173eec0068e3263ab625fcf61add4624f8bf8366ae4e3"
+  url "https://gitlab.com/Oslandia/SFCGAL/-/archive/v1.4.1/SFCGAL-v1.4.1.tar.gz"
+  sha256 "1800c8a26241588f11cddcf433049e9b9aea902e923414d2ecef33a3295626c3"
   license "LGPL-2.0-or-later"
-  revision 1
+  revision 2
 
   bottle do
     rebuild 1
-    sha256 arm64_big_sur: "ccef404f840195d1f22cc5915ce243009cd15f7d488419f6092afca25a1ac549"
-    sha256 big_sur:       "a84e1882800689fe3312cf3b93f179a5e34539151ef558468976003ae97d2692"
-    sha256 catalina:      "059645e8217cd404f6ae60c7fc3c9dcc98c6b0d64aa1756cf5ee2ebbe6d5c509"
-    sha256 mojave:        "8180bd969a152778f3eedd4149c517ea88d5f22efe1955d418e551808a405992"
+    sha256 cellar: :any,                 arm64_monterey: "27c79e4e9db21d023e67cc8b3c36962a5192fcf0a41e36f0716c5c2d4389db42"
+    sha256 cellar: :any,                 arm64_big_sur:  "c8c850d7b183f314c345e09eb950f551a92520fe6474ffa98bce470880ccbdaf"
+    sha256 cellar: :any,                 monterey:       "9c99287f0795eac493cf6ef6b692a4b7a756a7b8a883b3c59b94c70208ac2868"
+    sha256 cellar: :any,                 big_sur:        "3f1bef94cb398dc0ce41104ee1bcaa7da50abf781aa6e5484993322280dd0896"
+    sha256 cellar: :any,                 catalina:       "0236c932bfaf71363674a06ff7b22afa8e970c2d11fdc50d4d9e412f08bbe8bf"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "df8e58a9120cb041f88f928e733d5eb0577dbdaa5aab13acaeca455ca3f60ada"
   end
 
   depends_on "cmake" => :build
@@ -20,16 +22,13 @@ class Sfcgal < Formula
   depends_on "gmp"
   depends_on "mpfr"
 
-  # Build against boost >= 1.75
-  # https://gitlab.com/Oslandia/SFCGAL/-/issues/238
-  patch do
-    url "https://gitlab.com/Oslandia/SFCGAL/-/commit/d07ed747e7f06acb22d5891ece789b331cff14c5.patch"
-    sha256 "158b68643ff4de03aed064d1e494dd7e27acf86da3ae8949fddd78d5b73d6d73"
-  end
+  # error: array must be initialized with a brace-enclosed initializer
+  fails_with gcc: "5"
 
   def install
-    system "cmake", ".", *std_cmake_args
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do

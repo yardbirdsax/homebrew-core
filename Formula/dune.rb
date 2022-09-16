@@ -1,23 +1,27 @@
 class Dune < Formula
   desc "Composable build system for OCaml"
   homepage "https://dune.build/"
-  url "https://github.com/ocaml/dune/releases/download/2.8.2/dune-2.8.2.tbz"
-  sha256 "e2c4e8230f7c96236503fd75f22bdbc263639971bf104509e446855ded35ae1e"
+  url "https://github.com/ocaml/dune/releases/download/3.4.1/dune-3.4.1.tbz"
+  sha256 "299fa33cffc108cc26ff59d5fc9d09f6cb0ab3ac280bf23a0114cfdc0b40c6c5"
   license "MIT"
-  head "https://github.com/ocaml/dune.git"
+  head "https://github.com/ocaml/dune.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, big_sur:  "207990a41328767e8c46a8d3d7d8aa1db494a1243fbdf5bcd8fcca83668d57b1"
-    sha256 cellar: :any_skip_relocation, catalina: "a3603b422c90d1fa525f5b9581f18b4645aeb39e3ccb7450f11d6e833a92e697"
-    sha256 cellar: :any_skip_relocation, mojave:   "b6906bda3c1557367516849bda5957596a4cc4ca0407c04282a7d3d4ae3d873c"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "4ba632f42cb0122edac6828fa7a3837544d27e81ba7abfd9f094dae8853c880d"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "6bd9d3f7640c04174f982a398f06c1f09a1ec18c791ef21520ecd898bfd78299"
+    sha256 cellar: :any_skip_relocation, monterey:       "5f6c4cc376df4bee521b223205be37b0c53e22ad9246df4eb6217995471511cb"
+    sha256 cellar: :any_skip_relocation, big_sur:        "419a5d2c0cce823fad6e9a705e5073900c6e07c79e4f12013a93d2760a807629"
+    sha256 cellar: :any_skip_relocation, catalina:       "f5b23840ddc903a61c8c6b28501c853ade7725bbb8b51945fe7bc8d22e983506"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "19539ca2aeb18b116149e150a593aca195286cf52dc11ed86be1a5b1ba5d4527"
   end
 
   depends_on "ocaml" => [:build, :test]
 
   def install
-    system "ocaml", "bootstrap.ml"
-    system "./dune.exe", "build", "-p", "dune", "--profile", "dune-bootstrap"
-    bin.install "_build/default/bin/dune.exe" => "dune"
+    system "make", "release"
+    system "make", "PREFIX=#{prefix}", "install"
+    share.install prefix/"man"
+    elisp.install Dir[share/"emacs/site-lisp/*"]
   end
 
   test do

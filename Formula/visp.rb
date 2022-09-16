@@ -1,9 +1,10 @@
 class Visp < Formula
   desc "Visual Servoing Platform library"
   homepage "https://visp.inria.fr/"
-  url "https://gforge.inria.fr/frs/download.php/latestfile/475/visp-3.3.0.tar.gz"
-  sha256 "f2ed11f8fee52c89487e6e24ba6a31fa604b326e08fb0f561a22c877ebdb640d"
-  revision 11
+  url "https://visp-doc.inria.fr/download/releases/visp-3.5.0.tar.gz"
+  sha256 "494a648b2570da2a200ba326ed61a14e785eb9ee08ef12d3ad178b2f384d3d30"
+  license "GPL-2.0-or-later"
+  revision 4
 
   livecheck do
     url "https://visp.inria.fr/download/"
@@ -11,44 +12,46 @@ class Visp < Formula
   end
 
   bottle do
-    sha256 catalina: "bbc1c7b0022d1c99d9d144f73a82024d6af8eee0763a794fbc5ce0da98ac6308"
-    sha256 mojave:   "a6c1d3468de47a6725bea5933e1fddbb616fb5736af372a158a1d10aba992101"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "fecbe2ce737967f712f32d5ae64f00c31d2dfa4cabb117a1f06c32c666a884dd"
+    sha256 cellar: :any,                 arm64_big_sur:  "3c1244cc2b4f23958717043a607e8ca8fc578790c172adc3b67704f20f860115"
+    sha256 cellar: :any,                 monterey:       "d959e8ae260882359ae3eb79d556dd7722afd2645bca7de9da7938d01737b5b9"
+    sha256 cellar: :any,                 big_sur:        "1ef854161678265eefe57582f14609ab1e4c4345f31fd0558cd765fbcca9125a"
+    sha256 cellar: :any,                 catalina:       "63f27f3350b6239b6734ef06965c1c2ee5ea92d6c72dd2698c57e2a1822f0967"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "295b6f80fd2a437fc818b7e64c17e82f61984318a070e9e4a1bc46c2a329c159"
   end
 
   depends_on "cmake" => :build
   depends_on "pkg-config" => :build
   depends_on "eigen"
   depends_on "gsl"
-  depends_on "jpeg"
+  depends_on "jpeg-turbo"
   depends_on "libdc1394"
   depends_on "libpng"
   depends_on "opencv"
   depends_on "pcl"
   depends_on "zbar"
 
-  # from first commit at https://github.com/lagadic/visp/pull/768 - remove in next release
-  patch do
-    url "https://github.com/lagadic/visp/commit/61c8beb8442f9e0fe7df8966e2e874929af02344.patch?full_index=1"
-    sha256 "429bf02498fc03fff7bc2a2ad065dea6d8a8bfbde6bb1adb516fa821b1e5c96f"
+  uses_from_macos "libxml2"
+  uses_from_macos "zlib"
+
+  on_linux do
+    depends_on "libnsl"
   end
 
-  # Fixes build on OpenCV >= 4.4.0
-  # Extracted from https://github.com/lagadic/visp/pull/795
-  patch :DATA
+  fails_with gcc: "5"
 
   def install
     ENV.cxx11
 
-    sdk = MacOS::CLT.installed? ? "" : MacOS.sdk_path
-
     # Avoid superenv shim references
     inreplace "CMakeLists.txt" do |s|
-      s.sub! /CMake build tool:"\s+\${CMAKE_BUILD_TOOL}/,
-             "CMake build tool:            gmake\""
-      s.sub! /C\+\+ Compiler:"\s+\${VISP_COMPILER_STR}/,
-             "C++ Compiler:                clang++\""
-      s.sub! /C Compiler:"\s+\${CMAKE_C_COMPILER}/,
-             "C Compiler:                  clang\""
+      s.sub!(/CMake build tool:"\s+\${CMAKE_BUILD_TOOL}/,
+             "CMake build tool:            gmake\"")
+      s.sub!(/C\+\+ Compiler:"\s+\${VISP_COMPILER_STR}/,
+             "C++ Compiler:                #{ENV.cxx}\"")
+      s.sub!(/C Compiler:"\s+\${CMAKE_C_COMPILER}/,
+             "C Compiler:                  #{ENV.cc}\"")
     end
 
     system "cmake", ".", "-DBUILD_DEMOS=OFF",
@@ -57,16 +60,16 @@ class Visp < Formula
                          "-DBUILD_TUTORIALS=OFF",
                          "-DUSE_DC1394=ON",
                          "-DDC1394_INCLUDE_DIR=#{Formula["libdc1394"].opt_include}",
-                         "-DDC1394_LIBRARY=#{Formula["libdc1394"].opt_lib}/libdc1394.dylib",
+                         "-DDC1394_LIBRARY=#{Formula["libdc1394"].opt_lib/shared_library("libdc1394")}",
                          "-DUSE_EIGEN3=ON",
                          "-DEigen3_DIR=#{Formula["eigen"].opt_share}/eigen3/cmake",
                          "-DUSE_GSL=ON",
                          "-DGSL_INCLUDE_DIR=#{Formula["gsl"].opt_include}",
-                         "-DGSL_cblas_LIBRARY=#{Formula["gsl"].opt_lib}/libgslcblas.dylib",
-                         "-DGSL_gsl_LIBRARY=#{Formula["gsl"].opt_lib}/libgsl.dylib",
+                         "-DGSL_cblas_LIBRARY=#{Formula["gsl"].opt_lib/shared_library("libgslcblas")}",
+                         "-DGSL_gsl_LIBRARY=#{Formula["gsl"].opt_lib/shared_library("libgsl")}",
                          "-DUSE_JPEG=ON",
-                         "-DJPEG_INCLUDE_DIR=#{Formula["jpeg"].opt_include}",
-                         "-DJPEG_LIBRARY=#{Formula["jpeg"].opt_lib}/libjpeg.dylib",
+                         "-DJPEG_INCLUDE_DIR=#{Formula["jpeg-turbo"].opt_include}",
+                         "-DJPEG_LIBRARY=#{Formula["jpeg-turbo"].opt_lib/shared_library("libjpeg")}",
                          "-DUSE_LAPACK=ON",
                          "-DUSE_LIBUSB_1=OFF",
                          "-DUSE_OPENCV=ON",
@@ -74,25 +77,36 @@ class Visp < Formula
                          "-DUSE_PCL=ON",
                          "-DUSE_PNG=ON",
                          "-DPNG_PNG_INCLUDE_DIR=#{Formula["libpng"].opt_include}",
-                         "-DPNG_LIBRARY_RELEASE=#{Formula["libpng"].opt_lib}/libpng.dylib",
+                         "-DPNG_LIBRARY_RELEASE=#{Formula["libpng"].opt_lib/shared_library("libpng")}",
                          "-DUSE_PTHREAD=ON",
-                         "-DPTHREAD_INCLUDE_DIR=#{sdk}/usr/include",
-                         "-DPTHREAD_LIBRARY=/usr/lib/libpthread.dylib",
                          "-DUSE_PYLON=OFF",
                          "-DUSE_REALSENSE=OFF",
                          "-DUSE_REALSENSE2=OFF",
                          "-DUSE_X11=OFF",
                          "-DUSE_XML2=ON",
-                         "-DXML2_INCLUDE_DIR=#{sdk}/usr/include/libxml2",
-                         "-DXML2_LIBRARY=/usr/lib/libxml2.dylib",
                          "-DUSE_ZBAR=ON",
                          "-DZBAR_INCLUDE_DIRS=#{Formula["zbar"].opt_include}",
-                         "-DZBAR_LIBRARIES=#{Formula["zbar"].opt_lib}/libzbar.dylib",
+                         "-DZBAR_LIBRARIES=#{Formula["zbar"].opt_lib/shared_library("libzbar")}",
                          "-DUSE_ZLIB=ON",
-                         "-DZLIB_INCLUDE_DIR=#{sdk}/usr/include",
-                         "-DZLIB_LIBRARY_RELEASE=/usr/lib/libz.dylib",
                          *std_cmake_args
-    system "make", "install"
+
+    # Replace generated references to OpenCV's Cellar path
+    opencv = Formula["opencv"]
+    opencv_references = Dir[
+      "CMakeCache.txt",
+      "CMakeFiles/Export/lib/cmake/visp/VISPModules.cmake",
+      "VISPConfig.cmake",
+      "VISPGenerateConfigScript.info.cmake",
+      "VISPModules.cmake",
+      "modules/**/flags.make",
+      "unix-install/VISPConfig.cmake",
+    ]
+    inreplace opencv_references, opencv.prefix.realpath, opencv.opt_prefix
+    system "cmake", "--build", "."
+    system "cmake", "--install", "."
+
+    # Make sure software built against visp don't reference opencv's cellar path either
+    inreplace lib/"pkgconfig/visp.pc", opencv.prefix.realpath, opencv.opt_prefix
   end
 
   test do
@@ -110,26 +124,3 @@ class Visp < Formula
     assert_equal version.to_s, shell_output("./test").chomp
   end
 end
-__END__
-diff --git a/modules/vision/src/key-point/vpKeyPoint.cpp b/modules/vision/src/key-point/vpKeyPoint.cpp
-index dd5cabf..23ed382 100644
---- a/modules/vision/src/key-point/vpKeyPoint.cpp
-+++ b/modules/vision/src/key-point/vpKeyPoint.cpp
-@@ -2269,7 +2269,7 @@ void vpKeyPoint::initDetector(const std::string &detectorName)
-
-   if (detectorNameTmp == "SIFT") {
- #ifdef VISP_HAVE_OPENCV_XFEATURES2D
--    cv::Ptr<cv::FeatureDetector> siftDetector = cv::xfeatures2d::SIFT::create();
-+    cv::Ptr<cv::FeatureDetector> siftDetector = cv::SIFT::create();
-     if (!usePyramid) {
-       m_detectors[detectorNameTmp] = siftDetector;
-     } else {
-@@ -2447,7 +2447,7 @@ void vpKeyPoint::initExtractor(const std::string &extractorName)
- #else
-   if (extractorName == "SIFT") {
- #ifdef VISP_HAVE_OPENCV_XFEATURES2D
--    m_extractors[extractorName] = cv::xfeatures2d::SIFT::create();
-+    m_extractors[extractorName] = cv::SIFT::create();
- #else
-     std::stringstream ss_msg;
-     ss_msg << "Fail to initialize the extractor: SIFT. OpenCV version  " << std::hex << VISP_HAVE_OPENCV_VERSION

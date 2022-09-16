@@ -1,31 +1,40 @@
 class Watchexec < Formula
   desc "Execute commands when watched files change"
   homepage "https://github.com/watchexec/watchexec"
-  url "https://github.com/watchexec/watchexec/archive/1.14.1.tar.gz"
-  sha256 "23ca90f1f070b0d30e821667c8b9deaf174d020373ea032e9e22f1a78adcfa1c"
+  url "https://github.com/watchexec/watchexec/archive/cli-v1.20.6.tar.gz"
+  sha256 "fa490944bbc8eafdc585454d27ec6f75988ce7d159db8ee1244b1fc5bbd86935"
   license "Apache-2.0"
+  head "https://github.com/watchexec/watchexec.git", branch: "main"
+
+  livecheck do
+    url :stable
+    regex(/^cli[._-]v?(\d+(?:\.\d+)+)$/i)
+  end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "6d4e987c12e2ccdd9ed5ec73c7c987259faf2687195c5d3be4e8896b67c372f9"
-    sha256 cellar: :any_skip_relocation, big_sur:       "d53e7eccb32fcefde96e0237d8a900a64fcda304d94b9a675528c75dd0cc419a"
-    sha256 cellar: :any_skip_relocation, catalina:      "bd5816dbe23399183808f0a407a4d605d7113644c0e8fcf815439fefaf734dfb"
-    sha256 cellar: :any_skip_relocation, mojave:        "c8ba045ce6c7d45bbd5b3c12dc4a17038b1ca1d1ffbd2a1742d13c8a971e15bd"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "2add0c1e367f4626d16ded8470adbc3e1780811259d0b2faf52e8d0aaf50f91e"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "3c037bfa1aa3a1b77bcb85abb34273ecbf5bc5f6eb9c5627c819ed6c93a72f06"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "208eb02f68a5ae5b909e9e325518ca655fab05c7a601f1fb9678a5ce4f1629d7"
+    sha256 cellar: :any_skip_relocation, monterey:       "5aa3fcffdc6a394906c02e15f2bffc47fdd070d606f213b4644f926641aca4d3"
+    sha256 cellar: :any_skip_relocation, big_sur:        "2fb31b6ec806304cdcea676b71c90ff488bf599caaada386187c5cbe667ec80b"
+    sha256 cellar: :any_skip_relocation, catalina:       "5553d313a976a4ddf1f411686019d9afa880ce589f1aa689a21c899b19ba8772"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c25f950b7c299e3ecd5f57249cb58ed8a62089fb9a106ae5d7e6aa03045fea2a"
   end
 
   depends_on "rust" => :build
 
+  uses_from_macos "zlib"
+
   def install
-    system "cargo", "install", *std_cargo_args
+    system "cargo", "install", *std_cargo_args(path: "crates/cli")
     man1.install "doc/watchexec.1"
   end
 
   test do
     o = IO.popen("#{bin}/watchexec -1 --postpone -- echo 'saw file change'")
-    sleep 1
+    sleep 15
     touch "test"
-    sleep 1
-    Process.kill("INT", o.pid)
+    sleep 15
+    Process.kill("TERM", o.pid)
     assert_match "saw file change", o.read
   end
 end

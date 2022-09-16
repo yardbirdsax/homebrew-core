@@ -1,16 +1,18 @@
 class Mdbook < Formula
   desc "Create modern online books from Markdown files"
   homepage "https://rust-lang.github.io/mdBook/"
-  url "https://github.com/rust-lang/mdBook/archive/v0.4.6.tar.gz"
-  sha256 "a0a8f8e65030370cec8f5114ccb57334c9f2b7153dc51677e12dc74632d3ed23"
+  url "https://github.com/rust-lang/mdBook/archive/v0.4.21.tar.gz"
+  sha256 "17385837070c6a312eae4717fe0bfdd259ce07b4b653b5c258b4389062df886d"
   license "MPL-2.0"
-  head "https://github.com/rust-lang/mdBook.git"
+  head "https://github.com/rust-lang/mdBook.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "ac1f5fa9b9ba6c6926ae80d8579093314623ecc8fe59fcaf1568dbeccb5e2fda"
-    sha256 cellar: :any_skip_relocation, big_sur:       "d62347bbbab1bae29ec8a810e87c75926284e725f2a3c09d90052e638f5a7a47"
-    sha256 cellar: :any_skip_relocation, catalina:      "fc41c2b2c6b68b3092711c6833a9d802574c23536c4ad66a6934bf3a2e5cf2e8"
-    sha256 cellar: :any_skip_relocation, mojave:        "c96044e3c99cd45164176758c457d5639d1a9155468c646a4b5d3c521bea70d9"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "f27390977f9b377fd9845cfb1585f6d7d2795c4f208a360e8697fb41ac47a20c"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "fa2468366fc57c90d36438e2cc74ef764090e3f1f399a0fc47e6fee47e750fa1"
+    sha256 cellar: :any_skip_relocation, monterey:       "0666ad3aaab9a3513d99eff2a7c9ad7d028028eee5c21313c603deb8c672b64c"
+    sha256 cellar: :any_skip_relocation, big_sur:        "ec22fa1e5722c6299e35db49560ec40d3a7cea88393a50bd97568a9c0900dd0d"
+    sha256 cellar: :any_skip_relocation, catalina:       "c987b7c665ffb6a9e63e1eddbd8459103025dd656fc8cfee90e6ecbaf2728c59"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ea9b6e2fc664b8153425d8312ad395e9a05773f661ce79e794bd0f13dc4059b3"
   end
 
   depends_on "rust" => :build
@@ -22,6 +24,6 @@ class Mdbook < Formula
   test do
     # simulate user input to mdbook init
     system "sh", "-c", "printf \\n\\n | #{bin}/mdbook init"
-    system "#{bin}/mdbook", "build"
+    system bin/"mdbook", "build"
   end
 end

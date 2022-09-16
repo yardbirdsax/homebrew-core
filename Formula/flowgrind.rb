@@ -1,34 +1,40 @@
 class Flowgrind < Formula
   desc "TCP measurement tool, similar to iperf or netperf"
-  homepage "https://launchpad.net/flowgrind"
-  url "https://launchpad.net/flowgrind/trunk/flowgrind-0.8.0/+download/flowgrind-0.8.0.tar.bz2"
-  sha256 "2e8b58fc919bb1dae8f79535e21931336355b4831d8b5bf75cf43eacd1921d04"
-  revision 2
+  homepage "https://flowgrind.github.io"
+  url "https://github.com/flowgrind/flowgrind/releases/download/flowgrind-0.8.2/flowgrind-0.8.2.tar.bz2"
+  sha256 "432c4d15cb62d5d8d0b3509034bfb42380a02e3f0b75d16b7619a1ede07ac4f1"
+  license "GPL-3.0-or-later"
 
   livecheck do
     url :stable
-    regex(%r{<div class="version">\s*Latest version is flowgrind[._-]v?(\d+(?:\.\d+)+)\s*</div>}i)
+    strategy :github_latest
+    regex(%r{href=.*?/tag/flowgrind[._-]v?(\d+(?:\.\d+)+)["' >]}i)
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "04abc2739f06a85e452a618cf1eb5ec3fdb4ebd3e70840a58c2ee74815c6838d"
-    sha256 cellar: :any, big_sur:       "631e7fc8316f75178ac6d6dd82f750ccd5d61b60be2d02735af82f3a19009ccd"
-    sha256 cellar: :any, catalina:      "e598d94bf046253c93bfb394d532584bca417b69e63b70b851f0ab4f9adf3089"
-    sha256 cellar: :any, mojave:        "652a07d073f21ae8158fed8b7a34c739a88a0e594c32408a83d48e80a93df944"
-    sha256 cellar: :any, high_sierra:   "4b723ca4f7f92a354bf8226d67fd8537a13c07223ff5d05ebd9da82491cb546a"
+    sha256 cellar: :any,                 arm64_monterey: "7a6a9d6cf73f3654f250518d52970c29d71d95480d17d85ae6f3b605e3ed9cd8"
+    sha256 cellar: :any,                 arm64_big_sur:  "79be377bc6cfdc96c5f8bb42d97b91b51e81818894e68151496344b21515bce9"
+    sha256 cellar: :any,                 monterey:       "56cb3352c2793c2e4b74983de804a3d5ceed6fd9ab177c6e2f05a8856e07eb2d"
+    sha256 cellar: :any,                 big_sur:        "148b960d7dea68adf8e076e53af487d83184fd2e71bc225cefb01f253ae282a3"
+    sha256 cellar: :any,                 catalina:       "7c70ce687e46d8445f2e8c440924bdc2f54f8557ec073eaa605b598871b6b1f7"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c46119269a79cc4b4432ce84f5fe06c104a3617c59f8cd026a19666d01ed4f36"
+  end
+
+  head do
+    url "https://github.com/flowgrind/flowgrind.git", branch: "next"
+
+    depends_on "autoconf" => :build
+    depends_on "automake" => :build
   end
 
   depends_on "gsl"
   depends_on "xmlrpc-c"
 
-  def install
-    # Fix "ld: file not found: /usr/lib/system/libsystem_darwin.dylib" for lxml
-    ENV["SDKROOT"] = MacOS.sdk_path if MacOS.version == :sierra
+  uses_from_macos "libpcap"
 
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+  def install
+    system "autoreconf", "--force", "--install", "--verbose" if build.head?
+    system "./configure", *std_configure_args, "--disable-silent-rules"
     system "make", "install"
   end
 

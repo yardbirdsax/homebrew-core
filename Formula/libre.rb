@@ -1,15 +1,17 @@
 class Libre < Formula
   desc "Toolkit library for asynchronous network I/O with protocol stacks"
-  homepage "https://github.com/creytiv/re"
-  url "https://github.com/creytiv/re/releases/download/v0.6.1/re-0.6.1.tar.gz"
-  sha256 "cd5bfc79640411803b200c7531e4ba8a230da3806746d3bd2de970da2060fe43"
+  homepage "https://github.com/baresip/re"
+  url "https://github.com/baresip/re/archive/refs/tags/v2.7.0.tar.gz"
+  sha256 "999f02b4299f9f4bbf637cf610099b656225fef0ce08ce56728978214d448343"
+  license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "48714fc735db00829b900935b7a0640a74f9f39174fc57775fa145428acd7759"
-    sha256 cellar: :any, big_sur:       "73bb1c1c6ebe022f294cc73e672154579e4d8e634f109883bcbb68818e1f3374"
-    sha256 cellar: :any, catalina:      "0ca7e76631b5f30d72b4bc4248e894d00f05cfb785c98856d82cd5cc13e591f9"
-    sha256 cellar: :any, mojave:        "5d43d79ef2406e40c858463189ca8a40f0b13ede8a7090b56ba0fd1ef942dabc"
-    sha256 cellar: :any, high_sierra:   "32787ca36540a0c7c330560076e25726bcca0f08a7b77014d3837bd9c7ca1840"
+    sha256 cellar: :any,                 arm64_monterey: "8442c6a7a3bc3ab9bf559cd04b2781c31f36497504af9d27b9794c364cf1822f"
+    sha256 cellar: :any,                 arm64_big_sur:  "17a3557298806e77aed51910f2ec284459e9c9ee58769455c954606359fe2e49"
+    sha256 cellar: :any,                 monterey:       "cc9f01e6dd4aeed65a2a4fce43879c15835c189d53ef2b2f960e7f49ce3eed00"
+    sha256 cellar: :any,                 big_sur:        "e1c9883a3409eace6b417ecf60738bfed7f43afcc300c4477c6019f29e4fea04"
+    sha256 cellar: :any,                 catalina:       "4e078dfc396824f0ac8c0bbf22790fc76b15a66328a0aeaec646a723342ea71d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1dc246a8e27447e328d2aecb6450c16f82431caed7381b2371c4264720207bf3"
   end
 
   depends_on "openssl@1.1"
@@ -17,11 +19,13 @@ class Libre < Formula
   uses_from_macos "zlib"
 
   def install
-    system "make", "SYSROOT=#{MacOS.sdk_path}/usr", "install", "PREFIX=#{prefix}"
+    sysroot = "SYSROOT=#{MacOS.sdk_path}/usr" if OS.mac?
+    system "make", *sysroot, "install", "PREFIX=#{prefix}"
   end
 
   test do
     (testpath/"test.c").write <<~EOS
+      #include <stdint.h>
       #include <re/re.h>
       int main() {
         return libre_init();

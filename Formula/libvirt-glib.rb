@@ -1,46 +1,40 @@
 class LibvirtGlib < Formula
   desc "Libvirt API for glib-based programs"
   homepage "https://libvirt.org/"
-  url "https://libvirt.org/sources/glib/libvirt-glib-3.0.0.tar.gz"
-  sha256 "7fff8ca9a2b723dbfd04223b1c7624251c8bf79eb57ec27362a7301b2dd9ebfe"
+  url "https://libvirt.org/sources/glib/libvirt-glib-4.0.0.tar.xz"
+  sha256 "8423f7069daa476307321d1c11e2ecc285340cd32ca9fc05207762843edeacbd"
   license "LGPL-2.1-or-later"
   revision 1
 
   livecheck do
     url "https://libvirt.org/sources/glib/"
-    regex(/href=.*?libvirt-glib[._-]v?([\d.]+)\.t/i)
+    regex(/href=.*?libvirt-glib[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 big_sur:     "6fe016260618ce29746ac834739030d6b2e6c7a8325974cf56521266a87c8599"
-    sha256 catalina:    "167725ebc46919472e205ae7f11953ac1dd1a6b7d4431fa8a54f720dd8d32717"
-    sha256 mojave:      "836139b6c4349752f9e5e6ce0863f3129602c54ee040caf0e8bb31ea97a6bf3f"
-    sha256 high_sierra: "fd81e19fae3e2855e61e9519ec829859fd3a9956927c47396af123611c6a23cd"
+    sha256 arm64_monterey: "9281991a193059f2d8a39184c823652dc025b8f9ba9c888aba64b5b66d948e9b"
+    sha256 arm64_big_sur:  "dabfb25d593762d34de972fa15e7ef7c6a972c4790c9fb617c22d8dc4645fd3f"
+    sha256 monterey:       "f4a3e22facc0423d19b0a6adfcfa8bd678cf568b77d01f561dcb0e2c2341477b"
+    sha256 big_sur:        "fcd83bb1020ffbda0c8fd75b05e844708f0b08fe3068796af7270a0107e6f342"
+    sha256 catalina:       "4cffd32386653646d48037290a8c7d804a0ba75b1684312e8a2dc9d8f3ae42cb"
+    sha256 x86_64_linux:   "9ba421c50085712b450e1986d20e22b09b334548c70257cd83ca9afda92b07ed"
   end
 
   depends_on "gobject-introspection" => :build
   depends_on "intltool" => :build
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
   depends_on "pkg-config" => :build
-
   depends_on "gettext"
   depends_on "glib"
   depends_on "libvirt"
 
-  def install
-    # macOS ld does not support linker option: --version-script
-    # https://bugzilla.redhat.com/show_bug.cgi?id=1304981
-    inreplace "libvirt-gconfig/Makefile.in", /^.*-Wl,--version-script=.*$\n/, ""
-    inreplace "libvirt-glib/Makefile.in",    /^.*-Wl,--version-script=.*$\n/, ""
-    inreplace "libvirt-gobject/Makefile.in", /^.*-Wl,--version-script=.*$\n/, ""
+  uses_from_macos "libxml2"
 
-    args = %W[
-      --disable-dependency-tracking
-      --disable-silent-rules
-      --enable-introspection
-      --prefix=#{prefix}
-    ]
-    system "./configure", *args
-    system "make", "install"
+  def install
+    system "meson", "setup", "builddir", *std_meson_args, "-Dintrospection=enabled"
+    system "meson", "compile", "-C", "builddir"
+    system "meson", "install", "-C", "builddir"
   end
 
   test do
@@ -55,18 +49,23 @@ class LibvirtGlib < Formula
         return 0;
       }
     EOS
-    system ENV.cc, "test.cpp",
-                   "-I#{MacOS.sdk_path}/usr/include/libxml2",
-                   "-I#{Formula["glib"].include}/glib-2.0",
-                   "-I#{Formula["glib"].lib}/glib-2.0/include",
-                   "-I#{include}/libvirt-gconfig-1.0",
-                   "-I#{include}/libvirt-glib-1.0",
-                   "-I#{include}/libvirt-gobject-1.0",
-                   "-L#{lib}",
-                   "-lvirt-gconfig-1.0",
-                   "-lvirt-glib-1.0",
-                   "-lvirt-gobject-1.0",
-                   "-o", "test"
+    libxml2 = if OS.mac?
+      "#{MacOS.sdk_path}/usr/include/libxml2"
+    else
+      Formula["libxml2"].opt_include/"libxml2"
+    end
+    system ENV.cxx, "-std=c++11", "test.cpp",
+                    "-I#{libxml2}",
+                    "-I#{Formula["glib"].include}/glib-2.0",
+                    "-I#{Formula["glib"].lib}/glib-2.0/include",
+                    "-I#{include}/libvirt-gconfig-1.0",
+                    "-I#{include}/libvirt-glib-1.0",
+                    "-I#{include}/libvirt-gobject-1.0",
+                    "-L#{lib}",
+                    "-lvirt-gconfig-1.0",
+                    "-lvirt-glib-1.0",
+                    "-lvirt-gobject-1.0",
+                    "-o", "test"
     system "./test"
   end
 end

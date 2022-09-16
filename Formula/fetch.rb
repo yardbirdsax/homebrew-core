@@ -1,28 +1,30 @@
 class Fetch < Formula
   desc "Download assets from a commit, branch, or tag of GitHub repositories"
   homepage "https://www.gruntwork.io/"
-  url "https://github.com/gruntwork-io/fetch/archive/v0.3.14.tar.gz"
-  sha256 "af6513aadf2105bb2355c3b6acc74fa2b12df12d963292750df197b879c32868"
+  url "https://github.com/gruntwork-io/fetch/archive/v0.4.5.tar.gz"
+  sha256 "baa14d521cf0c59668dd5e84451579f48b623e16bb4d3b2254fa3c54b504fc9b"
   license "MIT"
-  head "https://github.com/gruntwork-io/fetch.git"
+  head "https://github.com/gruntwork-io/fetch.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "678a2b7373830d0dc64ca9a335706f0638c810298094b8ceb2eb7dff0db973f4"
-    sha256 cellar: :any_skip_relocation, big_sur:       "61109bd1f647acef7cb68a09cfd4a8fa04053dfff90a3be32deb8027ee6b06f7"
-    sha256 cellar: :any_skip_relocation, catalina:      "194dba2e7ccdaf0691b3b17146ac1ab77088251823b143fe9cbcf3d790ca2a59"
-    sha256 cellar: :any_skip_relocation, mojave:        "544a2cc87fed7545d1e220954b445a6519c47662cd41b64c9ff8ec9f0fd0742b"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "24c8ec351ec9dbc8f71b679e94e1d8930c761b21b3bf4168be0b8d9aab32be0e"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5f10cdef839a155b13ae6ade9db0033303a0651e94958ff950d7585ef76d70b3"
+    sha256 cellar: :any_skip_relocation, monterey:       "52f270c33fb1323e965aef897c8067ad993723ce1ab2269df630fc29badef701"
+    sha256 cellar: :any_skip_relocation, big_sur:        "121acdd239dfbde5c29565b6719974acfd6bf0793f163773374740a64f243f3a"
+    sha256 cellar: :any_skip_relocation, catalina:       "2e13409b0cfbfae80a0aba1f012163529e978090b8eb39dae2feb349e5063201"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "35d3950442bc4c81b649a7563b2047b991aa13121b42dc47140d915f85ce4420"
   end
 
   depends_on "go" => :build
 
   def install
-    system "go", "build", "-ldflags", "-X main.VERSION=v#{version}", *std_go_args
+    system "go", "build", *std_go_args(ldflags: "-X main.VERSION=v#{version}")
   end
 
   test do
     repo_url = "https://github.com/gruntwork-io/fetch"
 
     assert_match "Downloading release asset SHA256SUMS to SHA256SUMS",
-      shell_output("#{bin}/fetch --repo=\"#{repo_url}\" --tag=\"v0.3.10\" --release-asset=\"SHA256SUMS\" . 2>1&")
+      shell_output("#{bin}/fetch --repo=\"#{repo_url}\" --tag=\"v0.3.10\" --release-asset=\"SHA256SUMS\" . 2>&1")
   end
 end

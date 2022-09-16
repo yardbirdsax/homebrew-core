@@ -1,17 +1,22 @@
 class BoostBcp < Formula
   desc "Utility for extracting subsets of the Boost library"
   homepage "https://www.boost.org/doc/tools/bcp/"
-  url "https://dl.bintray.com/boostorg/release/1.75.0/source/boost_1_75_0.tar.bz2"
-  mirror "https://dl.bintray.com/homebrew/mirror/boost_1_75_0.tar.bz2"
-  sha256 "953db31e016db7bb207f11432bef7df100516eeb746843fa0486a222e3fd49cb"
+  url "https://boostorg.jfrog.io/artifactory/main/release/1.79.0/source/boost_1_79_0.tar.bz2"
+  sha256 "475d589d51a7f8b3ba2ba4eda022b170e562ca3b760ee922c146b6c65856ef39"
   license "BSL-1.0"
-  head "https://github.com/boostorg/boost.git"
+  head "https://github.com/boostorg/boost.git", branch: "master"
+
+  livecheck do
+    formula "boost"
+  end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "aa6a534d72f1dcc51cb69fe2fe1fe42a201da205dcb70f025255446f810e56a0"
-    sha256 cellar: :any_skip_relocation, big_sur:       "237fce500e3799cd93f53c5221448c915c9836a18b7b239dc19ec006e4291f80"
-    sha256 cellar: :any_skip_relocation, catalina:      "2b679e21d034b4a68c4d1eeaaf6b4f8bbc6b5d456f396ef292009bdd874dda5b"
-    sha256 cellar: :any_skip_relocation, mojave:        "78e095ee35b6a0821b1211d0a9e126b8dc62628531f6ed7180bcf3fc598550f1"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "2554f876bdc8e1855fdd363317ecac0cad44fe347d7fa5d29f4b0266262b560e"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "143a1b99dc5026110ee64264382d9ff3ec6fdcb87dbfd51649b9d20f53547092"
+    sha256 cellar: :any_skip_relocation, monterey:       "bab5e2f23f461f1643b1c841cd59cbc77ad06f0aabd4b362d28c1cb29fa696a2"
+    sha256 cellar: :any_skip_relocation, big_sur:        "67002735a12b9bc625aeb01fce3f7308a2c14548b587501df29be73fe3c7da33"
+    sha256 cellar: :any_skip_relocation, catalina:       "453aebc4b61fbba898665ce83b95d298e3176c427df29199930f87d4996c756c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1ebd56254dd815d37fcb539bbd160476628df6b67f6c2e4acd6eb019c49e726a"
   end
 
   depends_on "boost-build" => :build

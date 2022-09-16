@@ -4,6 +4,7 @@ class Heimdal < Formula
   url "https://github.com/heimdal/heimdal/releases/download/heimdal-7.7.0/heimdal-7.7.0.tar.gz"
   sha256 "f02d3314d634cc55eb9cf04a1eae0d96b293e45a1f837de9d894e800161b7d1b"
   license "BSD-3-Clause"
+  revision 3
 
   livecheck do
     url :stable
@@ -12,14 +13,15 @@ class Heimdal < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_big_sur: "16cc4ba36dbbc9750c522eefa8da0a6e7685281f00ef611c982d8dd7b5b4bd69"
-    sha256 big_sur:       "95ad69bc1e08ebbd279062632bdf576982fbcba5c34a4ba83c7e91523952b6e6"
-    sha256 catalina:      "6345879296177a9b33c73bbae4749debb92d20cf6fe951d51bb2c592f9d82b3b"
-    sha256 mojave:        "280f713c88dd355d0c385eaa7e3e4e3ae762854259b1edc801821287f132c15a"
+    sha256 arm64_monterey: "5bf1331cbf18fbacee694aebd48cf61bcebcd170fbbbe9e9c8a2bdf9ee90fcf6"
+    sha256 arm64_big_sur:  "5c45da30c4f837fd11fa4d656ff9f92c0a7cfd1d6c7e3442d925cd4c6406b766"
+    sha256 monterey:       "f91432a5c773478e95f79aed4381d8659980e7c19358cd109d9502eeaf5d6c6f"
+    sha256 big_sur:        "b0f45237bb7226ab0c6b06ce4c2a6ce143eded7335232e1cb85133863ad96f60"
+    sha256 catalina:       "1da6cca0420efc5ccd5075b8c3076435a9e2b077261d9ad91e0e3d4e644d38d0"
+    sha256 x86_64_linux:   "6505b354257b8f5096a209eb9bc8fbfea1f3377efff1e84b4c58a308c9cf2b34"
   end
 
-  keg_only :shadowed_by_macos, "macOS provides Kerberos"
+  keg_only "conflicts with Kerberos"
 
   depends_on "bison" => :build
   depends_on "berkeley-db"
@@ -28,11 +30,18 @@ class Heimdal < Formula
   depends_on "openldap"
   depends_on "openssl@1.1"
 
+  uses_from_macos "libxcrypt"
   uses_from_macos "perl"
 
   resource "JSON" do
     url "https://cpan.metacpan.org/authors/id/I/IS/ISHIGAKI/JSON-4.02.tar.gz"
     sha256 "444a88755a89ffa2a5424ab4ed1d11dca61808ebef57e81243424619a9e8627c"
+  end
+
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
   end
 
   def install

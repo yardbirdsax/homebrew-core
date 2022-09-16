@@ -3,19 +3,20 @@ class LizardAnalyzer < Formula
 
   desc "Extensible Cyclomatic Complexity Analyzer"
   homepage "http://www.lizard.ws"
-  url "https://files.pythonhosted.org/packages/60/a7/7a93f5d004bf86209406c533d21d7dede965f976384d29e8681aa47faed9/lizard-1.17.7.tar.gz"
-  sha256 "d08e7afb4534fc326401ede2d5aace027757fb1a9deb3cc9f8e7f4339983c630"
+  url "https://files.pythonhosted.org/packages/ef/70/bbb7c6b5d1b29acca0cd13582a7303fc528e6dbf40d0026861f9aa7f3ff0/lizard-1.17.10.tar.gz"
+  sha256 "62d78acd64724be28b5f4aa27a630dfa4b4afbd1596d1f25d5ad1c1a3a075adc"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "6261f2b69242bb01b65933bd32cbe97a510465b9648294c3065ac2c3c49c2059"
-    sha256 cellar: :any_skip_relocation, big_sur:       "7c38c8e8ed4b8cb71d2021b6d4eb0aae2d8bae8976634f93242943ce91bf1bbe"
-    sha256 cellar: :any_skip_relocation, catalina:      "f3e7d8d0c1108714727d7b8065166073f207a5d35ad302f1be788d48c91cca51"
-    sha256 cellar: :any_skip_relocation, mojave:        "bc9bca50b8f2d83404353f5692021d00e995ca95dc389eb976584ae29d1bb1f9"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "79f9a6da530de4e7d15a93256a7eb7ec4bcf4b4a227c601974cccdeee21b9a32"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "c83c2c3fdb726b91840d2855bb1610d0a6ae28a13dcafdb5de8c919989550361"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c83c2c3fdb726b91840d2855bb1610d0a6ae28a13dcafdb5de8c919989550361"
+    sha256 cellar: :any_skip_relocation, monterey:       "84f2bb45b64ad581b192bece7e059973e44b6b18ea850558091a1c4b44e75181"
+    sha256 cellar: :any_skip_relocation, big_sur:        "84f2bb45b64ad581b192bece7e059973e44b6b18ea850558091a1c4b44e75181"
+    sha256 cellar: :any_skip_relocation, catalina:       "84f2bb45b64ad581b192bece7e059973e44b6b18ea850558091a1c4b44e75181"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9f41ad1d419b165bb654888c8048deacb609b1db3eadf0470e89fb9728ddcf99"
   end
 
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   def install
     virtualenv_install_with_resources

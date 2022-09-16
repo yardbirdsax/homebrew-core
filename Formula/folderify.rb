@@ -3,31 +3,59 @@ class Folderify < Formula
 
   desc "Generate pixel-perfect macOS folder icons in the native style"
   homepage "https://github.com/lgarron/folderify"
-  url "https://files.pythonhosted.org/packages/4a/ae/77e25559b76ec9e4e5df9f2173b8e008b6199b3049d4fb8d4207bbf68fff/folderify-2.1.1.tar.gz"
-  sha256 "4167dcd86878fa0115101959d5437531954a6707dbe207f8cb45425a4547d730"
+  url "https://files.pythonhosted.org/packages/68/03/a4834a40d95a0bc2debdbad7e0e1bf909a95ff68c0a64098ea52f6ccb794/folderify-2.3.1.tar.gz"
+  sha256 "0927c9453dc8efb6ea4addb0eee2711528152045f22d411c9de1e7f45621f06c"
   license "MIT"
-  # Default branch is "main" not "master"
+  revision 1
   head "https://github.com/lgarron/folderify.git", branch: "main"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "1b56e80d1b6eabac87521806039b4cf15c625f35f63d0a8c636a1e82025ca53d"
-    sha256 cellar: :any_skip_relocation, big_sur:       "de4134789053813c8779bdbf1f0a4561fc1334c976028ae11f9f2fe1bd77a8d5"
-    sha256 cellar: :any_skip_relocation, catalina:      "388a1cdd813fd6be004e6b19caf157e51fd66546353e8d7d5a991dd9479f5647"
-    sha256 cellar: :any_skip_relocation, mojave:        "e945cc2979f3f0517ab567db78d311aeb3bfb3df6062916612b583c39df9033d"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "b35bc64a01041e596b159c71533eb632ad3d2a278b3f850d5bc2dea5ff5b542c"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "4b9491bd61efa21a3fb11de4048bf3976549737f5519fa9c8707d3d29aa88495"
+    sha256 cellar: :any_skip_relocation, monterey:       "d494fd1ad63d3dbee0d088fea5ccaaea738f790a4c0017f60d1c9933cfa6dc57"
+    sha256 cellar: :any_skip_relocation, big_sur:        "1c35e9f509ca6b82360b58f5ce7ddf8f08f2922ac88357e298846849400cab8a"
+    sha256 cellar: :any_skip_relocation, catalina:       "f77da3ff2274fcff4d3fec345b63f31d8d2eb21b9d59a59f1b9e236b3567fc3a"
   end
 
+  depends_on xcode: :build
   depends_on "imagemagick"
-  depends_on "python@3.9"
+  depends_on :macos
+  depends_on "python@3.10"
+
+  resource "osxiconutils" do
+    url "https://github.com/sveinbjornt/osxiconutils.git",
+        revision: "d3b43f1dd5e1e8ff60d2dbb4df4e872388d2cd10"
+  end
+
+  def python3
+    "python3.10"
+  end
 
   def install
-    virtualenv_install_with_resources
+    venv = virtualenv_create(libexec, python3, system_site_packages: false)
+    venv.pip_install_and_link buildpath
+
+    # Replace bundled pre-built `seticon` with one we built ourselves.
+    resource("osxiconutils").stage do
+      xcodebuild "-arch", Hardware::CPU.arch,
+                 "-parallelizeTargets",
+                 "-project", "osxiconutils.xcodeproj",
+                 "-target", "seticon",
+                 "-configuration", "Release",
+                 "CONFIGURATION_BUILD_DIR=build",
+                 "SYMROOT=."
+
+      (libexec/Language::Python.site_packages(python3)/"folderify/lib").install "build/seticon"
+    end
   end
 
   test do
     # Copies an example icon
-    cp("#{libexec}/lib/python3.9/site-packages/folderify/GenericFolderIcon.Yosemite.iconset/icon_16x16.png",
-    "icon.png")
+    site_packages = libexec/Language::Python.site_packages(python3)
+    cp(
+      "#{site_packages}/folderify/GenericFolderIcon.Yosemite.iconset/icon_16x16.png",
+      "icon.png",
+    )
     # folderify applies the test icon to a folder
     system "folderify", "icon.png", testpath.to_s
     # Tests for the presence of the file icon

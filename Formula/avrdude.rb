@@ -1,10 +1,20 @@
 class Avrdude < Formula
   desc "Atmel AVR MCU programmer"
-  homepage "https://savannah.nongnu.org/projects/avrdude/"
-  url "https://download.savannah.gnu.org/releases/avrdude/avrdude-6.3.tar.gz"
-  mirror "https://download-mirror.savannah.gnu.org/releases/avrdude/avrdude-6.3.tar.gz"
-  sha256 "0f9f731b6394ca7795b88359689a7fa1fba818c6e1d962513eb28da670e0a196"
-  revision 1
+  homepage "https://www.nongnu.org/avrdude/"
+  license "GPL-2.0-or-later"
+  revision 2
+
+  stable do
+    url "https://download.savannah.gnu.org/releases/avrdude/avrdude-7.0.tar.gz"
+    mirror "https://download-mirror.savannah.gnu.org/releases/avrdude/avrdude-7.0.tar.gz"
+    sha256 "c0ef65d98d6040ca0b4f2b700d51463c2a1f94665441f39d15d97442dbb79b54"
+
+    # Fix -flat_namespace being used on Big Sur and later.
+    patch do
+      url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+      sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+    end
+  end
 
   livecheck do
     url "https://download.savannah.gnu.org/releases/avrdude/"
@@ -12,40 +22,59 @@ class Avrdude < Formula
   end
 
   bottle do
-    sha256 big_sur:     "80bd53f8b78f172aaea62b9a58f6febfc4ac4b510969511ab0f3e06da9adb1bb"
-    sha256 catalina:    "d3f4c82170fa37bacd6e1bc3276ba27e7a8ed2ea781b101b7899e7602393a15b"
-    sha256 mojave:      "65fe6de6f540eb1c6ad94d35c847f8a5921cc9059ff044d1bc78f68cc8b8334b"
-    sha256 high_sierra: "b0cb94b5c4f01fcc870f286bca293218c98fda23d76397db8a831272f7087038"
-    sha256 sierra:      "e8e26af5565cd897867d4e6e71e66e6e946e1e21eb4e27d3cd49f199f088fc5d"
-    sha256 el_capitan:  "c953526dc893a9b162a109d074edf8bb71d7049c63990282edc994c63de90c44"
+    sha256 arm64_monterey: "14bda58af73b8b6a92edfccab045e6118a0c18feb436e6afff74d51dfc7610ef"
+    sha256 arm64_big_sur:  "a4fb2845fc9fcad852484d388e6a904cfab655c66b1a61a0b5fff8b56062be97"
+    sha256 monterey:       "37913838cd9ceadfafe1759b293ebb24ddc9f2c8b8168e297f8fbbfed612aab6"
+    sha256 big_sur:        "c7ddfb9110e029c2b10fe2ddf5e60d1dfa7aa52143aedfb7538a343dc388d156"
+    sha256 catalina:       "b6eba14a4c1e300a69c76d221c4709d1988af07a9bbb2586f10c4515db1dcae3"
+    sha256 x86_64_linux:   "1c317e35642426bce04e756295230de6cfd0d69689aed14c0520d8d4d190097e"
   end
 
   head do
-    url "https://svn.savannah.nongnu.org/svn/avrdude/trunk/avrdude"
-
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool" => :build
+    url "https://github.com/avrdudes/avrdude.git", branch: "main"
+    depends_on "cmake" => :build
   end
 
-  depends_on "libelf"
-  depends_on "libftdi0"
-  depends_on "libhid"
+  depends_on "hidapi"
+  depends_on "libftdi"
+  depends_on "libusb"
   depends_on "libusb-compat"
+
+  uses_from_macos "bison" => :build
+  uses_from_macos "flex" => :build
+
+  on_macos do
+    depends_on "libelf" => :build
+  end
+
+  on_linux do
+    depends_on "elfutils"
+    depends_on "readline"
+  end
 
   def install
     if build.head?
-      inreplace "bootstrap", /libtoolize/, "glibtoolize"
-      system "./bootstrap"
+      args = std_cmake_args + ["-DCMAKE_INSTALL_SYSCONFDIR=#{etc}"]
+      shared_args = ["-DBUILD_SHARED_LIBS=ON", "-DCMAKE_INSTALL_RPATH=#{rpath}"]
+      shared_args << "-DCMAKE_SHARED_LINKER_FLAGS=-Wl,-undefined,dynamic_lookup" if OS.mac?
+
+      system "cmake", "-S", ".", "-B", "build/shared", *args, *shared_args
+      system "cmake", "--build", "build/shared"
+      system "cmake", "--install", "build/shared"
+
+      system "cmake", "-S", ".", "-B", "build/static", *args
+      system "cmake", "--build", "build/static"
+      lib.install "build/static/src/libavrdude.a"
+    else
+      system "./configure", *std_configure_args, "--sysconfdir=#{etc}"
+      system "make"
+      system "make", "install"
     end
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}"
-    system "make"
-    system "make", "install"
   end
 
   test do
-    assert_equal "avrdude done.  Thank you.",
-      shell_output("#{bin}/avrdude -c jtag2 -p x16a4 2>&1", 1).strip
+    output = shell_output("#{bin}/avrdude -c jtag2 -p x16a4 2>&1", 1).strip
+    refute_match "avrdude was compiled without usb support", output
+    assert_match "avrdude done.  Thank you.", output
   end
 end

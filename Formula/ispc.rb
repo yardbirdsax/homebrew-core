@@ -1,30 +1,51 @@
 class Ispc < Formula
   desc "Compiler for SIMD programming on the CPU"
   homepage "https://ispc.github.io"
-  url "https://github.com/ispc/ispc/archive/v1.15.0.tar.gz"
-  sha256 "2658ff00dc045ac9fcefbf6bd26dffaf723b059a942a27df91bbb61bc503a285"
+  url "https://github.com/ispc/ispc/archive/v1.18.0.tar.gz"
+  sha256 "81f2cc23b555c815faf53429e9eee37d1f2f16873ae7074e382ede94721ee042"
   license "BSD-3-Clause"
-  revision 1
+  revision 2
 
   bottle do
-    sha256 cellar: :any, big_sur:  "1ea73410e81f830f137d3aea93269480f821c417aa804330b4fe1d42e0df7b93"
-    sha256 cellar: :any, catalina: "a0e3f1d9cd1abc2aefc1da0154707affcf44fef9646ec39379f2501e775bd87d"
-    sha256 cellar: :any, mojave:   "cdfd24be494e49464be851a264d6db90e99f3a9d9f7d1241b050951c81bdd481"
+    sha256 cellar: :any,                 arm64_monterey: "5a5fc37bbdf6fcbb4fba27258c45375a26eea734edcbecae41715a990b989d99"
+    sha256 cellar: :any,                 arm64_big_sur:  "f69fc55e33fd45a8bd12da6c97604f4f72c043e03cbca2f11095d0d46a638c16"
+    sha256 cellar: :any,                 monterey:       "17bffc3892dd6cce820a77585f04f6b3edb3394ccd76104b7e0b5243c2e1c40a"
+    sha256 cellar: :any,                 big_sur:        "25c32b978928b322c5742da89ce024016daefbba49e4b9fb63d70073756bd914"
+    sha256 cellar: :any,                 catalina:       "8fce16395de7f76c88eae707da678b1bf63c39f6768e3404b87749ae081ab99e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "97be3aa73e6249c6b65a4352f37a2157fa660a027292ab57c2850432e82a8376"
   end
 
   depends_on "bison" => :build
   depends_on "cmake" => :build
   depends_on "flex" => :build
-  depends_on "python@3.9" => :build
-  depends_on "llvm"
+  depends_on "python@3.10" => :build
+  depends_on "llvm" # Must be LLVM 13
+
+  on_linux do
+    depends_on "gcc"
+  end
+
+  fails_with gcc: "5"
+
+  def llvm
+    deps.map(&:to_formula).find { |f| f.name.match? "^llvm" }
+  end
 
   def install
+    # Force cmake to use our compiler shims instead of bypassing them.
+    inreplace "CMakeLists.txt", "set(CMAKE_C_COMPILER \"clang\")", "set(CMAKE_C_COMPILER \"#{ENV.cc}\")"
+    inreplace "CMakeLists.txt", "set(CMAKE_CXX_COMPILER \"clang++\")", "set(CMAKE_CXX_COMPILER \"#{ENV.cxx}\")"
+
+    # Disable building of i686 target on Linux, which we do not support.
+    inreplace "cmake/GenerateBuiltins.cmake", "set(target_arch \"i686\")", "return()" unless OS.mac?
+
     args = std_cmake_args + %W[
       -DISPC_INCLUDE_EXAMPLES=OFF
       -DISPC_INCLUDE_TESTS=OFF
       -DISPC_INCLUDE_UTILS=OFF
-      -DLLVM_TOOLS_BINARY_DIR='#{Formula["llvm"].opt_bin}'
+      -DLLVM_TOOLS_BINARY_DIR='#{llvm.opt_bin}'
       -DISPC_NO_DUMPS=ON
+      -DARM_ENABLED=#{Hardware::CPU.arm? ? "ON" : "OFF"}
     ]
 
     mkdir "build" do
@@ -47,7 +68,15 @@ class Ispc < Formula
         }
       }
     EOS
-    system bin/"ispc", "--arch=x86-64", "--target=sse2", testpath/"simple.ispc",
+
+    if Hardware::CPU.arm?
+      arch = "aarch64"
+      target = "neon"
+    else
+      arch = "x86-64"
+      target = "sse2"
+    end
+    system bin/"ispc", "--arch=#{arch}", "--target=#{target}", testpath/"simple.ispc",
       "-o", "simple_ispc.o", "-h", "simple_ispc.h"
 
     (testpath/"simple.cpp").write <<~EOS

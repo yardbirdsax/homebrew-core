@@ -1,10 +1,9 @@
 class Gdcm < Formula
   desc "Grassroots DICOM library and utilities for medical files"
   homepage "https://sourceforge.net/projects/gdcm/"
-  url "https://github.com/malaterre/GDCM/archive/v3.0.8.tar.gz"
-  sha256 "47b96be345b1611784f9e65fc39367c7450c9a1ef81c21f8acddfb6207098315"
+  url "https://github.com/malaterre/GDCM/archive/v3.0.18.tar.gz"
+  sha256 "d3e9d83d73f05f5d33a72725d3cf7c33adaa2fbbf136a2dd95087b47933a4cfc"
   license "BSD-3-Clause"
-  revision 1
 
   livecheck do
     url :stable
@@ -12,11 +11,12 @@ class Gdcm < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "95715d03f75daa82bd11f1368bedee8e9d0132f9d1728edd9fe9473de73a292a"
-    sha256 big_sur:       "2f416ce53cbca29849bf6d3720d289f0b778593620937ba8a833c75a257aaf89"
-    sha256 catalina:      "d5ce02b3b5473665b241484eff50b226d7b7f800253255362c26195fc69e40eb"
-    sha256 mojave:        "3e75b52ddc6151a6f39a63e2d4403c960247b0a6b780a2488cc6bda293a773fa"
-    sha256 high_sierra:   "8a5ac94c29c78add6e335dd5a07ef2f2b2f2d0c7da9704d7655d9800f5278dd8"
+    sha256 arm64_monterey: "2882fc6066cfc778616c61ebe61b8dd6a084ca9dd49249c267210d3aca07fb08"
+    sha256 arm64_big_sur:  "cfae7d30d79a63551b847a9db691a7f9e98041a64099ce483904a85217a05e3c"
+    sha256 monterey:       "524019259dd16e288c90471294ea1b37e956eda37736c8a2916baba8495786d2"
+    sha256 big_sur:        "5fc7c2b3091088312fc4ae54e1c954ba89c4643a090b490fea8cc4e5ad58d7bd"
+    sha256 catalina:       "4fa9fa2c5faf80ba8aa2ec3e810f77d9e45e9bbafa9d2f6147001762d3eab2ba"
+    sha256 x86_64_linux:   "b43a4f216c9ff4a6c668fdec953efe70b7a51e441ad9ad833d46ee292b1805e6"
   end
 
   depends_on "cmake" => :build
@@ -25,44 +25,56 @@ class Gdcm < Formula
   depends_on "swig" => :build
   depends_on "openjpeg"
   depends_on "openssl@1.1"
-  depends_on "python@3.9"
-  depends_on "vtk@8.2"
+  depends_on "python@3.10"
+
+  uses_from_macos "expat"
+  uses_from_macos "zlib"
+
+  on_linux do
+    depends_on "util-linux" # for libuuid
+  end
+
+  fails_with gcc: "5"
+
+  def python3
+    which("python3.10")
+  end
 
   def install
-    ENV.cxx11
-
-    python3 = Formula["python@3.9"].opt_bin/"python3"
-    xy = Language::Python.major_minor_version python3
     python_include =
       Utils.safe_popen_read(python3, "-c", "from distutils import sysconfig;print(sysconfig.get_python_inc(True))")
            .chomp
-    python_executable = Utils.safe_popen_read(python3, "-c", "import sys;print(sys.executable)").chomp
 
-    args = std_cmake_args + %W[
-      -GNinja
-      -DGDCM_BUILD_APPLICATIONS=ON
-      -DGDCM_BUILD_SHARED_LIBS=ON
-      -DGDCM_BUILD_TESTING=OFF
-      -DGDCM_BUILD_EXAMPLES=OFF
-      -DGDCM_BUILD_DOCBOOK_MANPAGES=OFF
-      -DGDCM_USE_VTK=ON
-      -DGDCM_USE_SYSTEM_OPENJPEG=ON
-      -DGDCM_USE_SYSTEM_OPENSSL=ON
-      -DGDCM_WRAP_PYTHON=ON
-      -DPYTHON_EXECUTABLE=#{python_executable}
-      -DPYTHON_INCLUDE_DIR=#{python_include}
-      -DGDCM_INSTALL_PYTHONMODULE_DIR=#{lib}/python#{xy}/site-packages
-      -DCMAKE_INSTALL_RPATH=#{lib}
-      -DGDCM_NO_PYTHON_LIBS_LINKING=ON
+    prefix_site_packages = prefix/Language::Python.site_packages(python3)
+    args = [
+      "-DCMAKE_CXX_STANDARD=11",
+      "-DGDCM_BUILD_APPLICATIONS=ON",
+      "-DGDCM_BUILD_SHARED_LIBS=ON",
+      "-DGDCM_BUILD_TESTING=OFF",
+      "-DGDCM_BUILD_EXAMPLES=OFF",
+      "-DGDCM_BUILD_DOCBOOK_MANPAGES=OFF",
+      "-DGDCM_USE_VTK=OFF", # No VTK 9 support: https://sourceforge.net/p/gdcm/bugs/509/
+      "-DGDCM_USE_SYSTEM_EXPAT=ON",
+      "-DGDCM_USE_SYSTEM_ZLIB=ON",
+      "-DGDCM_USE_SYSTEM_UUID=ON",
+      "-DGDCM_USE_SYSTEM_OPENJPEG=ON",
+      "-DGDCM_USE_SYSTEM_OPENSSL=ON",
+      "-DGDCM_WRAP_PYTHON=ON",
+      "-DPYTHON_EXECUTABLE=#{python3}",
+      "-DPYTHON_INCLUDE_DIR=#{python_include}",
+      "-DGDCM_INSTALL_PYTHONMODULE_DIR=#{prefix_site_packages}",
+      "-DCMAKE_INSTALL_RPATH=#{rpath};#{rpath(source: prefix_site_packages)}",
+      "-DGDCM_NO_PYTHON_LIBS_LINKING=#{OS.mac?}",
     ]
-
-    mkdir "build" do
-      ENV.append "LDFLAGS", "-undefined dynamic_lookup"
-
-      system "cmake", "..", *args
-      system "ninja"
-      system "ninja", "install"
+    if OS.mac?
+      %w[EXE SHARED MODULE].each do |type|
+        args << "-DCMAKE_#{type}_LINKER_FLAGS=-Wl,-undefined,dynamic_lookup -liconv"
+      end
     end
+
+    system "cmake", "-S", ".", "-B", "build", "-G", "Ninja", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
@@ -79,6 +91,6 @@ class Gdcm < Formula
     system ENV.cxx, "-std=c++11", "test.cxx.o", "-o", "test", "-L#{lib}", "-lgdcmDSED"
     system "./test"
 
-    system Formula["python@3.9"].opt_bin/"python3", "-c", "import gdcm"
+    system python3, "-c", "import gdcm"
   end
 end

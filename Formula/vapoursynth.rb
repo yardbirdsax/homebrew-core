@@ -1,10 +1,10 @@
 class Vapoursynth < Formula
   desc "Video processing framework with simplicity in mind"
-  homepage "http://www.vapoursynth.com"
-  url "https://github.com/vapoursynth/vapoursynth/archive/R52.tar.gz"
-  sha256 "4d5dc7950f4357da695d29708bc98013bc3e0bd72fc5d697f8c91ce3c4a4b2ac"
+  homepage "https://www.vapoursynth.com"
+  url "https://github.com/vapoursynth/vapoursynth/archive/R60.tar.gz"
+  sha256 "d0ff9b7d88d4b944d35dd7743d72ffcea5faa687f6157b160f57be45f4403a30"
   license "LGPL-2.1-or-later"
-  head "https://github.com/vapoursynth/vapoursynth.git"
+  head "https://github.com/vapoursynth/vapoursynth.git", branch: "master"
 
   livecheck do
     url :stable
@@ -12,10 +12,12 @@ class Vapoursynth < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "b3c19ccf1ca5ced181f926a8bf4216161e1768d32206a1a37d9622429d58c1a1"
-    sha256 cellar: :any, big_sur:       "3c71ee0d92d3187ddab6500dac2a36597268efa50cee90c854ffb69d75d5e6e7"
-    sha256 cellar: :any, catalina:      "4e4668fb68c7df01857472c070dfcf562fd392c48200204f637856a1368181b8"
-    sha256 cellar: :any, mojave:        "3d1e521272e5b5cff323d6678ff56f959945b9756f938c5ad46a797a345959c1"
+    sha256 cellar: :any,                 arm64_monterey: "c4eaf67aa81f58cc03bba831e78bc58ec34bafc3b893916466700af6d8196fb5"
+    sha256 cellar: :any,                 arm64_big_sur:  "5920e6e2e47d365a54fcf7b8ba530d63ab8d582117a5348a345c521c464c5233"
+    sha256 cellar: :any,                 monterey:       "4b7bd0b44eb0086e766efeff9129d7fef118b6ddf0a88701c4c94f643083e70a"
+    sha256 cellar: :any,                 big_sur:        "404d71359e917d42ce78fe3b37c4588ca14a64a91a4da417c9baab025d3b23f5"
+    sha256 cellar: :any,                 catalina:       "6284a9174f2cabde880f828e093a690700457bb31f40b65b40b0dec221d17e5f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7eca219f5145507ceebe8144c401cbe48d0dd1cc75e1257cc5071577e92a9aef"
   end
 
   depends_on "autoconf" => :build
@@ -24,8 +26,10 @@ class Vapoursynth < Formula
   depends_on "libtool" => :build
   depends_on "nasm" => :build
   depends_on "pkg-config" => :build
-  depends_on "python@3.9"
+  depends_on "python@3.10"
   depends_on "zimg"
+
+  fails_with gcc: "5"
 
   def install
     system "./autogen.sh"
@@ -34,19 +38,10 @@ class Vapoursynth < Formula
                           "--disable-silent-rules",
                           "--disable-dependency-tracking",
                           "--with-cython=#{Formula["cython"].bin}/cython",
-                          "--with-plugindir=#{HOMEBREW_PREFIX}/lib/vapoursynth"
+                          "--with-plugindir=#{HOMEBREW_PREFIX}/lib/vapoursynth",
+                          "--with-python_prefix=#{prefix}",
+                          "--with-python_exec_prefix=#{prefix}"
     system "make", "install"
-    %w[eedi3 miscfilters morpho removegrain vinverse vivtc].each do |filter|
-      rm prefix/"vapoursynth/lib#{filter}.la"
-    end
-  end
-
-  def post_install
-    (HOMEBREW_PREFIX/"lib/vapoursynth").mkpath
-    %w[eedi3 miscfilters morpho removegrain vinverse vivtc].each do |filter|
-      (HOMEBREW_PREFIX/"lib/vapoursynth").install_symlink \
-        prefix/"vapoursynth/lib#{filter}.dylib" => "lib#{filter}.dylib"
-    end
   end
 
   def caveats
@@ -60,16 +55,14 @@ class Vapoursynth < Formula
         brew install vapoursynth-imwri
       To use \x1B[3m\x1B[1mvapoursynth.core.ffms2\x1B[0m, execute the following:
         brew install ffms2
-        ln -s "../libffms2.dylib" "#{HOMEBREW_PREFIX}/lib/vapoursynth/libffms2.dylib"
+        ln -s "../libffms2.dylib" "#{HOMEBREW_PREFIX}/lib/vapoursynth/#{shared_library("libffms2")}"
       For more information regarding plugins, please visit:
         \x1B[4mhttp://www.vapoursynth.com/doc/plugins.html\x1B[0m
     EOS
   end
 
   test do
-    xy = Language::Python.major_minor_version Formula["python@3.9"].opt_bin/"python3"
-    ENV.prepend_path "PYTHONPATH", lib/"python#{xy}/site-packages"
-    system Formula["python@3.9"].opt_bin/"python3", "-c", "import vapoursynth"
+    system Formula["python@3.10"].opt_bin/"python3.10", "-c", "import vapoursynth"
     system bin/"vspipe", "--version"
   end
 end

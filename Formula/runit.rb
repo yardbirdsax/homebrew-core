@@ -10,17 +10,24 @@ class Runit < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "c3de3e4ad3452a4aec3dee1aacd399c795564290dcd13afb4f52430af6d12b9e"
-    sha256 cellar: :any_skip_relocation, big_sur:       "3d22eb4db4e411604950ffc708beb131f4a380af75025148f507e323633f4e5c"
-    sha256 cellar: :any_skip_relocation, catalina:      "c6e5b49ab3601824db1969967c5ba4a0d35fa65841cfa2ec1d50fcca968fcf05"
-    sha256 cellar: :any_skip_relocation, mojave:        "3c684c031305f98a2d24e904b6fc3301a71f0089e84e814028bad8ab05658cae"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "a66fbfb0258db267c5a3a3d7790fe4b5224478e7ecc1377a9a877118d5e27be5"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "8f052bec9af60ed628dec6fd235468b4cbb88d5b02c2570d1e1cddd0596e64be"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "39e047730d34a1981348cee841295648336b6ff705a200ef5f99130dc0cfde3c"
+    sha256 cellar: :any_skip_relocation, monterey:       "80de201022723bb21ff78b50bd6dd1501ea8fb8a4d062e4974ad219d0971d1f4"
+    sha256 cellar: :any_skip_relocation, big_sur:        "a619f4f93c0a243b27e229916a5c7fc0371c7f38db7a608e5232d27eca9e9987"
+    sha256 cellar: :any_skip_relocation, catalina:       "d0e17adfaaf02589b498e362596486515b37a0fda917ee8f0e51ac8e2409afd6"
+    sha256 cellar: :any_skip_relocation, mojave:         "ec6f4b2f1b323aba830a5f26daed8615395b0f774de82e074ee699627b1c106a"
+    sha256                               x86_64_linux:   "4f36fd98073523f04cebacef60f30fae7501f351c4a885e3a7a4540e41cafb14"
   end
 
   def install
     # Runit untars to 'admin/runit-VERSION'
     cd "runit-#{version}" do
+      # Work around build error from root requirement: "Oops. Your getgroups() returned 0,
+      # and setgroups() failed; this means that I can't reliably do my shsgr test. Please
+      # either ``make'' as root or ``make'' while you're in one or more supplementary groups."
+      inreplace "src/Makefile", "( cat warn-shsgr; exit 1 )", "cat warn-shsgr" if OS.linux?
+
       # Per the installation doc on macOS, we need to make a couple changes.
       system "echo 'cc -Xlinker -x' >src/conf-ld"
       inreplace "src/Makefile", / -static/, ""
@@ -56,43 +63,12 @@ class Runit < Formula
     EOS
   end
 
-  plist_options manual: "runit"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-        <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_bin}/runsvdir</string>
-            <string>-P</string>
-            <string>#{var}/service</string>
-          </array>
-          <key>EnvironmentVariables</key>
-          <dict>
-            <key>PATH</key>
-            <string>/usr/bin:/bin:/usr/sbin:/sbin:#{opt_bin}</string>
-          </dict>
-          <key>KeepAlive</key>
-          <dict>
-            <key>Crashed</key>
-            <true/>
-            <key>SuccessfulExit</key>
-            <false/>
-          </dict>
-          <key>ProcessType</key>
-          <string>Background</string>
-         <key>StandardErrorPath</key>
-          <string>#{var}/log/runit.log</string>
-          <key>StandardOutPath</key>
-          <string>#{var}/log/runit.log</string>
-        </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_bin/"runsvdir", "-P", var/"service"]
+    keep_alive true
+    log_path var/"log/runit.log"
+    error_log_path var/"log/runit.log"
+    environment_variables PATH: "/usr/bin:/bin:/usr/sbin:/sbin:#{opt_bin}"
   end
 
   test do

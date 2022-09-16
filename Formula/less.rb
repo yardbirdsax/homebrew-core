@@ -1,28 +1,22 @@
 class Less < Formula
   desc "Pager program similar to more"
-  homepage "http://www.greenwoodsoftware.com/less/index.html"
+  homepage "https://www.greenwoodsoftware.com/less/index.html"
+  url "https://www.greenwoodsoftware.com/less/less-608.tar.gz"
+  sha256 "a69abe2e0a126777e021d3b73aa3222e1b261f10e64624d41ec079685a6ac209"
   license "GPL-3.0-or-later"
-
-  stable do
-    url "http://www.greenwoodsoftware.com/less/less-563.tar.gz"
-    sha256 "ce5b6d2b9fc4442d7a07c93ab128d2dff2ce09a1d4f2d055b95cf28dd0dc9a9a"
-
-    # Fix build with Xcode 12 as it no longer allows implicit function declarations
-    # See https://github.com/gwsw/less/issues/91
-    patch :DATA
-  end
 
   livecheck do
     url :homepage
-    regex(/less[._-]v?(\d+).+?released.+?general use/i)
+    regex(/less[._-]v?(\d+(?:\.\d+)*).+?released.+?general use/i)
   end
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any, arm64_big_sur: "c7bc35b8debbb322fc3bdd644ba526eeec3ab8d5f982c76442995a763c77c739"
-    sha256 cellar: :any, big_sur:       "431d227c11a0d52bb4d4392244615933d9f04265f36faedc93f5406226d38076"
-    sha256 cellar: :any, catalina:      "491fc7dc78848cd91c85c4a6a1ff5457166c0ad83dda9f05145489c2aa2828eb"
-    sha256 cellar: :any, mojave:        "d03e895349d8503cea9c8da326015298bf64d80796ab9ee62138a4a072e4559f"
+    sha256 cellar: :any,                 arm64_monterey: "0c111d7d5f231c4b409d4e6441ebb1cfc40bdf440c1bd7d6fff11b1e16adfc31"
+    sha256 cellar: :any,                 arm64_big_sur:  "ecc9669f294fd8d3826f3c513590387a2dd37a248d4bd827c8301d857bf6cfa4"
+    sha256 cellar: :any,                 monterey:       "b5cf2d6c6e1a6c23d9086323c4363a022e1e2264dd4f0e1a287396beb88edced"
+    sha256 cellar: :any,                 big_sur:        "2d40fdc792b4aee7bc4016cb1daf3c14708c7f90f464fb49a5dd6f6f659809e8"
+    sha256 cellar: :any,                 catalina:       "5a785fbf1ac017df8814d9b86cd0fcdbacfdc4159e80da7ea738b1944cd1e9d6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "98769ef6e7ed3f87c9d90bf73666693fea66ebd91434a7e5b2982f7b8ef55244"
   end
 
   head do
@@ -32,11 +26,11 @@ class Less < Formula
   end
 
   depends_on "ncurses"
-  depends_on "pcre"
+  depends_on "pcre2"
 
   def install
-    system "make", "-f", "Makefile.aut", "dist" if build.head?
-    system "./configure", "--prefix=#{prefix}", "--with-regex=pcre"
+    system "make", "-f", "Makefile.aut", "distfiles" if build.head?
+    system "./configure", "--prefix=#{prefix}", "--with-regex=pcre2"
     system "make", "install"
   end
 
@@ -44,21 +38,3 @@ class Less < Formula
     system "#{bin}/lesskey", "-V"
   end
 end
-__END__
-diff --git a/configure b/configure
-index 0ce6db1..eac7ca0 100755
---- a/configure
-+++ b/configure
-@@ -4104,11 +4104,11 @@ if test "x$TERMLIBS" = x; then
-     TERMLIBS="-lncurses"
-     SAVE_LIBS=$LIBS
-     LIBS="$LIBS $TERMLIBS"
-     cat confdefs.h - <<_ACEOF >conftest.$ac_ext
- /* end confdefs.h.  */
--
-+#include <termcap.h>
- int
- main ()
- {
- tgetent(0,0); tgetflag(0); tgetnum(0); tgetstr(0,0);
-   ;

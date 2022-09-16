@@ -1,17 +1,18 @@
 class Gocloc < Formula
   desc "Little fast LoC counter"
   homepage "https://github.com/hhatto/gocloc"
-  url "https://github.com/hhatto/gocloc/archive/v0.3.3.tar.gz"
-  sha256 "308461beea124991c1558d8278e3a7cc0c8411c5730d444ebbd54187edeb688d"
+  url "https://github.com/hhatto/gocloc/archive/v0.4.3.tar.gz"
+  sha256 "b96a3da5c5ec084107f29c339414774a7bf0c3c71e41ae5101cc48824ab9ecb2"
   license "MIT"
-  head "https://github.com/hhatto/gocloc.git"
+  head "https://github.com/hhatto/gocloc.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "518e718b3cfe49ee519352ad5891868ad1445f83061ac1b93e89ab045060b6a5"
-    sha256 cellar: :any_skip_relocation, big_sur:       "72eadebf1e8cafb5e94238f673af68216fbaacaae0100bfcb3699a6ffb54b9f3"
-    sha256 cellar: :any_skip_relocation, catalina:      "a6dc5fa859f29d07e0668c169dfc4d240dbd46a8e79fbc63c31261cdf4f6a79b"
-    sha256 cellar: :any_skip_relocation, mojave:        "a6dc5fa859f29d07e0668c169dfc4d240dbd46a8e79fbc63c31261cdf4f6a79b"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "a6dc5fa859f29d07e0668c169dfc4d240dbd46a8e79fbc63c31261cdf4f6a79b"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "7e01032fe7b3eba5c8fb7f4d22ab3bf0c1a9e122b464c73eef0d8fb53daf3064"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "7e01032fe7b3eba5c8fb7f4d22ab3bf0c1a9e122b464c73eef0d8fb53daf3064"
+    sha256 cellar: :any_skip_relocation, monterey:       "71eaf256d9a9108ef7b2ee147b8c71aae25c4304897744b57eaec70ccd3d2911"
+    sha256 cellar: :any_skip_relocation, big_sur:        "71eaf256d9a9108ef7b2ee147b8c71aae25c4304897744b57eaec70ccd3d2911"
+    sha256 cellar: :any_skip_relocation, catalina:       "71eaf256d9a9108ef7b2ee147b8c71aae25c4304897744b57eaec70ccd3d2911"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0b9874e4142f084105c7bda30819681a7af6f437ca8b1808a4f82c4d8f4f849e"
   end
 
   depends_on "go" => :build

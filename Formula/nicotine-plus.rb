@@ -3,23 +3,25 @@ class NicotinePlus < Formula
 
   desc "Graphical client for the Soulseek file sharing network"
   homepage "https://nicotine-plus.github.io/nicotine-plus/"
-  url "https://files.pythonhosted.org/packages/1e/d5/35536e21b33b881d2cd13c79f6404691a23268eafad00300214788b3ca2c/nicotine-plus-2.2.2.tar.gz"
-  sha256 "6913aabd98cb841d6c05213f8004300c2e90d9afdaf5aa081269b272494762f5"
+  url "https://files.pythonhosted.org/packages/b3/f7/c29555b98909f5be12d8084ea9dca8c5edc7b8c7ba448f8eefbd6192b78d/nicotine-plus-3.2.5.tar.gz"
+  sha256 "8fdee46eb790054dca54b860bf5117cc3d5511a944423e1b837b9666acce505a"
   license "GPL-3.0-or-later"
-  head "https://github.com/Nicotine-Plus/nicotine-plus.git"
+  head "https://github.com/Nicotine-Plus/nicotine-plus.git", branch: "master"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "284ab0e4d1fdfc9bab0c6478ed2c354c1f047f39d0658f1b073dd2a9a37b84ce"
-    sha256 cellar: :any_skip_relocation, big_sur:       "c6b26f5e472d343bd5f6190af50d15326df5d4b249c973bb997de195d7af26fa"
-    sha256 cellar: :any_skip_relocation, catalina:      "f03e6e761f7a8062d506738b544762e89a020f626d8ba154b7c838a44dbd5af4"
-    sha256 cellar: :any_skip_relocation, mojave:        "52431db05bd1e9c96594a8e1168c9e3645c53f582df85841d5e04ddf5b8bc1dd"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "0362859e0482ef9eef6e14fc46463e56dde517f058108198d4c152f83af6585e"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "0362859e0482ef9eef6e14fc46463e56dde517f058108198d4c152f83af6585e"
+    sha256 cellar: :any_skip_relocation, monterey:       "4442e32926d30d4c0e34980d627ba2d75cdef3e086019c84764db831db9fe0a5"
+    sha256 cellar: :any_skip_relocation, big_sur:        "4442e32926d30d4c0e34980d627ba2d75cdef3e086019c84764db831db9fe0a5"
+    sha256 cellar: :any_skip_relocation, catalina:       "4442e32926d30d4c0e34980d627ba2d75cdef3e086019c84764db831db9fe0a5"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1992d35a5c5c5f10ca06c0f1d6cc18bb067d3421c7783f40bc1e5a57827305fe"
   end
 
   depends_on "adwaita-icon-theme"
   depends_on "gtk+3"
+  depends_on "py3cairo"
   depends_on "pygobject3"
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   def install
     virtualenv_install_with_resources

@@ -1,12 +1,14 @@
 class Solr < Formula
   desc "Enterprise search platform from the Apache Lucene project"
-  homepage "https://lucene.apache.org/solr/"
-  url "https://www.apache.org/dyn/closer.lua?path=lucene/solr/8.8.0/solr-8.8.0.tgz"
-  mirror "https://archive.apache.org/dist/lucene/solr/8.8.0/solr-8.8.0.tgz"
-  sha256 "7318752d1d30fa2ef839eb3d2df0f2bdb2709d304aa4870b02b33b91e945b054"
+  homepage "https://solr.apache.org/"
+  url "https://dlcdn.apache.org/lucene/solr/8.11.2/solr-8.11.2.tgz"
+  mirror "https://archive.apache.org/dist/lucene/solr/8.11.2/solr-8.11.2.tgz"
+  sha256 "54d6ebd392942f0798a60d50a910e26794b2c344ee97c2d9b50e678a7066d3a6"
   license "Apache-2.0"
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "74b9246d38fc0c296b104f1c7cc9ec6a22e9552f32d70ef1fb14156973ae21dd"
+  end
 
   depends_on "openjdk"
 
@@ -23,6 +25,8 @@ class Solr < Formula
     env["SOLR_PID_DIR"] = "${SOLR_PID_DIR:-#{var/"run/solr"}}"
     bin.env_script_all_files libexec, env
     (libexec/"bin").rmtree
+
+    inreplace libexec/"solr", "/usr/local/share/solr", pkgshare
   end
 
   def post_install
@@ -30,33 +34,9 @@ class Solr < Formula
     (var/"log/solr").mkpath
   end
 
-  plist_options manual: "solr start"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-      <dict>
-          <key>Label</key>
-          <string>#{plist_name}</string>
-          <key>ProgramArguments</key>
-          <array>
-            <string>#{opt_bin}/solr</string>
-            <string>start</string>
-            <string>-f</string>
-            <string>-s</string>
-            <string>/usr/local/var/lib/solr</string>
-          </array>
-          <key>ServiceDescription</key>
-          <string>#{name}</string>
-          <key>WorkingDirectory</key>
-          <string>#{HOMEBREW_PREFIX}</string>
-          <key>RunAtLoad</key>
-          <true/>
-      </dict>
-      </plist>
-    EOS
+  service do
+    run [opt_bin/"solr", "start", "-f", "-s", HOMEBREW_PREFIX/"var/lib/solr"]
+    working_dir HOMEBREW_PREFIX
   end
 
   test do
@@ -72,7 +52,8 @@ class Solr < Formula
     # Impossible to start a second Solr node on the same port => exit code 1
     shell_output(bin/"solr start -p #{port}", 1)
     # Stop a Solr node => exit code 0
-    shell_output(bin/"solr stop -p #{port}")
+    # Exit code is 1 in a docker container, see https://github.com/apache/solr/pull/250
+    shell_output(bin/"solr stop -p #{port}", (OS.linux? && ENV["HOMEBREW_GITHUB_ACTIONS"]) ? 1 : 0)
     # No Solr node left to stop => exit code 1
     shell_output(bin/"solr stop -p #{port}", 1)
   end

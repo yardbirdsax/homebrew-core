@@ -1,16 +1,17 @@
 class GitAbsorb < Formula
   desc "Automatic git commit --fixup"
   homepage "https://github.com/tummychow/git-absorb"
-  url "https://github.com/tummychow/git-absorb/archive/0.6.6.tar.gz"
-  sha256 "955069cc70a34816e6f4b6a6bd1892cfc0ae3d83d053232293366eb65599af2f"
+  url "https://github.com/tummychow/git-absorb/archive/0.6.7.tar.gz"
+  sha256 "f562dbcf68c5f687197e8a594cb58cf102cc17a2e9fcf66dbacb83b49e053bd7"
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "c990b0116058e091c06b246e985bdd81e84a88f7078254c1253f0b2ea41ccd28"
-    sha256 cellar: :any_skip_relocation, big_sur:       "1a960e64840655e62b5bfdbdf5b235650b6d6655c32eaac05f9afb1b472893ef"
-    sha256 cellar: :any_skip_relocation, catalina:      "663a57962ac9400e4b35164b82358025b1304c5097ff8841043a8885ba8881ea"
-    sha256 cellar: :any_skip_relocation, mojave:        "afa2140c2f7e4f26c4027c3871a1f6b9f1522b9ef64b59cec358383247ae8263"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "42f677cb8adf051c212bc04ada5a0527289a0491d58d1b0ea71dbe4a04115c39"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "2bfa39873cfb6e80a361cada4bfd415f0b86c007860c0b5f3c976f40bb032337"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "4b42c97a5cd6838adf1757e981e8d3687a0f044f790b8dd3a8da6533f7819b0d"
+    sha256 cellar: :any_skip_relocation, monterey:       "9eaf884c1391d3407d6df867c8bf23587205b9b35d219f4fe20e7c9a035429eb"
+    sha256 cellar: :any_skip_relocation, big_sur:        "8a3a2219b257d4d24d6fd72fa8dc3176071e8808c0172c6f7d8e2b1fb381917e"
+    sha256 cellar: :any_skip_relocation, catalina:       "0c4e29e127af8c32a65575f788ef9d4d6adc7a1a2077801c093344f082e9563e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "dc3b9646158eea26aed4d2a2b8054a2276d6f02c03b584837c9cc006e4095df7"
   end
 
   depends_on "rust" => :build
@@ -20,6 +21,8 @@ class GitAbsorb < Formula
   def install
     system "cargo", "install", *std_cargo_args
     man1.install "Documentation/git-absorb.1"
+
+    generate_completions_from_executable(bin/"git-absorb", "--gen-completions")
   end
 
   test do

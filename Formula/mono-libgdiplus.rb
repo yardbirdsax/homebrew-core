@@ -1,21 +1,25 @@
 class MonoLibgdiplus < Formula
   desc "GDI+-compatible API on non-Windows operating systems"
   homepage "https://www.mono-project.com/docs/gui/libgdiplus/"
-  url "https://github.com/mono/libgdiplus/archive/6.0.5.tar.gz"
-  sha256 "1fd034f4b636214cc24e94c563cd10b3f3444d9f0660927b60e63fd4131d97fa"
+  url "https://download.mono-project.com/sources/libgdiplus/libgdiplus-6.1.tar.gz"
+  sha256 "97d5a83d6d6d8f96c27fb7626f4ae11d3b38bc88a1726b4466aeb91451f3255b"
   license "MIT"
   revision 1
 
-  bottle do
-    sha256 cellar: :any, arm64_big_sur: "1ffc07c204c2dfb3caad9695283676bb2793da4f95889d09fa2a976c2699720b"
-    sha256 cellar: :any, big_sur:       "251d2f8b3f0aefe6678a1e34288cdcdc160410dc4b3b555d08cf58d01f9c37a0"
-    sha256 cellar: :any, catalina:      "d72a67f877199f82b096a47a19b071414581fed3160f62942dcbe21804fb29b7"
-    sha256 cellar: :any, mojave:        "c865c0d6aac91e8293d951a1c7d278bc8d64cba7babab1dc60f9fc198b6649fd"
+  livecheck do
+    url "https://download.mono-project.com/sources/libgdiplus/"
+    regex(/href=.*?libgdiplus[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
-  depends_on "autoconf" => :build
-  depends_on "automake" => :build
-  depends_on "libtool" => :build
+  bottle do
+    sha256 cellar: :any,                 arm64_monterey: "b52734ab6bdc00e1b79d5e0ea316cfd3ca31761dbd7b8e08043dda470425166b"
+    sha256 cellar: :any,                 arm64_big_sur:  "2911312b0811551362741646e5565673e98df0ef00c3ae72ab8ebf05458347fb"
+    sha256 cellar: :any,                 monterey:       "18090bbf1aad53b2ac5c787ef77c995c2cf7519adef6863116b304a224efdfc3"
+    sha256 cellar: :any,                 big_sur:        "624eccbf7b63582b5b7f17b76d2b44c34f7bab08e9e3c7280957f603518a46bd"
+    sha256 cellar: :any,                 catalina:       "4a034e8661fdb77377bdea527d3f74b6363a8f1691a5b7cf76419d1f7888b7b9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "736da321f47ed7ea4c676883b58b139d370bc1d3cee694140b9898d65b97bf37"
+  end
+
   depends_on "pkg-config" => :build
   depends_on "cairo"
   depends_on "fontconfig"
@@ -23,29 +27,23 @@ class MonoLibgdiplus < Formula
   depends_on "gettext"
   depends_on "giflib"
   depends_on "glib"
-  depends_on "jpeg"
+  depends_on "jpeg-turbo"
   depends_on "libexif"
   depends_on "libpng"
   depends_on "libtiff"
   depends_on "pango"
-  depends_on "pixman"
 
-  # Remove at next version bump.
-  # Upstream PR: https://github.com/mono/libgdiplus/pull/605.
-  # Without this patch, it requires pango 1.43 or lower (current available version is 1.48).
+  # Fix -flat_namespace being used on Big Sur and later.
   patch do
-    url "https://github.com/mono/libgdiplus/commit/8f42e17e92c562cc243844b8a004cd03144b1384.patch?full_index=1"
-    sha256 "b38823891ea201588c1edf29f931a0d353a155d7fac36f114482bbe608c5a1c9"
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
   end
 
   def install
-    system "autoreconf", "-fiv"
-    system "./configure", "--disable-debug",
-                          "--disable-dependency-tracking",
+    system "./configure", *std_configure_args,
                           "--disable-silent-rules",
-                          "--without-x11",
                           "--disable-tests",
-                          "--prefix=#{prefix}"
+                          "--without-x11"
     system "make"
     cd "tests" do
       system "make", "testbits"

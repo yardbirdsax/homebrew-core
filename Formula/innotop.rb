@@ -1,17 +1,19 @@
 class Innotop < Formula
   desc "Top clone for MySQL"
   homepage "https://github.com/innotop/innotop/"
-  url "https://github.com/innotop/innotop/archive/v1.12.0.tar.gz"
-  sha256 "f56d51b2c33a9c03f1b9d4fc5f7480f1c2104ef1e8f04def84a16f35d0bc42f6"
+  url "https://github.com/innotop/innotop/archive/v1.13.0.tar.gz"
+  sha256 "6ec91568e32bda3126661523d9917c7fbbd4b9f85db79224c01b2a740727a65c"
   license any_of: ["GPL-2.0-only", "Artistic-1.0-Perl"]
-  revision 3
+  revision 2
   head "https://github.com/innotop/innotop.git"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "dcfabcbe448f15fe82dfeac2c9378fa7c9cc38bd69120453a0dff464a0672547"
-    sha256 cellar: :any, big_sur:       "8b8d3b6840f59625a668ee3da9bf335ef6be785386d8b7fbb2ad3c07c1220c78"
-    sha256 cellar: :any, catalina:      "26eb012deedfd145e01f71a2cb44ee2cc2782968585f8a9846e2e891359d31cc"
-    sha256 cellar: :any, mojave:        "cb4497e2e54831dbc98836a234a3ab627a16257a4025b5ced74bc417ae1d014a"
+    sha256 cellar: :any,                 arm64_monterey: "45a9b49284646d65f952a15670eb9e3bb0a471365daae7f57d101377a4c7f252"
+    sha256 cellar: :any,                 arm64_big_sur:  "c974c0178ce90162a6a417b00bb1576b49941bf07caf382d2bde7ff0ad556eb7"
+    sha256 cellar: :any,                 monterey:       "3f0158957c8a7188425a28da90e9f2839b8ab501a4f886d3e0c755eff247ceb8"
+    sha256 cellar: :any,                 big_sur:        "22a308935fcd0931a72e0812b2a5b8ed75953106c57130b5d519cc6f56602ca9"
+    sha256 cellar: :any,                 catalina:       "550b3ac3cf0736304172e83c35419585e7caffd3803201a0ba03694e570099c8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a4653b6f4bc93efa58c34f86fa479a40cc48127ea9d083360cac334add7bfb09"
   end
 
   depends_on "mysql-client"
@@ -48,7 +50,7 @@ class Innotop < Formula
         # from a relative path -- while in the middle of our build we need to
         # refer to them by their full path.  Workaround adapted from:
         #   https://github.com/fink/fink-distributions/issues/461#issuecomment-563331868
-        inreplace "Makefile", "blib/", "$(shell pwd)/blib/" if r.name == "TermReadKey"
+        inreplace "Makefile", "blib/", "$(shell pwd)/blib/" if OS.mac? && r.name == "TermReadKey"
         system "make", "install"
       end
     end

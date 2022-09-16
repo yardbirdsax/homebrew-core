@@ -1,10 +1,9 @@
 class Vips < Formula
   desc "Image processing library"
   homepage "https://github.com/libvips/libvips"
-  url "https://github.com/libvips/libvips/releases/download/v8.10.5/vips-8.10.5.tar.gz"
-  sha256 "a4eef2f5334ab6dbf133cd3c6d6394d5bdb3e76d5ea4d578b02e1bc3d9e1cfd8"
+  url "https://github.com/libvips/libvips/releases/download/v8.13.1/vips-8.13.1.tar.gz"
+  sha256 "ad377b7e561bb2118de9a3864fcaa60c61ba7f47e849f6044d1b339906197702"
   license "LGPL-2.1-or-later"
-  revision 2
 
   livecheck do
     url :stable
@@ -12,56 +11,60 @@ class Vips < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "7465e3684f04ad85463694971862aa3694ec67655b01e8d5d6eef6af22852af9"
-    sha256 big_sur:       "423bdd4aa945fefc6dd01646892c429494620cc942a96f25e2eab72cc8088df0"
-    sha256 catalina:      "8d60363727bb9f48e8733b8d570732734ae727809489547e8ec3c956a72569f2"
-    sha256 mojave:        "49429e971e5550fd703dcdcd3647a0d14c08267fa7e5c2ac4f6e0a402e92fb2f"
+    rebuild 1
+    sha256 arm64_monterey: "d80754b65c0cebadfec262509bdb1d3ba612ac4d2816b58de4930b4adacb36c2"
+    sha256 arm64_big_sur:  "813ca47272e8d3b88c2d30d5c190137aa2b525fbae626ea459a043f6fb18e023"
+    sha256 monterey:       "4c5882f10591209eb3337c6f6f1a96b7c4a214dd5f64b2470ada7280259ee951"
+    sha256 big_sur:        "eae9f30e6d1a22e41472facf37f78a9a285bd003ab0dce5a02aa9a91bc1f0f14"
+    sha256 catalina:       "bb36f709353d7f7128dbec7b4f500bd12fb87e174dc149e191a1c31067a593e8"
+    sha256 x86_64_linux:   "a246cde2f92677386854e7249e644c26f7af4a9f70ab2fa8806cf205377d77a0"
   end
 
+  depends_on "gobject-introspection" => :build
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
   depends_on "pkg-config" => :build
+  depends_on "cairo"
   depends_on "cfitsio"
+  depends_on "cgif"
   depends_on "fftw"
   depends_on "fontconfig"
   depends_on "gettext"
-  depends_on "giflib"
   depends_on "glib"
   depends_on "imagemagick"
+  depends_on "jpeg-xl"
   depends_on "libexif"
   depends_on "libgsf"
   depends_on "libheif"
   depends_on "libimagequant"
   depends_on "libmatio"
-  depends_on "libpng"
   depends_on "librsvg"
   depends_on "libspng"
   depends_on "libtiff"
   depends_on "little-cms2"
   depends_on "mozjpeg"
   depends_on "openexr"
+  depends_on "openjpeg"
   depends_on "openslide"
   depends_on "orc"
   depends_on "pango"
   depends_on "poppler"
   depends_on "webp"
 
+  uses_from_macos "expat"
   uses_from_macos "zlib"
 
-  on_linux do
-    depends_on "gobject-introspection"
-  end
+  fails_with gcc: "5"
 
   def install
     # mozjpeg needs to appear before libjpeg, otherwise it's not used
     ENV.prepend_path "PKG_CONFIG_PATH", Formula["mozjpeg"].opt_lib/"pkgconfig"
 
-    args = %W[
-      --disable-dependency-tracking
-      --prefix=#{prefix}
-      --with-magick
-    ]
-
-    system "./configure", *args
-    system "make", "install"
+    mkdir "build" do
+      system "meson", *std_meson_args, ".."
+      system "ninja"
+      system "ninja", "install"
+    end
   end
 
   test do

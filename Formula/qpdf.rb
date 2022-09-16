@@ -1,25 +1,33 @@
 class Qpdf < Formula
   desc "Tools for and transforming and inspecting PDF files"
   homepage "https://github.com/qpdf/qpdf"
-  url "https://github.com/qpdf/qpdf/releases/download/release-qpdf-10.1.0/qpdf-10.1.0.tar.gz"
-  sha256 "862c144e4516302327cea908f2879131cc8198b10d3d3a90ef7bc006a915120d"
+  url "https://github.com/qpdf/qpdf/releases/download/v11.0.0/qpdf-11.0.0.tar.gz"
+  sha256 "8d99e98893f68f52ca3b579770e7e6f4c96612084d6a0e7e05854a6d631b8fe6"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "c67009187b297a88ae00a45983b27ca082e2907db1618ce864452a69ef683f63"
-    sha256 cellar: :any, big_sur:       "c857f3f740bba6770c759b6a4bbb1c805ec333e3f96cdf75ff0100c8365196b5"
-    sha256 cellar: :any, catalina:      "5a6208cd3267fbec41837612b535f558f383e16f67dcb7a78c8ef5808cffda5c"
-    sha256 cellar: :any, mojave:        "5f1da4c5b3f8bcd4b308ff0ed6941d8faa708cb3b06b13faee860c4f72650c3b"
+    sha256 cellar: :any,                 arm64_monterey: "2e6ee49528ec16b9b75803ca18d8b1c3f5fb04007a951c5ff26f199791aed0ba"
+    sha256 cellar: :any,                 arm64_big_sur:  "c9df69b0d26c61cc6fe23ec8f31e541f2c22daa030bf66752af54b28efb2ef8d"
+    sha256 cellar: :any,                 monterey:       "6249200d021e01a2e6ddf9ed17cabfe6f31eb105d97a6c4afda37342b1660c7f"
+    sha256 cellar: :any,                 big_sur:        "b665d2dccb58f69fc0bf60acdaecfbf8e4e346ba796d143a8574e01688cc645b"
+    sha256 cellar: :any,                 catalina:       "af97af23f5e4311ca937b1c5b5da867b7d8947ace7f082ad88ae726f9c984485"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "946de1ef971947ffba69831c2923a458228d6b716389efb79ff4106d64903233"
   end
 
-  depends_on "jpeg"
+  depends_on "cmake" => :build
+  depends_on "jpeg-turbo"
+  depends_on "openssl@1.1"
 
   uses_from_macos "zlib"
 
   def install
-    system "./configure", "--prefix=#{prefix}"
-    system "make"
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build",
+                    "-DUSE_IMPLICIT_CRYPTO=0",
+                    "-DREQUIRE_CRYPTO_OPENSSL=1",
+                    "-DCMAKE_INSTALL_RPATH=#{rpath}",
+                    *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do

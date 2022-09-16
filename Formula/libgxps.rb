@@ -1,10 +1,11 @@
 class Libgxps < Formula
   desc "GObject based library for handling and rendering XPS documents"
   homepage "https://wiki.gnome.org/Projects/libgxps"
-  url "https://download.gnome.org/sources/libgxps/0.3/libgxps-0.3.1.tar.xz"
-  sha256 "1a939fc8fcea9471b7eca46b1ac90cff89a30d26f65c7c9a375a4bf91223fa94"
+  url "https://download.gnome.org/sources/libgxps/0.3/libgxps-0.3.2.tar.xz"
+  sha256 "6d27867256a35ccf9b69253eb2a88a32baca3b97d5f4ef7f82e3667fa435251c"
   license "LGPL-2.1-or-later"
-  revision 1
+  revision 2
+  head "https://gitlab.gnome.org/GNOME/libgxps.git", branch: "master"
 
   livecheck do
     url :stable
@@ -12,16 +13,15 @@ class Libgxps < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "985cab45b1a3186698595bd51e153806d10ff3e6ae014793e4dafeb14f4ef703"
-    sha256 cellar: :any, big_sur:       "2b3f7d48efd67aae795cbe831c3f6016ef3935927bc277e605525a9a29d38e45"
-    sha256 cellar: :any, catalina:      "dd6c63cf7f8af07a9ea8bbe4ee902d55a834652f4100780affab11dd38a3deb0"
-    sha256 cellar: :any, mojave:        "a71f1a595fe620805393786fe14dedc8fe3fb6f75a812536ba5acc00e9ec9c07"
-    sha256 cellar: :any, high_sierra:   "ed21a1e2b30b473883f54fa09c7a1707eb6ae2a78946ecbb1d1d11f5f340154a"
+    sha256 cellar: :any, arm64_monterey: "ef4bbc6216124d5e51c73cca76d1c4a4bed7747931b7a519e6e829d20cd7021c"
+    sha256 cellar: :any, arm64_big_sur:  "e45ca333cf831e269ac4ed11864da0f09524c87780e9c7f194415505753b6f2a"
+    sha256 cellar: :any, monterey:       "7956a71251563f6589ffd7a061a0e53cdfadcf90893220c94b004231640e3860"
+    sha256 cellar: :any, big_sur:        "19265edef8bb260d7a1adca6f6044f5ba94558b06d54d751c5f1144deb5b820e"
+    sha256 cellar: :any, catalina:       "1b25899eda944421ff3e97ecd872afc97b15f31cd7e651e1eb1ef05959327fa0"
+    sha256               x86_64_linux:   "49e69a37f4fd97632211101d926390e1eae26c8a215b73ed22b86b7caebae3c5"
   end
 
-  head do
-    url "https://gitlab.gnome.org/GNOME/libgxps.git"
-  end
+  keg_only "it conflicts with `ghostscript`"
 
   depends_on "gobject-introspection" => :build
   depends_on "meson" => :build
@@ -29,15 +29,29 @@ class Libgxps < Formula
   depends_on "pkg-config" => :build
   depends_on "glib"
   depends_on "gtk+3"
+  depends_on "jpeg-turbo"
   depends_on "libarchive"
+  depends_on "libtiff"
   depends_on "little-cms2"
 
+  uses_from_macos "zip" => :test
+  uses_from_macos "zlib"
+
   def install
-    mkdir "build" do
-      system "meson", *std_meson_args, ".."
-      system "ninja", "-v"
-      system "ninja", "install", "-v"
-    end
+    # Tell meson to search for brewed zlib before host zlib on Linux.
+    # This is not the same variable as setting LD_LIBRARY_PATH!
+    ENV.append "LIBRARY_PATH", Formula["zlib"].opt_lib unless OS.mac?
+
+    system "meson", *std_meson_args, "build"
+    system "meson", "compile", "-C", "build", "-v"
+    system "meson", "install", "-C", "build"
+  end
+
+  def caveats
+    <<~EOS
+      `ghostscript` now installs a conflicting #{shared_library("libgxps")}.
+      You may need to `brew unlink libgxps` if you have both installed.
+    EOS
   end
 
   test do
@@ -74,8 +88,9 @@ class Libgxps < Formula
       EOS
     end
 
+    zip = OS.mac? ? "/usr/bin/zip" : Formula["zip"].opt_bin/"zip"
     Dir.chdir(testpath) do
-      system "/usr/bin/zip", "-qr", (testpath/"test.xps"), "_rels", "Documents", "FixedDocumentSequence.fdseq"
+      system zip, "-qr", (testpath/"test.xps"), "_rels", "Documents", "FixedDocumentSequence.fdseq"
     end
     system "#{bin}/xpstopdf", (testpath/"test.xps")
   end

@@ -1,25 +1,22 @@
 class SshCopyId < Formula
   desc "Add a public key to a remote machine's authorized_keys file"
   homepage "https://www.openssh.com/"
-  url "https://ftp.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-8.4p1.tar.gz"
-  mirror "https://mirror.vdms.io/pub/OpenBSD/OpenSSH/portable/openssh-8.4p1.tar.gz"
-  version "8.4p1"
-  sha256 "5a01d22e407eb1c05ba8a8f7c654d388a13e9f226e4ed33bd38748dafa1d2b24"
+  url "https://cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-9.0p1.tar.gz"
+  mirror "https://cloudflare.cdn.openbsd.org/pub/OpenBSD/OpenSSH/portable/openssh-9.0p1.tar.gz"
+  version "9.0p1"
+  sha256 "03974302161e9ecce32153cfa10012f1e65c8f3750f573a73ab1befd5972a28a"
   license "SSH-OpenSSH"
-  revision 1
-  head "https://github.com/openssh/openssh-portable.git"
+  head "https://github.com/openssh/openssh-portable.git", branch: "master"
 
-  bottle :unneeded
+  livecheck do
+    formula "openssh"
+  end
+
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "41e65b946f66a2737c2ce8d3819726c5275f25506e406d9dd804327d63dc26b4"
+  end
 
   keg_only :provided_by_macos
-
-  # Fixes an invalid heredoc within a multiline `$()` block.
-  # Fixed upstream; will be in the next release.
-  # https://github.com/openssh/openssh-portable/pull/206
-  patch do
-    url "https://github.com/openssh/openssh-portable/commit/d9e727dcc04a52caaac87543ea1d230e9e6b5604.patch?full_index=1"
-    sha256 "fbca48deeaf0e51ddf220fa18088142ade2d406ad06bb03720389313df282651"
-  end
 
   def install
     bin.install "contrib/ssh-copy-id"

@@ -1,15 +1,17 @@
 class Vsearch < Formula
   desc "Versatile open-source tool for microbiome analysis"
   homepage "https://github.com/torognes/vsearch"
-  url "https://github.com/torognes/vsearch/archive/v2.15.2.tar.gz"
-  sha256 "ce821f5f870c00938ddc0938ba5a13f17e697a9ddd1d53cfbebd276ae4c640c8"
+  url "https://github.com/torognes/vsearch/archive/v2.21.2.tar.gz"
+  sha256 "841361c5e2081945177f6a63e2a85674b8c2aa439ad2b81dfc44b2a6c0b4b484"
   license any_of: ["BSD-2-Clause", "GPL-3.0-or-later"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "4d94291e05b0e22797c10612563c129aa0095843459eeb98d2ff96292dcd9e28"
-    sha256 cellar: :any_skip_relocation, big_sur:       "6801f717e69fb4c30da5fa87c54bd2e19e05af88f7b08b8efbf0df0444a6ef15"
-    sha256 cellar: :any_skip_relocation, catalina:      "907ea4fbfaae550577d4f9569e7602bc55668fc8a0f0594907f69ab2ce80b25f"
-    sha256 cellar: :any_skip_relocation, mojave:        "f0a8d4c30ce9921d29d574266c83bfd47ec4a0d8e7428790ca82a07b410f0deb"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "0fb2e3930a3fed5e89202d71ad3c479daf442b1c02b0df3b2039db0d8844c575"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "86d15945c4c95ed305452c71a970b6f26b097e71ac299921717aa0528fabb378"
+    sha256 cellar: :any_skip_relocation, monterey:       "0bfaf15f0c27d0d016f7dff4f06748d079f4bfb9e9d61beaaf600833737153b9"
+    sha256 cellar: :any_skip_relocation, big_sur:        "bf52412a64c3ce1add4ea8a1dfd78c397a15b7af7945147bdca02c7def93794b"
+    sha256 cellar: :any_skip_relocation, catalina:       "65bf796bed27a063f941201b2138a144f9a6dacdff71eb99d06c701e2f56510e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "476aa8cd70419bf47c47d55c584808cc9adce17e4ebdbbb0827ce8dd0d9e10e8"
   end
 
   depends_on "autoconf" => :build

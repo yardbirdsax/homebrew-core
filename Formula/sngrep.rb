@@ -1,15 +1,17 @@
 class Sngrep < Formula
   desc "Command-line tool for displaying SIP calls message flows"
   homepage "https://github.com/irontec/sngrep"
-  url "https://github.com/irontec/sngrep/archive/v1.4.8.tar.gz"
-  sha256 "f39fded8dc9ef0b7a41319f223dd4afa348bb2418bea578ed281557726829728"
+  url "https://github.com/irontec/sngrep/archive/v1.6.0.tar.gz"
+  sha256 "fd80964d6560f2ff57b4f5bef2353d1a6f7c48d2f1a5f0a167c854bd2e801999"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 arm64_big_sur: "18b64ed24e66e3030fd8cf53ac64293d657093bfede0ccb7929621efe5edd146"
-    sha256 big_sur:       "9f4802e1906e6177e83aff155174187fafdac32401d38c22af472035801c01c2"
-    sha256 catalina:      "489e6591c8008cbec241633ef0697c609aef20b02b9d97e7249c35d88af15d70"
-    sha256 mojave:        "d645f96ed390b34ce5e4fe9b01a687722b4046db196c0933546a7bb7a964d55a"
+    sha256 cellar: :any,                 arm64_monterey: "2bbb0e2441c8192002e427ba0b5a3e8673cee8689fd5befebd0f3ba0532e3cb2"
+    sha256 cellar: :any,                 arm64_big_sur:  "69a7368edfbff2b60ed13cf1dbd9891ca8346bc4764108441c48e28a27ff08cc"
+    sha256                               monterey:       "c0d3b02aa03ce6c44e7d0a14e06d34bea256934504fce358c0ad94308b4e410f"
+    sha256                               big_sur:        "d02e2bb89ebe085ba45d1bf9ccd3da89b4bb2b79dd69942bf56a1b3e70acfad4"
+    sha256                               catalina:       "f66d29b77e3a75b7824eccba63ee8e7c4d97e684afbb7cb1dccf79ce5ca8a273"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f787893debb7a1c5e9bfc7dd4d951f7806cfd6d0c9a04f53579f421c5f5bebc5"
   end
 
   depends_on "autoconf" => :build
@@ -17,7 +19,12 @@ class Sngrep < Formula
   depends_on "ncurses" if DevelopmentTools.clang_build_version >= 1000
   depends_on "openssl@1.1"
 
+  uses_from_macos "libpcap"
+  uses_from_macos "ncurses"
+
   def install
+    ENV.append_to_cflags "-I#{Formula["ncurses"].opt_include}/ncursesw" if OS.linux?
+
     system "./bootstrap.sh"
     system "./configure", "--disable-debug",
                           "--disable-dependency-tracking",

@@ -1,8 +1,9 @@
 class Lwtools < Formula
   desc "Cross-development tools for Motorola 6809 and Hitachi 6309"
-  homepage "http://lwtools.projects.l-w.ca/"
-  url "http://lwtools.projects.l-w.ca/releases/lwtools/lwtools-4.17.tar.gz"
-  sha256 "a93ab316ca0176901822873dba4bc286d3a5cf86e6a853d3edb7a51ecc96a91c"
+  homepage "http://www.lwtools.ca/"
+  url "http://www.lwtools.ca/releases/lwtools/lwtools-4.20.tar.gz"
+  sha256 "58ef6d09c5b69885c06f8bc73be3ee739e9ce3b7ceb3422fabdd892fd72917d4"
+  license "GPL-3.0-only"
 
   livecheck do
     url "http://www.lwtools.ca/releases/lwtools/"
@@ -10,17 +11,17 @@ class Lwtools < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "121467ab1181db0a5ea6126ffba307c6d6541eeb2dda43532c5437cb6330a42b"
-    sha256 cellar: :any_skip_relocation, big_sur:       "382b0f72477f4440fc260f2a055e52cd9aeb22e726a79f351cb35b890d9dcc0d"
-    sha256 cellar: :any_skip_relocation, catalina:      "1ce602bff92ea48cca7732b218e999350d62a3f76d7c69c3e73573da2139d662"
-    sha256 cellar: :any_skip_relocation, mojave:        "3cfae9c3afc0a2fa0d8fdf48c88cb504056f35702f45a4afe5070ceb408d4919"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "8c0c67d34661986431d9fdb2fe5b6315a0da6b4ec9b4eac139868bfa1ee18069"
-    sha256 cellar: :any_skip_relocation, sierra:        "d4f5b062ba3fbd7c7d3115c6f6451fdaa4daf331e0e7f0641580df19dc3c65e4"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "17c44cb127a40b306eb838bfff0dd8ebaa052ff712e63f20d1677f0b69e26e3c"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "11825578987a2aaaa08ddf2ebf67921c5e46c7ff712cded183e71d95b465d267"
+    sha256 cellar: :any_skip_relocation, monterey:       "7037098728211b7aac84cfcbadcf7260b62fdb417b04b80fa755597b571c34e7"
+    sha256 cellar: :any_skip_relocation, big_sur:        "e5ba969783c40c2a6772c0d4afd7e3df58fdacdb0e83fb6865c9d74d7f737c24"
+    sha256 cellar: :any_skip_relocation, catalina:       "676551e684a6b379be7605d61cd87274a718b9955af77618ce5eacd6b75eb03c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4178ef6d2a56b0f6bcd0b4dca4d296df4301dc12883328105d526f1fc3014ece"
   end
 
   def install
     system "make"
-    system "make", "install", "INSTALLDIR=#{bin}"
+    system "make", "install", "PREFIX=#{prefix}"
   end
 
   test do

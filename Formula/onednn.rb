@@ -1,17 +1,23 @@
 class Onednn < Formula
   desc "Basic building blocks for deep learning applications"
   homepage "https://01.org/oneDNN"
-  url "https://github.com/oneapi-src/oneDNN/archive/v2.0.tar.gz"
-  sha256 "922b42c3ea7a7122a77c61568dc4512aa8130c264c0489283c989919d1f59a6d"
+  url "https://github.com/oneapi-src/oneDNN/archive/v2.6.2.tar.gz"
+  sha256 "baed0a7426189c6e5f1cb242c6d282d3638802cbd05772e1c4810a83bd7bc4df"
   license "Apache-2.0"
-  head "https://github.com/oneapi-src/onednn.git"
+  head "https://github.com/oneapi-src/onednn.git", branch: "master"
+
+  livecheck do
+    url :stable
+    regex(/^v?(\d+(?:\.\d+)+)$/i)
+  end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any, arm64_big_sur: "045f62a40883229b10146c715306d1412f6f0bc4828d45942dbba29f03bb3c12"
-    sha256 cellar: :any, big_sur:       "8acd092ad84f8677785da0c5bb92e117b17f903a2702b66ee4572c93d5bb80a1"
-    sha256 cellar: :any, catalina:      "669ffb542483c34cf208829b6fe5d8debc60d0e9def35394834676d4db42c4cd"
-    sha256 cellar: :any, mojave:        "aa2922eb9ba741cde52d2b74f8787fdcec61e478b0d949cd6c8795fa3a2560e4"
+    sha256 cellar: :any,                 arm64_monterey: "34df1bbf2939def7744e48f9adcf7efba6c718d8bff498b14b195952e502b349"
+    sha256 cellar: :any,                 arm64_big_sur:  "c85789ba9c848cf736baed3771eb13992087beb47ea3d0d8cf66bd64007c1db1"
+    sha256 cellar: :any,                 monterey:       "dc15c513f66706b78659d0dd282b68d88dce7c7748e5a0e823e86a9c139e9ffc"
+    sha256 cellar: :any,                 big_sur:        "3964faa79479cd9c1dde977decc3937007bda1c2e7f0a10af86cebdd36cd0e1c"
+    sha256 cellar: :any,                 catalina:       "25b156186ef4d10036da06fd5010c4fbdf0cd7f1019d937ab3e93f8462a8866e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "09133365edd6f3ca52904b8f0c00d3ad6b65a817f1ca3aba2ec9a61ed7e910c6"
   end
 
   depends_on "cmake" => :build
@@ -26,14 +32,14 @@ class Onednn < Formula
 
   test do
     (testpath/"test.c").write <<~EOS
-      #include <mkldnn.h>
+      #include <oneapi/dnnl/dnnl.h>
       int main() {
-        mkldnn_engine_t engine;
-        mkldnn_status_t status = mkldnn_engine_create(&engine, mkldnn_cpu, 0);
-        return !(status == mkldnn_success);
+        dnnl_engine_t engine;
+        dnnl_status_t status = dnnl_engine_create(&engine, dnnl_cpu, 0);
+        return !(status == dnnl_success);
       }
     EOS
-    system ENV.cc, "test.c", "-L#{lib}", "-lmkldnn", "-o", "test"
+    system ENV.cc, "test.c", "-L#{lib}", "-ldnnl", "-o", "test"
     system "./test"
   end
 end

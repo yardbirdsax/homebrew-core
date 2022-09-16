@@ -1,35 +1,39 @@
 class F3d < Formula
   desc "Fast and minimalist 3D viewer"
-  homepage "https://kitware.github.io/F3D/"
-  url "https://gitlab.kitware.com/f3d/f3d/-/archive/v1.1.0/f3d-v1.1.0.tar.gz"
-  sha256 "93aa9759efcc4e77beac4568280aaeaca21bfb233d3c9f60262207ca595bde79"
+  homepage "https://f3d-app.github.io/f3d/"
+  url "https://github.com/f3d-app/f3d/archive/refs/tags/v1.3.1.tar.gz"
+  sha256 "653dc4044e14d0618c1d947a8ee85d2513e100b3fc24bd6e51830131a13e795d"
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "bb7240f16fcb91501863f5c0d47d602d79a51573b2ec640d99548598f78a25ee"
-    sha256 cellar: :any, big_sur:       "0bac4019ea861ad37466e7bfbd3c5ce7cc497af88b84bc3b281a1e65c90ec570"
-    sha256 cellar: :any, catalina:      "084b51e428b310c22349769db16e2d55ec467ce6711251536f63e33ef469c6eb"
-    sha256 cellar: :any, mojave:        "4bf7e46f38dcecc2ce4d6d4e6ef1f7d0418cd3b6578f3f0d44d9b6708f858669"
+    sha256 cellar: :any, arm64_monterey: "eb43ad624a8cda6e60911b4de70631e5cfa71c7bc0ce2260337f1442243060f7"
+    sha256 cellar: :any, arm64_big_sur:  "267fcff261a954ec13a7cd01f59f4db0dbf01215e7df0404121edd9e88cae7c9"
+    sha256 cellar: :any, monterey:       "7e8cb99a85f499057447134306a1fc80d2a7d7a74f1dd58faa3ed633afcb90aa"
+    sha256 cellar: :any, big_sur:        "90819e0682f31fb0df1b634b0554d6cf672a37d0d2b06c0218f1d0c786565fdf"
+    sha256 cellar: :any, catalina:       "9ef83d637737e119fefc46f957d43c8d22c1e3a9fed97985919e6a7bad2da58e"
   end
 
   depends_on "cmake" => :build
+  depends_on "alembic"
+  depends_on "assimp"
+  depends_on "opencascade"
   depends_on "vtk"
 
   def install
-    args = std_cmake_args + %W[
-      -DMACOSX_BUILD_BUNDLE:BOOL=OFF
+    args = %W[
+      -DF3D_MACOS_BUNDLE:BOOL=OFF
       -DBUILD_SHARED_LIBS:BOOL=ON
       -DBUILD_TESTING:BOOL=OFF
       -DF3D_INSTALL_DEFAULT_CONFIGURATION_FILE:BOOL=ON
-      -DCMAKE_INSTALL_NAME_DIR:STRING=#{lib}
-      -DCMAKE_INSTALL_RPATH:STRING=#{lib}
+      -DF3D_MODULE_ALEMBIC:BOOL=ON
+      -DF3D_MODULE_ASSIMP:BOOL=ON
+      -DF3D_MODULE_OCCT:BOOL=ON
+      -DCMAKE_INSTALL_RPATH:STRING=#{rpath}
     ]
 
-    mkdir "build" do
-      system "cmake", "..", *args
-      system "make"
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
@@ -42,8 +46,8 @@ class F3d < Formula
     EOS
 
     f3d_out = shell_output("#{bin}/f3d --verbose --no-render --geometry-only #{testpath}/test.obj 2>&1").strip
-    assert_match /Loading.+obj/, f3d_out
-    assert_match /Number of points: 3/, f3d_out
-    assert_match /Number of polygons: 1/, f3d_out
+    assert_match(/Loading.+obj/, f3d_out)
+    assert_match "Number of points: 3", f3d_out
+    assert_match "Number of polygons: 1", f3d_out
   end
 end

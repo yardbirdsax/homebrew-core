@@ -1,28 +1,30 @@
 class Condure < Formula
+  include Language::Python::Virtualenv
+
   desc "HTTP/WebSocket connection manager"
   homepage "https://github.com/fanout/condure"
-  url "https://github.com/fanout/condure/archive/1.1.0.tar.gz"
-  sha256 "28d19110765e78701b512cf81aba23e4a823e3f502c6e87c7e247554da748cfe"
+  url "https://github.com/fanout/condure/archive/1.7.0.tar.gz"
+  sha256 "ca0c350731fc11eba0e7c28ffb4cc231a7c2142c458d77dff29627b0af7b458a"
   license "Apache-2.0"
 
   bottle do
-    rebuild 2
-    sha256 cellar: :any, arm64_big_sur: "49a9a397891392a99536028f60a15d951c942764e96f37ea7bab668710217ec6"
-    sha256 cellar: :any, big_sur:       "4e037359206bf4563fc7c7d64809d7e22905d1624ddda1047d0b92aa81a51b88"
-    sha256 cellar: :any, catalina:      "26957f142c585546573cadf4f89475803d55f308d3d63c51ee1248a70af3dd40"
-    sha256 cellar: :any, mojave:        "09bed07fabc6999a7eaf9f44ab25085b64ca9400fd2988328226f2fbba37d428"
-    sha256 cellar: :any, high_sierra:   "080bfe369f308022f3f766f7d9034e15114e17db0911dae9a37e482eb07954bf"
+    sha256 cellar: :any,                 arm64_monterey: "1030408f7784b124a187130f04d096a089b3e89675f50f08b512d40eb8310523"
+    sha256 cellar: :any,                 arm64_big_sur:  "cf17625a77e47278dbcfcc68ba0eec040080976641c93851ef41e5309a715efb"
+    sha256 cellar: :any,                 monterey:       "2d77e63d5307612fa4a93edcb935777dd4312e688ffc563541e17325527ff35b"
+    sha256 cellar: :any,                 big_sur:        "345e93d43f1ca1d4e0c60ccaacdf47a12d583725daebcf956928c238eb628f85"
+    sha256 cellar: :any,                 catalina:       "44ca84ed977424ef1d8d2edd84d5a5e9b105f0f55a34c102e9e36b2a3692b4c9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a364fff377b21ca26057de61082b7db2a6d65a38d631c44e9e4d1f697faa11f6"
   end
 
   depends_on "pkg-config" => :build
   depends_on "rust" => :build
-  depends_on "python@3.9" => :test
+  depends_on "python@3.10" => :test
   depends_on "openssl@1.1"
   depends_on "zeromq"
 
   resource "pyzmq" do
-    url "https://files.pythonhosted.org/packages/86/08/e5fc492317cc9d65b32d161c6014d733e8ab20b5e78e73eca63f53b17004/pyzmq-19.0.1.tar.gz"
-    sha256 "13a5638ab24d628a6ade8f794195e1a1acd573496c3b85af2f1183603b7bf5e0"
+    url "https://files.pythonhosted.org/packages/72/37/d5603f352522e249e44ee767a8a59b3fe7cf7f708a94fd40a637c6890add/pyzmq-23.2.1.tar.gz"
+    sha256 "2b381aa867ece7d0a82f30a0c7f3d4387b7cf2e0697e33efaa5bed6c5784abcd"
   end
 
   resource "tnetstring3" do
@@ -38,15 +40,9 @@ class Condure < Formula
     ipcfile = testpath/"client"
     runfile = testpath/"test.py"
 
-    resource("pyzmq").stage do
-      system Formula["python@3.9"].opt_bin/"python3",
-      *Language::Python.setup_install_args(testpath/"vendor")
-    end
-
-    resource("tnetstring3").stage do
-      system Formula["python@3.9"].opt_bin/"python3",
-      *Language::Python.setup_install_args(testpath/"vendor")
-    end
+    venv = virtualenv_create(testpath/"vendor", "python3.10")
+    venv.pip_install resource("pyzmq")
+    venv.pip_install resource("tnetstring3")
 
     runfile.write(<<~EOS,
       import threading
@@ -88,9 +84,7 @@ class Condure < Formula
     end
 
     begin
-      xy = Language::Python.major_minor_version Formula["python@3.9"].opt_bin/"python3"
-      ENV["PYTHONPATH"] = testpath/"vendor/lib/python#{xy}/site-packages"
-      system Formula["python@3.9"].opt_bin/"python3", runfile
+      system testpath/"vendor/bin/python3", runfile
     ensure
       Process.kill("TERM", pid)
       Process.wait(pid)

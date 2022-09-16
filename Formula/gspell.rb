@@ -1,16 +1,18 @@
 class Gspell < Formula
   desc "Flexible API to implement spellchecking in GTK+ applications"
   homepage "https://wiki.gnome.org/Projects/gspell"
-  url "https://download.gnome.org/sources/gspell/1.8/gspell-1.8.4.tar.xz"
-  sha256 "cf4d16a716e813449bd631405dc1001ea89537b8cdae2b8abfb3999212bd43b4"
+  url "https://download.gnome.org/sources/gspell/1.10/gspell-1.10.0.tar.xz"
+  sha256 "803bb884c0215d3fd22a85d7f30423aff88d9792f05a5199d8a489a2ffaae1da"
   license "LGPL-2.1-or-later"
   revision 1
 
   bottle do
-    sha256 arm64_big_sur: "95eb286c8aeeb8ce8b3342e96b44c028d6e0d0a8480028a69fdba8571e97caf6"
-    sha256 big_sur:       "8f64c612f1821ce72363a92af87bd7b31a72a97b63979c890b2325397bdbd0f7"
-    sha256 catalina:      "ddcf9d182d0248a598860a2657ab0fc029b5fe2c14c1079e9600355fa6fa5486"
-    sha256 mojave:        "0b780e3db25001367090861c8867b0b4f06a8df1512f7f32e858a7b0d1200b34"
+    sha256 arm64_monterey: "9102f866c84b027e06b66e499a68aa3e961b0d0d7028365ed08aa85da0ed32ff"
+    sha256 arm64_big_sur:  "acdc517ea5c19323f0f92f8a7ddd2ef2ace672373abe5ec43e86403bb162b224"
+    sha256 monterey:       "cb88a9aecaf314b56977c9b9f9970ead4548556b8d46db4f8de86817004c73c5"
+    sha256 big_sur:        "5cbbf56cda623114fe425da2f8cdc2ff70fee4b69426459232ccc46371c6bcaf"
+    sha256 catalina:       "0f4dd2be2efba396adc89b94b3e2ade6206c5d8b4263fca4bb6fefb104b15566"
+    sha256 x86_64_linux:   "50efdf695eb3f553fa52cabbf2b361e5fd1e70f177afbd904708050960fa2c70"
   end
 
   depends_on "autoconf" => :build
@@ -32,10 +34,8 @@ class Gspell < Formula
   patch :DATA
 
   def install
-    system "autoreconf", "-if"
-    system "./configure", "--disable-dependency-tracking",
-                          "--disable-silent-rules",
-                          "--prefix=#{prefix}"
+    system "autoreconf", "--force", "--install", "--verbose"
+    system "./configure", *std_configure_args, "--disable-silent-rules"
     system "make", "install"
   end
 
@@ -74,7 +74,7 @@ class Gspell < Formula
       -I#{glib.opt_include}/glib-2.0
       -I#{glib.opt_lib}/glib-2.0/include
     ]
-    on_macos do
+    if OS.mac?
       gtk_mac_integration = Formula["gtk-mac-integration"]
       flags << "-I#{gtk_mac_integration.opt_include}/gtkmacintegration"
     end
@@ -109,9 +109,7 @@ class Gspell < Formula
       -lpango-1.0
       -lpangocairo-1.0
     ]
-    on_macos do
-      flags << "-lintl"
-    end
+    flags << "-lintl" if OS.mac?
     system ENV.cc, "test.c", "-o", "test", *flags
     ENV["G_DEBUG"] = "fatal-warnings"
 
@@ -130,7 +128,7 @@ index 076a9fd..6c67184 100644
 	$(BUILT_SOURCES)
 
  libgspell_core_la_LIBADD =	\
-+	$(GTK_MAC_LIBS)		\
++	$(GTK_MAC_LIBS) \
 	$(CODE_COVERAGE_LIBS)
 
  libgspell_core_la_CFLAGS =	\

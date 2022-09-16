@@ -1,16 +1,17 @@
 class Genact < Formula
   desc "Nonsense activity generator"
   homepage "https://github.com/svenstaro/genact"
-  url "https://github.com/svenstaro/genact/archive/v0.10.0.tar.gz"
-  sha256 "c8db67ba56e7c327540cb5a883abcb0ab682378e9dacef79056502f32ad3c759"
+  url "https://github.com/svenstaro/genact/archive/v1.1.1.tar.gz"
+  sha256 "231ea3735c59a659264d11b7ef1a6a2572c73f7bd7c9cb3efb940709673b58bf"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "b0ca573fdebdaa5c89bb0216c0d550b75b6e887eecbbf70f5ce50407a6b74719"
-    sha256 cellar: :any_skip_relocation, big_sur:       "2893eecf7c750540e11f2548800950cba608e9b244975acaa8bc69e4069de7db"
-    sha256 cellar: :any_skip_relocation, catalina:      "cda834ea05c4403ebf7555ff32233141eda5d6e1c05cf88c2c601e88d72e27f9"
-    sha256 cellar: :any_skip_relocation, mojave:        "a8e61aa9d3683aaedd59154030f154a8bfbfcc8fceec399a1b51b03ae37091d3"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "d52830ec3b3744074df6193d3c714f9572472969bc610236813441ea257a8de6"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "89ed51d8655586d5ad825d68a32024928f6dd3e320bffb41a8904358a145e49e"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d00008a0d2d508b2bfa99893b9b8a639aa205070c15e57ff6a3910a3c405ca85"
+    sha256 cellar: :any_skip_relocation, monterey:       "f7eb817897921a01a64cff11536b366f8937c5974f88e70a6d3223258cbce898"
+    sha256 cellar: :any_skip_relocation, big_sur:        "a45b49d4bda05d0fc9556c5925c4aea53bc89017ede5477a0d9be2620ef36623"
+    sha256 cellar: :any_skip_relocation, catalina:       "80da481cd24279859017296c0124a2aca438ed115b703bd6a5442af73b5f67c3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "bacc60d0958df84d21d9a4b36cc6cce0088faa56fd4be03e973994cb8ef75098"
   end
 
   depends_on "rust" => :build
@@ -20,6 +21,6 @@ class Genact < Formula
   end
 
   test do
-    assert_match /Available modules:/, shell_output("#{bin}/genact --list-modules")
+    assert_match "Available modules:", shell_output("#{bin}/genact --list-modules")
   end
 end

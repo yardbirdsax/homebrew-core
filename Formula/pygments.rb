@@ -3,19 +3,21 @@ class Pygments < Formula
 
   desc "Generic syntax highlighter"
   homepage "https://pygments.org/"
-  url "https://files.pythonhosted.org/packages/e1/86/8059180e8217299079d8719c6e23d674aadaba0b1939e25e0cc15dcf075b/Pygments-2.7.4.tar.gz"
-  sha256 "df49d09b498e83c1a73128295860250b0b7edd4c723a32e9bc0d295c7c2ec337"
+  url "https://files.pythonhosted.org/packages/e0/ef/5905cd3642f2337d44143529c941cc3a02e5af16f0f65f81cbef7af452bb/Pygments-2.13.0.tar.gz"
+  sha256 "56a8508ae95f98e2b9bdf93a6be5ae3f7d8af858b43e02c5a2ff083726be40c1"
   license "BSD-2-Clause"
-  head "https://github.com/pygments/pygments.git"
+  head "https://github.com/pygments/pygments.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "a03ce270d1a5bc2b1b0b59b07939f041a433873fb89c3cb48df1d89ef9df8443"
-    sha256 cellar: :any_skip_relocation, big_sur:       "ba143cb212e8a0e5065d46784c113d120b620dfc03bf01de940aea49c024b18f"
-    sha256 cellar: :any_skip_relocation, catalina:      "9725becf19d65286936b2a260b4c9da4edc17240d7f91b896993393b227f08fd"
-    sha256 cellar: :any_skip_relocation, mojave:        "60e2749b874ba3bf69c7034d2ecbe00b340f2eae14a5ca5c9362e3f1ea1695ab"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "b4c7d99905c7d9895a5480f2f2f1c2a5298e3deb6672f4ff095b6d0901b63ee1"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b4c7d99905c7d9895a5480f2f2f1c2a5298e3deb6672f4ff095b6d0901b63ee1"
+    sha256 cellar: :any_skip_relocation, monterey:       "160c038d24aa8d3ad62b15846e72fa092738132c4c33d8382db29b1f771d06e8"
+    sha256 cellar: :any_skip_relocation, big_sur:        "160c038d24aa8d3ad62b15846e72fa092738132c4c33d8382db29b1f771d06e8"
+    sha256 cellar: :any_skip_relocation, catalina:       "160c038d24aa8d3ad62b15846e72fa092738132c4c33d8382db29b1f771d06e8"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6c21d509491a4667da89fb9a3c3de978b0b9fc62426c6df146a46552be05047f"
   end
 
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   def install
     bash_completion.install "external/pygments.bashcomp" => "pygmentize"

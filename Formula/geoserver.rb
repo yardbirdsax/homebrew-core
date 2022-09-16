@@ -1,8 +1,8 @@
 class Geoserver < Formula
   desc "Java server to share and edit geospatial data"
-  homepage "http://geoserver.org/"
-  url "https://downloads.sourceforge.net/project/geoserver/GeoServer/2.18.2/geoserver-2.18.2-bin.zip"
-  sha256 "66aaf2eb0a8704e832a12cba012af9ff78a8f78cc9904e551c293e2defd5210c"
+  homepage "https://geoserver.org/"
+  url "https://downloads.sourceforge.net/project/geoserver/GeoServer/2.21.1/geoserver-2.21.1-bin.zip"
+  sha256 "2e7eef1d4fc9f3479d3896cbde501ecd7ae4fa3250da619663dfbad46ca22d79"
 
   # GeoServer releases contain a large number of files for each version, so the
   # SourceForge RSS feed may only contain the most recent version (which may
@@ -14,7 +14,9 @@ class Geoserver < Formula
     regex(%r{href=(?:["']|.*?GeoServer/)?v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "1710bcfe0d00c290ab19922aa6489b306e592cffcecac7609020b46e4f7f47c9"
+  end
 
   def install
     libexec.install Dir["*"]

@@ -4,9 +4,10 @@
 class Mu < Formula
   desc "Tool for searching e-mail messages stored in the maildir-format"
   homepage "https://www.djcbsoftware.nl/code/mu/"
-  url "https://github.com/djcb/mu/archive/1.4.15.tar.gz"
-  sha256 "e19900a68b6d26d2e01bf002b8ffaa97916239eca4d7104b7bc57db0add406b2"
+  url "https://github.com/djcb/mu/releases/download/v1.8.10/mu-1.8.10.tar.xz"
+  sha256 "a60b330e8a360255134b1fa1d9f672363ebf318d5cbe4b4b0bee1e9f94ae15c9"
   license "GPL-3.0-or-later"
+  head "https://github.com/djcb/mu.git", branch: "master"
 
   # We restrict matching to versions with an even-numbered minor version number,
   # as an odd-numbered minor version number indicates a development version:
@@ -17,23 +18,19 @@ class Mu < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "d7a73a634d7b10e4c1bad9879d5f2b17bdaf1261ed8bfcf231c8a45a4ac7bd3e"
-    sha256 cellar: :any, big_sur:       "156897a7a8054b5d6621bfb8dead7bedf0479e8bf30e8bbd705f35e2bfbf6654"
-    sha256 cellar: :any, catalina:      "2352f980cdc3e560e3901cf91f0163b8f9c4fad08b935646c38abc3cc076f6ba"
-    sha256 cellar: :any, mojave:        "2543a69a0ea5f7c8aeca43e71f6c79bca8332fb2fa5d449c766a7f74462eb6e8"
+    sha256 arm64_monterey: "3f2560981abd6a016c0a87ea0e2c22c8516c59cd48b1193d64b0faa07df0460d"
+    sha256 arm64_big_sur:  "b13e3b82950a4b60b63d7a6328646f6d4183ff1e2cef5199a797b84a871afb3d"
+    sha256 monterey:       "afdfec52961a37a6e1f047903f16e25b7eacff5d5ae442c2c1b4cce2ef9cffd4"
+    sha256 big_sur:        "56c7955f0b306add81f45755a12bff3e0199b1c46549c2a70f348c6b45837c86"
+    sha256 catalina:       "5f9a9fc7d6ebab692dcb2d7f1c5d8937f47c48cc0e44bebd7e2142d26fa3586d"
+    sha256 x86_64_linux:   "e615b5e61c118528aabd1c265426d4b9b16f2e2aabf08cbae799e22cfddf72cf"
   end
 
-  head do
-    url "https://github.com/djcb/mu.git"
-
-    depends_on "autoconf-archive" => :build
-  end
-
-  depends_on "autoconf" => :build
-  depends_on "automake" => :build
   depends_on "emacs" => :build
   depends_on "libgpg-error" => :build
   depends_on "libtool" => :build
+  depends_on "meson" => :build
+  depends_on "ninja" => :build
   depends_on "pkg-config" => :build
   depends_on "gettext"
   depends_on "glib"
@@ -42,13 +39,16 @@ class Mu < Formula
 
   uses_from_macos "texinfo" => :build
 
+  conflicts_with "mu-repo", because: "both install `mu` binaries"
+
+  fails_with gcc: "5"
+
   def install
-    system "autoreconf", "-ivf"
-    system "./configure", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}",
-                          "--with-lispdir=#{elisp}"
-    system "make"
-    system "make", "install"
+    mkdir "build" do
+      system "meson", *std_meson_args, "-Dlispdir=#{elisp}", ".."
+      system "ninja", "-v"
+      system "ninja", "install", "-v"
+    end
   end
 
   # Regression test for:

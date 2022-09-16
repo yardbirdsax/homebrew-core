@@ -1,53 +1,47 @@
 class Fish < Formula
   desc "User-friendly command-line shell for UNIX-like operating systems"
   homepage "https://fishshell.com"
-  url "https://github.com/fish-shell/fish-shell/releases/download/3.1.2/fish-3.1.2.tar.gz"
-  sha256 "d5b927203b5ca95da16f514969e2a91a537b2f75bec9b21a584c4cd1c7aa74ed"
-  license "GPL-2.0"
+  url "https://github.com/fish-shell/fish-shell/releases/download/3.5.1/fish-3.5.1.tar.xz"
+  sha256 "a6d45b3dc5a45dd31772e7f8dfdfecabc063986e8f67d60bd7ca60cc81db6928"
+  license "GPL-2.0-only"
 
   livecheck do
     url :stable
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
+  pour_bottle? only_if: :default_prefix
+
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "b1257836de799a5204be8289bde8008b616c2fc070b22fec914e044f0a4bd8f2"
-    sha256 cellar: :any_skip_relocation, big_sur:       "ef7f5a2fd69ba2baed78d02ee162cc8fb85644161dd765d47b570b56db9569cf"
-    sha256 cellar: :any_skip_relocation, catalina:      "b158b7f8640feb7c622ff3ca92b1bd88565f274f3e761499f5926bb124eeff7d"
-    sha256 cellar: :any_skip_relocation, mojave:        "6797636eaba364d0cbbc0459103a8767598e985f01846cca6cb57c986dfee7b8"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "2609577a0d9f6b661331adccf5d1d8e010662ffe128869757e0af9a6760e26fb"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "13e8e8cbb8dff7100071fa3c6b6ac1c8020391bebb6ee6bc09a30f6596b745b6"
+    sha256 cellar: :any,                 arm64_big_sur:  "b89a98ad4bd08705fa846414067b107108306ae7ad8b36262c4ea1f2de416ebc"
+    sha256 cellar: :any,                 monterey:       "0586d93e70fdf0fdc28f9043f95fb64034fb1b2bca6d02a4dbc8e18b0c057057"
+    sha256 cellar: :any,                 big_sur:        "d5af21044ac5b8974411fed9b51ffaad19410194f14a78c4545a9d5b836de0c9"
+    sha256 cellar: :any,                 catalina:       "a071642cc6bcc7e5297775f4a7b702388e6b34aa22a1beb348f765f2eb6c0c9e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c8ed12388a0f26f7f242efdd492e9f439e4a5cff0167f6e22c26ca1b44d11dbd"
   end
 
   head do
-    url "https://github.com/fish-shell/fish-shell.git", shallow: false
+    url "https://github.com/fish-shell/fish-shell.git", branch: "master"
 
     depends_on "sphinx-doc" => :build
   end
 
   depends_on "cmake" => :build
+  # Apple ncurses (5.4) is 15+ years old and
+  # has poor support for modern terminals
+  depends_on "ncurses"
   depends_on "pcre2"
 
-  uses_from_macos "ncurses"
-
   def install
-    # Disable code signing in cmake, so we can codesign ourselves in brew
-    # Backport of https://github.com/fish-shell/fish-shell/issues/6952
-    # See https://github.com/fish-shell/fish-shell/issues/7467
-    # Remove in 3.2.0
-    inreplace "CMakeLists.txt", "CODESIGN_ON_MAC(${target})", "" if build.stable?
-
-    # In Homebrew's 'superenv' sed's path will be incompatible, so
-    # the correct path is passed into configure here.
-    args = %W[
-      -Dextra_functionsdir=#{HOMEBREW_PREFIX}/share/fish/vendor_functions.d
-      -Dextra_completionsdir=#{HOMEBREW_PREFIX}/share/fish/vendor_completions.d
-      -Dextra_confdir=#{HOMEBREW_PREFIX}/share/fish/vendor_conf.d
-    ]
-    on_macos do
-      args << "-DSED=/usr/bin/sed"
-    end
-    system "cmake", ".", *std_cmake_args, *args
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args,
+                    "-DCMAKE_INSTALL_SYSCONFDIR=#{etc}",
+                    "-Dextra_functionsdir=#{HOMEBREW_PREFIX}/share/fish/vendor_functions.d",
+                    "-Dextra_completionsdir=#{HOMEBREW_PREFIX}/share/fish/vendor_completions.d",
+                    "-Dextra_confdir=#{HOMEBREW_PREFIX}/share/fish/vendor_conf.d"
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   def post_install

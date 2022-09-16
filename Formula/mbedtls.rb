@@ -1,10 +1,10 @@
 class Mbedtls < Formula
   desc "Cryptographic & SSL/TLS library"
   homepage "https://tls.mbed.org/"
-  url "https://github.com/ARMmbed/mbedtls/archive/mbedtls-2.25.0.tar.gz"
-  sha256 "ea2049c2dd4868693998d5a9780e198194be5aea1706ff4a9d4f882f18c0a101"
+  url "https://github.com/Mbed-TLS/mbedtls/archive/mbedtls-3.2.1.tar.gz"
+  sha256 "5850089672560eeaca03dc36678ee8573bb48ef6e38c94f5ce349af60c16da33"
   license "Apache-2.0"
-  head "https://github.com/ARMmbed/mbedtls.git", branch: "development"
+  head "https://github.com/Mbed-TLS/mbedtls.git", branch: "development"
 
   livecheck do
     url :stable
@@ -13,28 +13,38 @@ class Mbedtls < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "785f8faddef2276f59790346f8841f4e330482d438e3bbfd9f4108dfb5ca279e"
-    sha256 cellar: :any, big_sur:       "35a4787c9909ce5a07a2493a66f29a9c28b15adf22c1a11aed84fc4af473e51c"
-    sha256 cellar: :any, catalina:      "62225a9f1f13ac7994b6fd5d842ff98177b5c91acbfeae9fdf1e6dd8d38ed767"
-    sha256 cellar: :any, mojave:        "141066621c3a63f86614e3d13b781e33f80816119f8adf50a07c014537eb891d"
+    sha256 cellar: :any,                 arm64_monterey: "21009291bc1c17051363355c2815cd4826603f3a3f4d0d071f78a78be2b22ae9"
+    sha256 cellar: :any,                 arm64_big_sur:  "772fc2c15da4aa90218b3afdcb1c2cd076dd8333f89c951a4946fca5cbfcd227"
+    sha256 cellar: :any,                 monterey:       "b473d94ce270b5b795b842708329334a04eec7cb43fa15f4e06d9e66f8d48e3d"
+    sha256 cellar: :any,                 big_sur:        "c6788160e03dfe51b88224991adecef63c269c1033349aa66e5b2b69c9247e88"
+    sha256 cellar: :any,                 catalina:       "a3cba57dd337562c7793f7afc32e6ce0406c5ad31211a3250ebe7cd0b3ce9229"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "eb233f2a360971476b190253ab1e778800309ced62c44f3409cd0d1af7a73d25"
   end
 
   depends_on "cmake" => :build
-  depends_on "python@3.9" => :build
+  depends_on "python@3.10" => :build
 
   def install
-    inreplace "include/mbedtls/config.h" do |s|
+    inreplace "include/mbedtls/mbedtls_config.h" do |s|
       # enable pthread mutexes
       s.gsub! "//#define MBEDTLS_THREADING_PTHREAD", "#define MBEDTLS_THREADING_PTHREAD"
       # allow use of mutexes within mbed TLS
       s.gsub! "//#define MBEDTLS_THREADING_C", "#define MBEDTLS_THREADING_C"
     end
 
-    system "cmake", "-DUSE_SHARED_MBEDTLS_LIBRARY=On",
-      "-DPython3_EXECUTABLE=#{Formula["python@3.9"].opt_bin}/python3",
-      *std_cmake_args
-    system "make"
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build",
+                    "-DUSE_SHARED_MBEDTLS_LIBRARY=On",
+                    "-DPython3_EXECUTABLE=#{which("python3.10")}",
+                    "-DCMAKE_INSTALL_RPATH=#{rpath}",
+                    "-DGEN_FILES=OFF",
+                    *std_cmake_args
+    system "cmake", "--build", "build"
+    # We run CTest because this is a crypto library. Running tests in parallel causes failures.
+    # https://github.com/Mbed-TLS/mbedtls/issues/4980
+    with_env(CC: DevelopmentTools.locate(DevelopmentTools.default_compiler)) do
+      system "ctest", "--parallel", "1", "--test-dir", "build", "--rerun-failed", "--output-on-failure"
+    end
+    system "cmake", "--install", "build"
 
     # Why does Mbedtls ship with a "Hello World" executable. Let's remove that.
     rm_f bin/"hello"

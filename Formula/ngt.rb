@@ -1,31 +1,34 @@
 class Ngt < Formula
   desc "Neighborhood graph and tree for indexing high-dimensional data"
   homepage "https://github.com/yahoojapan/NGT"
-  url "https://github.com/yahoojapan/NGT/archive/v1.13.3.tar.gz"
-  sha256 "4d1705e03d784b089af35a923cb486ba8a56781d69e93234f86e4acb3a8aac4f"
+  url "https://github.com/yahoojapan/NGT/archive/v1.14.6.tar.gz"
+  sha256 "5d7b092855ecea76f6dcf439beeba774a36893aaf7a61732de07068449f6f86f"
   license "Apache-2.0"
 
   livecheck do
     url :stable
-    regex(/^v?(\d+(?:\.\d+)+)$/i)
+    strategy :github_latest
   end
 
   bottle do
-    sha256 arm64_big_sur: "2904b34765e80cab35c4ba6eced566acebd6ccc785dc0b02cda507d1fce44256"
-    sha256 big_sur:       "abb91b335f7adc31fe0406e29f5dee6c485c966fed3f24abaadf2f0f110d6fbe"
-    sha256 catalina:      "5bb09741c501f1dfec11e46652022c929de3d79d7a268fa52f90e3d2dbde41a4"
-    sha256 mojave:        "b00f6760adccd430822d17e27b8fd3202ff332a5a8bb93734e5e0b8ebcc01958"
+    sha256 cellar: :any,                 arm64_monterey: "396c9824989332a89bbfba2181f3f254b43c7c6200bb54e67650f67c2b0fbf78"
+    sha256 cellar: :any,                 arm64_big_sur:  "935d284d92326d4f94e2dbe711649e315c9806fca44f53ffdd0b8e3ac778ec15"
+    sha256 cellar: :any,                 monterey:       "95b5ee150031b09d5944456a521f6dd1645409ccf00f1204cd9ee078b8af5b7c"
+    sha256 cellar: :any,                 big_sur:        "67ab721ab751f4ee0cace5ee748b8d6c2eda40667b8102ccd623879cf0817b7f"
+    sha256 cellar: :any,                 catalina:       "9b1d239e62573e9eddfa500106acc7d90e9154362930b7d1be90c7769a71ed11"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7492d0e49321729aaf643453315b7cd733f12dae20386aa1d86158638213cb9a"
   end
 
   depends_on "cmake" => :build
-  depends_on "libomp"
+
+  on_macos do
+    depends_on "libomp"
+  end
 
   def install
-    mkdir "build" do
-      system "cmake", "..", *std_cmake_args, "-DCMAKE_INSTALL_RPATH=#{lib}"
-      system "make"
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args, "-DCMAKE_INSTALL_RPATH=#{rpath}"
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
     pkgshare.install "data"
   end
 

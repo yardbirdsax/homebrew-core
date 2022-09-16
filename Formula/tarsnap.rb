@@ -1,41 +1,41 @@
 class Tarsnap < Formula
   desc "Online backups for the truly paranoid"
   homepage "https://www.tarsnap.com/"
-  url "https://www.tarsnap.com/download/tarsnap-autoconf-1.0.39.tgz"
-  sha256 "5613218b2a1060c730b6c4a14c2b34ce33898dd19b38fb9ea0858c5517e42082"
+  url "https://www.tarsnap.com/download/tarsnap-autoconf-1.0.40.tgz"
+  sha256 "bccae5380c1c1d6be25dccfb7c2eaa8364ba3401aafaee61e3c5574203c27fd5"
   license "0BSD"
-  revision 1
 
   livecheck do
-    url "https://www.tarsnap.com/download/"
-    regex(/href=.*?tarsnap-autoconf[._-]v?(\d+(?:\.\d+)+)\.t/i)
+    url "https://www.tarsnap.com/download.html"
+    regex(/href=.*?tarsnap-autoconf[._-]v?(\d+(?:\.\d+)+[a-z]?)\.t/i)
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "879ca63de6f2c293dd325fe0cf7a7284cf5603bf5efcc6fc5159ddb676d1163d"
-    sha256 cellar: :any, big_sur:       "db0fceeaf2b93d4d7588ef1b3c0ac69080595e4fd05311fb3d61ccb95c9f9ae0"
-    sha256 cellar: :any, catalina:      "afa6ebfefbc93faf12ac6576f26edb0b68c6a47cc65b893d590ea1efd4301fb4"
-    sha256 cellar: :any, mojave:        "c6c97cd8e16ba02f7997d1d269373dca82d4a3d188b89dc3532c8149e277bd02"
-    sha256 cellar: :any, high_sierra:   "847aae76230beaedfa23ea0a0f375864a8af6063c8539634637ab218a425540d"
-    sha256 cellar: :any, sierra:        "dbf1a477d46c723a3cebb6b1001771bf51956035ea3369b5e2451c091cad5930"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "2f85cb28a47e95f3c56f4e8f46fd0dbc93fd08e4bba009316496d0cfbcbf97c7"
+    sha256 cellar: :any,                 arm64_big_sur:  "1568e243b45336f4056edd5b318089467241896d2e61495cc96d0ad69cdf3faf"
+    sha256 cellar: :any,                 monterey:       "f63b7b06c773b38efe542a851cd978b21019c2387c54afb63be12b4341637e30"
+    sha256 cellar: :any,                 big_sur:        "d5e0ed53466a5fe9b2a0be1cc1870ca6a98a06a34068ea6549b57de7b7a1862e"
+    sha256 cellar: :any,                 catalina:       "4240cae3fe32207826e333930377408f7832a4404fd033d6cba331d56cd98c09"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d95c422ceceb7439b60c44c9412639deb8eb9a9a9a5c539fdb3a164cc11e0e92"
   end
 
   head do
-    url "https://github.com/Tarsnap/tarsnap.git"
+    url "https://github.com/Tarsnap/tarsnap.git", branch: "master"
     depends_on "autoconf" => :build
     depends_on "automake" => :build
   end
 
   depends_on "openssl@1.1"
 
-  def install
-    # dyld: lazy symbol binding failed: Symbol not found: _clock_gettime
-    # Reported 20 Aug 2017 https://github.com/Tarsnap/tarsnap/issues/286
-    if MacOS.version == :el_capitan && MacOS::Xcode.version >= "8.0"
-      inreplace "libcperciva/util/monoclock.c", "CLOCK_MONOTONIC",
-                                                "UNDEFINED_GIBBERISH"
-    end
+  uses_from_macos "bzip2"
+  uses_from_macos "zlib"
 
+  on_linux do
+    depends_on "e2fsprogs" => :build
+  end
+
+  def install
     system "autoreconf", "-iv" if build.head?
 
     args = %W[

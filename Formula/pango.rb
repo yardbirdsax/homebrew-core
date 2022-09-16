@@ -1,16 +1,18 @@
 class Pango < Formula
   desc "Framework for layout and rendering of i18n text"
-  homepage "https://www.pango.org/"
-  url "https://download.gnome.org/sources/pango/1.48/pango-1.48.1.tar.xz"
-  sha256 "08c2d550a96559f15fb317d7167b96df57ef743fef946f4e274bd8b6f2918058"
+  homepage "https://pango.gnome.org"
+  url "https://download.gnome.org/sources/pango/1.50/pango-1.50.9.tar.xz"
+  sha256 "1b636aabf905130d806372136f5e137b6a27f26d47defd9240bf444f6a4fe610"
   license "LGPL-2.0-or-later"
-  head "https://gitlab.gnome.org/GNOME/pango.git"
+  head "https://gitlab.gnome.org/GNOME/pango.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "61423401e031618466684aded96340d6df28170d679126342206a4e5b7114851"
-    sha256 cellar: :any, big_sur:       "a370a18fe0ed8f328b1e059047d8e3f5ec6962e61eef8bb73dddc687929abdfe"
-    sha256 cellar: :any, catalina:      "218767642ce196886e84c3968f4c0c4f6139ac13feecb911eef2d0c040034d99"
-    sha256 cellar: :any, mojave:        "4dc2faae3e57781d8b1d6751c1f695386eb624dadde62e83eba739bd36d47702"
+    sha256 cellar: :any, arm64_monterey: "6d1a63e1cfdb50bd7a1222f56890145957736b8c0a0e27ffbbb325bb5f7d74ab"
+    sha256 cellar: :any, arm64_big_sur:  "e20620018d636b5fc03af19bf8b56bde5888209a95b18f67507a1bdabd0941c0"
+    sha256 cellar: :any, monterey:       "9d3e59cd105c6f5be200123f63f955d02d341d6ad9f488260f26e76a68ce2d96"
+    sha256 cellar: :any, big_sur:        "c31ccbcfef47cd541fbb506b79d4dbb547488eb888fff65942f595623b418f3a"
+    sha256 cellar: :any, catalina:       "eb39b9a37dc88c4c292dfbd0f3b33e2ac9230f18b513599a3c1286e4dece8161"
+    sha256               x86_64_linux:   "983cf9007b6d0ec05180d295871b78f6b83384436b4c605eb4d6e0e43bc99731"
   end
 
   depends_on "gobject-introspection" => :build
@@ -19,24 +21,24 @@ class Pango < Formula
   depends_on "pkg-config" => :build
   depends_on "cairo"
   depends_on "fontconfig"
+  depends_on "freetype"
   depends_on "fribidi"
   depends_on "glib"
   depends_on "harfbuzz"
 
   def install
-    mkdir "build" do
-      system "meson", *std_meson_args,
-                      "-Ddefault_library=both",
-                      "-Dintrospection=enabled",
-                      "-Duse_fontconfig=true",
-                      ".."
-      system "ninja", "-v"
-      system "ninja", "install", "-v"
-    end
+    system "meson", *std_meson_args, "build",
+                    "-Ddefault_library=both",
+                    "-Dintrospection=enabled",
+                    "-Dfontconfig=enabled",
+                    "-Dcairo=enabled",
+                    "-Dfreetype=enabled"
+    system "meson", "compile", "-C", "build", "-v"
+    system "meson", "install", "-C", "build"
   end
 
   test do
-    system "#{bin}/pango-view", "--version"
+    system bin/"pango-view", "--version"
     (testpath/"test.c").write <<~EOS
       #include <pango/pangocairo.h>
 
@@ -80,9 +82,7 @@ class Pango < Formula
       -lpango-1.0
       -lpangocairo-1.0
     ]
-    on_macos do
-      flags << "-lintl"
-    end
+    flags << "-lintl" if OS.mac?
     system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"
   end

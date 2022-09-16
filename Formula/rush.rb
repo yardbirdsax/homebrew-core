@@ -1,18 +1,18 @@
 class Rush < Formula
   desc "GNU's Restricted User SHell"
   homepage "https://www.gnu.org/software/rush/"
-  url "https://ftp.gnu.org/gnu/rush/rush-2.1.tar.xz"
-  mirror "https://ftpmirror.gnu.org/rush/rush-2.1.tar.xz"
-  sha256 "c2ff487d44ce3d14854d0269eb0aa4c0f98bcca35390fad5ea52da75d9e4abdf"
+  url "https://ftp.gnu.org/gnu/rush/rush-2.3.tar.xz"
+  mirror "https://ftpmirror.gnu.org/rush/rush-2.3.tar.xz"
+  sha256 "8cae258247cd2623e856ea5e2c62cd7f09e9e3e043e6fc63bbd1abec3d3fdd93"
   license "GPL-3.0"
 
   bottle do
-    sha256 arm64_big_sur: "e9969a26058fc567b5b5f342aabdc07a6c3ce7cebcf638e0b27a7dd4ef982a65"
-    sha256 big_sur:       "c17a6969b3c949a756de8a5c60c8c916a485fffa6751aa8b365982ebfa66a676"
-    sha256 catalina:      "a818df5c93d76a0a53c47108af3009a6d8265722d132204a636e29460693ac0d"
-    sha256 mojave:        "5cdc9e464c7086e99e26063787dfefafd4805d90b0ea5aa40044b81f23d10db1"
-    sha256 high_sierra:   "a76250fc5b34898050b9e18abd00dffbefd2c37dcd021b37d30bef75574abe49"
-    sha256 sierra:        "55acb177bf3b6c2d041341b9a625ac10c6aba1237974febd66e40f1a7ec23319"
+    sha256 arm64_monterey: "c40ad559ccaebe83031cb3118bdcc2ade53433fd9d733a3e750a8593e44c54d4"
+    sha256 arm64_big_sur:  "c3031fa858e73ad07c42be20c11c97f8b8b46c52f3ae9c695fa5191751db7784"
+    sha256 monterey:       "5833155618b0bf4e4a0e2ee646a7f8585c4ef541f5548911d4eb09af38131327"
+    sha256 big_sur:        "b9fe9b70c28fb4bbe8427f1465cd9b99deabdbf10de7260801f95d1181f8e8b2"
+    sha256 catalina:       "e382adfc56df5e2fd3075f9183e0513ce85ed7358699f935272d57411d7979b9"
+    sha256 x86_64_linux:   "d00ab93f179b7714db5dd3eb7f2679f31cfa2fda5596387d9d6f310a6a931129"
   end
 
   def install

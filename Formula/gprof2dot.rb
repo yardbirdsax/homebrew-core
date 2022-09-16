@@ -3,22 +3,22 @@ class Gprof2dot < Formula
 
   desc "Convert the output from many profilers into a Graphviz dot graph"
   homepage "https://github.com/jrfonseca/gprof2dot"
-  url "https://files.pythonhosted.org/packages/fd/77/3158821acc45cc26d5815d4250275d03c254572ff53c0388af8df168ce78/gprof2dot-2019.11.30.tar.gz"
-  sha256 "b43fe04ebb3dfe181a612bbfc69e90555b8957022ad6a466f0308ed9c7f22e99"
-  license "LGPL-3.0"
-  revision 2
-  head "https://github.com/jrfonseca/gprof2dot.git"
+  url "https://files.pythonhosted.org/packages/ab/0b/fc056b26a90c1836aa6c6e1332372dc13050d384f017e388131854ead8cf/gprof2dot-2022.7.29.tar.gz"
+  sha256 "45b4d298bd36608fccf9511c3fd88a773f7a1abc04d6cd39445b11ba43133ec5"
+  license "LGPL-3.0-or-later"
+  head "https://github.com/jrfonseca/gprof2dot.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "684c64da289229aa5f3b0cba37aded80aa5ce8e771cd863d3b06788fdcce532a"
-    sha256 cellar: :any_skip_relocation, big_sur:       "e9834915198ff976dfc33b51aad580cdc585b19de21bae6ae2c23602e9d85c6f"
-    sha256 cellar: :any_skip_relocation, catalina:      "088de0dd88acd16d009b57229dc45028277d9a3401e7902208e0cde1972d75e0"
-    sha256 cellar: :any_skip_relocation, mojave:        "0d693183049e2ee10e946134997c9a0cd23a8ca335705080b0dce1af1831884c"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "b2396cc1daa5759af6642a8e85b66d447e3ff3f0395db74429d6969e62823f7c"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "831640a98f7f89f6afc897886d99c740315a4645f12948a7a94b433c9ef4b05e"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ef5ba7adfdd575dcca5d834d625b93f4c52f3198a6f5dfe72b12e09787bfdc7d"
+    sha256 cellar: :any_skip_relocation, monterey:       "6fcbb85db16b9a6d16e64261aa4ad622c43e8dba810746f5907bcc365a936477"
+    sha256 cellar: :any_skip_relocation, big_sur:        "275a457e221c3a500be1d51c769a0596b4e6ac9fb21ee5d3170e30d772ea45fb"
+    sha256 cellar: :any_skip_relocation, catalina:       "9093757342d285238eb6edb66d424d2ad36f685eb903fd6572302484c4c23755"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "427e0e3e99b450dd431970178853927d840018e476f5eddbac44884b216db638"
   end
 
   depends_on "graphviz"
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   on_linux do
     depends_on "libx11"

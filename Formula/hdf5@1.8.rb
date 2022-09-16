@@ -1,18 +1,24 @@
 class Hdf5AT18 < Formula
   desc "File format designed to store large amounts of data"
   homepage "https://www.hdfgroup.org/HDF5"
+  # NOTE: 1.8.23 is expected to be the last release for HDF5-1.8
+  # (see: https://portal.hdfgroup.org/display/support/HDF5%201.8.22#HDF51.8.22-futureFutureofHDF5-1.8).
   url "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/hdf5-1.8.22/src/hdf5-1.8.22.tar.bz2"
-  sha256 "0ac77e1c22bce5bbbdb337bd7f97aeb5ef43c727a84ccb6d683d092eb57ebd8e"
+  sha256 "689b88c6a5577b05d603541ce900545779c96d62b6f83d3f23f46559b48893a4"
+  revision 4
 
   livecheck do
-    url "https://support.hdfgroup.org/ftp/HDF5/current18/src/"
-    regex(/href=.*?hdf5[._-]v?(\d+(?:\.\d+)+)\.t/i)
+    url "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8/"
+    regex(%r{href=["']?hdf5[._-]v?(\d+(?:\.\d+)+)/?["' >]}i)
   end
 
   bottle do
-    sha256 cellar: :any, big_sur:  "e48732946d17c335fa5a76755f84740bb28871fff41776dbe283952f5729fc24"
-    sha256 cellar: :any, catalina: "b5143d69b2ef67f5811e24bbefc2b762b4bd65355c7bd572a2b8bae449d5e295"
-    sha256 cellar: :any, mojave:   "f2669a1ae176f1ffd9f408ad0e66d42a864fb921e1750ca100d83f54c3c5ad31"
+    sha256 cellar: :any,                 arm64_monterey: "21575ec969a79e88eef424a823ebb9f7fe85c96f982faf46a5043f4ad55defb9"
+    sha256 cellar: :any,                 arm64_big_sur:  "a67e86e9a05c5a5d39137d11a4621162181815c20e9c27c7f48c7f129be65db2"
+    sha256 cellar: :any,                 monterey:       "8d88ab9a75698dff01d2e2de7a0eb130c2e82a576661b693dc4396c59e7c63a6"
+    sha256 cellar: :any,                 big_sur:        "4b788d8b77a6f2cd98c6d32e6952142a31dd1c092a5a369133bd905b0483cd05"
+    sha256 cellar: :any,                 catalina:       "d4e81cfc7df31d2395daba3432682484cd90a5cefe20778ecfefccddda52d2ca"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0e1d82d3c1b0acce553621ac430d55722faf3fa72665beb43c6381966d5fa814"
   end
 
   keg_only :versioned_formula
@@ -21,32 +27,33 @@ class Hdf5AT18 < Formula
   depends_on "automake" => :build
   depends_on "libtool" => :build
   depends_on "gcc" # for gfortran
-  depends_on "szip"
+  depends_on "libaec"
 
   def install
     inreplace %w[c++/src/h5c++.in fortran/src/h5fc.in bin/h5cc.in],
-      "${libdir}/libhdf5.settings",
-      "#{pkgshare}/libhdf5.settings"
+              "${libdir}/libhdf5.settings",
+              "#{pkgshare}/libhdf5.settings"
 
     inreplace "src/Makefile.am", "settingsdir=$(libdir)", "settingsdir=#{pkgshare}"
 
-    system "autoreconf", "-fiv"
-
-    # necessary to avoid compiler paths that include shims directory being used
-    ENV["CC"] = "/usr/bin/cc"
-    ENV["CXX"] = "/usr/bin/c++"
+    system "autoreconf", "--force", "--install", "--verbose"
 
     args = %W[
       --disable-dependency-tracking
       --disable-silent-rules
-      --prefix=#{prefix}
-      --with-szlib=#{Formula["szip"].opt_prefix}
       --enable-build-mode=production
       --enable-fortran
       --disable-cxx
+      --prefix=#{prefix}
+      --with-szlib=#{Formula["libaec"].opt_prefix}
     ]
+    args << "--with-zlib=#{Formula["zlib"].opt_prefix}" if OS.linux?
 
     system "./configure", *args
+
+    # Avoid shims in settings file
+    inreplace "src/libhdf5.settings", Superenv.shims_path/ENV.cc, ENV.cc
+
     system "make", "install"
   end
 

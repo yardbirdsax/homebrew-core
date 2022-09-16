@@ -1,31 +1,35 @@
 class Purescript < Formula
   desc "Strongly typed programming language that compiles to JavaScript"
   homepage "https://www.purescript.org/"
-  url "https://hackage.haskell.org/package/purescript-0.13.8/purescript-0.13.8.tar.gz"
-  sha256 "701fac49de867ec01252b067185e8bbd1b72e4b96997044bac3cca91e3f8096a"
+  url "https://hackage.haskell.org/package/purescript-0.15.4/purescript-0.15.4.tar.gz"
+  sha256 "df279079a7c78c5b1fa813846797e696787f5dd567b1b6e042f7ab6a2701868f"
   license "BSD-3-Clause"
   revision 1
-  head "https://github.com/purescript/purescript.git"
+  head "https://github.com/purescript/purescript.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, catalina:    "3fd65800108e0e185468ca1779a8e6599e1834be1f9f1179da5d964221d82461"
-    sha256 cellar: :any_skip_relocation, mojave:      "2438c8f73284b0c5923f7bace263e0b00b8df592b073127cd4dd16178d512199"
-    sha256 cellar: :any_skip_relocation, high_sierra: "a12832fe00786da347d0069578ff78556aa93890a28e5ae36497e3b4b7f68aab"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "7d2d01f66f7cb985296b1b4801db52a3c47686bba33b4cf36ba8cb405bd45c76"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "64c3b8e647e8fb4b350752742f0368ad53ca0e384a6f0658118d9eb8d3f28a1d"
+    sha256 cellar: :any_skip_relocation, monterey:       "d7ad06ab5c115f7edd2db2644aeeec186cf969ebc7933430a27a0d47cb340236"
+    sha256 cellar: :any_skip_relocation, big_sur:        "ebda8f4eb5ce1151fb27645529426d4c380a3cd3bd6c0782e429985d1167dd58"
+    sha256 cellar: :any_skip_relocation, catalina:       "e9ebb7b6dab162ee3ce9e057f39328a53f15fa7b7558af6e6ea1d8cda9b6cf65"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "67a8df7632e6bd654de3a2963fe3739d6441a7054538a4c1bf6eb7207d535bea"
   end
 
-  depends_on "cabal-install" => :build
-  depends_on "ghc@8.6" => :build
+  depends_on "ghc" => :build
+  depends_on "haskell-stack" => :build
 
   uses_from_macos "ncurses"
   uses_from_macos "zlib"
 
-  depends_on "hpack" => :build if build.head?
-
   def install
-    system "hpack" if build.head?
+    # Use ncurses in REPL, providing an improved experience when editing long
+    # lines in the REPL.
+    # See https://github.com/purescript/purescript/issues/3696#issuecomment-657282303.
+    inreplace "stack.yaml", "terminfo: false", "terminfo: true"
 
-    system "cabal", "v2-update"
-    system "cabal", "v2-install", "-frelease", *std_cabal_v2_args
+    system "stack", "install", "--system-ghc", "--no-install-ghc", "--skip-ghc-check", "--local-bin-path=#{bin}"
   end
 
   test do

@@ -2,23 +2,36 @@ class Tanka < Formula
   desc "Flexible, reusable and concise configuration for Kubernetes using Jsonnet"
   homepage "https://tanka.dev"
   url "https://github.com/grafana/tanka.git",
-      tag:      "v0.14.0",
-      revision: "4b00e2b824c3b113557fd092601b65dedf507fed"
+      tag:      "v0.22.1",
+      revision: "ed87b3829074f6b26f62cea7ee190a43b910c4ec"
   license "Apache-2.0"
-  head "https://github.com/grafana/tanka.git"
+  head "https://github.com/grafana/tanka.git", branch: "main"
+
+  livecheck do
+    url :stable
+    strategy :github_latest
+  end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, big_sur:  "f07de82a23882bb5f3e70ce75af636ac8531a1dad3ffff9d6c3e1bff2477e48d"
-    sha256 cellar: :any_skip_relocation, catalina: "a623c5125bfe60bd68f2ce905a1181a16a1307ad9eefb058128ac7d5e34a0b87"
-    sha256 cellar: :any_skip_relocation, mojave:   "e05cfb512827a94bb0d8303a32737ff0da0fe63f5d44a49603b1d5d39d3ae264"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "d763332d1fe381e9ebd93051ae94d1a055e064647fb6456fdf64c3662f6bcae8"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d763332d1fe381e9ebd93051ae94d1a055e064647fb6456fdf64c3662f6bcae8"
+    sha256 cellar: :any_skip_relocation, monterey:       "3a81a8efadf9bf91865374e4033a9a16eafbd379992984b427d10df31ff84322"
+    sha256 cellar: :any_skip_relocation, big_sur:        "3a81a8efadf9bf91865374e4033a9a16eafbd379992984b427d10df31ff84322"
+    sha256 cellar: :any_skip_relocation, catalina:       "3a81a8efadf9bf91865374e4033a9a16eafbd379992984b427d10df31ff84322"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6f5fea4572a64cdb750cd912425e5c6c23cb57231172721d2f5ce27bc21d00aa"
   end
 
   depends_on "go" => :build
   depends_on "kubernetes-cli"
 
   def install
-    system "make", "static"
-    bin.install "tk"
+    ENV["CGO_ENABLED"] = "0"
+    ldflags = %W[
+      -s -w
+      -X github.com/grafana/tanka/pkg/tanka.CURRENT_VERSION=#{version}
+    ]
+    system "go", "build", *std_go_args(ldflags: ldflags.join(" "), output: bin/"tk"), "./cmd/tk"
   end
 
   test do

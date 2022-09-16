@@ -1,16 +1,18 @@
 class Tm < Formula
   desc "TriggerMesh CLI to work with knative objects"
   homepage "https://triggermesh.com"
-  url "https://github.com/triggermesh/tm/archive/v1.2.0.tar.gz"
-  sha256 "e798e544d5dfcae991dd141a9e17bd081ba7f41d0029093b1afd43971b70a22c"
+  url "https://github.com/triggermesh/tm/archive/v1.21.0.tar.gz"
+  sha256 "865d62d11ac28536ed630562088ca8537ceb5c54fcbc413788171f98ab301df2"
   license "Apache-2.0"
-  head "https://github.com/triggermesh/tm.git"
+  head "https://github.com/triggermesh/tm.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "ea3773e93db4af6d55289ccab9b0c605d6fe45288d9f8fdda9b7c3f441d0ece0"
-    sha256 cellar: :any_skip_relocation, big_sur:       "90a2a241e24d9ceb8cf91e17c7df282c14627494a7743db3edfc6f6fdec0a284"
-    sha256 cellar: :any_skip_relocation, catalina:      "70d84228a91b8c8646dc79447c14d9ec3773e093dd86521c6cd52e30c9c52214"
-    sha256 cellar: :any_skip_relocation, mojave:        "e1d9a3b8f64857f602e3ffc749e876beb888b5ca973aeba2dc736f1632bee379"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "a55ee1208229d3940370f20a88131eadeb396084a07720000c3484fa5b82d56a"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a63d19c633b0be034cc7bb8454f140c18273399890c25048f20fe3227c2b7217"
+    sha256 cellar: :any_skip_relocation, monterey:       "71035b89d26e7a8f1e03bde9cd7f9c1b3abb288703ee5719059be45e899d0401"
+    sha256 cellar: :any_skip_relocation, big_sur:        "b38ad58b65ceb623a5c816f1c20c46dcfb9e941f3c80a2353a1845ab356b2e10"
+    sha256 cellar: :any_skip_relocation, catalina:       "1d325bf50624c61747e81862667df2f74abfb03889c5dd1ad6f008136ba03c4f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "58105d9cd50de7d0aa4e130051b6819670acbb2c53702ed9c783d90f92b610ff"
   end
 
   depends_on "go" => :build
@@ -19,9 +21,9 @@ class Tm < Formula
     ldflags = %W[
       -s -w
       -X github.com/triggermesh/tm/cmd.version=v#{version}
-    ]
+    ].join(" ")
 
-    system "go", "build", *std_go_args, "-ldflags", ldflags.join(" ")
+    system "go", "build", *std_go_args(ldflags: ldflags)
   end
 
   test do

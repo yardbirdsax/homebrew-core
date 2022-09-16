@@ -1,11 +1,11 @@
 class Povray < Formula
   desc "Persistence Of Vision RAYtracer (POVRAY)"
   homepage "https://www.povray.org/"
-  url "https://github.com/POV-Ray/povray/archive/v3.7.0.8.tar.gz"
-  sha256 "53d11ebd2972fc452af168a00eb83aefb61387662c10784e81b63e44aa575de4"
+  url "https://github.com/POV-Ray/povray/archive/v3.7.0.10.tar.gz"
+  sha256 "7bee83d9296b98b7956eb94210cf30aa5c1bbeada8ef6b93bb52228bbc83abff"
   license "AGPL-3.0-or-later"
-  revision 1
-  head "https://github.com/POV-Ray/povray.git"
+  revision 3
+  head "https://github.com/POV-Ray/povray.git", branch: "master"
 
   livecheck do
     url :stable
@@ -13,20 +13,21 @@ class Povray < Formula
   end
 
   bottle do
-    rebuild 2
-    sha256 arm64_big_sur: "aa9bdecce6009e4bcf4c59c2d81c3b56aa0caa942e162dbe96e7440e9ee9b86e"
-    sha256 big_sur:       "11ca4524b9607133f05ec4a1bfc5068814c8f24c816457a15762068e0e53e108"
-    sha256 catalina:      "73110c4da834819acf4887efc1051cd0928e77cbaf773c76b891a92e28a68ac8"
-    sha256 mojave:        "02725cdedd6abd1239284729cdf3fac874f81d302b1d23f3016c69724a24bde4"
+    sha256 arm64_monterey: "e6ac3d85cc880f470d6e3d45b8b7c099bfb15a8ab8439bd167711d42b894e8a5"
+    sha256 arm64_big_sur:  "dd7219c0a8f537891038b8efbaf0182a2507955c67bc293d8006d306abc12022"
+    sha256 monterey:       "4d74fda4ef144bed539f6313c4f66bc0610aca47ff7318ddda5340b31321773f"
+    sha256 big_sur:        "54e70887d429f4ce6befb0838e3a6695c4b2f8a4f68a012c36526a05b2556f6f"
+    sha256 catalina:       "437e0a054b986e806c551988735fef73e7b2679d88792519dc1d90597bfa4553"
+    sha256 x86_64_linux:   "0c53bfc03f7cbabc4168461a5a3eacc739c63161186d6c9753ccd468692735d8"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "boost"
-  depends_on "jpeg"
+  depends_on "imath"
+  depends_on "jpeg-turbo"
   depends_on "libpng"
   depends_on "libtiff"
-
   depends_on "openexr"
 
   def install
@@ -55,14 +56,6 @@ class Povray < Formula
     end
 
     system "./configure", *args
-
-    # The VERSION file in the root of the package is read by the autoconf bits.
-    # However, on a non-case-sensitive filesystem this breaks "#include <version>"
-    # deep inside the boost libraries.  See https://github.com/POV-Ray/povray/issues/403
-    rm "VERSION"
-    rm "unix/VERSION"
-    rm "libraries/tiff/VERSION"
-
     system "make", "install"
   end
 

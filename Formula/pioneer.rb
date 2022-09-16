@@ -1,16 +1,19 @@
 class Pioneer < Formula
   desc "Game of lonely space adventure"
   homepage "https://pioneerspacesim.net/"
-  url "https://github.com/pioneerspacesim/pioneer/archive/20210203.tar.gz"
-  sha256 "fcbc57374123b44161e9d15d97bd950255f654a222840894f50bfc2be716ea68"
-  license "GPL-3.0"
-  head "https://github.com/pioneerspacesim/pioneer.git"
+  url "https://github.com/pioneerspacesim/pioneer/archive/20220203.tar.gz"
+  sha256 "415b55bab7f011f7244348428e13006fa67a926b9be71f2c4ad24e92cfeb051c"
+  license "GPL-3.0-only"
+  head "https://github.com/pioneerspacesim/pioneer.git", branch: "master"
 
   bottle do
-    sha256 arm64_big_sur: "a3151605aa2a2b4a8a5ac8266105d2293a7f06f594791fed4629340b8f819a71"
-    sha256 big_sur:       "8b59ff2ff180ccdd5485d063d8a46038bc7ae2fb77c70a9a6aec891aba40c7b7"
-    sha256 catalina:      "abeb86c374fa69e433e548cd1189105206cfd3859a1dd06d0ea2b45a15092b9f"
-    sha256 mojave:        "bd448dc95f9f104637263a4e9aea398177b502938a969b766db8229ddc89860a"
+    rebuild 1
+    sha256 arm64_monterey: "b2e190f79505cc823854dcb3c46b333994fb15f065e95dc77934d4b27119aa8d"
+    sha256 arm64_big_sur:  "0ca5b9a984198c3e3d60e3e02c8f3ccc046d2082900627a9bf970610c6260d95"
+    sha256 monterey:       "0bb70eb1bb53b649bafb3ae3a52d4743fdaf690274a3e9ee0288e03fc26bc427"
+    sha256 big_sur:        "310a48a34c8a19d9cb66bb7aa4f9a231d4519f636cfe1f3f2ecc219236ddbf1f"
+    sha256 catalina:       "9b4bf989c69c7d9c24093aa728351b2558ccaf3770891c65f3c8d28da9778bfa"
+    sha256 x86_64_linux:   "35b337ad69a13c8be0a0dc16281be604220cc3d26b247fdf90947ce51c93675a"
   end
 
   depends_on "cmake" => :build
@@ -23,6 +26,8 @@ class Pioneer < Formula
   depends_on "libvorbis"
   depends_on "sdl2"
   depends_on "sdl2_image"
+
+  fails_with gcc: "5"
 
   def install
     ENV.cxx11

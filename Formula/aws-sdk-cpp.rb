@@ -2,25 +2,34 @@ class AwsSdkCpp < Formula
   desc "AWS SDK for C++"
   homepage "https://github.com/aws/aws-sdk-cpp"
   # aws-sdk-cpp should only be updated every 10 releases on multiples of 10
-  url "https://github.com/aws/aws-sdk-cpp/archive/1.8.130.tar.gz"
-  sha256 "5dd09baa28d3f6f4fb03fbba1a4269724d79bcca3d47752cd3e15caf97276bda"
+  url "https://github.com/aws/aws-sdk-cpp.git",
+      tag:      "1.9.340",
+      revision: "028f4ca29fe7f6c613744a3d8ec23c4ead45357f"
   license "Apache-2.0"
-  head "https://github.com/aws/aws-sdk-cpp.git"
+  head "https://github.com/aws/aws-sdk-cpp.git", branch: "main"
 
   bottle do
-    sha256 arm64_big_sur: "f898d63526dc2a454e0c936b01e12209714c63952ab2ac412f5b34bf95dfb724"
-    sha256 big_sur:       "36e94d82731bcc77a910a870ad543ded1dff1034cf996ca08fa058942514a9f0"
-    sha256 catalina:      "4c0a1accc76ce3392992782b960e42331851fb7aa26daafec54e30e0c209f019"
-    sha256 mojave:        "0b9ca868ffd75a9e235e12898049df2e12ae9ee6454a952daf0ff8dc148161cb"
+    sha256 cellar: :any,                 arm64_monterey: "36acd7c70f79c391a61361745f2b7538d489695d6ee4fc8da5fd682ab1c8e250"
+    sha256 cellar: :any,                 arm64_big_sur:  "6c954af60347dfac5a61209994f0e0616aa72664996b5d0883fc36e1d751afb8"
+    sha256 cellar: :any,                 monterey:       "56808c4e37547dc68c7d709a49cc088f0ab43fa30adfcc70252bcb957f4c0d16"
+    sha256 cellar: :any,                 big_sur:        "9af2ebaa7a2ff95e23bea30005834d853f7979a7b18a2a39983f7f5c0322b2ba"
+    sha256 cellar: :any,                 catalina:       "36889643c101c27131519221b89ecce45a94130c4e082bb43e8f4fefff47c9f3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ebb484f372f672867044f3e792f51911d628ee2591f26c18745c59b0524eec31"
   end
 
   depends_on "cmake" => :build
 
   uses_from_macos "curl"
 
+  fails_with gcc: "5"
+
   def install
+    ENV.append "LDFLAGS", "-Wl,-rpath,#{rpath}"
     mkdir "build" do
-      system "cmake", "..", *std_cmake_args
+      args = %w[
+        -DENABLE_TESTING=OFF
+      ]
+      system "cmake", "..", *std_cmake_args, *args
       system "make"
       system "make", "install"
     end

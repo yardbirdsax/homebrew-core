@@ -1,20 +1,22 @@
 class Sundials < Formula
   desc "Nonlinear and differential/algebraic equations solver"
   homepage "https://computing.llnl.gov/projects/sundials"
-  url "https://computing.llnl.gov/projects/sundials/download/sundials-5.7.0.tar.gz"
-  sha256 "8d6dd094feccbb8d6ecc41340ec16a65fabac82ed4415023f6d7c1c2390ea2f3"
+  url "https://github.com/LLNL/sundials/releases/download/v6.3.0/sundials-6.3.0.tar.gz"
+  sha256 "89a22bea820ff250aa7239f634ab07fa34efe1d2dcfde29cc8d3af11455ba2a7"
   license "BSD-3-Clause"
 
   livecheck do
-    url "https://computation.llnl.gov/projects/sundials/sundials-software"
+    url "https://computing.llnl.gov/projects/sundials/sundials-software"
     regex(/href=.*?sundials[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 arm64_big_sur: "0fde980804a45806673fce03d868a090d38b8d1615b152dc8da3797f1d59054d"
-    sha256 big_sur:       "eca818ac9876c5f784483f49eaeb6b8bb2a4a7950520f13e7dd99f43ad06d223"
-    sha256 catalina:      "bacddf8c38b9c1236cd0aa2dc85273f7ffff6726418781f5a0e223bf132e3e07"
-    sha256 mojave:        "9ad76e3dbc09c9d9cb4af9e600376fcae287c63128a100959871ddfe8dba438e"
+    sha256 cellar: :any,                 arm64_monterey: "7589b240ea07145c55f634100f00204fd3918c1632d3d4e6f8edc97dacc830f4"
+    sha256 cellar: :any,                 arm64_big_sur:  "68630220962300923d5a63a6d135364add46bd058c1651f9e7a43bafa8ef7029"
+    sha256 cellar: :any,                 monterey:       "18e9d07618cc03ee9373c0d38c43fcc7e7576a4ecb7dffa64eed8d54637f97ea"
+    sha256 cellar: :any,                 big_sur:        "754766b19dc7345f378d3125978705348cfc04bd1cfe27f99862c5b657b17d29"
+    sha256 cellar: :any,                 catalina:       "735b7d4cba622ebfebd63f44484eeb1fb05fc2009f1f4dbc7cb75da6158cb815"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "43d5d8fe571749bcbc7981b58e9829c2574a05372dc3e9ef806972f26262038a"
   end
 
   depends_on "cmake" => :build
@@ -39,22 +41,21 @@ class Sundials < Formula
       -DMPI_ENABLE=ON
     ]
 
-    mkdir "build" do
-      system "cmake", "..", *args
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build", *args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
 
     # Only keep one example for testing purposes
     (pkgshare/"examples").install Dir[prefix/"examples/nvector/serial/*"] \
                                   - Dir[prefix/"examples/nvector/serial/{CMake*,Makefile}"]
-    rm_rf prefix/"examples"
+    (prefix/"examples").rmtree
   end
 
   test do
     cp Dir[pkgshare/"examples/*"], testpath
-    system ENV.cc, "-I#{include}", "test_nvector.c", "sundials_nvector.c",
-                   "test_nvector_serial.c", "-L#{lib}", "-lsundials_nvecserial"
+    system ENV.cc, "test_nvector.c", "test_nvector_serial.c", "-o", "test",
+                   "-I#{include}", "-L#{lib}", "-lsundials_nvecserial", "-lm"
     assert_match "SUCCESS: NVector module passed all tests",
-                 shell_output("./a.out 42 0")
+                 shell_output("./test 42 0")
   end
 end

@@ -1,20 +1,28 @@
 class UserspaceRcu < Formula
   desc "Library for userspace RCU (read-copy-update)"
   homepage "https://liburcu.org"
-  url "https://lttng.org/files/urcu/userspace-rcu-0.12.1.tar.bz2"
-  sha256 "bbfaead0345642b97e0de90f889dfbab4b2643a6a5e5c6bb59cd0d26fc0bcd0e"
+  url "https://lttng.org/files/urcu/userspace-rcu-0.13.2.tar.bz2"
+  sha256 "1213fd9f1b0b74da7de2bb74335b76098db9738fec5d3cdc07c0c524f34fc032"
+  license all_of: ["LGPL-2.1-or-later", "MIT"]
 
   livecheck do
-    url "https://www.lttng.org/files/urcu/"
+    url "https://lttng.org/files/urcu/"
     regex(/href=.*?userspace-rcu[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any, arm64_big_sur: "8d45763c520497f2a3062f4d4c7c9a291c956462e79fad11fc2f6bafc63ede75"
-    sha256 cellar: :any, big_sur:       "16786f80939cc886441f4be7850c1ffc3cad092aaedcfb9a5d3f4bc08aa17edf"
-    sha256 cellar: :any, catalina:      "87815b2af972d7e3596e639cec95b6da61436108dcb7380629c5f5b56785d513"
-    sha256 cellar: :any, mojave:        "a5fc1494e06f10ab0aa2743dea422d94206248cc72ea504cc48dd0fb1837c780"
+    sha256 cellar: :any,                 arm64_monterey: "d2cb9246e240a6db9c40d9e3a19288d064ef95345f3e884a5892fa2b341fcb9c"
+    sha256 cellar: :any,                 arm64_big_sur:  "c661f7dadf4ef5fdedc1ea707da817fba3e491b0b263b070fc234f35614a8afe"
+    sha256 cellar: :any,                 monterey:       "c9cf73dd281dddd9fca16844e005392d0f0fb1132f4540ef95e552d7799113c6"
+    sha256 cellar: :any,                 big_sur:        "5e1b5b33fc0f5ad814ddc1d738f5ca8c2811422b9d37ecc1d517328287fc7d4e"
+    sha256 cellar: :any,                 catalina:       "3056888d7a39aa8ff2859eaac9d14ed0d15b921d857378160f6f49f7365ab07c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "35bfb4f4d8c549bcc9a75aaa5e194c410ad3134768b8355ff428a82ec905a0dd"
+  end
+
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
   end
 
   def install
@@ -31,6 +39,6 @@ class UserspaceRcu < Formula
 
   test do
     cp_r "#{doc}/examples", testpath
-    system "make", "-C", "examples"
+    system "make", "CFLAGS=-pthread", "-C", "examples"
   end
 end

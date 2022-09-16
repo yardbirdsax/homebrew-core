@@ -1,36 +1,64 @@
 class Couchdb < Formula
   desc "Apache CouchDB database server"
   homepage "https://couchdb.apache.org/"
-  url "https://www.apache.org/dyn/closer.lua?path=couchdb/source/3.1.1/apache-couchdb-3.1.1.tar.gz"
-  mirror "https://archive.apache.org/dist/couchdb/source/3.1.1/apache-couchdb-3.1.1.tar.gz"
-  sha256 "8ffe766bba2ba39a7b49689a0732afacf69caffdf8e2d95447e82fb173c78ca3"
+  url "https://www.apache.org/dyn/closer.lua?path=couchdb/source/3.2.2/apache-couchdb-3.2.2.tar.gz"
+  mirror "https://archive.apache.org/dist/couchdb/source/3.2.2/apache-couchdb-3.2.2.tar.gz"
+  sha256 "69c9fd6f80133557f68a02e92dda72a4fd646d646f429f45bb8329a30f82f20e"
   license "Apache-2.0"
+  revision 1
+
+  livecheck do
+    url :homepage
+    regex(/href=.*?apache-couchdb[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
 
   bottle do
-    sha256 cellar: :any, catalina:    "8d192716d7cb1aabe1e0d556ee86717c11c9079e18699d718ffd3aa7c94d57ec"
-    sha256 cellar: :any, mojave:      "d683b22eecb84fe5326b8644d8ff5a0f72a0c935e84d0411369271e521a7b7dc"
-    sha256 cellar: :any, high_sierra: "ba42a4ef666858aa21beccaa8b3d80799860e5501af9453dd649988d5603cade"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_monterey: "10915b592f151923cfdbb897fdfce09472428acf706c47270be15bbb7e03519d"
+    sha256 cellar: :any,                 arm64_big_sur:  "2fa3cd31dc3c53a80f389cca0cfcb01e6437f5769fd016af407e71a07454b5f6"
+    sha256 cellar: :any,                 monterey:       "f62c2ccecaadc5de7caccd62d4f4500afebca0dc69d8d4d2dbe0b7ad5d68bd1e"
+    sha256 cellar: :any,                 big_sur:        "5f927c75898000afb985bd0574ac155869f1348fe018fc0b7c15ba4ae3950de5"
+    sha256 cellar: :any,                 catalina:       "ace6e1b4a44b08522fc49bfa65e194502a886fec1c0d5a8edad890eee43ecc3a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "af86b0a02aec04ac0b6d33027b4056ac3dad0794c1bdae9485c67626363ca5ed"
   end
 
   depends_on "autoconf" => :build
   depends_on "autoconf-archive" => :build
   depends_on "automake" => :build
-  depends_on "erlang@22" => :build
+  # Use Erlang 24 to work around a sporadic build error with rebar (v2) and Erlang 25.
+  # beam/beam_load.c(551): Error loading function rebar:save_options/2: op put_tuple u x:
+  #   please re-compile this module with an Erlang/OTP 25 compiler
+  # escript: exception error: undefined function rebar:main/1
+  # Ref: https://github.com/Homebrew/homebrew-core/pull/105876
+  depends_on "erlang@24" => :build
   depends_on "libtool" => :build
   depends_on "pkg-config" => :build
   depends_on "icu4c"
-  depends_on "openssl@1.1"
+  depends_on "openssl@3"
+  # NOTE: Supported `spidermonkey` versions are hardcoded at
+  # https://github.com/apache/couchdb/blob/#{version}/src/couch/rebar.config.script
   depends_on "spidermonkey"
 
   conflicts_with "ejabberd", because: "both install `jiffy` lib"
 
+  fails_with :gcc do
+    version "5"
+    cause "mfbt (and Gecko) require at least gcc 6.1 to build."
+  end
+
   def install
-    system "./configure"
+    spidermonkey = Formula["spidermonkey"]
+    inreplace "src/couch/rebar.config.script" do |s|
+      s.gsub! "-I/usr/local/include/mozjs", "-I#{spidermonkey.opt_include}/mozjs"
+      s.gsub! "-L/usr/local/lib", "-L#{spidermonkey.opt_lib} -L#{HOMEBREW_PREFIX}/lib"
+    end
+
+    system "./configure", "--spidermonkey-version", spidermonkey.version.major
     system "make", "release"
     # setting new database dir
     inreplace "rel/couchdb/etc/default.ini", "./data", "#{var}/couchdb/data"
     # remove windows startup script
-    File.delete("rel/couchdb/bin/couchdb.cmd") if File.exist?("rel/couchdb/bin/couchdb.cmd")
+    rm_rf("rel/couchdb/bin/couchdb.cmd")
     # install files
     prefix.install Dir["rel/couchdb/*"]
     if File.exist?(prefix/"Library/LaunchDaemons/org.apache.couchdb.plist")
@@ -52,27 +80,9 @@ class Couchdb < Formula
     EOS
   end
 
-  plist_options manual: "couchdb"
-
-  def plist
-    <<~EOS
-      <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-      <plist version="1.0">
-      <dict>
-        <key>KeepAlive</key>
-        <true/>
-        <key>Label</key>
-        <string>#{plist_name}</string>
-        <key>ProgramArguments</key>
-        <array>
-          <string>#{bin}/couchdb</string>
-        </array>
-        <key>RunAtLoad</key>
-        <true/>
-      </dict>
-      </plist>
-    EOS
+  service do
+    run opt_bin/"couchdb"
+    keep_alive true
   end
 
   test do
@@ -85,7 +95,7 @@ class Couchdb < Formula
     fork do
       exec "#{bin}/couchdb -couch_ini #{testpath}/etc/default.ini #{testpath}/etc/local.ini"
     end
-    sleep 2
+    sleep 30
 
     output = JSON.parse shell_output("curl --silent localhost:#{port}")
     assert_equal "Welcome", output["couchdb"]

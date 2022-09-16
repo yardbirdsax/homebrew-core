@@ -1,14 +1,29 @@
 class SNail < Formula
   desc "Fork of Heirloom mailx"
   homepage "https://www.sdaoden.eu/code.html"
-  url "https://www.sdaoden.eu/downloads/s-nail-14.9.21.tar.xz"
-  sha256 "bf21d72531f85b8882c5a583ce96c901104ce0102a287c7ad680ef068c2ceafd"
+  url "https://www.sdaoden.eu/downloads/s-nail-14.9.24.tar.xz"
+  sha256 "2714d6b8fb2af3b363fc7c79b76d058753716345d1b6ebcd8870ecd0e4f7ef8c"
+  license all_of: [
+    "BSD-2-Clause", # file-dotlock.h
+    "BSD-3-Clause",
+    "BSD-4-Clause",
+    "ISC",
+    "HPND-sell-variant", # GSSAPI code
+    "RSA-MD", # MD5 code
+  ]
+
+  livecheck do
+    url :homepage
+    regex(/href=.*?s-nail[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
 
   bottle do
-    sha256 arm64_big_sur: "06306c446dcf62dee3ee196960f68952e6440b0161e4fb40a823c652a1c4638d"
-    sha256 big_sur:       "bcf734125581c0b6bc01846a321145f6aa1838436846c042b12602c70745e5cc"
-    sha256 catalina:      "749f19641e745d458eb70bd5af6cf612b204084706bf286c749ffac466dd3679"
-    sha256 mojave:        "699925f22c2a244c74cd9ebe8fc16c786c4a1d3e5084f14187fcbb834f389c69"
+    sha256 arm64_monterey: "c76c42e8a887cf6ab33dbcecfd0644c6bc6aef38e27234bdf97e56aac6cd5372"
+    sha256 arm64_big_sur:  "f3124f53d46be06a975bd71b9ddebb1eead0104094a32c97e55a8e6f0b3cc635"
+    sha256 monterey:       "4d68b331ebc8b46aad429e3e91adc5009ee9ea936467979c2744b24b5304b35d"
+    sha256 big_sur:        "60c960dbe634d90101cd9c1fb9efc6119ae896a9ed8387592cf9300b6ac81573"
+    sha256 catalina:       "7eebdbe58288d603c2f584e961839fd233437c887b1e3bcd0f200c7f6a3436a5"
+    sha256 x86_64_linux:   "1783d8ab84a3d696f709685f91dff33cc1decbc5424271d9f2adc0f39e43aeef"
   end
 
   depends_on "awk" => :build
@@ -27,10 +42,11 @@ class SNail < Formula
   end
 
   test do
-    ENV["SOURCE_DATE_EPOCH"] = "844221007"
+    timestamp = 844_221_007
+    ENV["SOURCE_DATE_EPOCH"] = timestamp.to_s
 
-    date1 = shell_output("date -r 844221007 '+%a %b %e %T %Y'")
-    date2 = shell_output("date -r 844221007 '+%a, %d %b %Y %T %z'")
+    date1 = Time.at(timestamp).strftime("%a %b %e %T %Y")
+    date2 = Time.at(timestamp).strftime("%a, %d %b %Y %T %z")
 
     expected = <<~EOS
       From reproducible_build #{date1.chomp}

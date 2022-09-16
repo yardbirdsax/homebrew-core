@@ -1,21 +1,25 @@
 class Help2man < Formula
   desc "Automatically generate simple man pages"
   homepage "https://www.gnu.org/software/help2man/"
-  url "https://ftp.gnu.org/gnu/help2man/help2man-1.47.17.tar.xz"
-  mirror "https://ftpmirror.gnu.org/help2man/help2man-1.47.17.tar.xz"
-  sha256 "da3a35c50b1e1f8c8fa322d69fa47c9011ce443a8fb8d1d671b1f01b8b0008eb"
+  url "https://ftp.gnu.org/gnu/help2man/help2man-1.49.2.tar.xz"
+  mirror "https://ftpmirror.gnu.org/help2man/help2man-1.49.2.tar.xz"
+  sha256 "9e2e0e213a7e0a36244eed6204d902b6504602a578b6ecd15268b1454deadd36"
   license "GPL-3.0-or-later"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "7bc46236d8916519b432020f2d51df5c6006c7000b67835ff7e1276c58ec208c"
-    sha256 cellar: :any, big_sur:       "ee60622e70903c293171ea78097544d796a5454b29e8c1494529aa537901e460"
-    sha256 cellar: :any, catalina:      "603b604aaf17770dd4f4a0f9b45c266848d8c005228c64773fdec2d94e3d45dd"
-    sha256 cellar: :any, mojave:        "f57b3269934c79434b70ac7807ea364af47ae8a3b6096364c0615b2789d4a0a9"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "383b411c2f38bcc248ef62253135047fcdf62d9dc53f8204d8789648705750e2"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "383b411c2f38bcc248ef62253135047fcdf62d9dc53f8204d8789648705750e2"
+    sha256 cellar: :any,                 monterey:       "2fa2384e5b009445b1c22c3524c290f99097e28f513d05fc72bd34b5a2359c4c"
+    sha256 cellar: :any,                 big_sur:        "6d00cbba2327558de78a1e01fc1906ddce81a03067b3d8636f15df835290018a"
+    sha256 cellar: :any,                 catalina:       "96ff3329951b52db5e2e70f64e93a5fa291b79d70bc39a4d10d6c2cc3340a1b9"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "457df4779894e46898cb3ae03f9b7d2650a0bd42e75ab7cdf4aacbe0e6bb90d6"
   end
 
-  depends_on "gettext" if Hardware::CPU.intel?
+  uses_from_macos "perl", since: :mojave
 
-  uses_from_macos "perl"
+  on_intel do
+    depends_on "gettext"
+  end
 
   resource "Locale::gettext" do
     url "https://cpan.metacpan.org/authors/id/P/PV/PVANDRY/gettext-1.07.tar.gz"

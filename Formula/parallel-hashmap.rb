@@ -1,17 +1,13 @@
 class ParallelHashmap < Formula
   desc "Family of header-only, fast, memory-friendly C++ hashmap and btree containers"
   homepage "https://greg7mdp.github.io/parallel-hashmap/"
-  url "https://github.com/greg7mdp/parallel-hashmap/archive/1.32.tar.gz"
-  sha256 "50cc7abc08f78c6396a33a334e5bc0b3ade121af8604690dae13a1bad47cf07c"
+  url "https://github.com/greg7mdp/parallel-hashmap/archive/1.35.tar.gz"
+  sha256 "308ab6f92e4c6f49304562e352890cf7140de85ce723c097e74fbdec88e0e1ce"
   license "Apache-2.0"
-  head "https://github.com/greg7mdp/parallel-hashmap.git"
+  head "https://github.com/greg7mdp/parallel-hashmap.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "aa3977a35de46f745dc5b8eb8dd4acf1a8f16f7bf18dcb7e4a18c46daf670386"
-    sha256 cellar: :any_skip_relocation, big_sur:       "fd71614a7f2cb919499ae6f7f1bdf6121a7784d85064cfc4cde62d3892704cb0"
-    sha256 cellar: :any_skip_relocation, catalina:      "932e18bb079269506931abfe4722a1eab66bb83f850bb5952c982b21864679a3"
-    sha256 cellar: :any_skip_relocation, mojave:        "d020435a32c4fe59e1bbc0f0e744726b81cade9f89fd871fd49487c5c8a3958f"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "c3e7184629352580841f4e14d032eb09653e2dcc4d36f107113e8784ac45060c"
+    sha256 cellar: :any_skip_relocation, all: "62b3c2b212276c17c008d2823e4bb3b4c4c1fc8e77f1a82dee40d829b74ed0dd"
   end
 
   depends_on "cmake" => :build

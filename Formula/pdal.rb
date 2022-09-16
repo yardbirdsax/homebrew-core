@@ -1,17 +1,31 @@
 class Pdal < Formula
   desc "Point data abstraction library"
   homepage "https://www.pdal.io/"
-  url "https://github.com/PDAL/PDAL/releases/download/2.2.0/PDAL-2.2.0-src.tar.gz"
-  sha256 "421e94beafbfda6db642e61199bc4605eade5cab5d2e54585e08f4b27438e568"
+  url "https://github.com/PDAL/PDAL/releases/download/2.4.3/PDAL-2.4.3-src.tar.gz"
+  sha256 "abac604c6dcafdcd8a36a7d00982be966f7da00c37d89db2785637643e963e4c"
   license "BSD-3-Clause"
-  revision 2
-  head "https://github.com/PDAL/PDAL.git"
+  revision 1
+  head "https://github.com/PDAL/PDAL.git", branch: "master"
+
+  # The upstream GitHub repository sometimes tags a commit with only a
+  # major/minor version (`1.2`) and then uses major/minor/patch (`1.2.3`) for
+  # the release (with downloadable assets). This inconsistency can be a problem
+  # if we need to substitute the version from livecheck in the `stable` URL, so
+  # we use the `GithubLatest` strategy here.
+  livecheck do
+    url :stable
+    regex(/href=.*?PDAL[._-]v?(\d+(?:\.\d+)+)[._-]src\.t/i)
+    strategy :github_latest
+  end
 
   bottle do
-    sha256 arm64_big_sur: "282f7fa863a01ec05807e3e262ff90357e2c7003ee472a752ef1d21ba7f33aa7"
-    sha256 big_sur:       "ab6cfe4dd4892db1c461ed336a361afafe1ab396ad48d6b62738517e44a8a3af"
-    sha256 catalina:      "4d2cdd582fff619e8224292422b70de75381b95bdd7dd03af535769bbda0d061"
-    sha256 mojave:        "7f7191678e93323c1763c8eefb710f365d0a289633385acc5e69e146db29687f"
+    rebuild 1
+    sha256                               arm64_monterey: "27cd33bae8c8eba42f1745f47575d9bd3194063ef898cd6c3f500205e8718c55"
+    sha256                               arm64_big_sur:  "047036bece13c2c6177574729a8efb2312ded09895e9e9a178dd0c70adb913ae"
+    sha256                               monterey:       "75afee346e430fe3dcf6042482c7325ddec2b9dbc8a0aa18c6208860cbfcb7ba"
+    sha256                               big_sur:        "bdc5415e581f7f054abfd4484b11a45ce4de6958a2e90256ee9089834f8156c3"
+    sha256                               catalina:       "23cd4314c4097b66a55aa553da7eea5ebde1b24aac90a08a0d15bcb6b3614aa2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "eca526ebb3a39b85ba26d3b74429fa3bc74cb55bb4d4d9ae8e1c9832c0c93e5d"
   end
 
   depends_on "cmake" => :build
@@ -19,9 +33,11 @@ class Pdal < Formula
   depends_on "gdal"
   depends_on "hdf5"
   depends_on "laszip"
+  depends_on "libpq"
   depends_on "numpy"
   depends_on "pcl"
-  depends_on "postgresql"
+
+  fails_with gcc: "5" # gdal is compiled with GCC
 
   def install
     system "cmake", ".", *std_cmake_args,

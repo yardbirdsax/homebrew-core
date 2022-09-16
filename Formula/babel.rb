@@ -4,22 +4,24 @@ require "json"
 class Babel < Formula
   desc "Compiler for writing next generation JavaScript"
   homepage "https://babeljs.io/"
-  url "https://registry.npmjs.org/@babel/core/-/core-7.12.13.tgz"
-  sha256 "a128a4fa43e5b9032c709caaaf9b93a166a9bb7f7e78dbaff689a76e48900cdb"
+  url "https://registry.npmjs.org/@babel/core/-/core-7.19.1.tgz"
+  sha256 "a16a84e263a928bc9d11e2ebb9e500f1822269d979696846a797466a8e7a7409"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "2ca4905e175c2575f5c097120b0b375de6b7edd4dcbd051fdb979a1fd4a7b1da"
-    sha256 cellar: :any_skip_relocation, big_sur:       "9c6c97edbee426fd6cec35a5c127877bc1f5ae69238dbe98708b22338b7758d4"
-    sha256 cellar: :any_skip_relocation, catalina:      "ef060957fcf86295ac997da9ff49e857535e3193186ff7f21d544465a53415d3"
-    sha256 cellar: :any_skip_relocation, mojave:        "6d693bf124636a8968b6f5acd35044f887f863e796f555ab99c3c4b2cdb157c6"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "b73bad5b901717c921d1fd97c4c116968cd25ebe9cb5fbc6980e3c453a7dc620"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b73bad5b901717c921d1fd97c4c116968cd25ebe9cb5fbc6980e3c453a7dc620"
+    sha256 cellar: :any_skip_relocation, monterey:       "8171b05dc83a6d695b87a16bedc43c739f796de0d44e445cc6bbc7a1ce55d6d0"
+    sha256 cellar: :any_skip_relocation, big_sur:        "8171b05dc83a6d695b87a16bedc43c739f796de0d44e445cc6bbc7a1ce55d6d0"
+    sha256 cellar: :any_skip_relocation, catalina:       "8171b05dc83a6d695b87a16bedc43c739f796de0d44e445cc6bbc7a1ce55d6d0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b73bad5b901717c921d1fd97c4c116968cd25ebe9cb5fbc6980e3c453a7dc620"
   end
 
   depends_on "node"
 
   resource "babel-cli" do
-    url "https://registry.npmjs.org/@babel/cli/-/cli-7.12.13.tgz"
-    sha256 "4c1b4b189e4d2f68d891a33aeac7f74531a004685dde6d102e4aad357553dc3e"
+    url "https://registry.npmjs.org/@babel/cli/-/cli-7.18.10.tgz"
+    sha256 "9bda888e2b4feb37e343657b2a7eff5e0480c8fc1713d8919b368a24c8164f69"
   end
 
   def install
@@ -31,10 +33,10 @@ class Babel < Formula
     end
 
     # declare babel-core as a bundledDependency of babel-cli
-    pkg_json = JSON.parse(IO.read("package.json"))
+    pkg_json = JSON.parse(File.read("package.json"))
     pkg_json["dependencies"]["@babel/core"] = version
     pkg_json["bundleDependencies"] = ["@babel/core"]
-    IO.write("package.json", JSON.pretty_generate(pkg_json))
+    File.write("package.json", JSON.pretty_generate(pkg_json))
 
     system "npm", "install", *Language::Node.std_npm_install_args(libexec)
     bin.install_symlink Dir["#{libexec}/bin/*"]

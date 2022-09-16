@@ -1,20 +1,31 @@
 class Geogram < Formula
   desc "Programming library of geometric algorithms"
-  homepage "http://alice.loria.fr/software/geogram/doc/html/index.html"
-  url "https://gforge.inria.fr/frs/download.php/file/38361/geogram_1.7.6.tar.gz"
-  sha256 "4456d65baa014e9eb0352675f76eca260ed97eb386d23bc5c13af419dc2e8142"
+  homepage "https://brunolevy.github.io/geogram/"
+  url "https://brunolevy.github.io/geogram/Releases/geogram_1.8.0.tar.gz"
+  sha256 "7e59db5176ca22580055a5c48862d6fd50399f33551ab9bc20c80a4cc0adeb9e"
   license all_of: ["BSD-3-Clause", :public_domain, "LGPL-3.0-or-later", "MIT"]
+  head "https://github.com/BrunoLevy/geogram.git", branch: "main"
+
+  livecheck do
+    url "https://brunolevy.github.io/geogram/Releases/"
+    regex(/href=.*?geogram[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
 
   bottle do
-    rebuild 1
-    sha256 big_sur:     "16a2b60356439f3a481677989c256085696690a1599636859bc18a31723e075d"
-    sha256 catalina:    "4345844b616fb74fbb2124a0c7bdaeb222c62704908b358427bce7122cb9404d"
-    sha256 mojave:      "f263799496ffc570463ce635eedd9287f81502b06f72142a7829c0b857185079"
-    sha256 high_sierra: "f0eedab23f61affd89684a7e1492cfc2cc8deffa4ca7ebc8459a5768a05876f3"
+    sha256 cellar: :any,                 arm64_monterey: "68878fb9bea83c3c49294f8eba28763c739c3fab9a69a7dfeeb9dc712362929c"
+    sha256 cellar: :any,                 arm64_big_sur:  "6e074cfbe89f210ee31944d0f28d479110072036d0f9e1a82eb80bbbeaee2bff"
+    sha256 cellar: :any,                 monterey:       "7e45ba031704d12d3ae114d063755c8c9977bdad41a2893b3a101b93ada74fe3"
+    sha256 cellar: :any,                 big_sur:        "4f6fec4a8880e11fa600ebf7bee5456471e60a3e764012a67b2e28593075c13e"
+    sha256 cellar: :any,                 catalina:       "1944cf02f77aae7134804276ee78052cdccf06532a2039a32e44d33d9cbd5997"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "02cf25788c6614a20b1a33347605d8bd4d6e7653e99d8f420b43b7fb7b053d24"
   end
 
   depends_on "cmake" => :build
   depends_on "glfw"
+
+  on_linux do
+    depends_on "doxygen" => :build
+  end
 
   resource "bunny" do
     url "https://raw.githubusercontent.com/FreeCAD/Examples/be0b4f9/Point_cloud_ExampleFiles/PointCloud-Data_Stanford-Bunny.asc"
@@ -22,13 +33,16 @@ class Geogram < Formula
   end
 
   def install
+    mv "CMakeOptions.txt.sample", "CMakeOptions.txt"
     (buildpath/"CMakeOptions.txt").append_lines <<~EOS
+      set(CPACK_GENERATOR RPM)
       set(CMAKE_INSTALL_PREFIX #{prefix})
       set(GEOGRAM_USE_SYSTEM_GLFW3 ON)
     EOS
 
     system "./configure.sh"
-    cd "build/Darwin-clang-dynamic-Release" do
+    platform = OS.mac? ? "Darwin-clang" : "Linux64-gcc"
+    cd "build/#{platform}-dynamic-Release" do
       system "make", "install"
     end
 

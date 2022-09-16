@@ -1,22 +1,19 @@
 class Gcsfuse < Formula
   desc "User-space file system for interacting with Google Cloud"
   homepage "https://github.com/googlecloudplatform/gcsfuse"
-  url "https://github.com/GoogleCloudPlatform/gcsfuse/archive/v0.32.0.tar.gz"
-  sha256 "b509f55de799aba6bbc1f81d6e4c1495b09644872211e5fd8805b5e0e174ed84"
+  url "https://github.com/GoogleCloudPlatform/gcsfuse/archive/v0.41.0.tar.gz"
+  sha256 "7c3833ed090da8aa762fe831fd7c27d73273c5f47ce431dff4100c330bf53047"
   license "Apache-2.0"
-  head "https://github.com/GoogleCloudPlatform/gcsfuse.git"
+  head "https://github.com/GoogleCloudPlatform/gcsfuse.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, catalina:    "59df52ee1b44a532d2ebe8c83d0c9d2d3706da8510c9daf0b53d46c3aa156664"
-    sha256 cellar: :any_skip_relocation, mojave:      "a97edf4dbfa9e41d2e9d4de092507c9d5199de2324b0d95f454c50893d977889"
-    sha256 cellar: :any_skip_relocation, high_sierra: "e0f04b45a7fe6583e424fc81a7c34dace7b01e215739758930b6baab14d3d50c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux: "a27112808fc54795d62d27a921977a88428587c1c1415050d7934634ac0cf638"
   end
 
   depends_on "go" => :build
 
   on_macos do
-    deprecate! date: "2020-11-10", because: "requires FUSE"
-    depends_on :osxfuse
+    disable! date: "2021-04-08", because: "requires closed-source macFUSE"
   end
 
   on_linux do
@@ -34,8 +31,25 @@ class Gcsfuse < Formula
     system "./build_gcsfuse", buildpath, prefix, gcsfuse_version
   end
 
+  def caveats
+    on_macos do
+      <<~EOS
+        The reasons for disabling this formula can be found here:
+          https://github.com/Homebrew/homebrew-core/pull/64491
+
+        An external tap may provide a replacement formula. See:
+          https://docs.brew.sh/Interesting-Taps-and-Forks
+      EOS
+    end
+  end
+
   test do
     system "#{bin}/gcsfuse", "--help"
-    system "#{sbin}/mount_gcsfuse", "--help"
+    separator = if OS.mac?
+      "_"
+    else
+      "."
+    end
+    system "#{sbin}/mount#{separator}gcsfuse", "--help"
   end
 end

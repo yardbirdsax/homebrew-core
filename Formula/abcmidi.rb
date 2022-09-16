@@ -1,8 +1,8 @@
 class Abcmidi < Formula
   desc "Converts abc music notation files to MIDI files"
   homepage "https://ifdo.ca/~seymour/runabc/top.html"
-  url "https://ifdo.ca/~seymour/runabc/abcMIDI-2021.01.25.zip"
-  sha256 "5f3c676d3aa2645172b649b2fece6ee36de733c6dd14c717b0720b6fbaca70c3"
+  url "https://ifdo.ca/~seymour/runabc/abcMIDI-2022.09.01.zip"
+  sha256 "583933c4277760c52fffd6ec87af1b62967759378cb9f2a8b41e0da4468cac4b"
   license "GPL-2.0-or-later"
 
   livecheck do
@@ -11,18 +11,15 @@ class Abcmidi < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "991e24fef1645e9357b4dfb3a2fcbcec6afb978f40d08646a755fb5dc8a73846"
-    sha256 cellar: :any_skip_relocation, big_sur:       "e356ba35a777c2b28e9b745a644a0c1ae1eac513d3c37a3c3e838f96010422b8"
-    sha256 cellar: :any_skip_relocation, catalina:      "6552cbc1dde9ee3459af4c80608fa0f4b2c3a087130592c8dd1d4c5e84ab2796"
-    sha256 cellar: :any_skip_relocation, mojave:        "fc00db07ef366740523d83f89e87b1dd8da2841bf7b9ce7dac55337c3885c466"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "5d3b9cb25733443207fad61b61b264d84b7af219db13706629d0cea3484b49e6"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "9c2480430d0a5a00b6c06df940bcc49d3d0e85bdcc06a8bbb4e45b4297db8ca2"
+    sha256 cellar: :any_skip_relocation, monterey:       "8f4220120dab7f6157db034fbc4e18bce0760fc6e957604b30bb82d12ed8ea6b"
+    sha256 cellar: :any_skip_relocation, big_sur:        "eb82591a23a317227699ac5b8fc27f944a4b3d61d10d97b832b99206905c959b"
+    sha256 cellar: :any_skip_relocation, catalina:       "7be30959e86a787db2b8a2f15a24bb265ef1bf700c7a9e904aa992bfed7a6463"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a63df2b9e74ed271a09ef9ac6f76ba989619c805528b6254a4da77a2a004ce2e"
   end
 
   def install
-    # configure creates a "Makefile" file. A "makefile" file already exist in
-    # the tarball. On case-sensitive file-systems, the "makefile" file won't
-    # be overridden and will be chosen over the "Makefile" file.
-    rm "makefile"
-
     system "./configure", "--disable-debug",
                           "--prefix=#{prefix}",
                           "--mandir=#{man}"

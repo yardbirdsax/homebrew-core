@@ -4,73 +4,72 @@ class Dmd < Formula
   license "BSL-1.0"
 
   stable do
-    url "https://github.com/dlang/dmd/archive/v2.095.0.tar.gz"
-    sha256 "d8b54cdd885b86e2cc30ccb4ccc6923940b3bd79183b499889b86d34dd22621b"
+    url "https://github.com/dlang/dmd/archive/v2.100.2.tar.gz"
+    sha256 "84e647f83c5e231d6b64158334105321d26b3e31abdeb3bbdc0f0ea8130cd30a"
 
     resource "druntime" do
-      url "https://github.com/dlang/druntime/archive/v2.095.0.tar.gz"
-      sha256 "f8d6346aa13bdc6ff893eb9d9e5aa5e8ff5efe97dbfd92f7ecd8db8172d0c04a"
+      url "https://github.com/dlang/druntime/archive/v2.100.2.tar.gz"
+      sha256 "26e160c5b78f8ccc1fa5e06d9897be28b3a92b666efe3663d611963e5c9f85c2"
     end
 
     resource "phobos" do
-      url "https://github.com/dlang/phobos/archive/v2.095.0.tar.gz"
-      sha256 "f5c9606a988917a38b3b9a495c6da0d4e36b60beac8e805f6dea719d042d50d4"
+      url "https://github.com/dlang/phobos/archive/v2.100.2.tar.gz"
+      sha256 "ceb033c9c8fac4e43b33e026a9f48e229a955e66dc7dc31e2e6a4a5b99522012"
     end
 
     resource "tools" do
-      url "https://github.com/dlang/tools/archive/v2.095.0.tar.gz"
-      sha256 "7688c56285e098b91ec81a3efaaec6d236aa1a1736fe21797d3335175f8fea8c"
+      url "https://github.com/dlang/tools/archive/v2.100.2.tar.gz"
+      sha256 "83edea545d7afcbd3b6e3807652c668e9565450f5cd7fdf32ca4295eb365002a"
     end
   end
 
   bottle do
-    sha256 big_sur:  "0acb383286c9386439af8be1e6c577918f7cd2b378d88e3925ab78bec454bb36"
-    sha256 catalina: "c3a4d16a248a6f098d34a72ae0d53308862674bc6fab72fd94f79c38a1745450"
-    sha256 mojave:   "3b6c0164045fc0846426d0a433ccbe2fb3eb39652488ae222158dad276bd9db1"
+    sha256 monterey:     "e54e0c9ae68fb5f97583eafc1eee2dd4c2d44711eda230f61c31ad4630fd9718"
+    sha256 big_sur:      "0e8034fbd2f8ffbcab6ec9fa9c30e3ebd5b2fcc156e39fc42057f890ba4ed227"
+    sha256 catalina:     "fef67e3bc8fa339a1ee41e49a1dd403bd3dfc2c3b6ef691a47d3b952d36c55a0"
+    sha256 x86_64_linux: "18d502a96663c3d8a70c3e6b8b43d61ff675768cadccf24df0c3c701ce67f5ff"
   end
 
   head do
-    url "https://github.com/dlang/dmd.git"
+    url "https://github.com/dlang/dmd.git", branch: "master"
 
     resource "druntime" do
-      url "https://github.com/dlang/druntime.git"
+      url "https://github.com/dlang/druntime.git", branch: "master"
     end
 
     resource "phobos" do
-      url "https://github.com/dlang/phobos.git"
+      url "https://github.com/dlang/phobos.git", branch: "master"
     end
 
     resource "tools" do
-      url "https://github.com/dlang/tools.git"
+      url "https://github.com/dlang/tools.git", branch: "master"
     end
   end
 
+  depends_on "ldc" => :build
   depends_on arch: :x86_64
 
-  uses_from_macos "unzip" => :build
-  uses_from_macos "xz" => :build
-
   def install
-    # DMD defaults to v2.088.0 to bootstrap as of DMD 2.090.0
-    # On MacOS Catalina, a version < 2.087.1 would not work due to TLS related symbols missing
+    dmd_make_args = %W[
+      INSTALL_DIR=#{prefix}
+      SYSCONFDIR=#{etc}
+      HOST_DMD=#{Formula["ldc"].opt_bin/"ldmd2"}
+      ENABLE_RELEASE=1
+      VERBOSE=1
+    ]
+
+    system "ldc2", "src/build.d", "-of=src/build"
+    system "src/build", *dmd_make_args
 
     make_args = %W[
       INSTALL_DIR=#{prefix}
       MODEL=64
       BUILD=release
+      DMD_DIR=#{buildpath}
+      DRUNTIME_PATH=#{buildpath}/druntime
+      PHOBOS_PATH=#{buildpath}/phobos
       -f posix.mak
     ]
-
-    dmd_make_args = %W[
-      SYSCONFDIR=#{etc}
-      TARGET_CPU=X86
-      AUTO_BOOTSTRAP=1
-      ENABLE_RELEASE=1
-    ]
-
-    system "make", *dmd_make_args, *make_args
-
-    make_args.unshift "DMD_DIR=#{buildpath}", "DRUNTIME_PATH=#{buildpath}/druntime", "PHOBOS_PATH=#{buildpath}/phobos"
 
     (buildpath/"druntime").install resource("druntime")
     system "make", "-C", "druntime", *make_args
@@ -83,12 +82,8 @@ class Dmd < Formula
       system "make", "install", *make_args
     end
 
-    on_macos do
-      bin.install "generated/osx/release/64/dmd"
-    end
-    on_linux do
-      bin.install "generated/linux/release/64/dmd"
-    end
+    kernel_name = OS.mac? ? "osx" : OS.kernel_name.downcase
+    bin.install "generated/#{kernel_name}/release/64/dmd"
     pkgshare.install "samples"
     man.install Dir["docs/man/*"]
 
@@ -125,7 +120,7 @@ class Dmd < Formula
   end
 
   test do
-    system bin/"dmd", pkgshare/"samples/hello.d"
+    system bin/"dmd", "-fPIC", pkgshare/"samples/hello.d"
     system "./hello"
   end
 end

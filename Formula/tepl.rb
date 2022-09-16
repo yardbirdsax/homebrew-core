@@ -1,15 +1,19 @@
 class Tepl < Formula
   desc "GNOME Text Editor Product Line"
-  homepage "https://wiki.gnome.org/Projects/Tepl"
-  url "https://download.gnome.org/sources/tepl/5.0/tepl-5.0.1.tar.xz"
-  sha256 "b1274967609f524484b38775fa9ecb296c6d6616aabd052f286339a289912804"
+  homepage "https://gitlab.gnome.org/swilmet/tepl"
+  url "https://gitlab.gnome.org/swilmet/tepl.git",
+      tag:      "6.1.2",
+      revision: "62aba5222f8512042285d65d29e455da56f67dc3"
   license "LGPL-2.1-or-later"
+  revision 1
 
   bottle do
-    sha256 arm64_big_sur: "b004d7cbc84ea585b4314dbe7e74c067d8afbe91e74e332f791e943cccb29ca7"
-    sha256 big_sur:       "6c38d94b1b6229fc7d19d0e69f8ef120ce4240d37a92be886aeab5e34975b0b2"
-    sha256 catalina:      "675eed4ccdb966979a976569153b4fc9e7523f33e745bf4af6816c57c110f753"
-    sha256 mojave:        "d2f9ce09157721d7c2b6b989c999b286e26e6cd626c98d8dd110cf5465091891"
+    sha256 arm64_monterey: "07940e3b541b093e135209af85e1ddd789c11017a47f0fb678bc5ac00aa18407"
+    sha256 arm64_big_sur:  "539dc3dd69c7b6d4f25ed7c4dc2370327c51f61f52062e58243e88421345ff06"
+    sha256 monterey:       "4cdfae729a09db4baa0ba34b48f6586bfec57910dd0ba6f0265e38408ff66c29"
+    sha256 big_sur:        "9b33524b90c42436a431ce54b22f8165db29efac4d4f31b669cdb90a73461043"
+    sha256 catalina:       "48a87f65d0c693c7ef36694a10e329c2e0a6a76f85a023ca18301ea6cb874d54"
+    sha256 x86_64_linux:   "b2bcdcf44555d49b6f85b40f439d07aaf252fcc1f52187f402b0b46d9f4446bd"
   end
 
   depends_on "gobject-introspection" => :build
@@ -18,20 +22,13 @@ class Tepl < Formula
   depends_on "pkg-config" => :build
   depends_on "amtk"
   depends_on "gtksourceview4"
+  depends_on "icu4c"
   depends_on "uchardet"
 
-  # Submitted upstream at https://gitlab.gnome.org/GNOME/tepl/-/merge_requests/8
-  patch do
-    url "https://gitlab.gnome.org/GNOME/tepl/-/commit/a8075b0685764d1243762e569fc636fa4673d244.patch"
-    sha256 "cf4966f9975026ad349eac05980bdbc6cdfc2ed581b04c099ed892777db0767c"
-  end
-
   def install
-    mkdir "build" do
-      system "meson", *std_meson_args, ".."
-      system "ninja", "-v"
-      system "ninja", "install", "-v"
-    end
+    system "meson", *std_meson_args, "build", "-Dgtk_doc=false"
+    system "meson", "compile", "-C", "build", "-v"
+    system "meson", "install", "-C", "build"
   end
 
   test do
@@ -95,7 +92,7 @@ class Tepl < Formula
       -L#{lib}
       -L#{pango.opt_lib}
       -latk-1.0
-      -lamtk-5.0
+      -lamtk-5
       -lcairo
       -lcairo-gobject
       -lgdk-3
@@ -103,13 +100,13 @@ class Tepl < Formula
       -lgio-2.0
       -lglib-2.0
       -lgobject-2.0
-      -ltepl-5
+      -ltepl-6
       -lgtk-3
-      -lgtksourceview-4.0
-      -lintl
+      -lgtksourceview-4
       -lpango-1.0
       -lpangocairo-1.0
     ]
+    flags << "-lintl" if OS.mac?
     system ENV.cc, "test.c", "-o", "test", *flags
     system "./test"
   end

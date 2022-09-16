@@ -1,54 +1,49 @@
 class Gcovr < Formula
+  include Language::Python::Virtualenv
+
   desc "Reports from gcov test coverage program"
   homepage "https://gcovr.com/"
-  url "https://github.com/gcovr/gcovr/archive/4.2.tar.gz"
-  sha256 "589d5cb7164c285192ed0837d3cc17001ba25211e24933f0ba7cb9cf38b8a30e"
+  url "https://files.pythonhosted.org/packages/ff/e6/7fdb0c3f73d630fcc94b0d4798d27fe22f6c72237b33ae887951791beacb/gcovr-5.2.tar.gz"
+  sha256 "217195085ec94346291a87b7b1e6d9cfdeeee562b3e0f9a32b25c9530b3bce8f"
   license "BSD-3-Clause"
-  revision 1
-  head "https://github.com/gcovr/gcovr.git"
+  head "https://github.com/gcovr/gcovr.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "9274fc9010345a944d75bf90c8418fd100b0195e910a3ab746fa36bddca352a4"
-    sha256 cellar: :any_skip_relocation, big_sur:       "b9877f8a9da46667db0271977f2dcc1b2c95a21f0598b32e03cc8c9c50cd7c91"
-    sha256 cellar: :any_skip_relocation, catalina:      "0e5e2e559d936a1bd54895b1f594f55d555a01d7a296abf8955ea6cb8293e01b"
-    sha256 cellar: :any_skip_relocation, mojave:        "2398c9991b0a3817192dc11d84399ad1aed85b9e1730f8d10a2ce49bb86b5fc4"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "073e15e002cd9d40c63865632bf67e53913628c9bd940650fb781b724549d2fa"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "e8fed94a127327339a1a5c571f687ef169bc1d2df359a1f20e4c74e253645c02"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "36969e4f3cb4fc868d2a3c168c5ff1564154e7173be06f9920dbe5dfdfd5d6e6"
+    sha256 cellar: :any_skip_relocation, monterey:       "5b13a3cb220e0c835577a46d06a5ca3b000378a9bd7bf42d86d76a530348588e"
+    sha256 cellar: :any_skip_relocation, big_sur:        "21933ce627f701a515c6f0f11e4797e70a8d4694f90ebcae1809b701c123ead7"
+    sha256 cellar: :any_skip_relocation, catalina:       "0f5febc5b78f08f3011bba00412ea6f2c27a9a67bb0c0fe0c99bccf4c087f17a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f50db5ded09aad3ec882ce2eb406b543bc37387c52a09fb431d3c035b1c4e444"
   end
 
-  depends_on "python@3.9"
+  depends_on "python@3.10"
 
   uses_from_macos "libxml2"
   uses_from_macos "libxslt"
 
   resource "Jinja2" do
-    url "https://files.pythonhosted.org/packages/d8/03/e491f423379ea14bb3a02a5238507f7d446de639b623187bccc111fbecdf/Jinja2-2.11.1.tar.gz"
-    sha256 "93187ffbc7808079673ef52771baa950426fd664d3aad1d0fa3e95644360e250"
+    url "https://files.pythonhosted.org/packages/7a/ff/75c28576a1d900e87eb6335b063fab47a8ef3c8b4d88524c4bf78f670cce/Jinja2-3.1.2.tar.gz"
+    sha256 "31351a702a408a9e7595a8fc6150fc3f43bb6bf7e319770cbc0db9df9437e852"
   end
 
   resource "lxml" do
-    url "https://files.pythonhosted.org/packages/39/2b/0a66d5436f237aff76b91e68b4d8c041d145ad0a2cdeefe2c42f76ba2857/lxml-4.5.0.tar.gz"
-    sha256 "8620ce80f50d023d414183bf90cc2576c2837b88e00bea3f33ad2630133bbb60"
+    url "https://files.pythonhosted.org/packages/70/bb/7a2c7b4f8f434aa1ee801704bf08f1e53d7b5feba3d5313ab17003477808/lxml-4.9.1.tar.gz"
+    sha256 "fe749b052bb7233fe5d072fcb549221a8cb1a16725c47c37e42b0b9cb3ff2c3f"
   end
 
   resource "MarkupSafe" do
-    url "https://files.pythonhosted.org/packages/b9/2e/64db92e53b86efccfaea71321f597fa2e1b2bd3853d8ce658568f7a13094/MarkupSafe-1.1.1.tar.gz"
-    sha256 "29872e92839765e546828bb7754a68c418d927cd064fd4708fab9fe9c8bb116b"
+    url "https://files.pythonhosted.org/packages/1d/97/2288fe498044284f39ab8950703e88abbac2abbdf65524d576157af70556/MarkupSafe-2.1.1.tar.gz"
+    sha256 "7f91197cc9e48f989d12e4e6fbc46495c446636dfc81b9ccf50bb0ec74b91d4b"
+  end
+
+  resource "Pygments" do
+    url "https://files.pythonhosted.org/packages/59/0f/eb10576eb73b5857bc22610cdfc59e424ced4004fe7132c8f2af2cc168d3/Pygments-2.12.0.tar.gz"
+    sha256 "5eb116118f9612ff1ee89ac96437bb6b49e8f04d8a13b514ba26f620208e26eb"
   end
 
   def install
-    xy = Language::Python.major_minor_version "python3"
-    ENV.prepend_create_path "PYTHONPATH", libexec/"vendor/lib/python#{xy}/site-packages"
-    resources.each do |r|
-      r.stage do
-        system "python3", *Language::Python.setup_install_args(libexec/"vendor")
-      end
-    end
-
-    ENV.prepend_create_path "PYTHONPATH", libexec/"lib/python#{xy}/site-packages"
-    system "python3", *Language::Python.setup_install_args(libexec)
-
-    bin.install Dir[libexec/"bin/*"]
-    bin.env_script_all_files(libexec/"bin", PYTHONPATH: ENV["PYTHONPATH"])
+    virtualenv_install_with_resources
   end
 
   test do

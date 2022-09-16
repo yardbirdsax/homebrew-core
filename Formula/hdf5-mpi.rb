@@ -1,24 +1,31 @@
 class Hdf5Mpi < Formula
   desc "File format designed to store large amounts of data"
   homepage "https://www.hdfgroup.org/HDF5"
-  url "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.0/src/hdf5-1.12.0.tar.bz2"
-  sha256 "97906268640a6e9ce0cde703d5a71c9ac3092eded729591279bf2e3ca9765f61"
+  url "https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.12/hdf5-1.12.2/src/hdf5-1.12.2.tar.bz2"
+  sha256 "1a88bbe36213a2cea0c8397201a459643e7155c9dc91e062675b3fb07ee38afe"
+  license "BSD-3-Clause"
   revision 1
+  version_scheme 1
+
+  livecheck do
+    formula "hdf5"
+  end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "483dd167599e83c428e8dd159fa2bbf44a217edf85c61978e2bfd19bda025a39"
-    sha256 cellar: :any, big_sur:       "2566ec49e96b8bf99b97962f65daaa541256ec59c9ffcf671557bfd7d7348764"
-    sha256 cellar: :any, catalina:      "ba61a9e5993f15c7b339a17afa405422abf89a908f890cd60aead67d2114f310"
-    sha256 cellar: :any, mojave:        "f39b0f908ba1cb1c74aff7a36cb54cf04bc417defd5641752dffb2902866bd0c"
-    sha256 cellar: :any, high_sierra:   "7be5d7e51464129cd531f124efec310affc716d2e810a224d238bba1659aea53"
+    sha256 cellar: :any,                 arm64_monterey: "7492722a2de0bac658f71662bdc21d4c75b0cf7bcfa0ef1d2e1080ab2e86ab79"
+    sha256 cellar: :any,                 arm64_big_sur:  "8a85b45df3b571bd8e8865406b0cdd1d81f3a695417f84a7882ba5b3afe21579"
+    sha256 cellar: :any,                 monterey:       "4300aaa8fef5bef03ec58b3f0e9f9be6fa355636e7c2ea934330f824e51494e7"
+    sha256 cellar: :any,                 big_sur:        "7ff6f72a8617a7a1636e8fd44c58aff342a88d4a00a6c072d3a4701670ae79fd"
+    sha256 cellar: :any,                 catalina:       "d4ce608c4e4034085c5d5de409cd8d4ad429d6926c4d85680876dcab7c06f0e2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "be5a8ef9dec6f0c7cec54e0b809b2a5a09f0e2707e2ba2bb62680b42668bf6e5"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
   depends_on "gcc" # for gfortran
+  depends_on "libaec"
   depends_on "open-mpi"
-  depends_on "szip"
 
   uses_from_macos "zlib"
 
@@ -26,29 +33,34 @@ class Hdf5Mpi < Formula
 
   def install
     inreplace %w[c++/src/h5c++.in fortran/src/h5fc.in bin/h5cc.in],
-      "${libdir}/libhdf5.settings",
-      "#{pkgshare}/libhdf5.settings"
+              "${libdir}/libhdf5.settings",
+              "#{pkgshare}/libhdf5.settings"
 
     inreplace "src/Makefile.am",
               "settingsdir=$(libdir)",
               "settingsdir=#{pkgshare}"
 
-    system "autoreconf", "-fiv"
+    if OS.mac?
+      system "autoreconf", "--force", "--install", "--verbose"
+    else
+      system "./autogen.sh"
+    end
 
     args = %W[
       --disable-dependency-tracking
       --disable-silent-rules
-      --prefix=#{prefix}
-      --with-szlib=#{Formula["szip"].opt_prefix}
       --enable-build-mode=production
       --enable-fortran
       --enable-parallel
+      --prefix=#{prefix}
+      --with-szlib=#{Formula["libaec"].opt_prefix}
       CC=mpicc
       CXX=mpic++
       FC=mpifort
       F77=mpif77
       F90=mpif90
     ]
+    args << "--with-zlib=#{Formula["zlib"].opt_prefix}" if OS.linux?
 
     system "./configure", *args
     system "make", "install"

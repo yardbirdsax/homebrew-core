@@ -1,25 +1,34 @@
 class Zebra < Formula
   desc "Information management system"
-  homepage "https://www.indexdata.com/zebra"
-  url "http://ftp.indexdata.dk/pub/zebra/idzebra-2.2.2.tar.gz"
-  sha256 "513c2bf272e12745d4a7b58599ded0bc1292a84e9dc420a32eb53b6601ae0000"
+  homepage "https://www.indexdata.com/resources/software/zebra/"
+  url "https://ftp.indexdata.com/pub/zebra/idzebra-2.2.5.tar.gz"
+  sha256 "747714b33b653cbe5697193703b9955489fa2f51597433f9b072ab2bf9cf92bb"
   license "GPL-2.0-or-later"
+  revision 1
 
   livecheck do
-    url "https://www.indexdata.com/resources/software/zebra"
-    regex(%r{>Latest:</strong>.*?v?(\d+(?:\.\d+)+)<}i)
+    url "https://ftp.indexdata.com/pub/zebra/"
+    regex(/href=.*?idzebra[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 arm64_big_sur: "68e15eda361139139937655b494e3726b1c9236480ff3ab6e37c8e120b0f2c5f"
-    sha256 big_sur:       "3521e4cde145c7ebd38c406d4a0c3a75d8f9154fe8a91ee63c62765befefb5d7"
-    sha256 catalina:      "b78b4ca52c9274c42692d190beb13c9b3709b8cb610831ee04bae42bf1ef4c04"
-    sha256 mojave:        "0c4967b8025621b5c3bc343329a2f01e07292163df9151c1432c70886dc81500"
-    sha256 high_sierra:   "a7f24384ddd17dda271a6c44a9f2db5f91ba3ee50944fbccc156ca9cd6387b3e"
+    sha256 arm64_monterey: "8bede656eb92a62100fbef7242bc5983698621e2e197bbcae466ab9f3ff2c51d"
+    sha256 arm64_big_sur:  "3f306cc62317d8a0ace3904ea87cfbe2b87b86eb1b8a1261650d2142ed9670cd"
+    sha256 monterey:       "4edf6fa6edd68cdd84f0160b2da734a11d1ea9ee3dba66f123d3a67786c8d6db"
+    sha256 big_sur:        "c4bcb8868fd1ad665e0b3793f63c3c26a2faf94be04c5bacc6cd3db12d6661d6"
+    sha256 catalina:       "f18e747b339b6df99dca4aa709d2545575a0f3f5cad7f1d1f76b9544ea7b8a39"
+    sha256 x86_64_linux:   "943a68df4bb5c465878db259e1865c9b181fc58b9af18eb57f6db5cbb5432363"
   end
 
   depends_on "icu4c"
   depends_on "yaz"
+
+  uses_from_macos "bzip2"
+  uses_from_macos "expat"
+  uses_from_macos "libxcrypt"
+  uses_from_macos "libxml2"
+  uses_from_macos "libxslt"
+  uses_from_macos "zlib"
 
   def install
     system "./configure", "--disable-dependency-tracking",

@@ -1,18 +1,35 @@
 class Pnetcdf < Formula
   desc "Parallel netCDF library for scientific data using the OpenMPI library"
   homepage "https://parallel-netcdf.github.io/index.html"
-  url "https://parallel-netcdf.github.io/Release/pnetcdf-1.12.2.tar.gz"
-  sha256 "3ef1411875b07955f519a5b03278c31e566976357ddfc74c2493a1076e7d7c74"
+  url "https://parallel-netcdf.github.io/Release/pnetcdf-1.12.3.tar.gz"
+  sha256 "439e359d09bb93d0e58a6e3f928f39c2eae965b6c97f64e67cd42220d6034f77"
   license "NetCDF"
+  revision 1
+
+  livecheck do
+    url "https://parallel-netcdf.github.io/wiki/Download.html"
+    regex(/href=.*?pnetcdf[._-]v?(\d+(?:\.\d+)+)\.t/i)
+  end
 
   bottle do
-    sha256 big_sur:  "85211030d47c598d6ff4de8af6c063194d82cfd030c3799ffe61d0ea775fee91"
-    sha256 catalina: "850305bbe69b1ada59f7cc8628d12471819e720dbd41f873d269ff12ff7a9f86"
-    sha256 mojave:   "7313cd18dde083b4cb5bee094a43e1138ab70f97f33e762c8d97d64d916143eb"
+    sha256 arm64_monterey: "1543e607fd7d317f0d235655c746f6e23e9b1f2646d366c4503008cab3b2ee1d"
+    sha256 arm64_big_sur:  "3835889299b0058c33d17b94b2f1c57b21d10a00694d9a43c19ea95079035200"
+    sha256 monterey:       "026bca86c31dc0ce029f790e93db11616877121173a780aa4a3954864ebd347a"
+    sha256 big_sur:        "2708f28a2cc2b81cb4ef5338219fdc644e23a666001ab0c622f3cfe97c731479"
+    sha256 catalina:       "1d5b9405435f5c0621fd1214e2678e8a52c84b27da7f7540a3a6e7a4ccac7c50"
+    sha256 x86_64_linux:   "315a952a703528f06ded6287166bfd92373ae53a8de6774ac32a638d322431a8"
   end
 
   depends_on "gcc"
   depends_on "open-mpi"
+
+  uses_from_macos "m4" => :build
+
+  # Fix -flat_namespace being used on Big Sur and later.
+  patch do
+    url "https://raw.githubusercontent.com/Homebrew/formula-patches/03cf8088210822aa2c1ab544ed58ea04c897d9c4/libtool/configure-big_sur.diff"
+    sha256 "35acd6aebc19843f1a2b3a63e880baceb0f5278ab1ace661e57a502d9d78c93c"
+  end
 
   def install
     system "./configure", "--disable-debug",
@@ -23,8 +40,7 @@ class Pnetcdf < Formula
 
     cd "src/utils" do
       # Avoid references to Homebrew shims
-      inreplace ["pnetcdf-config", "pnetcdf_version/Makefile"], "#{HOMEBREW_SHIMS_PATH}/mac/super/",
-                                                                "/usr/bin/"
+      inreplace ["pnetcdf-config", "pnetcdf_version/Makefile"], Superenv.shims_path, "/usr/bin"
     end
 
     system "make", "install"

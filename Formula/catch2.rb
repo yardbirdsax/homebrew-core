@@ -1,18 +1,23 @@
 class Catch2 < Formula
   desc "Modern, C++-native, header-only, test framework"
   homepage "https://github.com/catchorg/Catch2"
-  url "https://github.com/catchorg/Catch2/archive/v2.13.4.tar.gz"
-  sha256 "e7eb70b3d0ac2ed7dcf14563ad808740c29e628edde99e973adad373a2b5e4df"
+  url "https://github.com/catchorg/Catch2/archive/v3.1.0.tar.gz"
+  sha256 "c252b2d9537e18046d8b82535069d2567f77043f8e644acf9a9fffc22ea6e6f7"
   license "BSL-1.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "cc9b4a14e2dba8b4f2271bd376ef08c11d3046f3168f33bac63255cd1c3c73e4"
-    sha256 cellar: :any_skip_relocation, big_sur:       "d0edb0bd1f54ca94f52d83b34f01391d977f6e22d9b5edda6969b44f0acae3e2"
-    sha256 cellar: :any_skip_relocation, catalina:      "89905994724339d80de88e5fe043c59dda7fee37d608ed44d7c2d38233c44088"
-    sha256 cellar: :any_skip_relocation, mojave:        "137c7fd141b94d0c206f0265b3fffbad55cc89c3db52249bd0921a64094576e3"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "b07f3763a2b490e635e522921ce46bf394630cc890cc3c25eefbfbc7916b3a9f"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e1bfdeee516c57508fc966f8c8e597ac3027d14f15c8a66ee3c34f246a041170"
+    sha256 cellar: :any_skip_relocation, monterey:       "d2933b99b16a54f70c41b93187b3e832f24b5a98ebf0034162dac506611eb992"
+    sha256 cellar: :any_skip_relocation, big_sur:        "58efdf7d1cee6b5bfb3d641b20a4387dc7cf09c451dca4b170766d762a9d39e1"
+    sha256 cellar: :any_skip_relocation, catalina:       "0922e33d2d012d83970787e66af3f497490c31f3ba3f935b6a1f793fd82b284d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6a2beac4f21835c7d8178c0aeabc0931fe7328bc64b086d0a329c6be458737ae"
   end
 
   depends_on "cmake" => :build
+
+  fails_with gcc: "5"
 
   def install
     mkdir "build" do
@@ -23,8 +28,7 @@ class Catch2 < Formula
 
   test do
     (testpath/"test.cpp").write <<~EOS
-      #define CATCH_CONFIG_MAIN
-      #include <catch2/catch.hpp>
+      #include <catch2/catch_all.hpp>
       TEST_CASE("Basic", "[catch2]") {
         int x = 1;
         SECTION("Test section 1") {
@@ -36,7 +40,7 @@ class Catch2 < Formula
         }
       }
     EOS
-    system ENV.cxx, "test.cpp", "-std=c++11", "-o", "test"
+    system ENV.cxx, "test.cpp", "-std=c++14", "-L#{lib}", "-lCatch2Main", "-lCatch2", "-o", "test"
     system "./test"
   end
 end

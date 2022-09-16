@@ -1,32 +1,47 @@
 class Sqlcipher < Formula
   desc "SQLite extension providing 256-bit AES encryption"
   homepage "https://www.zetetic.net/sqlcipher/"
-  url "https://github.com/sqlcipher/sqlcipher/archive/v4.4.2.tar.gz"
-  sha256 "87458e0e16594b3ba6c7a1f046bc1ba783d002d35e0e7b61bb6b7bb862f362a7"
+  url "https://github.com/sqlcipher/sqlcipher/archive/v4.5.2.tar.gz"
+  sha256 "6925f012deb5582e39761a7d4816883cc15b41851a8e70b447c223b8ef406e2a"
   license "BSD-3-Clause"
-  head "https://github.com/sqlcipher/sqlcipher.git"
+  head "https://github.com/sqlcipher/sqlcipher.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "9e9d5ee53f8a6f0d81981e91ef66052afd72d58eb50331ddf199dd74d8f339b6"
-    sha256 cellar: :any, big_sur:       "cac60b27489ae08e4be4fffcb80c66208cc628889ce89295802983581a39febc"
-    sha256 cellar: :any, catalina:      "b6e926a4630f8b4547e5d71f5195bdde461ef08e54b9ae90a45644b11543cd9d"
-    sha256 cellar: :any, mojave:        "8d216a324ade956c2ec9b4dc94a676b27342e590c948b1c80ba49d602c885ccb"
+    sha256 cellar: :any,                 arm64_monterey: "3485f63912e36d01ecbf4dea5ea11ba0595f5a0d758fe2e50a734da28749429c"
+    sha256 cellar: :any,                 arm64_big_sur:  "6a61b33f89fe6517ade5304062b75a4b7fc0e788feeab7e425a29aa437a1f70c"
+    sha256 cellar: :any,                 monterey:       "28953e908487a25f6e502c299398206639f4542b469b772f85df48d8a578fa44"
+    sha256 cellar: :any,                 big_sur:        "9341a568923722c7583fc717037d63aefe941f1d7060c632da4ff2e8fb95a5bd"
+    sha256 cellar: :any,                 catalina:       "af5bdb1de84f318ba76ce36f25cc2fe7efbd79798ab06bdc84861ca994a78611"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "40c96980b21b40050833f9db489bf0ae8f4b8bf4b2a711a5f40237be9b727ecf"
   end
 
-  depends_on "openssl@1.1"
+  depends_on "openssl@3"
+
+  # Build scripts require tclsh. `--disable-tcl` only skips building extension
+  uses_from_macos "tcl-tk" => :build
+  uses_from_macos "sqlite"
 
   def install
     args = %W[
       --prefix=#{prefix}
       --enable-tempstore=yes
-      --with-crypto-lib=#{Formula["openssl@1.1"].opt_prefix}
+      --with-crypto-lib=#{Formula["openssl@3"].opt_prefix}
       --enable-load-extension
       --disable-tcl
     ]
 
     # Build with full-text search enabled
-    args << "CFLAGS=-DSQLITE_HAS_CODEC -DSQLITE_ENABLE_JSON1 -DSQLITE_ENABLE_FTS3 " \
-                   "-DSQLITE_ENABLE_FTS3_PARENTHESIS -DSQLITE_ENABLE_FTS5 -DSQLITE_ENABLE_COLUMN_METADATA"
+    cflags = %w[
+      -DSQLITE_HAS_CODEC
+      -DSQLITE_ENABLE_JSON1
+      -DSQLITE_ENABLE_FTS3
+      -DSQLITE_ENABLE_FTS3_PARENTHESIS
+      -DSQLITE_ENABLE_FTS5
+      -DSQLITE_ENABLE_COLUMN_METADATA
+    ].join(" ")
+    args << "CFLAGS=#{cflags}"
+
+    args << "LIBS=-lm" if OS.linux?
 
     system "./configure", *args
     system "make"

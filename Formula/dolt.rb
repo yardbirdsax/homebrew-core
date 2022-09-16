@@ -1,8 +1,8 @@
 class Dolt < Formula
   desc "Git for Data"
-  homepage "https://github.com/liquidata-inc/dolt"
-  url "https://github.com/dolthub/dolt/archive/v0.22.14.tar.gz"
-  sha256 "fea1c091fed044a3167597c1f2102ae4563e444635b85d8679fe46d576b1429f"
+  homepage "https://github.com/dolthub/dolt"
+  url "https://github.com/dolthub/dolt/archive/v0.41.3.tar.gz"
+  sha256 "875625691a494250b837fa644c6d998fb5f3bf7e81ad931158697cd9143e344f"
   license "Apache-2.0"
 
   livecheck do
@@ -11,10 +11,12 @@ class Dolt < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "7bb5b6c966ada6d17a2eb70c7c343bb6f76b2aa7a38530b6e1e9442ddf8ab026"
-    sha256 cellar: :any_skip_relocation, big_sur:       "97e1f1ac47bf77596cbd3f1cc0f1945332faa49603eb6ed7cbea972582818ccd"
-    sha256 cellar: :any_skip_relocation, catalina:      "75e3e0f913cdf22d2462d59335b71b13173f4f77ea3e3f1ada36089e6a3d4060"
-    sha256 cellar: :any_skip_relocation, mojave:        "95653a237c645a496ed03bace316409e571c4bb305de50373ea3c13b22f08141"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "568b0c26bc94abe9171c9ae7942bc83b9a64888011175ec391921bbc6dd3cbad"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a90ec95b623aad549aea7637f384599691263f6765ae831b4302cbee782fe0b8"
+    sha256 cellar: :any_skip_relocation, monterey:       "f8955831bea3d9c836b0273844f41b6ae27fa3e5f6db024bff14310a97d77a7e"
+    sha256 cellar: :any_skip_relocation, big_sur:        "cde8fc489110a01e21ac61189aa6f20eff73a88ed86319ddd0b8e1330bcd6da9"
+    sha256 cellar: :any_skip_relocation, catalina:       "80d5e31562547e3dc7c597c3d10abf6eb8a84fcd6e8c3a341668b692555befd2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9fb7f3c5845b80f6244069830420a5a083cd91fea58d14907368f94a8075d0f3"
   end
 
   depends_on "go" => :build
@@ -22,8 +24,6 @@ class Dolt < Formula
   def install
     chdir "go" do
       system "go", "build", *std_go_args, "./cmd/dolt"
-      system "go", "build", *std_go_args, "-o", bin/"git-dolt", "./cmd/git-dolt"
-      system "go", "build", *std_go_args, "-o", bin/"git-dolt-smudge", "./cmd/git-dolt-smudge"
     end
   end
 

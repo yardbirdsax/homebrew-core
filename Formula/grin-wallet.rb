@@ -1,22 +1,30 @@
 class GrinWallet < Formula
   desc "Official wallet for the cryptocurrency Grin"
   homepage "https://grin.mw"
-  url "https://github.com/mimblewimble/grin-wallet/archive/v5.0.3.tar.gz"
-  sha256 "943eed3d7b5d54298af7de3bfd6a746273dcfc0909f0efc191b4916e80f1ecf3"
+  url "https://github.com/mimblewimble/grin-wallet/archive/v5.1.0.tar.gz"
+  sha256 "33b3d00c3830c32927f555bf75ddc4d37ef7ee77b9ffda0e5d46162c4ffd0c9f"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, big_sur:  "a0dfda70b5c6cf1ed883e5af6b61c01aea7ddf18f6f22038aab71e06b5b9801a"
-    sha256 cellar: :any_skip_relocation, catalina: "4b43f745f1b82d9390cdaf4055c9d65e6bea850fe9ad7ebd2818789c33c45dbc"
-    sha256 cellar: :any_skip_relocation, mojave:   "3ce2c42866c3d02c527fac13c2393af01eabb9c9591ef25d5503aca073863f50"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "342e42ea8633a8dbffcd034bc4b980a380a20133d4ae8dd864f95aba73ae2a66"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "2fd93430e16fc5d5f856bc53961fd29b2c4817266e7144a5acd75cb06966c151"
+    sha256 cellar: :any_skip_relocation, monterey:       "20ea76cec3e1ac989368a14f4add19def5a60a09272f5b03b6d91885215c959f"
+    sha256 cellar: :any_skip_relocation, big_sur:        "ef761e96659760aba0f64a4218a30a0171baebf1c565b543179b2540a7c06f92"
+    sha256 cellar: :any_skip_relocation, catalina:       "5dea056f76f828d2b016d4892481387c2a06820099198e0d91072de3acc29545"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e679400d4c63acd8c30e2652f6b7acb2fb5635c278ab9ab43b24716fa46fb833"
   end
 
-  depends_on "llvm" => :build # for libclang
   depends_on "rust" => :build
 
-  def install
-    ENV["CLANG_PATH"] = Formula["llvm"].opt_bin/"clang"
+  uses_from_macos "llvm" => :build # for libclang
 
+  on_linux do
+    depends_on "pkg-config" => :build
+    depends_on "openssl@1.1" # Uses Secure Transport on macOS
+  end
+
+  def install
+    ENV["CLANG_PATH"] = Formula["llvm"].opt_bin/"clang" if OS.linux?
     system "cargo", "install", *std_cargo_args
   end
 

@@ -1,8 +1,8 @@
 class Oil < Formula
   desc "Bash-compatible Unix shell with more consistent syntax and semantics"
   homepage "https://www.oilshell.org/"
-  url "https://www.oilshell.org/download/oil-0.8.7.tar.gz"
-  sha256 "599a93985dd70adaf8773f021742ddced82deeb5a9414405de10f2298100ad7b"
+  url "https://www.oilshell.org/download/oil-0.12.5.tar.gz"
+  sha256 "e7fad0b14deb64fa28e9db40060dcfa8288f04f0f019acf8d15fc85b60ea5770"
   license "Apache-2.0"
 
   livecheck do
@@ -11,13 +11,17 @@ class Oil < Formula
   end
 
   bottle do
-    sha256 arm64_big_sur: "efa230c838f08708379180132ebc6a4ef7ceb3f621b7976ec983826df621eea8"
-    sha256 big_sur:       "3c5a97efe79952d35796bd6bbe42da9c409a96cd30f0778c4b740775db3a59c1"
-    sha256 catalina:      "50a478f15af8bd3d5e04aa3ad7e76089f03b80cc2ad2d45f7dbe78797112df6c"
-    sha256 mojave:        "265b248b82d7a7c410ee0545c3fa210362f7616b97e5623975fe269c03ef3985"
+    sha256 arm64_monterey: "a7308a9553f7f55c0cda7182612c0875f8c6a4a17103705671a9831b79ffbc5a"
+    sha256 arm64_big_sur:  "af1df7bb8ee26ce3cd7c6e142f6ea32b2da3c5b2f84fa4e2625456ef2d96f075"
+    sha256 monterey:       "aaa395c37c92e5973470ecc6562efb8c26a1a60fa15b693633ad500c075dbbb5"
+    sha256 big_sur:        "b5cae372631f127c873c1f39c048d5330420b6e7d48841db8f1d27a9522b2b0b"
+    sha256 catalina:       "c68663d0b15935329bc228454102cd7db844a17bd305decb672f2dad3607d19e"
+    sha256 x86_64_linux:   "5737d146a46cd681452de528d1e71800eaa533453ae06a4bf52fa5bcd74a7b6e"
   end
 
   depends_on "readline"
+
+  conflicts_with "omake", because: "both install 'osh' binaries"
 
   def install
     system "./configure", "--prefix=#{prefix}",
@@ -27,10 +31,10 @@ class Oil < Formula
   end
 
   test do
-    system "#{bin}/osh -c 'shopt -q parse_backticks'"
+    system "#{bin}/osh", "-c", "shopt -q parse_backticks"
     assert_equal testpath.to_s, shell_output("#{bin}/osh -c 'echo `pwd -P`'").strip
 
-    system "#{bin}/oil -c 'shopt -q parse_equals'"
+    system "#{bin}/oil", "-c", "shopt -u parse_equals"
     assert_equal "bar", shell_output("#{bin}/oil -c 'var foo = \"bar\"; write $foo'").strip
   end
 end

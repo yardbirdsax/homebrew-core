@@ -1,10 +1,10 @@
 class Asio < Formula
   desc "Cross-platform C++ Library for asynchronous programming"
   homepage "https://think-async.com/Asio"
-  url "https://downloads.sourceforge.net/project/asio/asio/1.18.1%20%28Stable%29/asio-1.18.1.tar.bz2"
-  sha256 "4af9875df5497fdd507231f4b7346e17d96fc06fe10fd30e2b3750715a329113"
+  url "https://downloads.sourceforge.net/project/asio/asio/1.24.0%20%28Stable%29/asio-1.24.0.tar.bz2"
+  sha256 "8976812c24a118600f6fcf071a20606630a69afe4c0abee3b0dea528e682c585"
   license "BSL-1.0"
-  head "https://github.com/chriskohlhoff/asio.git"
+  head "https://github.com/chriskohlhoff/asio.git", branch: "master"
 
   livecheck do
     url :stable
@@ -12,11 +12,12 @@ class Asio < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any, arm64_big_sur: "f335dcfcae4e9345a6510d06cafe8884a8368a43368d52e53f95e1ca6bb8699c"
-    sha256 cellar: :any, big_sur:       "9cf6b9d1a1cc605977a853af92d5fd65a21f20a6128126ad19d8cceabc766a4b"
-    sha256 cellar: :any, catalina:      "a3eec5329a66d0e7017f407d653adc6234f09f20de691cb4290a5f1ca16c6c94"
-    sha256 cellar: :any, mojave:        "1cbf161c11f1f4863d39d190d61a6c8efc0cdb2932c3763df7ff1111c480aaae"
+    sha256 cellar: :any,                 arm64_monterey: "e20aec9f064477c73792f6803c8e10e26c4cd4ce054b0ce459d6772368921689"
+    sha256 cellar: :any,                 arm64_big_sur:  "a6f2e2deeac5cd08a04b2bee1c526e8edc7c47f32303224ab1071471ed7e0d77"
+    sha256 cellar: :any,                 monterey:       "129fd9c1da610fec3a7a3a2fe12826f627528e105de614af9ca5d52d50a80f2e"
+    sha256 cellar: :any,                 big_sur:        "23ec57ee734521b53c0180751aacf12c44bf81f23767683a194afffd07dd295d"
+    sha256 cellar: :any,                 catalina:       "b8d84401529dd7156387686e552f267474cdebda31786f78320de6e6f6aa5b6e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9ad1851fe6c46fa7440e78f0572eb23698fded2b1d80795a7558126ab7c740da"
   end
 
   depends_on "autoconf" => :build
@@ -51,10 +52,9 @@ class Asio < Formula
     end
     sleep 1
     begin
-      assert_match /404 Not Found/, shell_output("curl http://127.0.0.1:#{port}")
+      assert_match "404 Not Found", shell_output("curl http://127.0.0.1:#{port}")
     ensure
       Process.kill 9, pid
-      Process.wait pid
     end
   end
 end

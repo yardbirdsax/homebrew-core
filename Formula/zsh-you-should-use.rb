@@ -5,7 +5,9 @@ class ZshYouShouldUse < Formula
   sha256 "db4486cd12974332ec858d446aff9393dae6be430d425a56d7036d2ce4edeb9e"
   license "GPL-3.0-or-later"
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "559c5067d040915063806f345fbf5470c5508766bb91208a92d2038b6d683f3b"
+  end
 
   def install
     pkgshare.install "you-should-use.plugin.zsh"
@@ -17,10 +19,7 @@ class ZshYouShouldUse < Formula
 
         source #{HOMEBREW_PREFIX}/share/zsh-you-should-use/you-should-use.plugin.zsh
 
-      You will also need to force reload of your .zshrc:
-
-        source ~/.zshrc
-
+      You will also need to restart your terminal for this change to take effect.
     EOS
   end
 

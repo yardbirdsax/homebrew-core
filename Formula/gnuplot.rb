@@ -1,21 +1,22 @@
 class Gnuplot < Formula
   desc "Command-driven, interactive function plotting"
   homepage "http://www.gnuplot.info/"
-  url "https://downloads.sourceforge.net/project/gnuplot/gnuplot/5.4.1/gnuplot-5.4.1.tar.gz"
-  sha256 "6b690485567eaeb938c26936e5e0681cf70c856d273cc2c45fabf64d8bc6590e"
+  url "https://downloads.sourceforge.net/project/gnuplot/gnuplot/5.4.4/gnuplot-5.4.4.tar.gz"
+  sha256 "372300b7867f5b3538b25fc5d0ac7734af6e3fe0d202b6db926e4369913f0902"
   license "gnuplot"
-  revision 1
 
   bottle do
     rebuild 1
-    sha256 arm64_big_sur: "72a503fc93c60629c22d4f286d45365037d792d76c2f7ff8a76e6469641b0cc7"
-    sha256 big_sur:       "9a9db26ab2b8537521d4ff508d4797c8535434ddd34748ab4044867d8eef65a0"
-    sha256 catalina:      "1de9920502210ab56fbedc9bf4025ab8f0c88d164f022a1e767863f64b6e9954"
-    sha256 mojave:        "19ed248f7d406ade2e6fd1faa28069878cd5b2a0b73911d735289478faaab8c3"
+    sha256 arm64_monterey: "747cde79b524c5f8aa457ff5d64bb7d67cb18c09d8d1131394dd6a27ce873772"
+    sha256 arm64_big_sur:  "14bce54eeb825dde24a8e16d3fe0418211b94827752faf0ae606ff6f3b0c7a35"
+    sha256 monterey:       "b1f287106aa78ce2fdb88152d103fd5509cd2343b223a53e3648c545dd611613"
+    sha256 big_sur:        "a4b81c9d0eff4a3d60b57e7f20d8f6c15d90542f9255842101984a2beb00b148"
+    sha256 catalina:       "b3e8dc8322ede575e7f287ab2308845e7146469da761f9bea0a2a5944619822c"
+    sha256 x86_64_linux:   "5663a25c03185c8d08f30ec8e323e2333f8d70051eaeeb5e24a0a9cc1215b94a"
   end
 
   head do
-    url "https://git.code.sf.net/p/gnuplot/gnuplot-main.git"
+    url "https://git.code.sf.net/p/gnuplot/gnuplot-main.git", branch: "master"
 
     depends_on "autoconf" => :build
     depends_on "automake" => :build
@@ -27,8 +28,10 @@ class Gnuplot < Formula
   depends_on "libcerf"
   depends_on "lua"
   depends_on "pango"
-  depends_on "qt"
+  depends_on "qt@5"
   depends_on "readline"
+
+  fails_with gcc: "5"
 
   def install
     # Qt5 requires c++11 (and the other backends do not care)

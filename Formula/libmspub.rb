@@ -4,7 +4,7 @@ class Libmspub < Formula
   url "https://dev-www.libreoffice.org/src/libmspub/libmspub-0.1.4.tar.xz"
   sha256 "ef36c1a1aabb2ba3b0bedaaafe717bf4480be2ba8de6f3894be5fd3702b013ba"
   license "MPL-2.0"
-  revision 8
+  revision 12
 
   livecheck do
     url "https://dev-www.libreoffice.org/src/"
@@ -12,11 +12,12 @@ class Libmspub < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "f3b6770af470cf567abaff75214a7f995a71b1fdc8c0b429de795b2c39548994"
-    sha256 cellar: :any, big_sur:       "560e6ca4196fddbb446fed8b0d485b987fb6682c287d48e1e455bd27b4a2245d"
-    sha256 cellar: :any, catalina:      "3195885cb49f812356a0abefe1b5510ded44227b1ed81aaa2b0528de4ee801d9"
-    sha256 cellar: :any, mojave:        "129b2e788cd9253e464272dbb8db2609832fbc26e473ec1a50d2ba6407ae6fd1"
-    sha256 cellar: :any, high_sierra:   "8fc4879c42cf295f2651cb4a91f7c51582fa8fe50ebbaffc3998dd2c534840fe"
+    sha256 cellar: :any,                 arm64_monterey: "6beeba33de3a77318d2072e29a9526aec45f8402c9ebe4b9cdb2706b47318283"
+    sha256 cellar: :any,                 arm64_big_sur:  "2885a8e55e3a5f7d888c0a75a5ccc2955dd9917246531c760e5195bfc09de281"
+    sha256 cellar: :any,                 monterey:       "10616dfa83cd78355352afa80411c49054c0bd7b19eabcf51328c13d0d4124dd"
+    sha256 cellar: :any,                 big_sur:        "946974c09dc55804597ef309307ec7f5075fc2f9b94ad3325d0a9214eaa39876"
+    sha256 cellar: :any,                 catalina:       "1611d6040a54bde36839db3ba89610e375c240265d8ac757a75c5785f0ffafab"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2ce7135a4964fbb0de251ee2a6ebc7b3cbf8a8412e02eea1281c69b17f38939a"
   end
 
   depends_on "boost" => :build

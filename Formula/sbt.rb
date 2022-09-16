@@ -1,9 +1,9 @@
 class Sbt < Formula
   desc "Build tool for Scala projects"
   homepage "https://www.scala-sbt.org/"
-  url "https://github.com/sbt/sbt/releases/download/v1.4.7/sbt-1.4.7.tgz"
-  mirror "https://sbt-downloads.cdnedge.bluemix.net/releases/v1.4.7/sbt-1.4.7.tgz"
-  sha256 "c2a759fe40a3c21a16b5a88d00cd66f3af6f0721e4ea61b63942dfb83a2d54fd"
+  url "https://github.com/sbt/sbt/releases/download/v1.7.1/sbt-1.7.1.tgz"
+  mirror "https://sbt-downloads.cdnedge.bluemix.net/releases/v1.7.1/sbt-1.7.1.tgz"
+  sha256 "8a183afdb3519290dde2f8c81c9b2bad19ddd78735ef311fb5fb9bdcf68d3fe4"
   license "Apache-2.0"
 
   livecheck do
@@ -11,7 +11,9 @@ class Sbt < Formula
     regex(/^v?(\d+(?:\.\d+)+)$/i)
   end
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "f0ae85a514c49e1e3c1412b42e34ae29603ada77cf3361226e4dcbf66fcdfede"
+  end
 
   depends_on "openjdk"
 
@@ -24,8 +26,11 @@ class Sbt < Formula
     libexec.install "bin"
     etc.install "conf/sbtopts"
 
+    # Removes:
+    # 1. `sbt.bat` (Windows-only)
+    # 2. `sbtn` (pre-compiled native binary)
+    (libexec/"bin").glob("sbt{.bat,n-x86_64*}").map(&:unlink)
     (bin/"sbt").write_env_script libexec/"bin/sbt", Language::Java.overridable_java_home_env
-    (bin/"sbtn").write_env_script libexec/"bin/sbtn-x86_64-apple-darwin", Language::Java.overridable_java_home_env
   end
 
   def caveats
@@ -33,14 +38,14 @@ class Sbt < Formula
       You can use $SBT_OPTS to pass additional JVM options to sbt.
       Project specific options should be placed in .sbtopts in the root of your project.
       Global settings should be placed in #{etc}/sbtopts
+
+      #{tap.user}'s installation does not include `sbtn`.
     EOS
   end
 
   test do
     ENV.append "_JAVA_OPTIONS", "-Dsbt.log.noformat=true"
-    system("#{bin}/sbt", "--sbt-create", "about")
+    system bin/"sbt", "--sbt-create", "about"
     assert_match version.to_s, shell_output("#{bin}/sbt sbtVersion")
-    system "#{bin}/sbtn", "about"
-    system "#{bin}/sbtn", "shutdown"
   end
 end

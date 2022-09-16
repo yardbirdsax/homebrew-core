@@ -1,18 +1,24 @@
 class RubyBuild < Formula
   desc "Install various Ruby versions and implementations"
   homepage "https://github.com/rbenv/ruby-build"
-  url "https://github.com/rbenv/ruby-build/archive/v20210119.tar.gz"
-  sha256 "5c49a0b46a471f8f6a176a56637ded1a09c7a583fa02451ae8a93ad5ced772c1"
+  url "https://github.com/rbenv/ruby-build/archive/v20220910.1.tar.gz"
+  sha256 "591c8f34b59ee10143393310580e8114cf00b190ee73d23581fb6824569668e5"
   license "MIT"
-  head "https://github.com/rbenv/ruby-build.git"
+  head "https://github.com/rbenv/ruby-build.git", branch: "master"
 
-  bottle :unneeded
+  bottle do
+    sha256 cellar: :any_skip_relocation, all: "044675037f4157fdeb91cbad6cd697df845f74fcc2817567a2d3840275b69acf"
+  end
 
   depends_on "autoconf"
   depends_on "pkg-config"
   depends_on "readline"
 
   def install
+    # these references are (as-of v20210420) only relevant on FreeBSD but they
+    # prevent having identical bottles between platforms so let's fix that.
+    inreplace "bin/ruby-build", "/usr/local", HOMEBREW_PREFIX
+
     ENV["PREFIX"] = prefix
     system "./install.sh"
   end

@@ -1,21 +1,31 @@
 class Flac < Formula
   desc "Free lossless audio codec"
   homepage "https://xiph.org/flac/"
-  url "https://downloads.xiph.org/releases/flac/flac-1.3.3.tar.xz"
-  sha256 "213e82bd716c9de6db2f98bcadbc4c24c7e2efe8c75939a1a84e28539c4e1748"
+  url "https://downloads.xiph.org/releases/flac/flac-1.4.0.tar.xz", using: :homebrew_curl
+  mirror "https://ftp.osuosl.org/pub/xiph/releases/flac/flac-1.4.0.tar.xz"
+  sha256 "af41c0733c93c237c3e52f64dd87e3b0d9af38259f1c7d11e8cbf583c48c2506"
+  license all_of: [
+    "BSD-3-Clause",
+    "GPL-2.0-or-later",
+    "ISC",
+    "LGPL-2.0-or-later",
+    "LGPL-2.1-or-later",
+    :public_domain,
+    any_of: ["GPL-2.0-or-later", "LGPL-2.1-or-later"],
+  ]
 
   livecheck do
-    url "https://downloads.xiph.org/releases/flac/"
+    url "https://ftp.osuosl.org/pub/xiph/releases/flac/?C=M&O=D"
     regex(/href=.*?flac[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any, arm64_big_sur: "0df3b501847bb370e70f11cd2758271048ad7caf9dd994e220bd2974fa162939"
-    sha256 cellar: :any, big_sur:       "2fd6b2eac2d88c39022752992baf18f4fa0deb43c1b27c57dc9d2349562c9514"
-    sha256 cellar: :any, catalina:      "3d33119f1e513ad58f20722e41498fc23315d756a834d8b346cee6842f45fea1"
-    sha256 cellar: :any, mojave:        "ffadc5a1825acd43aee92ea2523a1b46b3c63820f5cf59f61ee2972571454755"
-    sha256 cellar: :any, high_sierra:   "53562e93cd58b45d15fb5303938b1718298d69101a53612fd53075e881cbfc95"
+    sha256 cellar: :any,                 arm64_monterey: "b28eb662fa249a1c7a52c2ddcbfcc0a8234ab6af1c4106a802d72c831eb4b2f4"
+    sha256 cellar: :any,                 arm64_big_sur:  "cd5f7c81c96292f443d87c300fb384c79cd482cc1d9634a5127b08e7ba9d7044"
+    sha256 cellar: :any,                 monterey:       "01e8e78f2b677a6baa484baff6e58bdbf5c848ee2f9a1356461678a7301478e7"
+    sha256 cellar: :any,                 big_sur:        "4c8f98283d1643179dd1ab5dc0a25a1634786bda6dc9156277b9e2c78b097553"
+    sha256 cellar: :any,                 catalina:       "aecc4b3af655c6c55fa644eded750fcaaceaf5a829bac2145f99d2aa3b871f8e"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "bc67c5532ae6c74b1799498f8a1bdb53fe0553f04c4e20069e73e3bf6ca2394f"
   end
 
   head do

@@ -1,22 +1,23 @@
 class Gforth < Formula
   desc "Implementation of the ANS Forth language"
   homepage "https://www.gnu.org/software/gforth/"
-  url "https://www.complang.tuwien.ac.at/forth/gforth/gforth-0.7.3.tar.gz"
+  url "https://ftp.gnu.org/gnu/gforth/gforth-0.7.3.tar.gz"
   sha256 "2f62f2233bf022c23d01c920b1556aa13eab168e3236b13352ac5e9f18542bb0"
-  revision 2
+  revision 3
 
   bottle do
-    sha256 cellar: :any, arm64_big_sur: "ec3ed9b4ad030059db1e9cdcd43b1151ba0e8ec10dc40c47ff216f3ba87692fa"
-    sha256 cellar: :any, big_sur:       "bb4ac1848dbc2ed28dd2aa7f1dbd44161e10f11f30e4aa0ec255cbda16e5bc4d"
-    sha256 cellar: :any, catalina:      "e9063c35a2df4513ecb8c1aae8c02273c3da22487d90071db416c0b2b9bf1668"
-    sha256 cellar: :any, mojave:        "25fd07e36c780229c02e3243b7aa71c3b3b2744e1626409f6321ad2d99c67471"
-    sha256 cellar: :any, high_sierra:   "c5f42bd1b46307d521ccd626d7a5a4b030c48dd1788d4d580efb2d8aaa6d04bc"
+    rebuild 1
+    sha256 arm64_monterey: "88e70671a76d3012c1a968056b7a48e006e10cf1e9115322e627c6d90ea3b504"
+    sha256 arm64_big_sur:  "abb4ada62e3e52e94056c16e69258b058360592e2408ec19d1f5fc803da6ecf0"
+    sha256 monterey:       "679a6c16f2b39d18f1430f02e0904a4f1102675e9de018f6032f9b2d7c727479"
+    sha256 big_sur:        "95ea067782d74310f18e223546a868bcec0a7f4869e335d6c15c30e559e5ef95"
+    sha256 catalina:       "f8acb137af0f0005116a15761d2ef72cd721416f6ed1d88ad86f2a0655296e1e"
+    sha256 x86_64_linux:   "187183a4751b63734bccc9021f00f44c118623d4bf8c2bddc1c167c9194e6be3"
   end
 
   depends_on "emacs" => :build
-  depends_on "libffi"
   depends_on "libtool"
-  depends_on "pcre"
+  uses_from_macos "libffi"
 
   def install
     ENV["MACOSX_DEPLOYMENT_TARGET"] = MacOS.version

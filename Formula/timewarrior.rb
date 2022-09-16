@@ -1,20 +1,30 @@
 class Timewarrior < Formula
   desc "Command-line time tracking application"
   homepage "https://timewarrior.net/"
-  url "https://github.com/GothenburgBitFactory/timewarrior/releases/download/v1.4.2/timew-1.4.2.tar.gz"
-  sha256 "c3d3992aa8d2cc3cd86e59d00060fb4a3e16c15babce78451cc9d39a7f5bb2e1"
+  url "https://github.com/GothenburgBitFactory/timewarrior/releases/download/v1.4.3/timew-1.4.3.tar.gz"
+  sha256 "c4df7e306c9a267c432522c37958530b8fd6e5a410c058f575e25af4d8c7ca53"
   license "MIT"
-  head "https://github.com/GothenburgBitFactory/timewarrior.git"
+  revision 1
+  head "https://github.com/GothenburgBitFactory/timewarrior.git", branch: "dev"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_big_sur: "b725f7ad884389a11b3428f43ab9d823e179a5aa679a6506ea0b67eb65007c25"
-    sha256 cellar: :any_skip_relocation, big_sur:       "40d7ce6f5802ca1a755f6a722ebcabc68b574632007d95ef109ad99c2e7a4902"
-    sha256 cellar: :any_skip_relocation, catalina:      "4c872f73c14a7219179b3f468d5ceb0739b79ace42e69126f9b3549eac9cba94"
-    sha256 cellar: :any_skip_relocation, mojave:        "336d8bbaf618d17901774358a58772579318a405e7020c63583538283b1f2165"
-    sha256 cellar: :any_skip_relocation, high_sierra:   "c15692ae447c6364eb7c74665e3b9d8acb01be7f31eb0f4ebaf92d7c7dc3f874"
+    rebuild 1
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "9cced545d9ef04f31478f246a050d6f25e1263fa73d649f8c59618d593a4b8cc"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "9dc622b28df1e1f069f11fc3e120f2c80183591542a01a01f8cf0df5a1e5febb"
+    sha256 cellar: :any_skip_relocation, monterey:       "fd2a0160dc34d555396caf6f194a37f216ab907047228d7db420a9e09d84418b"
+    sha256 cellar: :any_skip_relocation, big_sur:        "b150f7a94f536990782fcbc22bbc8301b442dc949d6227c669de10c48228b019"
+    sha256 cellar: :any_skip_relocation, catalina:       "ea6624a0a220cf2d0499d52f88ab03e783d4d04ec7a601e4458463094cfb305c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c52deed21410b829bc9ba640e09138f9f39f210b831973a5421e6c47e296de81"
   end
 
+  depends_on "asciidoctor" => :build
   depends_on "cmake" => :build
+
+  on_linux do
+    depends_on "man-db" => :test
+  end
+
+  fails_with gcc: "5"
 
   def install
     system "cmake", ".", *std_cmake_args
@@ -25,6 +35,8 @@ class Timewarrior < Formula
     (testpath/".timewarrior/data").mkpath
     (testpath/".timewarrior/extensions").mkpath
     touch testpath/".timewarrior/timewarrior.cfg"
+    man = OS.mac? ? "man" : "gman"
+    system man, "-P", "cat", "timew-summary"
     assert_match "Tracking foo", shell_output("#{bin}/timew start foo")
   end
 end
