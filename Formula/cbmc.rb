@@ -2,23 +2,24 @@ class Cbmc < Formula
   desc "C Bounded Model Checker"
   homepage "https://www.cprover.org/cbmc/"
   url "https://github.com/diffblue/cbmc.git",
-      tag:      "cbmc-5.65.1",
-      revision: "f680e0fa669b248db6e103dbafed67a2d3f72807"
+      tag:      "cbmc-5.78.0",
+      revision: "a8abbf157233e33347dee68e6e3bfee1e385d208"
   license "BSD-4-Clause"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "681196a0001f7f6707163e620c09a1ecf4436d6ba5c64767991c16fea3a2ff0d"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5a88ddeabf9a9a2f9652f032a8169b74dd2e4a4e321515700f1ea19a56d58047"
-    sha256 cellar: :any_skip_relocation, monterey:       "373f656b44f4aa23f054a73e12e6fced32852cbe3880b6e7b46f98e3fff5ae84"
-    sha256 cellar: :any_skip_relocation, big_sur:        "54aad00c5ffe6de24513a5de302400c02fbc690ce221261a491f7a1585c97d65"
-    sha256 cellar: :any_skip_relocation, catalina:       "be81f9eac4eb81e34ffbc549d32496e50f16f276a8f30adf17ee74a3b3157464"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d707e99de9e978ea6a6e676f7b7a36cb4ed56dfb7fa5b0268ae999be8c3aa26f"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "be173d332a7e2e72a2273afb9c3c6216c7c7aa4b0edacf0e3c409c6ab4227986"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "e35093624b33a6ac96e3feb9ee3a3825e948fa503c8c9a39c8748f78bb82f555"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "087ff26ff208888f73db435dc12d84bbf279f3318e70f3b7dd78f6705a3e3067"
+    sha256 cellar: :any_skip_relocation, ventura:        "a19b5ad3ebe762e15ca5edf6d1a57fb597ed0b85b1d47269b3b2b6bcf85b7752"
+    sha256 cellar: :any_skip_relocation, monterey:       "ba00ed3a9068ca7b56433d5aa5c02867f1666296f689daf83b6d1b99ca9914d4"
+    sha256 cellar: :any_skip_relocation, big_sur:        "f4bbffde31ceda4e3411aa109cf1d573af3e61f750d325466b8c1f72f8ddc059"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "80409e3a26b297dc82f386f204460eb22a9db69b8d4c660dc17b94427e71f850"
   end
 
   depends_on "cmake" => :build
   depends_on "maven" => :build
   depends_on "openjdk" => :build
+  depends_on "rust" => :build
 
   uses_from_macos "bison" => :build
   uses_from_macos "flex" => :build
@@ -26,7 +27,7 @@ class Cbmc < Formula
   fails_with gcc: "5"
 
   def install
-    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "-S", ".", "-B", "build", "-Dsat_impl=minisat2;cadical", *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
 

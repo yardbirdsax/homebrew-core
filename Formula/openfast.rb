@@ -1,17 +1,18 @@
 class Openfast < Formula
   desc "NREL-supported OpenFAST whole-turbine simulation code"
   homepage "https://openfast.readthedocs.io"
-  url "https://github.com/openfast/openfast/archive/v3.2.1.tar.gz"
-  sha256 "29beab5eba93ab94b411a62eaad38b19b0fba1e04c1fc8e6d79c898d37c6f81e"
+  url "https://github.com/openfast/openfast/archive/v3.4.1.tar.gz"
+  sha256 "0717c3aba48aa58fac10de308313328f6ed798cdf9c210172ccc978ec591f170"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any,                 arm64_monterey: "5cf35500bf62908a08a97e25a2a30d9276f29e202732bf59cacd1a32b6bd6654"
-    sha256 cellar: :any,                 arm64_big_sur:  "6ff0d72f935941ccf391c368bc6f62fa10176e316b0249940e5776279871f9e1"
-    sha256 cellar: :any,                 monterey:       "dab5842e1cc5a52ab99f9e786d2f518c3370c0f0e5915ff9298f1cb96047c8ac"
-    sha256 cellar: :any,                 big_sur:        "1889601fec4353a90aabb60f28fba9f144da2fdc428e526808471d7707edc70a"
-    sha256 cellar: :any,                 catalina:       "f6ef48ad549a6cd3050cd0548ace68c83abee2502e45ec3ecf0e628f3aa61b8f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a4b13d88203a6af1be1c2bd4589c331f9f818e3abe54667a20407ea81fa3ceed"
+    sha256 cellar: :any,                 arm64_ventura:  "445ecd409fccf95219db12d6cefb101e2fc997d25c75a473427c3a7ae7939221"
+    sha256 cellar: :any,                 arm64_monterey: "2edd69143709b8289fc848b865ce68b24ea7d09016dd59cff344d98f2fe0c878"
+    sha256 cellar: :any,                 arm64_big_sur:  "92fec98fed83d8d6644742efcd853ad5bfffb89b2b034420c59aba0749828c2b"
+    sha256 cellar: :any,                 ventura:        "f52f053fa965eee38b1d1fa15c5928ebdfa4550d97b26f5cca765f4ebee207de"
+    sha256 cellar: :any,                 monterey:       "5fea5d63eb9e2d12839e3c560aa03190a7b7aa8453dfa2953506fd63f0e6089a"
+    sha256 cellar: :any,                 big_sur:        "730643bb4cdaa7e0904eeda4a1e8321ad72891851f7dd5b63f9d1eea49c24d80"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "34c3acba44c2319eca5765f94a5bea766fe83d0c2887924f8b76450cab2c5dc9"
   end
 
   depends_on "cmake" => :build

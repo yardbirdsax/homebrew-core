@@ -9,25 +9,29 @@ class Parliament < Formula
   head "https://github.com/duo-labs/parliament.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "cdff5a39d575b1cb0db1f88f743ae06b2f69f90cfc4c20632b68bc846df1eea6"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "2a05bd973215959bc47e00c533b50648798a34d280578d55a2e57a2698f4b617"
-    sha256 cellar: :any_skip_relocation, monterey:       "859bec622f67d11c95b39cf9b39c7d15e30bd0291b52f6ef5ec3f5896523442a"
-    sha256 cellar: :any_skip_relocation, big_sur:        "e7e23167434873bf54781347dcb1b716fc5b8e4a75b351a0b5fd412e9c44bbee"
-    sha256 cellar: :any_skip_relocation, catalina:       "7d2927bd06b9d807a0bdcc81e4aedf7ed7f4d403cef8d2e34cd77c7c9023a377"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "293a46e847761494af3c9d52693e6b6d40de6d235bf19f205031c380abb254c1"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "2d1a007e440c4a05547d8e71e9b0784150c8f1ff423b097812535deb0f98c2c2"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "084335ad41b5c41f03d257666820cd8a4df31f67ab54e7629215a928286aeeab"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "99df83d72b24d57320e75dad3de07a6787fc9e7b4292899c3da93715d6687b11"
+    sha256 cellar: :any_skip_relocation, ventura:        "34079d2c687af4a481712cad543e52f6d18ecd60a19d9bab117be228560e4c5a"
+    sha256 cellar: :any_skip_relocation, monterey:       "f14798318df7aee9f382e0f495aa19023eb8f68d59df1f0a887aaf8d09e0d237"
+    sha256 cellar: :any_skip_relocation, big_sur:        "26ebb19e82b2d7fb5baaf77743e972a15a473d924def8001b60673e969a5ebe5"
+    sha256 cellar: :any_skip_relocation, catalina:       "0efbf4eeeb931fb3c3b003f47706301ceee50bb3076f68eb5e44035dca8d2bbd"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ff77db0608241abe9505b4c7fdc9f76beb547948828184b3e9e725b242585fa8"
   end
 
-  depends_on "python@3.10"
+  depends_on "python@3.11"
+  depends_on "pyyaml"
   depends_on "six"
 
   resource "boto3" do
-    url "https://files.pythonhosted.org/packages/af/88/0aa54a60d9627bef23b9fe7c3f76c4761064d5f331edd92a2071e4cba358/boto3-1.24.67.tar.gz"
-    sha256 "2b9309a98fd7264788ff1d1b19146406cc4191e53ed9a03aca03e8837303fae2"
+    url "https://files.pythonhosted.org/packages/9e/a2/10f0d67f71bf6f87b2dc6558679f23c0cb4c3be42089a7eef625ed35d002/boto3-1.26.8.tar.gz"
+    sha256 "b39303fdda9b5d77a152e3ec9f264ae318ccdaa853eaf694626dc335464ded98"
   end
 
   resource "botocore" do
-    url "https://files.pythonhosted.org/packages/57/60/e307245349b8914d423064f53dca3f8a81dac6a7fe69972797067a909314/botocore-1.27.67.tar.gz"
-    sha256 "b00894d2eee8a795ecedf9f4cbc454fa449a7bb11af1390c7414755243f90610"
+    url "https://files.pythonhosted.org/packages/9c/62/0e7a8c2bc63c3529db0ca3ee4c0f5b60a65165e594d1487b13b6524ddccd/botocore-1.29.8.tar.gz"
+    sha256 "48cf33d7c513320711321c3b303b0c9810b23e15fa03424f7323883e4ce6cef8"
   end
 
   resource "jmespath" do
@@ -50,11 +54,6 @@ class Parliament < Formula
     sha256 "0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"
   end
 
-  resource "PyYAML" do
-    url "https://files.pythonhosted.org/packages/36/2b/61d51a2c4f25ef062ae3f74576b01638bebad5e045f747ff12643df63844/PyYAML-6.0.tar.gz"
-    sha256 "68fb519c14306fec9720a2a5b45bc9f0c8d1b9c72adf45c37baedfcd949c35a2"
-  end
-
   resource "s3transfer" do
     url "https://files.pythonhosted.org/packages/e1/eb/e57c93d5cd5edf8c1d124c831ef916601540db70acd96fa21fe60cef1365/s3transfer-0.6.0.tar.gz"
     sha256 "2ed07d3866f523cc561bf4a00fc5535827981b117dd7876f036b0c1aca42c947"
@@ -72,7 +71,7 @@ class Parliament < Formula
   test do
     assert_equal "MEDIUM - No resources match for the given action -  - [{'action': 's3:GetObject', " \
                  "'required_format': 'arn:*:s3:::*/*'}] - {'line': 1, 'column': 40, 'filepath': None}", \
-    pipe_output("#{bin}/parliament --string \'{\"Version\": \"2012-10-17\", \"Statement\": {\"Effect\": \"Allow\", " \
-                "\"Action\": \"s3:GetObject\", \"Resource\": \"arn:aws:s3:::secretbucket\"}}\'").strip
+    pipe_output("#{bin}/parliament --string '{\"Version\": \"2012-10-17\", \"Statement\": {\"Effect\": \"Allow\", " \
+                "\"Action\": \"s3:GetObject\", \"Resource\": \"arn:aws:s3:::secretbucket\"}}'").strip
   end
 end

@@ -6,19 +6,27 @@ class SqlxCli < Formula
   license any_of: ["Apache-2.0", "MIT"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "bb71d61259fda5bcca824ff851ee7004123ef8c01a7a2ebbf9795bc0a6f08daa"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ca30a08522aa469319c807a8ef389299ff2fba06c35520b9dd6d0a79a1cfc4a4"
-    sha256 cellar: :any_skip_relocation, monterey:       "d08c7380df1a7c84bfe122f75a3f0e5a1a290337ea22474ac8a293a692573db6"
-    sha256 cellar: :any_skip_relocation, big_sur:        "ff2bcd344339588c189b8a6375e86778f804706aa5e0df3e0e0ae333b0f8128f"
-    sha256 cellar: :any_skip_relocation, catalina:       "27be72ab658f6dd57e2d8ad5c3439f9a42c99586de66b3b0e44dd299eddadc35"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7a6274ad415e8863cbbb4e0fccfb7443e10f3a06571e6185ecf957aa3570d1d6"
+    rebuild 2
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "4e4901201ba0a070e8e6d89c5a79dad091b5c683de4682b10de52fa65549cf3b"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "5153d0b8338a833781b23861e68d1262e391ae3a32492a66ecd3a02d070edbd0"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "0ce6f164581fa51b9d4797bfd8def06d86b4de9451ebc423e7a68e170c893cc8"
+    sha256 cellar: :any_skip_relocation, ventura:        "188ef7dcab83d604e53efec308b34a1d1050f822c482f421313d8d4feedcaacf"
+    sha256 cellar: :any_skip_relocation, monterey:       "6f611c4dcb4d55530045d4b8fdf046198809c845bdeb05260fd112efd4970d75"
+    sha256 cellar: :any_skip_relocation, big_sur:        "3f2b4014f9e23b3c8216374bca8c8b2ed6917c3d920ff5c1f824472062704685"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "02dff02d06fb0bf0f3ac0aa961822c5fec25612b3edad2788f20eb6a847f447c"
   end
 
   depends_on "rust" => :build
 
   on_linux do
     depends_on "pkg-config" => :build
-    depends_on "openssl@1.1"
+    depends_on "openssl@3"
+  end
+
+  # fixes https://github.com/launchbadge/sqlx/issues/2198 for rust >= 1.65
+  patch do
+    url "https://github.com/launchbadge/sqlx/commit/2fdf85b212332647dc4ac47e087df946151feedf.patch?full_index=1"
+    sha256 "8f72bff76a88e5311aa4b83744a509ba0ac4effa9d6335ba3986ebedfee6051a"
   end
 
   def install

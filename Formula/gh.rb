@@ -1,8 +1,8 @@
 class Gh < Formula
   desc "GitHub command-line tool"
   homepage "https://github.com/cli/cli"
-  url "https://github.com/cli/cli/archive/v2.15.0.tar.gz"
-  sha256 "298dc4f6bcfd96b05f90cb5d6ad07c9fff4e5e26de45be18b525abdb5d69f345"
+  url "https://github.com/cli/cli/archive/v2.23.0.tar.gz"
+  sha256 "1e9f92a47caa92efedc06b22cfe9c951c5163c4a9bc60a45d477fd5d9b592e54"
   license "MIT"
 
   head "https://github.com/cli/cli.git", branch: "trunk"
@@ -13,12 +13,13 @@ class Gh < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "d73bd2946361ad5b88d519e486c46b6ddf60ad1ec2e3176e51f403a66199aa52"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "bca5b3a851c3041edcb82b260caa18cd516d6fed19c8203d41a7e4011d18dc8d"
-    sha256 cellar: :any_skip_relocation, monterey:       "9e48affcac3f5fbcb78c8de2301cca7d31d80cc6a24a616aa347ab6fbeadbdf1"
-    sha256 cellar: :any_skip_relocation, big_sur:        "3cf8e07e9a32441cac9951ac0209d407daada6a09b6191fecedbc930fd20f9e2"
-    sha256 cellar: :any_skip_relocation, catalina:       "65d1390df89e35bcb9be4d264deb94824e5af57fcb5a73675206a669b05e7aec"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "cd23b61a033d029ae6b9ea1feafd04fda17b771364e70dbe474c30f05b11ff6d"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "5199d0960a3a5b24d2224706c10db4752a28d5a3ed4670ab16a6892b3066bb51"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "e9e3b41d4c784ec831002c5e64f0f21e86afb6de7aed33164728e7006782be66"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5b3d4ab42a97160b922d63572f128a1a9f7e8d4bb780b4f50640ad4481281079"
+    sha256 cellar: :any_skip_relocation, ventura:        "1e9306dd50c18e00fcb46c12773829166534016fa48835561b1f2f2b587e03bf"
+    sha256 cellar: :any_skip_relocation, monterey:       "d46d29dc4c670c314e98fc79f34e5a2eaa64a0e343b5a9dcb6ea5f7f5205ab51"
+    sha256 cellar: :any_skip_relocation, big_sur:        "e8816c0b38873b8415961d664e0df465e2c673afebac65ebd7e2c61624b7d36f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d9bb11ba84ac40cbab211b9639e1c31ffd6b27ec08f5a09b09a7e27f69d39ca8"
   end
 
   depends_on "go" => :build

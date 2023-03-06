@@ -1,8 +1,8 @@
 class MysqlClient < Formula
   desc "Open source relational database management system"
   homepage "https://dev.mysql.com/doc/refman/8.0/en/"
-  url "https://cdn.mysql.com/Downloads/MySQL-8.0/mysql-boost-8.0.30.tar.gz"
-  sha256 "c331ac7a68099a2116097acbb14fd331423d486fe47ce0e346925111b44df69c"
+  url "https://cdn.mysql.com/Downloads/MySQL-8.0/mysql-boost-8.0.32.tar.gz"
+  sha256 "1a83a2e1712a2d20b80369c45cecbfcc7be9178d4fc0e81ffba5c273ce947389"
   license "GPL-2.0-only" => { with: "Universal-FOSS-exception-1.0" }
 
   livecheck do
@@ -10,13 +10,13 @@ class MysqlClient < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_monterey: "17895bca9ba923b7fb85e5f7d400fb0ad71f18a4f3899cb737f7c0e2c777b3e8"
-    sha256 arm64_big_sur:  "14cc13aa93faef1ed511d17ccd437feac78fcb6fa47e08749d57f33f286a4b7c"
-    sha256 monterey:       "59effc912ee39a20b56d9c76bb35d2c233ab7f17aabe41dcb64224cee640f7f5"
-    sha256 big_sur:        "3987bd3e7443f6b9332a345e775484b26feec6ddb1e48a96defbea851f02ee15"
-    sha256 catalina:       "13dc71e64aff7cffce2cde557f6c85480c65260f2abe542e039280f928ee9911"
-    sha256 x86_64_linux:   "a4c9f53a1c84a345be737a29403f686a96b813e5c4d4b1002dccb5e74819de56"
+    sha256 arm64_ventura:  "95dfb958dd64fddd166ad43e8be6694b9078a2482131bf8598ce567ddb558c6c"
+    sha256 arm64_monterey: "42ad933ea6281a8753b2f8b5208c69a8a2a15d1515a9826ce5f58c2c941ecbfd"
+    sha256 arm64_big_sur:  "25065dec8c335290a2102d3e33356105ab43ddb150fd0d3ca43df8458e6dde9a"
+    sha256 ventura:        "a774309a32f2487174cc87ef78322bc3a38b210b2a225c158afee78b65ba59a5"
+    sha256 monterey:       "f59757d710beb675217579a01893ea58f6b41cc3b6af22367c34520f1683c695"
+    sha256 big_sur:        "87e9fd2c04fd42dc66382281a8b7ad2ad17a0ce691e4dee8d9e5c7b9eb8af2cd"
+    sha256 x86_64_linux:   "1bacf303dc7b4a7f14c6076466546acb5fd3bd118e20bcb2d9d2f7ee3b5673da"
   end
 
   keg_only "it conflicts with mysql (which contains client libraries)"

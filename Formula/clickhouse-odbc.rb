@@ -2,10 +2,10 @@ class ClickhouseOdbc < Formula
   desc "Official ODBC driver implementation for accessing ClickHouse as a data source"
   homepage "https://github.com/ClickHouse/clickhouse-odbc#readme"
   url "https://github.com/ClickHouse/clickhouse-odbc.git",
-      tag:      "v1.1.10.20210822",
-      revision: "c7aaff6860e448acee523f5f7d3ee97862fd07d2"
+      tag:      "v1.2.1.20220905",
+      revision: "fab6efc57d671155c3a386f49884666b2a02c7b7"
   license "Apache-2.0"
-  revision 2
+  revision 3
   head "https://github.com/ClickHouse/clickhouse-odbc.git", branch: "master"
 
   livecheck do
@@ -14,19 +14,20 @@ class ClickhouseOdbc < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_monterey: "672e479aa4cccebdf6361e42bd578faae5c9a374ded20d7f73c2b313d512fed4"
-    sha256 cellar: :any,                 arm64_big_sur:  "b0db10491fb981f97a39d3996f96a93d581810345ff8f911374adfc22bd099cc"
-    sha256 cellar: :any,                 monterey:       "2ec9b05c9f11cf5de3e3f6e35b4bf3864f7b04d3dc5044a31d0df55affac2ea6"
-    sha256 cellar: :any,                 big_sur:        "922a347803f8a65bbd0ed3a159a1d2ac5522a281b3b7d174cbb03a0f9589e388"
-    sha256 cellar: :any,                 catalina:       "d3ea7bcd2951037214fd4b91a8af8c9bbc05758f42bdcacfd8721fb6407171f5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f07a7588bb547c0016fb80ffb7a1a30a52273f9942b8c0183beed47a0096eb45"
+    sha256 cellar: :any,                 arm64_ventura:  "9861a2a1c4cfd5e91da5bac18199324b960daaebd6d6c2cd63641a51124fa80e"
+    sha256 cellar: :any,                 arm64_monterey: "7db18ffe67c8d28059a4bfd6835f053fd48a6c12a21ad385df2aabf84ab87e60"
+    sha256 cellar: :any,                 arm64_big_sur:  "8178a93f509e725ba63e318059851183ed8d599c6a9eda6a1918258f63400ab5"
+    sha256 cellar: :any,                 ventura:        "00c541af823af303db5f25af6eed62ed43410b6f0a8d5459b72dfc33eef408a2"
+    sha256 cellar: :any,                 monterey:       "ceebc52bec28c344c2b06206ec8763336fb2b7f77224f7aacb183a8f25aee609"
+    sha256 cellar: :any,                 big_sur:        "6c41f4bd5a0404c135d2fb608e0a8086881cd71fc06ae7af95a1ccb52fe99bb2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f7ded074aefd6929a7a4660eb4f77175d6cb4cac2691067bfd0b7710b06a15b0"
   end
 
   depends_on "cmake" => :build
   depends_on "pkg-config" => :build
   depends_on "icu4c"
-  depends_on "openssl@1.1"
+  depends_on "openssl@3"
+  depends_on "poco"
 
   on_macos do
     depends_on "libiodbc"
@@ -36,24 +37,27 @@ class ClickhouseOdbc < Formula
     depends_on "unixodbc"
   end
 
-  fails_with gcc: "5"
-  fails_with gcc: "6"
+  fails_with :gcc do
+    version "6"
+  end
 
   def install
-    cmake_args = std_cmake_args.dup
+    # Remove bundled libraries excluding required bundled `folly` headers
+    %w[googletest nanodbc poco ssl].each { |l| (buildpath/"contrib"/l).rmtree }
 
-    cmake_args << "-DOPENSSL_ROOT_DIR=#{Formula["openssl@1.1"].opt_prefix}"
-    cmake_args << "-DICU_ROOT=#{Formula["icu4c"].opt_prefix}"
-
-    if OS.mac?
-      cmake_args << "-DODBC_PROVIDER=iODBC"
-      cmake_args << "-DODBC_DIR=#{Formula["libiodbc"].opt_prefix}"
-    elsif OS.linux?
-      cmake_args << "-DODBC_PROVIDER=UnixODBC"
-      cmake_args << "-DODBC_DIR=#{Formula["unixodbc"].opt_prefix}"
+    args = %W[
+      -DCH_ODBC_PREFER_BUNDLED_THIRD_PARTIES=OFF
+      -DCH_ODBC_THIRD_PARTY_LINK_STATIC=OFF
+      -DICU_ROOT=#{Formula["icu4c"].opt_prefix}
+      -DOPENSSL_ROOT_DIR=#{Formula["openssl@3"].opt_prefix}
+    ]
+    args += if OS.mac?
+      ["-DODBC_PROVIDER=iODBC", "-DODBC_DIR=#{Formula["libiodbc"].opt_prefix}"]
+    else
+      ["-DODBC_PROVIDER=UnixODBC", "-DODBC_DIR=#{Formula["unixodbc"].opt_prefix}"]
     end
 
-    system "cmake", "-S", ".", "-B", "build", *cmake_args
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end

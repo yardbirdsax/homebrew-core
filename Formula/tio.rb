@@ -1,18 +1,19 @@
 class Tio < Formula
   desc "Simple TTY terminal I/O application"
   homepage "https://tio.github.io"
-  url "https://github.com/tio/tio/releases/download/v2.0/tio-2.0.tar.xz"
-  sha256 "e5826109773a89b267c3484df71234bc6c45715f735e3fdbee5984768faf5836"
+  url "https://github.com/tio/tio/releases/download/v2.5/tio-2.5.tar.xz"
+  sha256 "063952ee90a78cee180f6e660d6c73773dfc109efcdc151585accfe1500c44a7"
   license "GPL-2.0-or-later"
   head "https://github.com/tio/tio.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_monterey: "e3bc546472e12af9c4b623f3e942985b4db986f3fa378999c423ba8e22f1b101"
-    sha256 cellar: :any,                 arm64_big_sur:  "9b32a47c43d2316a644948128726ecb93b7f73516b679a4777e34449e4080aa1"
-    sha256 cellar: :any,                 monterey:       "7fbae70803b4198775767af6519d381a13bde5dcfaa65fad0d5075f9f2658662"
-    sha256 cellar: :any,                 big_sur:        "9f1037d39e11076c641f15ff8488c50edb73842640e403c374f5d15ba9f05e37"
-    sha256 cellar: :any,                 catalina:       "842ef0221268408e620f883236c6e330e628d09d2db7ed10efdffa338cf08421"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1aad1c26f438c1e6a80619610dcae03c91e2104fab2f9f3264707d51b4275e6f"
+    sha256 cellar: :any,                 arm64_ventura:  "b930375c3f659075cbf694a4359c57a1faaeaae01d6870755d321f2aac8b736d"
+    sha256 cellar: :any,                 arm64_monterey: "b962573188a2f1607f489d6d33dbecbe2a70e69b73aa041ba6f6773410791fa1"
+    sha256 cellar: :any,                 arm64_big_sur:  "0273ac11ca8f72191b877b734dd99b791a3ee2cf64e9f2d0bb5709d0f35b80df"
+    sha256 cellar: :any,                 ventura:        "e684824b7b74ba4f7fe6d5defc20084462466b83e812bbe8a68a208d2766c09a"
+    sha256 cellar: :any,                 monterey:       "db8961e35722fd670a1f8393c20b87b7938f76b54391c6966ca5ebc3165586e4"
+    sha256 cellar: :any,                 big_sur:        "4a665334480f8cb670516b8cd96fa6779122795edafd240dd750d312a4867cb1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "475c233968a41f7c4335244202d190ca916d0076472dc49c9e48ca527dec0710"
   end
 
   depends_on "meson" => :build

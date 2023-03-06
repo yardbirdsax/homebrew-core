@@ -4,7 +4,7 @@ class S2geometry < Formula
   url "https://github.com/google/s2geometry/archive/v0.10.0.tar.gz"
   sha256 "1c17b04f1ea20ed09a67a83151ddd5d8529716f509dde49a8190618d70532a3d"
   license "Apache-2.0"
-  revision 2
+  revision 4
 
   livecheck do
     url :homepage
@@ -12,19 +12,19 @@ class S2geometry < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_monterey: "9bb01c8c7bc6efe13d77796923086638018625c79eb380d4faa8b796ab7d9419"
-    sha256 cellar: :any,                 arm64_big_sur:  "219ec814f133384132c12bc7a0d9501ec83dab8a6c140d5b1988f2293f7fdb64"
-    sha256 cellar: :any,                 monterey:       "c3e5d84331d87e661a31e31cd459c54d8f0d4486805abe52ece7b160cd3f59cf"
-    sha256 cellar: :any,                 big_sur:        "219d87857120781169b02514e302182ee47c56b4d97af21c8c7e12b8a2dcecd8"
-    sha256 cellar: :any,                 catalina:       "b534781ad0ebf074fc5a5892f79eae0e156498b45c0408aa15d99f830411150d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "62f45ffac6e5b54d175de7fde11243a731d2f5690d6c9a4a835ef8885f3df282"
+    sha256 cellar: :any,                 arm64_ventura:  "7c3d433e915ffd03e92c73b1d3be5e1cbf127041c6cedb761ea266831a9d0d57"
+    sha256 cellar: :any,                 arm64_monterey: "f5017d82e3624b783074ffc704819fb3c278ccce7b4f7749cba5f18c80de01d1"
+    sha256 cellar: :any,                 arm64_big_sur:  "3b4b5686c10ebddf04b5faa31520c8f80f91e0457596cad877b8ca123b5b2411"
+    sha256 cellar: :any,                 ventura:        "c8521cc65e3e8de4ecd1080a7e6186f03e90696bdd09176effc21ef5af1cc4d2"
+    sha256 cellar: :any,                 monterey:       "4a166d13c69aa0089127fd0c4b9a49f11007f85437649f4a0466c75113af0c79"
+    sha256 cellar: :any,                 big_sur:        "ec151db9a713cf396de417583f4e2c72e77a200852d0bad3dfc76dedfa54baed"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6e929ca8b220797e1dac8396b1da10dac728f022d421072e43ef76e94583f73c"
   end
 
   depends_on "cmake" => :build
   depends_on "abseil"
   depends_on "glog"
-  depends_on "openssl@1.1"
+  depends_on "openssl@3"
 
   fails_with gcc: "5" # C++17
 
@@ -32,9 +32,8 @@ class S2geometry < Formula
     # Abseil is built with C++17 and s2geometry needs to use the same C++ standard.
     inreplace "CMakeLists.txt", "set(CMAKE_CXX_STANDARD 11)", "set(CMAKE_CXX_STANDARD 17)"
 
-    ENV["OPENSSL_ROOT_DIR"] = Formula["openssl@1.1"].opt_prefix
-
-    args = std_cmake_args + %w[
+    args = std_cmake_args + %W[
+      -DOPENSSL_ROOT_DIR=#{Formula["openssl@3"].opt_prefix}
       -DWITH_GFLAGS=1
       -DWITH_GLOG=1
     ]
@@ -117,8 +116,8 @@ class S2geometry < Formula
         return  0;
       }
     EOS
-    system ENV.cxx, "-std=c++11", "test.cpp", "-o", "test",
-                    "-I#{Formula["openssl@1.1"].opt_include}",
+    system ENV.cxx, "-std=c++17", "test.cpp", "-o", "test",
+                    "-I#{Formula["openssl@3"].opt_include}",
                     "-L#{lib}", "-ls2"
     system "./test"
   end

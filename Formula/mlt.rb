@@ -1,20 +1,20 @@
 class Mlt < Formula
   desc "Author, manage, and run multitrack audio/video compositions"
   homepage "https://www.mltframework.org/"
-  url "https://github.com/mltframework/mlt/releases/download/v7.8.0/mlt-7.8.0.tar.gz"
-  sha256 "66606d79f91b400a4d9380a911a5d771a48bd6413447fa2f3713459eba70242d"
+  url "https://github.com/mltframework/mlt/releases/download/v7.12.0/mlt-7.12.0.tar.gz"
+  sha256 "48b385e83cbd5bf68bfc88631273868fbee36a41b3b7e2acd97f12b095b0083c"
   license "LGPL-2.1-only"
   revision 1
   head "https://github.com/mltframework/mlt.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 arm64_monterey: "2998ab596ce39b9e2765b169f6f49dc7ef73301988c1952b90bb1a17f701b8f7"
-    sha256 arm64_big_sur:  "20e65cade5bc4f2e6f58e5f343714892afa178ba5769097c01da59d719404d02"
-    sha256 monterey:       "56cbb917dfc78d1308a37a713aaa0fbe9085288b785c2bbb39bee04041cadeb6"
-    sha256 big_sur:        "c666d926739e0be20b42208a458472598137e14584fc6bc6b05a3db29e339f9c"
-    sha256 catalina:       "26959c80f7495223c31a3e607d95d09fd9c49ffd9c62be2c7d83f069c78cf96d"
-    sha256 x86_64_linux:   "9c8882eb8158298e2db065bd9f9b3f0857b499cfd7ced285955787059e68b808"
+    sha256 arm64_ventura:  "2c4651f63550c5c19bfac52e73a2e1d7a19856cfe1fd3da9ca030175d08f9d87"
+    sha256 arm64_monterey: "1de7a585b4b194ae22c0e9cfe63138c7ea259004c5fd614db4d43827329e75f9"
+    sha256 arm64_big_sur:  "c199677b5ff1ce8d2bddb419d2e737cf73a5c5ab8acfe6ceb338a2f6482a8c37"
+    sha256 ventura:        "2fbcb49848d82667ce73e3c1eb682d4479f8ed1d0f1b45108d5bc0c197e9d8d1"
+    sha256 monterey:       "3bbb6451dd55a7f13d51a2b3cdcb202676f67c93f12c717c0b64de0b0d26e12a"
+    sha256 big_sur:        "0d28fd842a31c83afbc4c2b146f1f3e29b708f0b5a4bc405b6d021cc951bd309"
+    sha256 x86_64_linux:   "c35b40e1e63c5c1c5a88fe9db561e5693509cabc36b1629f55ed9c80f2403b88"
   end
 
   depends_on "cmake" => :build

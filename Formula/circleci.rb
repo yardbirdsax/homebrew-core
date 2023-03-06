@@ -3,27 +3,24 @@ class Circleci < Formula
   homepage "https://circleci.com/docs/2.0/local-cli/"
   # Updates should be pushed no more frequently than once per week.
   url "https://github.com/CircleCI-Public/circleci-cli.git",
-      tag:      "v0.1.21091",
-      revision: "45afa93d0ae256aded8a2c3bbd3daae8adfa8842"
+      tag:      "v0.1.23816",
+      revision: "0ad35cd3f13fb21bdf70de11442e03cb3858ab69"
   license "MIT"
   head "https://github.com/CircleCI-Public/circleci-cli.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "c88b3edd5c17a505adf43b93fde4d06cfc576ac0c6c8c4bcfe41e317b877567f"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f232eabfa564c9338d0098258899d4ff9482df7194a24bd1e5091261f6c8bbc6"
-    sha256 cellar: :any_skip_relocation, monterey:       "7f069904f4aa52c40893b8697a00a7b1050eb9dc2e0a671f4a780fd4fd24fd6b"
-    sha256 cellar: :any_skip_relocation, big_sur:        "038e97772f107d4eb68c6f95927b2f03eb6ee3fb9660f513b15484ccaafdde50"
-    sha256 cellar: :any_skip_relocation, catalina:       "bd626de91ad8db17ba5a038a956d8451aa631cfffd562331f6c01214a5f81f8a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8becf1f44d4c169deea08507cfa93209eba46e53fd703994c0a9e0aab4c32d33"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "0abd02a0dcf35beb261ea068b03a248e2e7222a90059c3930f338259a232af68"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "0abd02a0dcf35beb261ea068b03a248e2e7222a90059c3930f338259a232af68"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "0abd02a0dcf35beb261ea068b03a248e2e7222a90059c3930f338259a232af68"
+    sha256 cellar: :any_skip_relocation, ventura:        "21a108185e49d702e9edf9a2ae8ecb67369169bb4a82bbb7a29f7025d539d807"
+    sha256 cellar: :any_skip_relocation, monterey:       "21a108185e49d702e9edf9a2ae8ecb67369169bb4a82bbb7a29f7025d539d807"
+    sha256 cellar: :any_skip_relocation, big_sur:        "21a108185e49d702e9edf9a2ae8ecb67369169bb4a82bbb7a29f7025d539d807"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "54c11b83005958e32d51e04a396fa1d38bf6180e53f2f5e8cc27fb03ccc4ca31"
   end
 
-  # Bump to 1.18 when the x/sys dependency is updated upstream.
-  depends_on "go@1.17" => :build
-  depends_on "packr" => :build
+  depends_on "go" => :build
 
   def install
-    system "packr2", "--ignore-imports", "-v"
-
     ldflags = %W[
       -s -w
       -X github.com/CircleCI-Public/circleci-cli/version.packageManager=homebrew
@@ -43,7 +40,7 @@ class Circleci < Formula
     output = shell_output("#{bin}/circleci config pack #{testpath}/.circleci.yml")
     assert_match "version: 2.1", output
     # assert update is not included in output of help meaning it was not included in the build
-    assert_match "update      This command is unavailable on your platform", shell_output("#{bin}/circleci help")
+    assert_match(/update.+This command is unavailable on your platform/, shell_output("#{bin}/circleci help 2>&1"))
     assert_match "`update` is not available because this tool was installed using `homebrew`.",
       shell_output("#{bin}/circleci update")
   end

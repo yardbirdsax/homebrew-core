@@ -1,9 +1,19 @@
 class Protobuf < Formula
   desc "Protocol buffers (Google's data interchange format)"
   homepage "https://github.com/protocolbuffers/protobuf/"
-  url "https://github.com/protocolbuffers/protobuf/releases/download/v21.6/protobuf-all-21.6.tar.gz"
-  sha256 "5c375b3b09faf4e6268d24afd48e39ca981cc22d721fca776780e4a66a9fa372"
   license "BSD-3-Clause"
+  head "https://github.com/protocolbuffers/protobuf.git", branch: "main"
+
+  stable do
+    url "https://github.com/protocolbuffers/protobuf/releases/download/v21.12/protobuf-all-21.12.tar.gz"
+    sha256 "2c6a36c7b5a55accae063667ef3c55f2642e67476d96d355ff0acb13dbb47f09"
+
+    # Fix build with Python 3.11. Remove in the next release.
+    patch do
+      url "https://github.com/protocolbuffers/protobuf/commit/da973aff2adab60a9e516d3202c111dbdde1a50f.patch?full_index=1"
+      sha256 "911925e427a396fa5e54354db8324c0178f5c602b3f819f7d471bb569cc34f53"
+    end
+  end
 
   livecheck do
     url :stable
@@ -11,51 +21,50 @@ class Protobuf < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_monterey: "11267e08f84d284a85749be270a2cda5aa6bafd37c55bd6947a9f9c1a972df1c"
-    sha256 cellar: :any,                 arm64_big_sur:  "4d6fea844ce0bd0d126bd487741bd2d2079335ac83d0aa2583a7b9b0fb17e7c5"
-    sha256 cellar: :any,                 monterey:       "a2896da738f5681b7e97130d1ffa58e5efbbbaf8646f4f7119c89193706730be"
-    sha256 cellar: :any,                 big_sur:        "789c1e874f6de8cbd84b0ad94a02ffd34b0faa44276ff3548f618a0d3c8b3223"
-    sha256 cellar: :any,                 catalina:       "7d71f7953e307680cbb5c93f3c473e5a61c1ecbb648483a384bcede0a0817c54"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d27d3c261ef65f18260d92cc18160195951db9201b5b942b6ae9df905b705ea5"
+    rebuild 1
+    sha256 cellar: :any,                 arm64_ventura:  "3c5d748539ceda50335ecea31041934e3b4d3d927c10ee1f3996db6fac79fb2e"
+    sha256 cellar: :any,                 arm64_monterey: "fdc3ded19005c755de4a5c29aa23c868cf24f45623b49587dda98a93d2fe0f70"
+    sha256 cellar: :any,                 arm64_big_sur:  "d70aa6ab732457192ec4e4b3c7ad27e4b378c5c450221f0d608b98d38e52596d"
+    sha256 cellar: :any,                 ventura:        "fc99214087c90571c8d9dd7d36e30af49a89beb996359b3b234f31002e4b0c00"
+    sha256 cellar: :any,                 monterey:       "44db5f3a73f9e3d9725e90e8fcaa73b1929be24f04efb20b79e1b288ef7d704e"
+    sha256 cellar: :any,                 big_sur:        "d64e264d07b331a8043c35d608de0871e9df4f9a9b208d5d8060b956f110baed"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b24e37fc94949837ae10ab0dff5caf1af2022b3b3ec9b918789478ff4bf6f686"
   end
 
-  head do
-    url "https://github.com/protocolbuffers/protobuf.git", branch: "main"
-
-    depends_on "autoconf" => :build
-    depends_on "automake" => :build
-    depends_on "libtool" => :build
-  end
-
+  depends_on "cmake" => :build
   depends_on "python@3.10" => [:build, :test]
-  depends_on "python@3.9" => [:build, :test]
+  depends_on "python@3.11" => [:build, :test]
 
   uses_from_macos "zlib"
 
+  def pythons
+    deps.map(&:to_formula)
+        .select { |f| f.name.match?(/^python@\d\.\d+$/) }
+        .map { |f| f.opt_libexec/"bin/python" }
+  end
+
   def install
-    # Don't build in debug mode. See:
-    # https://github.com/Homebrew/homebrew/issues/9279
-    # https://github.com/protocolbuffers/protobuf/blob/5c24564811c08772d090305be36fae82d8f12bbe/configure.ac#L61
-    ENV.prepend "CXXFLAGS", "-DNDEBUG"
-    ENV.cxx11
+    cmake_args = %w[
+      -Dprotobuf_BUILD_LIBPROTOC=ON
+      -Dprotobuf_BUILD_SHARED_LIBS=ON
+      -Dprotobuf_INSTALL_EXAMPLES=ON
+      -Dprotobuf_BUILD_TESTS=OFF
+    ] + std_cmake_args
 
-    system "./autogen.sh" if build.head?
-    system "./configure", "--disable-debug", "--disable-dependency-tracking",
-                          "--prefix=#{prefix}", "--with-zlib"
-    system "make"
-    system "make", "check"
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build", *cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
 
-    # Install editor support and examples
-    pkgshare.install "editors/proto.vim", "examples"
+    pkgshare.install "editors/proto.vim"
     elisp.install "editors/protobuf-mode.el"
 
     ENV.append_to_cflags "-I#{include}"
     ENV.append_to_cflags "-L#{lib}"
+    ENV["PROTOC"] = bin/"protoc"
 
     cd "python" do
-      ["3.9", "3.10"].each do |xy|
-        system "python#{xy}", *Language::Python.setup_install_args(prefix, "python#{xy}"), "--cpp_implementation"
+      pythons.each do |python|
+        system python, *Language::Python.setup_install_args(prefix, python), "--cpp_implementation"
       end
     end
   end
@@ -74,7 +83,8 @@ class Protobuf < Formula
     (testpath/"test.proto").write testdata
     system bin/"protoc", "test.proto", "--cpp_out=."
 
-    system Formula["python@3.9"].opt_bin/"python3.9", "-c", "import google.protobuf"
-    system Formula["python@3.10"].opt_bin/"python3.10", "-c", "import google.protobuf"
+    pythons.each do |python|
+      system python, "-c", "import google.protobuf"
+    end
   end
 end

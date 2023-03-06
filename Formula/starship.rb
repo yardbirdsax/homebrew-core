@@ -1,18 +1,19 @@
 class Starship < Formula
   desc "Cross-shell prompt for astronauts"
   homepage "https://starship.rs"
-  url "https://github.com/starship/starship/archive/v1.10.3.tar.gz"
-  sha256 "39c5f8f88a8aa6d32575ddb26017572f2683fae129b9be5442acbae74019ea5e"
+  url "https://github.com/starship/starship/archive/v1.13.1.tar.gz"
+  sha256 "6cce984c7fb0067b9dc457274139f277e2ff56488811c96a7ae68102184656f9"
   license "ISC"
   head "https://github.com/starship/starship.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "bf006c8cd8eb931dc8f5ce982912fa66aef51fbeddf4bb7e11e49b66c9b2c7c1"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "9e3bdc975e9fee1de10a032438759744e1f7f3e1dedfb2f8b4e73d290936b2cb"
-    sha256 cellar: :any_skip_relocation, monterey:       "2cea5a5b331be5f0f88c70ba70149bfe5a3a03152eb989d240b87f8546fbccaa"
-    sha256 cellar: :any_skip_relocation, big_sur:        "95794f8bf3644c959db217b702ed22cce6e11bb6ca9cd3440045c3159a96f4ce"
-    sha256 cellar: :any_skip_relocation, catalina:       "b8278a50780b041e461d731ee6bcfe3ed03dff84516c8b34fbb1294f1907cfa3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "30b5f36caca039447669830365f52f0779074fcff564189bbde908235b908187"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "9d12ac9dcb05ca2ea86b943be41eaa32c2850ae429b6fc576c280f1e78514613"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "e5eaafb06f2d76282359dd33a35e0df8a6a20c0471cf262244b01524d1f2597a"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "f6117338c98223bd121a6ebae87f4e294bfb300f8f7d9f845d1f78532cf5ceb2"
+    sha256 cellar: :any_skip_relocation, ventura:        "1e50ab8e5c2dbcb4176c38c006ba586c9f9c70f2ce1eb03f74126cd22d3bd77b"
+    sha256 cellar: :any_skip_relocation, monterey:       "7ca4f9822b6c8bd33880b2703234fe3e5d5bac3ad23f1365178e587155260d3f"
+    sha256 cellar: :any_skip_relocation, big_sur:        "fd180eb92b4822ed728c1810cbaf1d4ed73729961ca38911f8bde86082d9e22a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7404de9f003218aa5bc90d4decf01ddd690110c2bf9af321f924e9c2de2d2c9b"
   end
 
   depends_on "cmake" => :build

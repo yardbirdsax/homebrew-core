@@ -1,24 +1,27 @@
 class LdFindCodeRefs < Formula
   desc "Build tool for sending feature flag code references to LaunchDarkly"
   homepage "https://github.com/launchdarkly/ld-find-code-refs"
-  url "https://github.com/launchdarkly/ld-find-code-refs/archive/v2.6.3.tar.gz"
-  sha256 "d778dc9b80d42011a1b6ad55cf072d61528f0a35a10496f011bcefa3f5d83464"
+  url "https://github.com/launchdarkly/ld-find-code-refs/archive/v2.10.0.tar.gz"
+  sha256 "c4192ecb9a281906425f37bbfd43626d3f3e78b643c9cde28b59a16c1d340258"
   license "Apache-2.0"
   head "https://github.com/launchdarkly/ld-find-code-refs.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "553b165d00565448be8c0ff2e96e10255a4b0900d505eb0cb58a5b27541c5f63"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c209bf972b479bad44b3bc4570f258b921260b057b2c5175620bdc83a1dbc943"
-    sha256 cellar: :any_skip_relocation, monterey:       "2f82b931efa422b7773e4575cf2ecbf42842af8fc732681187823cad2dfaa0c1"
-    sha256 cellar: :any_skip_relocation, big_sur:        "2e83d13b4f0119694bbd89775e823293827fb7ab394714c24364c225f9019b03"
-    sha256 cellar: :any_skip_relocation, catalina:       "1008eff3eb46872e1b77907c313c18906af3b958888f348861b844bc90ab52b5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "fdf84d5cafb55a4737a20172b79ca39450adb26c1d1892c2b13598e2033a7406"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "9d60bab491f188e7b1d2619b9247705b7d9f5839f8afb14f94998b5a55448be0"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "8c95700a2fa1c7b20195ef1fb1cf54428168c2d2ae76181cf009795c4b713a72"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "29304508204e073961ae05910b6f16412f4b71518104d04b081bc1ae53a5ceb5"
+    sha256 cellar: :any_skip_relocation, ventura:        "146305ecec15abb7bd076af886d3c9ba814c0607705afdc4902795066a9943cc"
+    sha256 cellar: :any_skip_relocation, monterey:       "5a532953c9213444aa08b2d18b158166576775d90443f2a0dba10418e8125ea2"
+    sha256 cellar: :any_skip_relocation, big_sur:        "97ddc08923cd36dd0e8d0dcaaf969c5150ba84580d3d79a671231857f9dad8e3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e27d3de56bd72a40494490e228a6768e50d20d015bcc7833a011d584c320ca98"
   end
 
   depends_on "go" => :build
 
   def install
     system "go", "build", *std_go_args(ldflags: "-s -w"), "./cmd/ld-find-code-refs"
+
+    generate_completions_from_executable(bin/"ld-find-code-refs", "completion")
   end
 
   test do
@@ -28,7 +31,8 @@ class LdFindCodeRefs < Formula
     system "git", "add", "README", ".gitignore"
     system "git", "commit", "-m", "Initial commit"
 
-    assert_match "git branch: master",
-      shell_output(bin/"ld-find-code-refs --dryRun --ignoreServiceErrors -t=xx -p=test -r=test -d=.")
+    assert_match "could not retrieve flag key",
+      shell_output(bin/"ld-find-code-refs --dryRun " \
+                       "--ignoreServiceErrors -t=xx -p=test -r=test -d=. 2>&1", 1)
   end
 end

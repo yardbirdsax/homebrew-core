@@ -1,33 +1,29 @@
 class Kubecfg < Formula
   desc "Manage complex enterprise Kubernetes environments as code"
   homepage "https://github.com/kubecfg/kubecfg"
-  url "https://github.com/kubecfg/kubecfg/archive/v0.27.0.tar.gz"
-  sha256 "4fed9a09ee12fa2452becb9b64278444f99093d3044bc417aaa92ab3b5851d81"
+  url "https://github.com/kubecfg/kubecfg/archive/v0.29.1.tar.gz"
+  sha256 "4adf945ae1119f40466158508e3de708731b97aae371945dbf391e8e7dd51da3"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "c8c599b530ea6e392ffad32eae315c4df77d4ab8697c2fd09f5837ba402c131a"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "cf055bec7533a856a84e1fd79db5347f900619ebfb380318feb95dd7ac40346b"
-    sha256 cellar: :any_skip_relocation, monterey:       "4d9fd238db1efba13fea37740dccfd2478ea3d497a69c2622fb7113bb020e89f"
-    sha256 cellar: :any_skip_relocation, big_sur:        "02b474b024727b5e9cf8d235606597c5d2908d6cd2881b17e597cea3f92c7168"
-    sha256 cellar: :any_skip_relocation, catalina:       "1fc431a6f7a97621ce9c00f10f4b7885f7def50175f25dabbe52993fd235fec4"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6c3e5b71623d46c82aaf1e2b6203c643efc432617fa2406fe3722580999d4d8d"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "cd22315c4e4a4388ff505833a18d064134a305929900f8ee9ae68335382c6adc"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "96837a4df36fa2e45ec6e68f65e78cc9b4e9c15aaede9cf7fc4690df72c2e017"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "aa090af8b71eea8e57702a371065505a5f1661ddc2305e74079b97471f9d641a"
+    sha256 cellar: :any_skip_relocation, ventura:        "fd615eb793a5ef9a406204f24ea65f89d3a8a137af4a7e3e1e2bcd75479c8a04"
+    sha256 cellar: :any_skip_relocation, monterey:       "61364172563443f092d3fd6350e1229d6628882a027b8132cb5de22eeb64b8bc"
+    sha256 cellar: :any_skip_relocation, big_sur:        "2706579912d9b2fdeb3eac77179b95303989f263b97ffd90cd40ff765ff35131"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6cc70ab9c84dbb2c411d01873e87f8f3219aae6fb9b4db7948ea781ba34ae579"
   end
 
   depends_on "go" => :build
 
   def install
-    (buildpath/"src/github.com/kubecfg/kubecfg").install buildpath.children
+    system "make", "VERSION=v#{version}"
+    bin.install "kubecfg"
+    pkgshare.install Pathname("examples").children
+    pkgshare.install Pathname("testdata").children
 
-    cd "src/github.com/kubecfg/kubecfg" do
-      system "make", "VERSION=v#{version}"
-      bin.install "kubecfg"
-      pkgshare.install Pathname("examples").children
-      pkgshare.install Pathname("testdata").children
-      prefix.install_metafiles
-    end
-
-    generate_completions_from_executable(bin/"kubecfg", "completion", "--shell", shells: [:bash, :zsh])
+    generate_completions_from_executable(bin/"kubecfg", "completion", "--shell")
   end
 
   test do

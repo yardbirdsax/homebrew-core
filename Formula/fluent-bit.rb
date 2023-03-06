@@ -1,8 +1,8 @@
 class FluentBit < Formula
   desc "Fast and Lightweight Logs and Metrics processor"
   homepage "https://github.com/fluent/fluent-bit"
-  url "https://github.com/fluent/fluent-bit/archive/v1.9.8.tar.gz"
-  sha256 "1ad4d6e89c676df8fec461533087ff76b7e2deccc615a03f027b9ef7f9f4057f"
+  url "https://github.com/fluent/fluent-bit/archive/v2.0.9.tar.gz"
+  sha256 "393ad4a6ced48c327607653d610ef273843085a17b6e5c8013877abdf31e6945"
   license "Apache-2.0"
   head "https://github.com/fluent/fluent-bit.git", branch: "master"
 
@@ -12,12 +12,13 @@ class FluentBit < Formula
   end
 
   bottle do
-    sha256                               arm64_monterey: "19fdc15b77a5b73aa9859160a83e3aab0630140d7972f13a19aaaab9dfd630e4"
-    sha256                               arm64_big_sur:  "d0cddda4b35d05968621fc1c3580b8179223f91d90653e2ba8734cc74004ca07"
-    sha256                               monterey:       "e00e9a729bd42066fa16749bbaa33a5f04e4d2b308d9aa200461f77d15e0a8d0"
-    sha256                               big_sur:        "a0f6c4a87ff6d90cbb6674d7210a7d1f382d7a546133464df535542435fbe018"
-    sha256                               catalina:       "45a137b3290b4ddd40516d58dac4da2d04176bda6cff6a3f7bd9c88549a79d80"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "885c13f69eca19ca717d07964647c72dd889d8ba86388b09921582fec485f079"
+    sha256 arm64_ventura:  "0463fea8a38a358abccc5194f9fc829dd5e406f10f94201349c8df4ff112939c"
+    sha256 arm64_monterey: "4cca4e925adc910fcd8a32b9e5e6167c20e27d43142b0380c67807f8fbac1f1d"
+    sha256 arm64_big_sur:  "4ff5023587bbb7230f341e6a5b9edd046fb779aadff9e4e9c92c1af4ac8b74ee"
+    sha256 ventura:        "613a3cfd4ca024c1c305dec08bbbe6101cc50b6c89af48ef26b3d0a7c8cc1318"
+    sha256 monterey:       "13bc4baa31c2bd8ab8da89cd1f2405803bf9b291e672c62fefebe014cb54714f"
+    sha256 big_sur:        "3a0c14a2533306840ebbc3f5ed4375469d047be9f7023a3afab9385321acb27b"
+    sha256 x86_64_linux:   "b790144b4e472e8cab875fb13117cf47cc2d8dcfda6792bcbed1207587a435a9"
   end
 
   depends_on "bison" => :build
@@ -26,10 +27,7 @@ class FluentBit < Formula
   depends_on "pkg-config" => :build
 
   depends_on "libyaml"
-
-  on_linux do
-    depends_on "openssl@1.1"
-  end
+  depends_on "openssl@3"
 
   def install
     # Prevent fluent-bit to install files into global init system
@@ -38,15 +36,14 @@ class FluentBit < Formula
     inreplace "src/CMakeLists.txt", "if(IS_DIRECTORY /lib/systemd/system)", "if(False)"
     inreplace "src/CMakeLists.txt", "elseif(IS_DIRECTORY /usr/share/upstart)", "elif(False)"
 
-    chdir "build" do
-      # Per https://luajit.org/install.html: If MACOSX_DEPLOYMENT_TARGET
-      # is not set then it's forced to 10.4, which breaks compile on Mojave.
-      # fluent-bit builds against a vendored Luajit.
-      ENV["MACOSX_DEPLOYMENT_TARGET"] = MacOS.version
+    # Per https://luajit.org/install.html: If MACOSX_DEPLOYMENT_TARGET
+    # is not set then it's forced to 10.4, which breaks compile on Mojave.
+    # fluent-bit builds against a vendored Luajit.
+    ENV["MACOSX_DEPLOYMENT_TARGET"] = MacOS.version
 
-      system "cmake", "..", *std_cmake_args
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do

@@ -2,8 +2,8 @@ class Juju < Formula
   desc "DevOps management tool"
   homepage "https://juju.is/"
   url "https://github.com/juju/juju.git",
-      tag:      "juju-2.9.34",
-      revision: "20b8212e62c5d122e63141825a7733bf66c4c5a9"
+      tag:      "juju-3.1.0",
+      revision: "924c9e190eb56d9a9324d9cc0dd9dd663c501ac4"
   license "AGPL-3.0-only"
   version_scheme 1
   head "https://github.com/juju/juju.git", branch: "develop"
@@ -14,12 +14,13 @@ class Juju < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "ca2f5e1a00942a372e3ce5b237a1dc6bc890345c40d1fecc2b84ea4edf410416"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "3bf912cfc942848b406ba41dc675dfdf08e86da0a8b49785dce64e248c18605f"
-    sha256 cellar: :any_skip_relocation, monterey:       "b3677103a612f52516ad41a770f3db5601b52c655b218cd13ff3c0fec901466f"
-    sha256 cellar: :any_skip_relocation, big_sur:        "984ae41d611c8913ee5d4a72c36e220af4be0148464f37556fe74a898b464cd8"
-    sha256 cellar: :any_skip_relocation, catalina:       "646e67eb894602fc344a3d93948e2c9fcbb464d5435c8818edecfb55eeddf320"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d3282e75314a0b07384ed19c84a4cc5038f1d98dbb19b46ee9a0452e8981d33f"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "21fa811589d1c26a6350b8153c93bcdb4e1ce0f4dd3dfdccfe754da9eb6c377c"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "9f8449ea7f25780e131f3b2cb559b970bbab57df0ec97103962f3003346b2d40"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "fc8106863cbca607c0a77dc20a8e2276c00b3ede6afc79a14187c4294d40fe08"
+    sha256 cellar: :any_skip_relocation, ventura:        "ac115e1ad5d1f206df3cf26af966a0dfcd9381846bfbf79eaf81d90f82636876"
+    sha256 cellar: :any_skip_relocation, monterey:       "f2f5abb915c21cac222ea0e16b1d1ab3c0108acf001bf36e990285da3aa5575d"
+    sha256 cellar: :any_skip_relocation, big_sur:        "cb256c37847820b0bdc81f053dc71e9f6a7157a7cded4700e8d166557bac9836"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "920443adb51bd358e5d6ca4edb79c049e0982a2ab8615f5c4781f0ff12b65280"
   end
 
   depends_on "go" => :build

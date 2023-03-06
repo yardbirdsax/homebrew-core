@@ -1,23 +1,23 @@
 class Gifski < Formula
   desc "Highest-quality GIF encoder based on pngquant"
   homepage "https://gif.ski/"
-  url "https://github.com/ImageOptim/gifski/archive/1.7.2.tar.gz"
-  sha256 "a686cba9b9874d06ff138249119b796960d30fa06d036ce51df93d8dde6b829f"
+  url "https://github.com/ImageOptim/gifski/archive/1.10.0.tar.gz"
+  sha256 "cc536bd3e73c302264cd2add460d9a270c66c545759dcd60cbfc7d365768c656"
   license "AGPL-3.0-only"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_monterey: "ad1d6084e9f06f1a8d8601f988a1e6fb7057174df5841e4a9157fac0a65a1a60"
-    sha256 cellar: :any,                 arm64_big_sur:  "d17cd7c01944d1868928debaea3b440fefb1f77d04f882f49e6c60f40bd9464b"
-    sha256 cellar: :any,                 monterey:       "a8ae5fd607d327693c41c953f3bd795bec2cdd2a6685aab118517b9cf6725100"
-    sha256 cellar: :any,                 big_sur:        "0052439c326c966371734039503ad38cbb0e81b560cff8967019d036be4a155e"
-    sha256 cellar: :any,                 catalina:       "b9eee9279bf404f00e01c6930aed817d8aab53b4314139d397d935ee064a4d58"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "02a02b16b00857089e0950b4ca09c6e77f1ec4b1eb4b6819f791e9d073f04b2c"
+    sha256 cellar: :any,                 arm64_ventura:  "2bff5cc701dcab0998ac5faa2d188098d260e065883a642f70b86acc8faed0c6"
+    sha256 cellar: :any,                 arm64_monterey: "6365d6386b896f732e65c0bade8e05c9e8fe9b6b2498595e15cbd8b92598067b"
+    sha256 cellar: :any,                 arm64_big_sur:  "ad1fff271c9c7ffe684243c4fdf9572a51291faa53283d4916225af2fc62f251"
+    sha256 cellar: :any,                 ventura:        "c7dc1fa5f1ce84fdf50662558d5363cc7bf2c46f359df39ee55c1e490733ab58"
+    sha256 cellar: :any,                 monterey:       "2f866f1ba36dcb6ba87b40e14d8f864283f4e5fea5dedea7ad42e09708c14c90"
+    sha256 cellar: :any,                 big_sur:        "421ae4ed99a0c7bfc07a673f83027380a50d61c586efc30d271b93e65afba3a2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9902c36327e0cc159fd8334dbc432088a95f11ec2f44d5cb49fa59186803196d"
   end
 
   depends_on "pkg-config" => :build
   depends_on "rust" => :build
-  depends_on "ffmpeg@4"
+  depends_on "ffmpeg@4" # FFmpeg 5 issue: https://github.com/ImageOptim/gifski/issues/242
 
   uses_from_macos "llvm" => :build
 

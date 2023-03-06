@@ -1,20 +1,19 @@
 class Poac < Formula
-  desc "Package manager for C++"
-  homepage "https://github.com/poacpm/poac"
-  url "https://github.com/poacpm/poac/archive/refs/tags/0.4.1.tar.gz"
-  sha256 "3717a873120a7125fcdcc99227f5c7d42c4e170f7572feee19ab458d657f9451"
+  desc "Package Manager for C++"
+  homepage "https://github.com/poac-dev/poac"
+  url "https://github.com/poac-dev/poac/archive/refs/tags/0.5.1.tar.gz"
+  sha256 "439ce4f3be89e33abbafe5ef5bef53e2c6209c0cc0a8e718698675c247fb2ca4"
   license "Apache-2.0"
-  revision 3
-  head "https://github.com/poacpm/poac.git", branch: "main"
+  head "https://github.com/poac-dev/poac.git", branch: "main"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_monterey: "0e4a3817fbd3e97354dda7043f8e664125022e9d89fb29a3f96ed8351fb20596"
-    sha256 cellar: :any,                 arm64_big_sur:  "bfe8ae0e153c4a3175a1123806858607c2efe5df0641b01aa9238faaf54cfe44"
-    sha256 cellar: :any,                 monterey:       "932bef48de62ce5476c19922f058913e9504d3f940f14e318db11b380dad82f8"
-    sha256 cellar: :any,                 big_sur:        "27fc0745d17099863c60acf92768d2cee215cf904e797a45d37fc69e8ce3a502"
-    sha256 cellar: :any,                 catalina:       "5dfd726f44f674bb80b3319b01060ba66b7143e4a8ac051b0787b44b162fb9b0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2c17cd835d36713d5b575cd5311ba55252b239925162143dad5578def6750ade"
+    sha256 cellar: :any,                 arm64_ventura:  "adee712ee6e9d1b2c3790e40b5dba26c5e9e4919fcb91af302194d7f08ee3f2f"
+    sha256 cellar: :any,                 arm64_monterey: "fb3d23a9b79b994bb5c7757eb30a759cad75f722988431fad9d16611f75fc809"
+    sha256 cellar: :any,                 arm64_big_sur:  "f783e3f2f86151c1d73b15fa1904a552968344cd103903f52ac1e7edfadaa009"
+    sha256 cellar: :any,                 ventura:        "5cbd4dbe598ddff26f4c61bb2c8af6c662cf096346ea7e835133bcf79ff6f43d"
+    sha256 cellar: :any,                 monterey:       "764182fc107dc0a0cb8f7be3f69d045b6b81939584bdfa44660ab3269178f8be"
+    sha256 cellar: :any,                 big_sur:        "a4613be522f0201662f4684e2e3d8174622be2bf5cdde438b600136b902fa36f"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "66ce3c40e223be249fdecaefd7480b8f648a7052c60bfa734c92b05f1d1e8369"
   end
 
   depends_on "cmake" => :build
@@ -38,10 +37,9 @@ class Poac < Formula
   fails_with gcc: "5" # C++20
 
   def install
-    ENV.remove "HOMEBREW_LIBRARY_PATHS", Formula["llvm"].opt_lib
     ENV.llvm_clang if OS.mac? && (DevelopmentTools.clang_build_version <= 1200)
 
-    system "cmake", "-B", "build", "-DCPM_USE_LOCAL_PACKAGES=ON", *std_cmake_args
+    system "cmake", "-B", "build", "-DPOAC_BUILD_TESTING=OFF", *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
 

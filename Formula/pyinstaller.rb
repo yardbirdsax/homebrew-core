@@ -3,40 +3,41 @@ class Pyinstaller < Formula
 
   desc "Bundle a Python application and all its dependencies"
   homepage "https://pyinstaller.org/"
-  url "https://files.pythonhosted.org/packages/18/9e/dbee87c405633be8ae926520d5e91c29cd76c969328ad4c724e6983e2b58/pyinstaller-5.4.1.tar.gz"
-  sha256 "2a09e6bd6e121eb1a71fadb223797dc502e4fd4168931c31a5f87faa10eb5b4c"
+  url "https://files.pythonhosted.org/packages/63/20/cfb61921d7db3e8473440091ac99ae900357f26197502ab7ec9ff6473ca5/pyinstaller-5.8.0.tar.gz"
+  sha256 "314fb883caf3cbf06adbea2b77671bb73c3481568e994af0467ea7e47eb64755"
   license "GPL-2.0-or-later"
   head "https://github.com/pyinstaller/pyinstaller.git", branch: "develop"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "bbd9e8cdb6c4e523f132d813748462283e13292928adcbc355687a265647a4a3"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "0ac8277e358d0cc435517078632ce1ac09b28e68c61d94be40cf27065edd81f6"
-    sha256 cellar: :any_skip_relocation, monterey:       "21e2e3a5c91e55cdead9f48e6605b6d9c9f87e9b7d1f56b9949a6e0068456640"
-    sha256 cellar: :any_skip_relocation, big_sur:        "ac336ef4c373b1e8e05bcd0b19ccb6b49900c9931377760df968242da6096f77"
-    sha256 cellar: :any_skip_relocation, catalina:       "64f0e1d0770a745b753a271b4657dcb32290ef3c00a64839db486422b0768f4f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1453c0f56101dba069b94c17cf45eef6741cf5b9b014be17580b4e1ddab610b6"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "0b2ca34db0f42d9d96dddfb986867ae632af026b76b6562e1b7adb0519712bf2"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "97ce83b12a20f9985748c567a1bfb9b398fcc8b4777248c83bc4f85fe45d772b"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5e7c9fad75cec238a122ce550b8a010089bbef09f505075016582f63c2a794d8"
+    sha256 cellar: :any_skip_relocation, ventura:        "858dcbfed086243ab0bc456f261c79fb5b7a976db34cbd28d8f909d780f3dd9f"
+    sha256 cellar: :any_skip_relocation, monterey:       "b124294203838050949e354c8e292ff8ea360f86263298635392833a10320d6f"
+    sha256 cellar: :any_skip_relocation, big_sur:        "9d52e96d8bf4ecaa807a45a195d76705260fefc4ac52b821788ca52f767a4794"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3351e3ba567c84c323572267799b0ed47f34d1a138d965f789bbba20bd6aaf87"
   end
 
-  depends_on "python@3.10"
+  depends_on "python@3.11"
 
   resource "altgraph" do
-    url "https://files.pythonhosted.org/packages/a9/f1/62830c4915178dbc6948687916603f1cd37c2c299634e4a8ee0efc9977e7/altgraph-0.17.2.tar.gz"
-    sha256 "ebf2269361b47d97b3b88e696439f6e4cbc607c17c51feb1754f90fb79839158"
+    url "https://files.pythonhosted.org/packages/5a/13/a7cfa43856a7b8e4894848ec8f71cd9e1ac461e51802391a3e2101c60ed6/altgraph-0.17.3.tar.gz"
+    sha256 "ad33358114df7c9416cdb8fa1eaa5852166c505118717021c6a8c7c7abbd03dd"
   end
 
   resource "macholib" do
-    url "https://files.pythonhosted.org/packages/16/1b/85fd523a1d5507e9a5b63e25365e0a26410d5b6ee89082426e6ffff30792/macholib-1.16.tar.gz"
-    sha256 "001bf281279b986a66d7821790d734e61150d52f40c080899df8fefae056e9f7"
+    url "https://files.pythonhosted.org/packages/46/92/bffe4576b383f20995ffb15edccf1c97d2e39f9a8c72136836407f099277/macholib-1.16.2.tar.gz"
+    sha256 "557bbfa1bb255c20e9abafe7ed6cd8046b48d9525db2f9b77d3122a63a2a8bf8"
   end
 
   resource "pyinstaller-hooks-contrib" do
-    url "https://files.pythonhosted.org/packages/8d/46/5b21e3eedc41fe0a8522e409ab2c71ebf137eab0f9e632c5213e76f97b7e/pyinstaller-hooks-contrib-2022.10.tar.gz"
-    sha256 "e5edd4094175e78c178ef987b61be19efff6caa23d266ade456fc753e847f62e"
+    url "https://files.pythonhosted.org/packages/70/ca/a8c03acf2f249a3675cac6a322e70fa4ea200f40590cf72cb4cd322bfeb3/pyinstaller-hooks-contrib-2022.15.tar.gz"
+    sha256 "73fd4051dc1620f3ae9643291cd9e2f47bfed582ade2eb05e3247ecab4a4f5f3"
   end
 
   def install
     cd "bootloader" do
-      system "python3.10", "./waf", "all", "--no-universal2", "STRIP=/usr/bin/strip"
+      system "python3.11", "./waf", "all", "--no-universal2", "STRIP=/usr/bin/strip"
     end
     virtualenv_install_with_resources
   end

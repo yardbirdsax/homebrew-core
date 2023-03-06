@@ -1,8 +1,8 @@
 class Goenv < Formula
   desc "Go version management"
   homepage "https://github.com/syndbg/goenv"
-  url "https://github.com/syndbg/goenv/archive/1.23.3.tar.gz"
-  sha256 "1559f2907ee0339328466fe93f3c9637b7674917db81754412c7f842749e3201"
+  url "https://github.com/syndbg/goenv/archive/2.0.5.tar.gz"
+  sha256 "bf1d3bde10c88dca3c42ab26110436c3627d91ba50dda1b7960e109c36cb4206"
   license "MIT"
   version_scheme 1
   head "https://github.com/syndbg/goenv.git", branch: "master"
@@ -13,8 +13,13 @@ class Goenv < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, all: "18e8cdaeba562696634782aff8f2affff1201d91fab4334346942b11ece548a5"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "91f85cc1957be391a24b241014f2d03c18ce8949f02e7dc9ee2b671c22687ecf"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "91f85cc1957be391a24b241014f2d03c18ce8949f02e7dc9ee2b671c22687ecf"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "91f85cc1957be391a24b241014f2d03c18ce8949f02e7dc9ee2b671c22687ecf"
+    sha256 cellar: :any_skip_relocation, ventura:        "6b54b59c24c8a917a3f15ec22b36be5ff41ba72b616157fc17c1327d7ce0bc0a"
+    sha256 cellar: :any_skip_relocation, monterey:       "6b54b59c24c8a917a3f15ec22b36be5ff41ba72b616157fc17c1327d7ce0bc0a"
+    sha256 cellar: :any_skip_relocation, big_sur:        "6b54b59c24c8a917a3f15ec22b36be5ff41ba72b616157fc17c1327d7ce0bc0a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "91f85cc1957be391a24b241014f2d03c18ce8949f02e7dc9ee2b671c22687ecf"
   end
 
   def install
@@ -24,7 +29,6 @@ class Goenv < Formula
       "test/goenv.bats",
       "test/test_helper.bash",
     ]
-    inreplace_files << "test/init.bats" unless build.head?
     inreplace inreplace_files, "/usr/local", HOMEBREW_PREFIX
 
     prefix.install Dir["*"]

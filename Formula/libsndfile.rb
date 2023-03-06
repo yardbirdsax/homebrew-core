@@ -1,8 +1,8 @@
 class Libsndfile < Formula
   desc "C library for files containing sampled sound"
   homepage "https://libsndfile.github.io/libsndfile/"
-  url "https://github.com/libsndfile/libsndfile/releases/download/1.1.0/libsndfile-1.1.0.tar.xz"
-  sha256 "0f98e101c0f7c850a71225fb5feaf33b106227b3d331333ddc9bacee190bcf41"
+  url "https://github.com/libsndfile/libsndfile/releases/download/1.2.0/libsndfile-1.2.0.tar.xz"
+  sha256 "0e30e7072f83dc84863e2e55f299175c7e04a5902ae79cfb99d4249ee8f6d60a"
   license "LGPL-2.1-or-later"
   revision 1
 
@@ -12,37 +12,37 @@ class Libsndfile < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_monterey: "9ed727cc18747f0a6d3719fb2d9eaee6b1ac6f0f246e25af94148f38d64474f6"
-    sha256 cellar: :any,                 arm64_big_sur:  "dc8a056668adb95bd8cb09d8b26f9ba934e3a636161ab1858ec2c00bd29a30e5"
-    sha256 cellar: :any,                 monterey:       "46ef23309fcd5a9719b32ac664a2311e3de8bbfae8f0b576a7910f7bcc1dbb75"
-    sha256 cellar: :any,                 big_sur:        "9ae6459378ff5eb03da93314b33d88d1b3bb32fb920db887c049fbbe40edc016"
-    sha256 cellar: :any,                 catalina:       "0c62f981692a252ee7d4b6403423437f084076139ec09c717ba0e73ace14148a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0f1ccedcb7ec0d71a45cc48a73112bc45b400c6d6c27a455709a3beb955d5266"
+    sha256 cellar: :any,                 arm64_ventura:  "d47a7f33280fbfe3cb631ca61ab171a7ffaa47034d11ba319a3c3bb5b4f0f33b"
+    sha256 cellar: :any,                 arm64_monterey: "0d591252ff07fa6aac8833b67fdedc5f1b32317aec3be57db3bb3f7b80e00462"
+    sha256 cellar: :any,                 arm64_big_sur:  "0cfcd4a6778e9273fed09dd99bee8dff9912a7c3a008491fb8074d94809b8eaf"
+    sha256 cellar: :any,                 ventura:        "182c363201a8a9891ec319080b61259a0849b2cf506a0f964ae016102ade085d"
+    sha256 cellar: :any,                 monterey:       "a5bd790aa2431212bc81a2993dcff31e11a53601d4c0882c9c52ba92e6f16dd2"
+    sha256 cellar: :any,                 big_sur:        "7653baa66df98b46cb5409303f92b6abb38d994b867c27bf3b4a474bc17469e3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4ccaf1d11b4b2120285c628d9b6b19b1e58104d7dc5a6dada00e0eab9936bdb6"
   end
 
-  depends_on "autoconf" => :build
-  depends_on "automake" => :build
-  depends_on "libtool" => :build
-  depends_on "pkg-config" => :build
-  # TODO: check if this can be `uses_from_macos "python" => :build`.
-  depends_on "python@3.10" => :build
+  depends_on "cmake" => :build
   depends_on "flac"
+  depends_on "lame"
   depends_on "libogg"
   depends_on "libvorbis"
+  depends_on "mpg123"
   depends_on "opus"
 
-  # Fix unsubstituted variable @EXTERNAL_MPEG_LIBS@ in sndfile.pc
-  # PR ref: https://github.com/libsndfile/libsndfile/pull/828
-  # Remove in the next release.
-  patch do
-    url "https://github.com/libsndfile/libsndfile/commit/e4fdaeefddd39bae1db27d48ccb7db7733e0c009.patch?full_index=1"
-    sha256 "af1e9faf1b7f414ff81ef3f1641e2e37f3502f0febd17f70f0db6ecdd02dc910"
-  end
+  uses_from_macos "python" => :build
 
   def install
-    system "autoreconf", "-fvi"
-    system "./configure", "--disable-dependency-tracking", "--prefix=#{prefix}"
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "build",
+                    "-DBUILD_SHARED_LIBS=ON",
+                    "-DBUILD_PROGRAMS=ON",
+                    "-DENABLE_PACKAGE_CONFIG=ON",
+                    "-DINSTALL_PKGCONFIG_MODULE=ON",
+                    "-DBUILD_EXAMPLES=OFF",
+                    "-DCMAKE_INSTALL_RPATH=#{rpath}",
+                    "-DPYTHON_EXECUTABLE=#{which("python3")}",
+                    *std_cmake_args
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do

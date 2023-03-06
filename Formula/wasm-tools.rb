@@ -1,8 +1,8 @@
 class WasmTools < Formula
   desc "Low level tooling for WebAssembly in Rust"
   homepage "https://github.com/bytecodealliance/wasm-tools"
-  url "https://github.com/bytecodealliance/wasm-tools/archive/refs/tags/wasm-tools-1.0.10.tar.gz"
-  sha256 "3b0601e94fc00f7008590b4fa602edc34adba750b55c6d764e918f7abcc31cb1"
+  url "https://github.com/bytecodealliance/wasm-tools/archive/refs/tags/wasm-tools-1.0.25.tar.gz"
+  sha256 "60e3dc26d5e28a58d0244de8edaa63555c4dc9c78c0d20957a94385fa3fd2480"
   license "Apache-2.0" => { with: "LLVM-exception" }
   head "https://github.com/bytecodealliance/wasm-tools.git", branch: "main"
 
@@ -12,12 +12,13 @@ class WasmTools < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "97595fd8afff2beb796389769e9461cf0573279879a8f7de1346b23e306b882c"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c9b4ecd8a9719f990b3a55227a99589a36c48c1e8712f7ef1fa3d7263dddf725"
-    sha256 cellar: :any_skip_relocation, monterey:       "561d3028ad705d59fb953f4cba0daab7f2672355476449f9032a41a14c5f5891"
-    sha256 cellar: :any_skip_relocation, big_sur:        "111dd439cb249fd286d0ff55b908aa21530fda45da79d6bf901fe53427abe68b"
-    sha256 cellar: :any_skip_relocation, catalina:       "1ae53fd64711f613ec7e05b9eda71b0bcfa0e9a9969386fd0e511ac5c7a45fdc"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "915349785b437fb084ce6b004c963e251da624ecb854b7662b70e542b0113c2d"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "69b052bffabedbe2418fe41f706562e88cc2350a1ba85a315f9abe6e1cc9a3bb"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "186c16d1395b54cfc7ad94bdbd69e8590a15a3333657179825c8776156c18f80"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "988b47d0b3308a8349e8f974056c92db9cdfa01995752b16cd36de0876fd1686"
+    sha256 cellar: :any_skip_relocation, ventura:        "8ca8fb1c1170e47ff720d89374b4a3487a231f11d223e2db9ed2ec72d60455d4"
+    sha256 cellar: :any_skip_relocation, monterey:       "89b2acbad3a9463a7bc4ae89b70f4e11a7046c34e68794b478a7285d12233046"
+    sha256 cellar: :any_skip_relocation, big_sur:        "b18c96a6e5ebf2c97e3a235ca7d3f0835749748290758828e67e31636a0427a7"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "de0af903e9362cdcc7f134c015f0cf0483cd35aefb2235cc24ec7327b84315c3"
   end
 
   depends_on "rust" => :build
@@ -31,7 +32,7 @@ class WasmTools < Formula
     (testpath/"sum.wasm").write(wasm)
     system bin/"wasm-tools", "validate", testpath/"sum.wasm"
 
-    expected = <<~EOS
+    expected = <<~EOS.strip
       (module
         (type (;0;) (func (param i32 i32) (result i32)))
         (func (;0;) (type 0) (param i32 i32) (result i32)

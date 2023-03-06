@@ -3,40 +3,43 @@ class CfnLint < Formula
 
   desc "Validate CloudFormation templates against the CloudFormation spec"
   homepage "https://github.com/aws-cloudformation/cfn-lint/"
-  url "https://files.pythonhosted.org/packages/9c/3b/155e43f293cbbd36d1f4f362a207a322146b2fb6914e392e1c188cc3d13b/cfn-lint-0.65.0.tar.gz"
-  sha256 "a83c6844463d79dfaa2f7747dfc98282af901502a7db4c66cb7200262e3cc1d0"
+  url "https://files.pythonhosted.org/packages/e5/ab/896d52b8dbaa08a35c99eef6001a1700ba0ae03e7d32f89e806161447854/cfn-lint-0.74.0.tar.gz"
+  sha256 "b5096fe3d1a1f6ff99cfd1b219b9237ec10759a92784391b98d586dc345a39ee"
   license "MIT-0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "840cf75580b1cfe2c0a8cd190a61f46368b58c8f67e0b323e0c2535d8b5f99c0"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "963480581e2d8d19d42b65303e87771af65d163769d7bc850fc4e41279c1ea0d"
-    sha256 cellar: :any_skip_relocation, monterey:       "f62e61bdc98816d66f1d0489248845ba406b1bf030c9984f6a8af56d9efafa0c"
-    sha256 cellar: :any_skip_relocation, big_sur:        "26350c91e00aad703a7866af1824e96be1b3c9a2419876cead0c3ba106087fa4"
-    sha256 cellar: :any_skip_relocation, catalina:       "a0c463215952f66e416e7b7b71bf31e3da1c77bc8024b438fd0eb965b4b1bf06"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4f9689ef8871e4c395ea7ca53ee3faeb3c15abe15af069d9b2db9daef49c4d28"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "845c83ddaba35cdd25cbafb5d9a16b0dd8db332b88e887e17bc92e4ee7b23d05"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "842087e4c79c33c27d64c3e71613282c913afdef88f6a125d90e1004842b8839"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "715427f19bbb6faae3dcc1eb2bdcdc0bb4c82a4a8e1ccba51074aef3f6d83792"
+    sha256 cellar: :any_skip_relocation, ventura:        "f58cfefd697b3f74469ebb0a4953b55840007d840c4e032fa5e311380ef40658"
+    sha256 cellar: :any_skip_relocation, monterey:       "b357f7d904443d9b85f1ed79a71e3a7e9aba5d214a13888b3e4c83d9a4cbd326"
+    sha256 cellar: :any_skip_relocation, big_sur:        "25fa6ac396c778b5cabb49228bb65119c1a01feebea937474117ed9f1a9351ee"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4c6fa2f03a21b7e185738879e263fe02b5405c497878b519b843cee83c601bc2"
   end
 
-  depends_on "python@3.10"
+  depends_on "python-typing-extensions"
+  depends_on "python@3.11"
+  depends_on "pyyaml"
   depends_on "six"
 
   resource "attrs" do
-    url "https://files.pythonhosted.org/packages/1a/cb/c4ffeb41e7137b23755a45e1bfec9cbb76ecf51874c6f1d113984ecaa32c/attrs-22.1.0.tar.gz"
-    sha256 "29adc2665447e5191d0e7c568fde78b21f9672d344281d0c6e1ab085429b22b6"
+    url "https://files.pythonhosted.org/packages/21/31/3f468da74c7de4fcf9b25591e682856389b3400b4b62f201e65f15ea3e07/attrs-22.2.0.tar.gz"
+    sha256 "c9227bfc2f01993c03f68db37d1d15c9690188323c067c641f1a35ca58185f99"
   end
 
   resource "aws-sam-translator" do
-    url "https://files.pythonhosted.org/packages/3e/71/ae7afb44d810382896eca910bd856cb3589854353a36c09a5716228889a6/aws-sam-translator-1.51.0.tar.gz"
-    sha256 "4c39d78dd92a8d4b46b5b02dc74e6f0ef8713109ebc8910aec234c3b18649ffb"
+    url "https://files.pythonhosted.org/packages/58/d0/42434a73d2908bed6b24ad7b6d17b45589621d35319938aeca9c6c83152d/aws-sam-translator-1.60.0.tar.gz"
+    sha256 "ba3c4e38c6dd2f7e530f71eec2012b491fb7cde934d0ff5db4145209995095dd"
   end
 
   resource "boto3" do
-    url "https://files.pythonhosted.org/packages/3e/77/716a16c5173e34aeaadc2c89f386140087ec199dcfb2b26250640bd70d04/boto3-1.24.72.tar.gz"
-    sha256 "2e502227bfb67fe83b6d61ef9dacd49297bcb631d005cf27b5e54f65064c6e6d"
+    url "https://files.pythonhosted.org/packages/0e/4c/49217b9be681525fd8b87e41565a69e7d54185022594d2d8e3fffaf65044/boto3-1.26.80.tar.gz"
+    sha256 "7816da48b9626a482e955628ade527a4a84ff462043ac1a129011f7f66e8648c"
   end
 
   resource "botocore" do
-    url "https://files.pythonhosted.org/packages/ab/9c/c790ba19f53e1ea7cfb96ca413012dcfcbbf82af1340e37becf7d2378ce0/botocore-1.27.72.tar.gz"
-    sha256 "6184ab43a59118541b88e0ede24ccd671553323ace95bb7c8de3082a5cc581cb"
+    url "https://files.pythonhosted.org/packages/ca/f6/119e2a57ebb28fc8b6d860b211d539a4525b36ff3b9904e198609d7bb15f/botocore-1.29.80.tar.gz"
+    sha256 "19d4cadc79f75b31ffa78b5e750833d53e0edfe414d308b6788382ad32d23e12"
   end
 
   resource "jmespath" do
@@ -55,8 +58,8 @@ class CfnLint < Formula
   end
 
   resource "jsonpickle" do
-    url "https://files.pythonhosted.org/packages/65/09/50bc3aabaeba15b319737560b41f3b6acddf6f10011b9869c796683886aa/jsonpickle-2.2.0.tar.gz"
-    sha256 "7b272918b0554182e53dc340ddd62d9b7f902fec7e7b05620c04f3ccef479a0e"
+    url "https://files.pythonhosted.org/packages/2b/3f/dd9bc9c1c9e57c687e8ebc4723e76c48980004244cf8db908a7b2543bd53/jsonpickle-3.0.1.tar.gz"
+    sha256 "032538804795e73b94ead410800ac387fdb6de98f8882ac957fcd247e3a85200"
   end
 
   resource "jsonpointer" do
@@ -65,39 +68,33 @@ class CfnLint < Formula
   end
 
   resource "jsonschema" do
-    url "https://files.pythonhosted.org/packages/69/11/a69e2a3c01b324a77d3a7c0570faa372e8448b666300c4117a516f8b1212/jsonschema-3.2.0.tar.gz"
-    sha256 "c8a85b28d377cc7737e46e2d9f2b4f44ee3c0e1deac6bf46ddefc7187d30797a"
+    url "https://files.pythonhosted.org/packages/36/3d/ca032d5ac064dff543aa13c984737795ac81abc9fb130cd2fcff17cfabc7/jsonschema-4.17.3.tar.gz"
+    sha256 "0f864437ab8b6076ba6707453ef8f98a6a0d512a80e93f8abdb676f737ecb60d"
   end
 
-  # only doing this because junit-xml source is not available in PyPI for v1.9
   resource "junit-xml" do
-    url "https://github.com/kyrus/python-junit-xml.git",
-        revision: "4bd08a272f059998cedf9b7779f944d49eba13a6"
+    url "https://files.pythonhosted.org/packages/98/af/bc988c914dd1ea2bc7540ecc6a0265c2b6faccc6d9cdb82f20e2094a8229/junit-xml-1.9.tar.gz"
+    sha256 "de16a051990d4e25a3982b2dd9e89d671067548718866416faec14d9de56db9f"
   end
 
   resource "networkx" do
-    url "https://files.pythonhosted.org/packages/d9/c6/ad9dc9195c0e5d8879d2a28667aa45e087631576b40f9c954a086693a36d/networkx-2.8.6.tar.gz"
-    sha256 "bd2b7730300860cbd2dafe8e5af89ff5c9a65c3975b352799d87a6238b4301a6"
+    url "https://files.pythonhosted.org/packages/99/f9/d45c9ecf50a6b67a200e0bbd324201b5cd777dfc0e6c8f6d1620ce5a7ada/networkx-3.0.tar.gz"
+    sha256 "9a9992345353618ae98339c2b63d8201c381c2944f38a2ab49cb45a4c667e412"
   end
 
   resource "pbr" do
-    url "https://files.pythonhosted.org/packages/b4/40/4c5d3681b141a10c24c890c28345fac915dd67f34b8c910df7b81ac5c7b3/pbr-5.10.0.tar.gz"
-    sha256 "cfcc4ff8e698256fc17ea3ff796478b050852585aa5bae79ecd05b2ab7b39b9a"
+    url "https://files.pythonhosted.org/packages/02/d8/acee75603f31e27c51134a858e0dea28d321770c5eedb9d1d673eb7d3817/pbr-5.11.1.tar.gz"
+    sha256 "aefc51675b0b533d56bb5fd1c8c6c0522fe31896679882e1c4c63d5e4a0fccb3"
   end
 
   resource "pyrsistent" do
-    url "https://files.pythonhosted.org/packages/42/ac/455fdc7294acc4d4154b904e80d964cc9aae75b087bbf486be04df9f2abd/pyrsistent-0.18.1.tar.gz"
-    sha256 "d4d61f8b993a7255ba714df3aca52700f8125289f84f704cf80916517c46eb96"
+    url "https://files.pythonhosted.org/packages/bf/90/445a7dbd275c654c268f47fa9452152709134f61f09605cf776407055a89/pyrsistent-0.19.3.tar.gz"
+    sha256 "1a2994773706bbb4995c31a97bc94f1418314923bd1048c6d964837040376440"
   end
 
   resource "python-dateutil" do
     url "https://files.pythonhosted.org/packages/4c/c4/13b4776ea2d76c115c1d1b84579f3764ee6d57204f6be27119f13a61d0a9/python-dateutil-2.8.2.tar.gz"
     sha256 "0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"
-  end
-
-  resource "PyYAML" do
-    url "https://files.pythonhosted.org/packages/36/2b/61d51a2c4f25ef062ae3f74576b01638bebad5e045f747ff12643df63844/PyYAML-6.0.tar.gz"
-    sha256 "68fb519c14306fec9720a2a5b45bc9f0c8d1b9c72adf45c37baedfcd949c35a2"
   end
 
   resource "s3transfer" do
@@ -111,8 +108,8 @@ class CfnLint < Formula
   end
 
   resource "urllib3" do
-    url "https://files.pythonhosted.org/packages/b2/56/d87d6d3c4121c0bcec116919350ca05dc3afd2eeb7dc88d07e8083f8ea94/urllib3-1.26.12.tar.gz"
-    sha256 "3fa96cf423e6987997fc326ae8df396db2a8b7c667747d47ddd8ecba91f4a74e"
+    url "https://files.pythonhosted.org/packages/c5/52/fe421fb7364aa738b3506a2d99e4f3a56e079c0a798e9f4fa5e14c60922f/urllib3-1.26.14.tar.gz"
+    sha256 "076907bf8fd355cde77728471316625a4d2f7e713c125f51953bb5b3eecf4f72"
   end
 
   def install

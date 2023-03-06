@@ -1,41 +1,31 @@
 class MariadbAT107 < Formula
   desc "Drop-in replacement for MySQL"
   homepage "https://mariadb.org/"
-  url "https://downloads.mariadb.com/MariaDB/mariadb-10.7.4/source/mariadb-10.7.4.tar.gz"
-  sha256 "73dd9c9d325520f20ca5e0ef16f94b7be1146bed7e4a78e735c20daebf3a4173"
+  url "https://downloads.mariadb.com/MariaDB/mariadb-10.7.8/source/mariadb-10.7.8.tar.gz"
+  sha256 "f8c69d9080d85eafb3e3a84837bfa566a7f5527a8af6f9a081429d4de0de4778"
   license "GPL-2.0-only"
 
-  # This uses a placeholder regex to satisfy the `PageMatch` strategy
-  # requirement. In the future, this will be updated to use a `Json` strategy
-  # and we can remove the unused regex at that time.
+  # https://mariadb.com/kb/en/mariadb-10-7-8-release-notes/#notable-items
   livecheck do
-    url "https://downloads.mariadb.org/rest-api/mariadb/all-releases/?olderReleases=false"
-    regex(/unused/i)
-    strategy :page_match do |page|
-      json = JSON.parse(page)
-      json["releases"]&.map do |release|
-        next unless release["release_number"]&.start_with?(version.major_minor)
-        next unless release["status"]&.include?("stable")
-
-        release["release_number"]
-      end
-    end
+    skip "10.7.8 is the final release of MariaDB 10.7"
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_monterey: "f2b7c29ec5641ed3bec7564ac2ea5f613412de8480fbafab9aa75e16fa695f6c"
-    sha256 arm64_big_sur:  "b48783da6385ee0636d77e4eb29a8d12227216fe15f4d4877f3ec7e91f3146f7"
-    sha256 monterey:       "300511b4911eb83d7d2fc6613abe8d97533c412ca5ca883006110fe19bb26de6"
-    sha256 big_sur:        "bad5d2c351acb1dd3c6a6242940ca13f992d0ad9d64efd4cdee6d8fa5bb91d2c"
-    sha256 catalina:       "e485b00feb962e1975e79237c84ca766d16334d125c95de4a3484cc5839edcf0"
-    sha256 x86_64_linux:   "f346b4a2379f1a204ceee3c892c96b3a214707dc0a170fbf5e83e9e95273a921"
+    sha256 arm64_ventura:  "8f0a0e4d4638e3cd70b84e61349b1602d81826e5a57ae6d8143727302a9531af"
+    sha256 arm64_monterey: "89fc9092f426431a756b9e7922a856611d32c287cb0c8d6ca9eb09255a933486"
+    sha256 arm64_big_sur:  "60dd2de709df30222cc8b1d9ebdfee1d8e14c8f1eeb7184f3306ccfaf1cacc04"
+    sha256 ventura:        "ae41f693e1fade9f269cb241bc4ba565454514f62d4fa37397e249b41a09fdb9"
+    sha256 monterey:       "a74860e584fbcfd2ff0ddbf53bfb84f2eee35c1b77ffb81b1d4a28b1cd0943f1"
+    sha256 big_sur:        "a4aacf02a33ca4fc6c74b9a60dd36a200b14410293241d0278c6177461fe37bd"
+    sha256 x86_64_linux:   "c8f87ce51571b084849bfc5ab32600e5beda52552bcdf4edd65cf607fe81cfb3"
   end
 
   keg_only :versioned_formula
 
   # See: https://mariadb.com/kb/en/changes-improvements-in-mariadb-107/
-  disable! date: "2023-02-01", because: :unsupported
+  # and https://mariadb.org/about/#maintenance-policy
+  # End-of-life on 2023-02-09. Disable date set to 3 months after.
+  disable! date: "2023-05-09", because: :unsupported
 
   depends_on "bison" => :build
   depends_on "cmake" => :build

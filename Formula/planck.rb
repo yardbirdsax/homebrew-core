@@ -1,19 +1,20 @@
 class Planck < Formula
   desc "Stand-alone ClojureScript REPL"
   homepage "https://planck-repl.org/"
-  url "https://github.com/planck-repl/planck/archive/2.26.0.tar.gz"
-  sha256 "e2a01ea5cefcc08399a6bfc7204b228bfd0602b1126d5968fc976f48135a59b2"
+  url "https://github.com/planck-repl/planck/archive/2.27.0.tar.gz"
+  sha256 "d69be456efd999a8ace0f8df5ea017d4020b6bd806602d94024461f1ac36fe41"
   license "EPL-1.0"
   revision 1
   head "https://github.com/planck-repl/planck.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any,                 arm64_monterey: "60251db7bcf9f8aefdeedfe73e9d881a9c6f0810e7f0f92cf8d06f36357dac77"
-    sha256 cellar: :any,                 arm64_big_sur:  "22402b255e0865167b1fab89938287dcaea4897c39c6576bb9f7a1b9badc2dba"
-    sha256 cellar: :any,                 monterey:       "90688a347f810a1cc3f6a54f4b342c0a1e8bbcfe1f88f7c2c0190cae70c04d91"
-    sha256 cellar: :any,                 big_sur:        "767b85cc2af1a1f83c0ca5030fba4feff75caeb86b294b854e6768591e33c94f"
-    sha256 cellar: :any,                 catalina:       "b1ede3e99381062067def61a1b8c4da247abd71c5349c3afd619d0d93fd57db0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9d711302abf6a781f2832991709912746c96d0a8cb2c25bf700c1da5f22568f3"
+    sha256 cellar: :any,                 arm64_ventura:  "c81dda09a6a3a8344297eaa3df9166d7b122c21a2517ffb4f0f444a44b295ec7"
+    sha256 cellar: :any,                 arm64_monterey: "f54712c0e883a890d941d0a98bb221d56d5c893103127f8de7772d71eb751879"
+    sha256 cellar: :any,                 arm64_big_sur:  "e63c950981cf2bed5c64b7f9b451acdfed2fa373abb088971a1812456507815d"
+    sha256 cellar: :any,                 ventura:        "aef5e8e914c5a14fe894ab88d5b37c60ce46648b64d0cf4a995a5a73ae19297d"
+    sha256 cellar: :any,                 monterey:       "5f89821929f06839eaeb4ec0aeaca9514318f4369ff21466f8057ead1be8cd79"
+    sha256 cellar: :any,                 big_sur:        "7ba97d3ba268d49078c097cc5ee97e24d9e794d609468fc1d2e1e8d68835c6dc"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "831a7271ddea7ebbd62b95ae33b52ad65804cebe9a60e7a717f9d5fa035db2da"
   end
 
   depends_on "clojure" => :build
@@ -28,19 +29,12 @@ class Planck < Formula
   uses_from_macos "libffi"
 
   on_linux do
-    depends_on "gcc"
     depends_on "glib"
     depends_on "pcre"
     depends_on "webkitgtk"
   end
 
   fails_with gcc: "5"
-
-  # Apply upstream commit to fix issue with GNU sed.  Remove with next release.
-  patch do
-    url "https://github.com/planck-repl/planck/commit/f1f21bf9eb4cfca6312ff0117f75d3b38164b43d.patch?full_index=1"
-    sha256 "787ddf6fb1cfea1d70fa18a6f7b292579ea1ffbf1f437f1f775e3330d2b8d36c"
-  end
 
   def install
     ENV["JAVA_HOME"] = Formula["openjdk"].opt_prefix

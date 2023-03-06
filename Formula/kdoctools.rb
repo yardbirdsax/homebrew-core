@@ -1,8 +1,8 @@
 class Kdoctools < Formula
   desc "Create documentation from DocBook"
   homepage "https://api.kde.org/frameworks/kdoctools/html/index.html"
-  url "https://download.kde.org/stable/frameworks/5.98/kdoctools-5.98.0.tar.xz"
-  sha256 "1a32f311d63d0cf4a286d1e2cac87085da58656196b78cd858555bdfb492f779"
+  url "https://download.kde.org/stable/frameworks/5.103/kdoctools-5.103.0.tar.xz"
+  sha256 "ba5782de152606269a3589ae560bab2ce6709b85f0e07181fe3ef6ebd6ace4a8"
   license all_of: [
     "BSD-3-Clause",
     "GPL-2.0-or-later",
@@ -19,12 +19,13 @@ class Kdoctools < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_monterey: "0797ae8328c185b5f9154e6c6611f5c376da7b8f30bb4cd1f6a112054f407190"
-    sha256 cellar: :any,                 arm64_big_sur:  "b25a544044a11171947371b59e099be3ec0a234b23c6ff58801c6f5b270c6c25"
-    sha256 cellar: :any,                 monterey:       "de1af0279fbfbed8a6c7d56ef2f074dc04939714c1a6278d1e034547db512a5d"
-    sha256 cellar: :any,                 big_sur:        "1d3dbc85c984bf294853c09bda07640337a60af224e66638407a36a379150fbe"
-    sha256 cellar: :any,                 catalina:       "e80b8241b099680fda5b9f2e1889250b16c4ac4465e3d76b2f17ae6aa2f42ac1"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d30163c87f0d92f10fabb818f29899e0777fcbb2d13490701a7357f59a212507"
+    sha256 cellar: :any,                 arm64_ventura:  "90020b577c2dc83f55ccfe26e3fc6bd6a4e2f896eb5141e48b5595ae819731f0"
+    sha256 cellar: :any,                 arm64_monterey: "89646a03c3db70bd712bfc05bcc03d8bec8ed2ca5093692cce944e6170db393a"
+    sha256 cellar: :any,                 arm64_big_sur:  "33ab752112f6c1b7e829ae2b97700b19300b493b7c2576e0e2341961efa519ed"
+    sha256 cellar: :any,                 ventura:        "f886373b4ad2c3aaaa0bb07e291e50614379f063d8478240f01a41ba7cccc8b3"
+    sha256 cellar: :any,                 monterey:       "75e79712fa13ecb70ca437d9ffb2d0c7449de14fa78e6f7ad808df50df9f4ad0"
+    sha256 cellar: :any,                 big_sur:        "1a2e35ac9a1c340005e6c63a6ab3010c31faae64bb177acce9c017c8073d7ca0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "541751c3d03575e2171ff1cafb28329e35d26ef8be3e061b3ee73250217a4fda"
   end
 
   depends_on "cmake" => [:build, :test]

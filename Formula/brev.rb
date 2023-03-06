@@ -1,8 +1,8 @@
 class Brev < Formula
   desc "CLI tool for managing workspaces provided by brev.dev"
   homepage "https://docs.brev.dev"
-  url "https://github.com/brevdev/brev-cli/archive/refs/tags/v0.6.105.tar.gz"
-  sha256 "5c7099fc6295f46f3d9061ee7ba8e87513fa21b81c8fe79379b2545e641903c6"
+  url "https://github.com/brevdev/brev-cli/archive/refs/tags/v0.6.208.tar.gz"
+  sha256 "3b37a978060115c5676e5d9d0557c865b7ba58ba4d6d4f31f2a8aa4176bf5f2f"
   license "MIT"
 
   livecheck do
@@ -11,21 +11,22 @@ class Brev < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "c62224e0f36b6df8b383c37d389dafe764467729693dfe27a568f24c3f833d04"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "42480f4632a251bbaff0f95d33ae31986f7a0141fabb83e525d5e3eced58cdd3"
-    sha256 cellar: :any_skip_relocation, monterey:       "a7fa9df878f872cf409d6231d9764b7fc5ac565a9aa6b1ce8a7300cb8fae6548"
-    sha256 cellar: :any_skip_relocation, big_sur:        "17729d6057693a1d51837800dfc0cbeeb4e808884a09922baafad8e0665e9d2e"
-    sha256 cellar: :any_skip_relocation, catalina:       "11052b88e01665d626308f916610c215b585f69a96da2a6bb809a9e19332ca49"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "de034d661168254a66370479421f3e83eb215eb0958804e239a179889f319292"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "c1d92bb8589d8dc1baa1243d1be8c76e2451f83f622b11c87d3828831621ae58"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "95b8690e70e76d4fd2344aa9af6af916d152f0de0e8346dac9dc6b2b524ffcc5"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "464dabb2d616abe0bea5b351fe3931e73d4532bd36f2747f7a993693b4725e28"
+    sha256 cellar: :any_skip_relocation, ventura:        "a615a49dc85b0d01b583bb47b12065174431fd2d9d2eabadad42ecb70186224e"
+    sha256 cellar: :any_skip_relocation, monterey:       "1711bc28d676d9e1f7b7dbce51167e0d98379b7339141a3db5d8af379f5f9a43"
+    sha256 cellar: :any_skip_relocation, big_sur:        "f054e90cddb5ec11e99b5861edc5116a36080c83a3102ed4652bd54bd0476720"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "06404d361af4683a8c32641f51139277e46bda5cb9f0e3be6def1a8bdc8c403a"
   end
 
-  # Required latest gvisor.dev/gvisor/pkg/gohacks instead of inet.af/netstack/gohacks
-  # Try to switch to the latest go on the next release
-  depends_on "go@1.18" => :build
+  depends_on "go" => :build
 
   def install
-    ldflags = "-X github.com/brevdev/brev-cli/pkg/cmd/version.Version=v#{version}"
+    ldflags = "-s -w -X github.com/brevdev/brev-cli/pkg/cmd/version.Version=v#{version}"
     system "go", "build", *std_go_args(ldflags: ldflags)
+
+    generate_completions_from_executable(bin/"brev", "completion")
   end
 
   test do

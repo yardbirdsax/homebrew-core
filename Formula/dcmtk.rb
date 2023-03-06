@@ -1,52 +1,43 @@
 class Dcmtk < Formula
   desc "OFFIS DICOM toolkit command-line utilities"
   homepage "https://dicom.offis.de/dcmtk.php.en"
-  revision 2
+  url "https://dicom.offis.de/download/dcmtk/dcmtk367/dcmtk-3.6.7.tar.gz"
+  sha256 "7c58298e3e8d60232ee6fc8408cfadd14463cc11a3c4ca4c59af5988c7e9710a"
   head "https://git.dcmtk.org/dcmtk.git", branch: "master"
 
-  stable do
-    url "https://dicom.offis.de/download/dcmtk/dcmtk366/dcmtk-3.6.6.tar.gz"
-    sha256 "6859c62b290ee55677093cccfd6029c04186d91cf99c7642ae43627387f3458e"
-
-    # Fix build for Apple Silicon.
-    # Issue ref: https://support.dcmtk.org/redmine/issues/957
-    # TODO: Remove in the next release along with stable block
-    patch do
-      url "https://git.dcmtk.org/?p=dcmtk.git;a=patch;h=5fba853b6f7c13b02bed28bd9f7d3f450e4c72bb"
-      sha256 "189966c15406898d4a38f49d76806356378ee51557dff114420d7ae897ad17d6"
-    end
-  end
-
   livecheck do
-    url "https://dicom.offis.de/download/dcmtk/release/"
+    url "https://dicom.offis.de/en/dcmtk/dcmtk-software-development/"
     regex(/href=.*?dcmtk[._-]v?(\d+(?:\.\d+)+)\.t/i)
   end
 
   bottle do
-    sha256 arm64_monterey: "f203412cec4eb400615ac2848f2c5b69fd71646f247dd5b9e56dd9599d2267b7"
-    sha256 arm64_big_sur:  "37339a0e0df51bc216fd468999b2237da7504811d896f7b07f1aeb4a1c56e7d6"
-    sha256 monterey:       "e0f4cc646793500166589dfc9a49f0844952274d577f24f5f92811d89e57d83e"
-    sha256 big_sur:        "a3b37c92e50f83c07b5f4b8c8738927c4fd8074721cbe717adde6ef3cc74e49b"
-    sha256 catalina:       "a38a36ffc1c0a620a8a4c7e2e49794528c31d35333cf007e4f0a72bdeb624bb8"
-    sha256 x86_64_linux:   "9adb7099d18838ded48e5aa4cb7be585c609fdc723ee8f9bb3bfdb804de5e1a0"
+    rebuild 1
+    sha256 arm64_ventura:  "805f52eeba91d0172e8ed683b3de11ad4e73beecb5c920fb11398865870c2b0b"
+    sha256 arm64_monterey: "565fbd4791b791742003351d4ecae98be11cc4f275a57878f091e6bb515919f9"
+    sha256 arm64_big_sur:  "5741131292a6166f82c63315df61f9c36e4f4ffbc65bebdea40596800606ff93"
+    sha256 ventura:        "a446481184f15e119a67f2c5b931bf19caf9c696d2ea9965fc0044ddde75f20f"
+    sha256 monterey:       "df14ac2121da42c2a3cf7a58772c95ceaf8fde5e891b822ccd34267060dab14e"
+    sha256 big_sur:        "f1f870f1cc726934826df5edbc3687cb3d4b4ed9c464bc0c3ddf5922ba5d5380"
+    sha256 x86_64_linux:   "e44445d8fb07d33bf0c979c44a8d17cd82cca337be63a01d58d438bf28dd34ea"
   end
 
   depends_on "cmake" => :build
   depends_on "libpng"
   depends_on "libtiff"
-  depends_on "openssl@1.1"
+  depends_on "openssl@3"
 
   uses_from_macos "libxml2"
 
   def install
-    ENV.cxx11 if OS.linux? # due to `icu4c` dependency in `libxml2`
-    system "cmake", "-S", ".", "-B", "build/shared", *std_cmake_args,
+    args = std_cmake_args + ["-DDCMTK_WITH_ICU=OFF"]
+
+    system "cmake", "-S", ".", "-B", "build/shared", *args,
                     "-DBUILD_SHARED_LIBS=ON",
                     "-DCMAKE_INSTALL_RPATH=#{rpath}"
     system "cmake", "--build", "build/shared"
     system "cmake", "--install", "build/shared"
 
-    system "cmake", "-S", ".", "-B", "build/static", *std_cmake_args,
+    system "cmake", "-S", ".", "-B", "build/static", *args,
                     "-DBUILD_SHARED_LIBS=OFF"
     system "cmake", "--build", "build/static"
     lib.install Dir["build/static/lib/*.a"]

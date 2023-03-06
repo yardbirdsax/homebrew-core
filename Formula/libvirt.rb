@@ -1,8 +1,8 @@
 class Libvirt < Formula
   desc "C virtualization API"
   homepage "https://libvirt.org/"
-  url "https://libvirt.org/sources/libvirt-8.7.0.tar.xz"
-  sha256 "72e63a0f27911e339afd8269c6e8b029721893940edec11e09e471944f60e538"
+  url "https://libvirt.org/sources/libvirt-9.1.0.tar.xz"
+  sha256 "defebea252a24c1800fbf484b14018b6261192acbac5bda8395e47eba2a14d6a"
   license all_of: ["LGPL-2.1-or-later", "GPL-2.0-or-later"]
   head "https://gitlab.com/libvirt/libvirt.git", branch: "master"
 
@@ -12,13 +12,13 @@ class Libvirt < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_monterey: "fa48c8a6c5142745ab9a45986de4a880aedb7871f91ec0ee13d798da12c87718"
-    sha256 arm64_big_sur:  "7a30b97876d627424dcd89f4a4dc998eb0d002280120b556bba6bf721aae4f1f"
-    sha256 monterey:       "164b10e7549c2eb47c82dc7910b541fa59223b4c3e292dbf1f57e49ae166b1c2"
-    sha256 big_sur:        "3716c37b8d7ce8d69217d33fe4fde0aed115b5c2ecf84716138deeb2cf3cdf07"
-    sha256 catalina:       "1b65b1e372d38f4d17f445e5e99f70d7bd89c3a9b50d63ebbbe119ff10971ecb"
-    sha256 x86_64_linux:   "e57b83bd5972ee640aa84b3c7f724d4b7b8a9d3512e6a56ada75840584ff0775"
+    sha256 arm64_ventura:  "a0ad1459d0cd11d37810d873eb1c2fba2ad167a0b4ab5ebe538ed8b44495e413"
+    sha256 arm64_monterey: "f0f153f7d349657a44b8177df87f519ed54ea6d3c95ade7f3c61e6de28728c5c"
+    sha256 arm64_big_sur:  "220969ba84fcac799a45ed3a4f145ad7dde85a560b5c9d8fbaa84302de9a027b"
+    sha256 ventura:        "7c7c79718b8eb242cb398fea929629b476d012bfcfb2bbf548866e0cbce1a3eb"
+    sha256 monterey:       "92a10075ddec2c0565e621fa0d3104add7b0da3b2babe78205f9d8662317d69a"
+    sha256 big_sur:        "91fd6fb6464237ea7848dd3a7fd87c74deec4c25d7208e88f53d8a858570a253"
+    sha256 x86_64_linux:   "6a7c8079937edc6b31676e8285f24fb046721c95185b1ab160540b996368410f"
   end
 
   depends_on "docutils" => :build
@@ -26,7 +26,7 @@ class Libvirt < Formula
   depends_on "ninja" => :build
   depends_on "perl" => :build
   depends_on "pkg-config" => :build
-  depends_on "python@3.10" => :build
+  depends_on "python@3.11" => :build
   depends_on "gettext"
   depends_on "glib"
   depends_on "gnu-sed"
@@ -35,6 +35,7 @@ class Libvirt < Formula
   depends_on "libgcrypt"
   depends_on "libiscsi"
   depends_on "libssh2"
+  depends_on "readline" # Possible opportunistic linkage. TODO: Check if this can be removed.
   depends_on "yajl"
 
   uses_from_macos "curl"
@@ -46,27 +47,24 @@ class Libvirt < Formula
 
   on_linux do
     depends_on "libtirpc"
-    depends_on "linux-headers@5.16"
   end
 
   fails_with gcc: "5"
 
   def install
-    mkdir "build" do
-      args = %W[
-        --localstatedir=#{var}
-        --mandir=#{man}
-        --sysconfdir=#{etc}
-        -Ddriver_esx=enabled
-        -Ddriver_qemu=enabled
-        -Ddriver_network=enabled
-        -Dinit_script=none
-        -Dqemu_datadir=#{Formula["qemu"].opt_pkgshare}
-      ]
-      system "meson", *std_meson_args, *args, ".."
-      system "meson", "compile"
-      system "meson", "install"
-    end
+    args = %W[
+      --localstatedir=#{var}
+      --mandir=#{man}
+      --sysconfdir=#{etc}
+      -Ddriver_esx=enabled
+      -Ddriver_qemu=enabled
+      -Ddriver_network=enabled
+      -Dinit_script=none
+      -Dqemu_datadir=#{Formula["qemu"].opt_pkgshare}
+    ]
+    system "meson", "setup", "build", *args, *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
+    system "meson", "install", "-C", "build"
   end
 
   service do

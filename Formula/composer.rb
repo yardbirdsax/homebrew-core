@@ -1,8 +1,8 @@
 class Composer < Formula
   desc "Dependency Manager for PHP"
   homepage "https://getcomposer.org/"
-  url "https://getcomposer.org/download/2.4.2/composer.phar"
-  sha256 "8fe98a01050c92cc6812b8ead3bd5b6e0bcdc575ce7a93b242bde497a31d7732"
+  url "https://getcomposer.org/download/2.5.4/composer.phar"
+  sha256 "91ce6cbf9463eae86ae9d5c21d42faa601a519f3fbb2b623a55ee24678079bd3"
   license "MIT"
 
   livecheck do
@@ -11,12 +11,13 @@ class Composer < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "46f55289dc508424d73e341ff9dc197e8e06b1b9b0535b3ae4947534e2123ea6"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "46f55289dc508424d73e341ff9dc197e8e06b1b9b0535b3ae4947534e2123ea6"
-    sha256 cellar: :any_skip_relocation, monterey:       "5a8aa64099fdfeb9201132e36f580287906c8e2d55e804104319d476f10cd936"
-    sha256 cellar: :any_skip_relocation, big_sur:        "5a8aa64099fdfeb9201132e36f580287906c8e2d55e804104319d476f10cd936"
-    sha256 cellar: :any_skip_relocation, catalina:       "5a8aa64099fdfeb9201132e36f580287906c8e2d55e804104319d476f10cd936"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "46f55289dc508424d73e341ff9dc197e8e06b1b9b0535b3ae4947534e2123ea6"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "2c7cf469b14b68d6a73a7f51acccf24dcbfc6897a14bfdb8af12066b525b448b"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "2c7cf469b14b68d6a73a7f51acccf24dcbfc6897a14bfdb8af12066b525b448b"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "2c7cf469b14b68d6a73a7f51acccf24dcbfc6897a14bfdb8af12066b525b448b"
+    sha256 cellar: :any_skip_relocation, ventura:        "a5f368b6207d02127fc485b209aabad9b4634ff000613ff45a224cd251fbb166"
+    sha256 cellar: :any_skip_relocation, monterey:       "a5f368b6207d02127fc485b209aabad9b4634ff000613ff45a224cd251fbb166"
+    sha256 cellar: :any_skip_relocation, big_sur:        "a5f368b6207d02127fc485b209aabad9b4634ff000613ff45a224cd251fbb166"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2c7cf469b14b68d6a73a7f51acccf24dcbfc6897a14bfdb8af12066b525b448b"
   end
 
   depends_on "php"

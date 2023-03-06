@@ -2,18 +2,19 @@ class RustAnalyzer < Formula
   desc "Experimental Rust compiler front-end for IDEs"
   homepage "https://rust-analyzer.github.io/"
   url "https://github.com/rust-lang/rust-analyzer.git",
-       tag:      "2022-09-12",
-       revision: "2e9f1204ca01c3e20898d4a67c8b84899d394a88"
-  version "2022-09-12"
+       tag:      "2023-02-27",
+       revision: "4e29820f6d9880606a403e7bec6e91312e7f0575"
+  version "2023-02-27"
   license any_of: ["Apache-2.0", "MIT"]
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "544590ab1dfe4730ba0a37933b61f1a9adf46a6a25c44178b922d84ce6755978"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "506905c01a1cf78d52f8a79ecdf198f3e0ec42a2c6caa01bd24951021d0245da"
-    sha256 cellar: :any_skip_relocation, monterey:       "b939258bc22da3c0ffccccbed164f316990083fb0e736ad7888df5f6be3430f2"
-    sha256 cellar: :any_skip_relocation, big_sur:        "9175e41f7e82514a6fbf2b4d85dd0a3313b2cf8c5469f6c1f640ddd41195ba48"
-    sha256 cellar: :any_skip_relocation, catalina:       "024d766af949438e922ded61eea72f1a5bdc6ee4f82e9b3c49ec21ade684cbba"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "60640a3e816d7768979ceb9fbc16df63faf2246ef38259aad1d57124ee5ab5a3"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "ff9193490615207ec9de98baedfbd410072fb1610ce2c509b1617eabfbc1f955"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "40aa43a4811ed9de63f210df14dd99b97e724efff5d571e0f5e70f133ff4ecc5"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "6ebbe705e76faa6db9d9e4da30b9e031479c3f91769de313c6b1bcbd7a9f9c9e"
+    sha256 cellar: :any_skip_relocation, ventura:        "4e388ac4055310eafce5fd9add3d705b454a07e321b9494cd9f52d865ccf08fa"
+    sha256 cellar: :any_skip_relocation, monterey:       "cb10f89f88a6e24f7a72616f1d0ce1e0c532a4190865cb1891b3955030bd1123"
+    sha256 cellar: :any_skip_relocation, big_sur:        "c5a8ce029258c9cdd57e6fca7aaf3f06372728a1c2f441e8452b539da3ad4e25"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "40edfbd22093f0645370960e91ec693a631532c90826387a98e1a0ce8e992fd9"
   end
 
   depends_on "rust" => :build

@@ -1,8 +1,8 @@
 class PythonAT39 < Formula
   desc "Interpreted, interactive, object-oriented programming language"
   homepage "https://www.python.org/"
-  url "https://www.python.org/ftp/python/3.9.14/Python-3.9.14.tar.xz"
-  sha256 "651304d216c8203fe0adf1a80af472d8e92c3b0e0a7892222ae4d9f3ae4debcf"
+  url "https://www.python.org/ftp/python/3.9.16/Python-3.9.16.tar.xz"
+  sha256 "22dddc099246dd2760665561e8adb7394ea0cc43a72684c6480f9380f7786439"
   license "Python-2.0"
 
   livecheck do
@@ -11,12 +11,13 @@ class PythonAT39 < Formula
   end
 
   bottle do
-    sha256 arm64_monterey: "24d551890bac7307df1231a65d572af9d5c69cda63a98a7a47bc557dcadda89b"
-    sha256 arm64_big_sur:  "fde3a4306df315717e91c46e71d8888118155b3ae69a6b0e17cdd63ef3c79bab"
-    sha256 monterey:       "26cd7888bec99e064ed99e2967344a253856e6b70b60f5329516d7f9a812b643"
-    sha256 big_sur:        "e3e86d85b5585a9556ac90144fd2081c6120a96f9c6d8d657454a65123f9ec6b"
-    sha256 catalina:       "7c14d8928f26a1223aac7c9f99c1cd18c5d84140d3fed884d37e0d2ba1a199d4"
-    sha256 x86_64_linux:   "85baefa3f6502adb186d61cb64a6dbab58841f2619887831f69982745165652a"
+    sha256 arm64_ventura:  "10c001463bfb8480b07a06d42151a199d0c8b2205f59946a2d77e96191ee7d1b"
+    sha256 arm64_monterey: "cba18cf1ef0bf77404e5532048bc3d86c7136a5b067c22742114b68bdc777bd2"
+    sha256 arm64_big_sur:  "275d925e9375c487df055a3ffce108735781821a9f37fd810cbdd3c09a49fc3e"
+    sha256 ventura:        "06e42063af5803d934d891dbd15748ab156c54a567411822ab7e5d727a0a7a2a"
+    sha256 monterey:       "f048ad5c291c14a3864312ca807024b95a02909a782dc5e3f2e05c28a7487294"
+    sha256 big_sur:        "3e8b53506dc283aa31a22e5a5a206c3a559f3fcea4d1b0dbebaf7da21b28a4fc"
+    sha256 x86_64_linux:   "a18df25578c0a8b11d25d73cc29ecf9c569d0045197d63522c1da812e430eb77"
   end
 
   # setuptools remembers the build flags python is built with and uses them to
@@ -49,18 +50,18 @@ class PythonAT39 < Formula
 
   # Always update to latest release
   resource "setuptools" do
-    url "https://files.pythonhosted.org/packages/cc/83/7ea9d9b3a6ff3225aca2fce5e4df373bee7e0a74c539711a4fbfda53374f/setuptools-65.3.0.tar.gz"
-    sha256 "7732871f4f7fa58fb6bdcaeadb0161b2bd046c85905dbaa066bdcbcc81953b57"
+    url "https://files.pythonhosted.org/packages/b6/21/cb9a8d0b2c8597c83fce8e9c02884bce3d4951e41e807fc35791c6b23d9a/setuptools-65.6.3.tar.gz"
+    sha256 "a7620757bf984b58deaf32fc8a4577a9bbc0850cf92c20e1ce41c38c19e5fb75"
   end
 
   resource "pip" do
-    url "https://files.pythonhosted.org/packages/4b/30/e15b806597e67057e07a5acdc135216ccbf76a5f1681a324533b61066b0b/pip-22.2.2.tar.gz"
-    sha256 "3fd1929db052f056d7a998439176d3333fa1b3f6c1ad881de1885c0717608a4b"
+    url "https://files.pythonhosted.org/packages/a3/50/c4d2727b99052780aad92c7297465af5fe6eec2dbae490aa9763273ffdc1/pip-22.3.1.tar.gz"
+    sha256 "65fd48317359f3af8e593943e6ae1506b66325085ea64b706a998c6e83eeaf38"
   end
 
   resource "wheel" do
-    url "https://files.pythonhosted.org/packages/c0/6c/9f840c2e55b67b90745af06a540964b73589256cb10cc10057c87ac78fc2/wheel-0.37.1.tar.gz"
-    sha256 "e9a504e793efbca1b8e0e9cb979a249cf4a0a7b5b8c9e8b65a5e39d49529c1c4"
+    url "https://files.pythonhosted.org/packages/a2/b8/6a06ff0f13a00fc3c3e7d222a995526cbca26c1ad107691b6b1badbbabf1/wheel-0.38.4.tar.gz"
+    sha256 "965f5259b566725405b05e7cf774052044b1ed30119b5d586b2703aafe8719ac"
   end
 
   # Link against libmpdec.so.3, update for mpdecimal.h symbol cleanup.
@@ -346,7 +347,7 @@ class PythonAT39 < Formula
            "--target=#{site_packages}",
            bundled/"setuptools-#{resource("setuptools").version}-py3-none-any.whl",
            bundled/"pip-#{resource("pip").version}-py3-none-any.whl",
-           libexec/"wheel-#{resource("wheel").version}-py2.py3-none-any.whl"
+           libexec/"wheel-#{resource("wheel").version}-py3-none-any.whl"
 
     # pip install with --target flag will just place the bin folder into the
     # target, so move its contents into the appropriate location
@@ -402,6 +403,7 @@ class PythonAT39 < Formula
       # <https://docs.brew.sh/Homebrew-and-Python>
       import re
       import os
+      import site
       import sys
       if sys.version_info[:2] != (#{version.major}, #{version.minor}):
           # This can only happen if the user has set the PYTHONPATH to a mismatching site-packages directory.
@@ -409,9 +411,10 @@ class PythonAT39 < Formula
           # because the PYTHONPATH is evaluated after the sitecustomize.py. Many modules (e.g. PyQt4) are
           # built only for a specific version of Python and will fail with cryptic error messages.
           # In the end this means: Don't set the PYTHONPATH permanently if you use different Python versions.
-          exit('Your PYTHONPATH points to a site-packages dir for Python #{version.major_minor} but you are running Python ' +
-               str(sys.version_info[0]) + '.' + str(sys.version_info[1]) + '!\\n     PYTHONPATH is currently: "' + str(os.environ['PYTHONPATH']) + '"\\n' +
-               '     You should `unset PYTHONPATH` to fix this.')
+          exit(f'Your PYTHONPATH points to a site-packages dir for Python #{version.major_minor} '
+               f'but you are running Python {sys.version_info[0]}.{sys.version_info[1]}!\\n'
+               f'     PYTHONPATH is currently: "{os.environ["PYTHONPATH"]}"\\n'
+               f'     You should `unset PYTHONPATH` to fix this.')
       # Only do this for a brewed python:
       if os.path.realpath(sys.executable).startswith('#{rack}'):
           # Shuffle /Library site-packages to the end of sys.path
@@ -422,22 +425,24 @@ class PythonAT39 < Formula
           sys.path.extend(library_packages)
           # the Cellar site-packages is a symlink to the HOMEBREW_PREFIX
           # site_packages; prefer the shorter paths
-          long_prefix = re.compile(r'#{rack}/[0-9\._abrc]+/Frameworks/Python\.framework/Versions/#{version.major_minor}/lib/python#{version.major_minor}/site-packages')
-          sys.path = [long_prefix.sub('#{HOMEBREW_PREFIX/"lib/python#{version.major_minor}/site-packages"}', p) for p in sys.path]
+          long_prefix = re.compile(r'#{rack}/[0-9\\._abrc]+/Frameworks/Python\\.framework/Versions/#{version.major_minor}/lib/python#{version.major_minor}/site-packages')
+          sys.path = [long_prefix.sub('#{site_packages}', p) for p in sys.path]
           # Set the sys.executable to use the opt_prefix. Only do this if PYTHONEXECUTABLE is not
           # explicitly set and we are not in a virtualenv:
           if 'PYTHONEXECUTABLE' not in os.environ and sys.prefix == sys.base_prefix:
               sys.executable = sys._base_executable = '#{opt_bin}/python#{version.major_minor}'
       if 'PYTHONHOME' not in os.environ:
-          cellar_prefix = re.compile(r'#{rack}/[0-9\._abrc]+/')
+          cellar_prefix = re.compile(r'#{rack}/[0-9\\._abrc]+/')
           if os.path.realpath(sys.base_prefix).startswith('#{rack}'):
               new_prefix = cellar_prefix.sub('#{opt_prefix}/', sys.base_prefix)
               if sys.prefix == sys.base_prefix:
+                  site.PREFIXES[:] = [new_prefix if x == sys.prefix else x for x in site.PREFIXES]
                   sys.prefix = new_prefix
               sys.base_prefix = new_prefix
           if os.path.realpath(sys.base_exec_prefix).startswith('#{rack}'):
               new_exec_prefix = cellar_prefix.sub('#{opt_prefix}/', sys.base_exec_prefix)
               if sys.exec_prefix == sys.base_exec_prefix:
+                  site.PREFIXES[:] = [new_prefix if x == sys.exec_prefix else x for x in site.PREFIXES]
                   sys.exec_prefix = new_exec_prefix
               sys.base_exec_prefix = new_exec_prefix
       # Check for and add the python-tk prefix.

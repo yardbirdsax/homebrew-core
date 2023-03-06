@@ -1,18 +1,19 @@
 class Livekit < Formula
   desc "Scalable, high-performance WebRTC server"
   homepage "https://livekit.io"
-  url "https://github.com/livekit/livekit/archive/refs/tags/v1.2.1.tar.gz"
-  sha256 "e3cc9d98c8936ce1c3d55aed93ed7932f29b077370ae63ed4e81d4b052a72512"
+  url "https://github.com/livekit/livekit/archive/refs/tags/v1.3.5.tar.gz"
+  sha256 "ab06bf5158e1315bf8c3e26fc0f92581eb93ff530bdf5aa9ad001a73963ffec6"
   license "Apache-2.0"
   head "https://github.com/livekit/livekit.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "445a717f32cb89c3add44082c0dcca2f1a18de281e3a21a526506752ba8bd831"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "7185c74607c126c890db49625dd6aa13a290386ae35f3c278539b289aaf779d7"
-    sha256 cellar: :any_skip_relocation, monterey:       "b9f552b61946ec2093a0d7d7646cf8856ca56a646eb17a06ad52bc42e45aabc4"
-    sha256 cellar: :any_skip_relocation, big_sur:        "4a9da5c11da47dca9949dbaeeb09863f6665be209b2e1f39da7c7b897be189ff"
-    sha256 cellar: :any_skip_relocation, catalina:       "e40359366684b3f20c31b12da2c40e6945b441186c013f2cede80a1e490826be"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c4ee92c792d1e391f1c246fb777c30254f6576250131f1f8e8eba8e628bce054"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "03e4fff4a131fc0521b950ea90673fff04b2c3274ac3387fbfb7a88144703d01"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "77f4cd61ba9021575f86881567430362bd4ca99de5118f16b55c2f9b09d703b4"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "2f7126f08fbace7ddca2cfcacc8c192c25d32b8ef57e9713b776b673a03424c0"
+    sha256 cellar: :any_skip_relocation, ventura:        "13a6387e88091d0692b3f318b95c77233718255fc8c934d6dde5bcfaaf9a2bb7"
+    sha256 cellar: :any_skip_relocation, monterey:       "f828df6718ca28c29fdab4d3bd43cc7e25bf3b93d3d77a6b0b09177eb0955d14"
+    sha256 cellar: :any_skip_relocation, big_sur:        "9f90e9007d4666444928bb64fa0982a0668b3c83bd2b867deb69a481ec191006"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e56837f8a8e38451880bcf1ea4b5428574d7c912513557f1e57f78ff4bbc2d73"
   end
 
   depends_on "go" => :build
@@ -23,13 +24,14 @@ class Livekit < Formula
 
   test do
     http_port = free_port
+    random_key = "R4AA2dwX3FrMbyY@My3X&Hsmz7W)LuQy"
     fork do
-      exec bin/"livekit-server", "--keys", "test: key", "--config-body", "port: #{http_port}"
+      exec bin/"livekit-server", "--keys", "test: #{random_key}", "--config-body", "port: #{http_port}"
     end
     sleep 3
-    assert_match "OK", shell_output("curl localhost:#{http_port}")
+    assert_match "OK", shell_output("curl -s http://localhost:#{http_port}")
 
-    output = shell_output("#{bin}/livekit-server --version")
+    output = shell_output("#{bin}/livekit-server --version", 1)
     assert_match "livekit-server version #{version}", output
   end
 end

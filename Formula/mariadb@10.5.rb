@@ -1,10 +1,9 @@
 class MariadbAT105 < Formula
   desc "Drop-in replacement for MySQL"
   homepage "https://mariadb.org/"
-  url "https://downloads.mariadb.com/MariaDB/mariadb-10.5.13/source/mariadb-10.5.13.tar.gz"
-  sha256 "16f008c66831130e9263b2601265d566ffc4e890d37bacecd4dcecebfd0d1c58"
+  url "https://downloads.mariadb.com/MariaDB/mariadb-10.5.19/source/mariadb-10.5.19.tar.gz"
+  sha256 "244c4a24249064106623cb84aa6de514ddf1787de86664075282bba8ec5757f4"
   license "GPL-2.0-only"
-  revision 1
 
   # This uses a placeholder regex to satisfy the `PageMatch` strategy
   # requirement. In the future, this will be updated to use a `Json` strategy
@@ -24,19 +23,20 @@ class MariadbAT105 < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_monterey: "54901960e53c489b984b49cb800707f790e05e9999e66a5a8f34d03c4c728c49"
-    sha256 arm64_big_sur:  "6d29fc92ca441869936e36fdb0e6b844e6378ebd759d1cb9363c95798ed1725a"
-    sha256 monterey:       "70aaf09d726c50f181af2fe6c51c3f7f4a59eb15fb209f5e89b4f5e50bf654ce"
-    sha256 big_sur:        "e01bb83612222567e3bcf1b4eb90ba9dc26231996e75112b6310ddda418b43a5"
-    sha256 catalina:       "86818eb769d70cb3f973532717b550e55bc71a221155bb4fa6fa978b91c0a004"
-    sha256 x86_64_linux:   "643131841d01ecdf253cf642da88097f97f2bf750e908a984e192416d4edb5f7"
+    sha256 arm64_ventura:  "434c949a98e4b059b785166a3ac17945d4a42b7093a233e9a6e2b4e125a2fea3"
+    sha256 arm64_monterey: "b45e07f2592cd8bd186e1ece998662fe2d51f422fd584947fd44d34d903a9bed"
+    sha256 arm64_big_sur:  "502dc88f27c2ff830f84430b75ec43053369f06a899e8a4c95acba0f6501251a"
+    sha256 ventura:        "9b2365bdf9ab8ea0af5f93b89a72af772dc16bdf23449cea69bb4bb2893113ca"
+    sha256 monterey:       "ef0d5389161d51974ba8287e715d987be1f460dcef84bc6f6f2c2299db6986f6"
+    sha256 big_sur:        "35fa2a360c590367f8c2bfb0c56d88b5e21e8efafedb559cff5aa885c6f466d5"
+    sha256 x86_64_linux:   "bc0c01ca9470d9ad44306b3c89d4a04c9d19ee24b6a249023ff1acf4d49de7c9"
   end
 
   keg_only :versioned_formula
 
   # See: https://mariadb.com/kb/en/changes-improvements-in-mariadb-105/
-  deprecate! date: "2025-06-01", because: :unsupported
+  # End-of-life on 2025-06-24: https://mariadb.org/about/#maintenance-policy
+  deprecate! date: "2025-06-24", because: :unsupported
 
   depends_on "bison" => :build
   depends_on "cmake" => :build
@@ -47,6 +47,7 @@ class MariadbAT105 < Formula
 
   uses_from_macos "bzip2"
   uses_from_macos "libxcrypt"
+  uses_from_macos "libxml2"
   uses_from_macos "ncurses"
   uses_from_macos "zlib"
 
@@ -91,16 +92,19 @@ class MariadbAT105 < Formula
       args << "-DCONNECT_WITH_JDBC=OFF"
     end
 
+    if OS.mac?
+      args << "-DWITH_READLINE=NO" # uses libedit on macOS
+    end
+
     # disable TokuDB, which is currently not supported on macOS
     args << "-DPLUGIN_TOKUDB=NO"
 
     # Disable RocksDB on Apple Silicon (currently not supported)
     args << "-DPLUGIN_ROCKSDB=NO" if Hardware::CPU.arm?
 
-    system "cmake", ".", *std_cmake_args, *args
-
-    system "make"
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "_build", *std_cmake_args, *args
+    system "cmake", "--build", "_build"
+    system "cmake", "--install", "_build"
 
     # Fix my.cnf to point to #{etc} instead of /etc
     (etc/"my.cnf.d").mkpath

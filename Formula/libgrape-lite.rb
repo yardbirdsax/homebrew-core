@@ -1,17 +1,18 @@
 class LibgrapeLite < Formula
   desc "C++ library for parallel graph processing"
   homepage "https://github.com/alibaba/libgrape-lite"
-  url "https://github.com/alibaba/libgrape-lite/archive/refs/tags/v0.2.1.tar.gz"
-  sha256 "87f306f537e63a5d6960ca125b69ee3785e35a49b396679145f892e52ed76161"
+  url "https://github.com/alibaba/libgrape-lite/archive/refs/tags/v0.2.3.tar.gz"
+  sha256 "fa3b0a67d82894d2766fe8c9081d8db18b92906754ad1073846185fbaf115634"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any, arm64_monterey: "83f192293edd96693e82f70371fff632725ab9f9ae3d63abeed1c5d2ad113026"
-    sha256 cellar: :any, arm64_big_sur:  "c5cfbf25cf3a3991c6cacb5b9b6ef6455fb65a54dfa4c26b1b6909d2f5c599d7"
-    sha256 cellar: :any, monterey:       "780b15e69886c16faef1c6c609865144cb8d623a4763f3f8a3e0be285fa6e5e3"
-    sha256 cellar: :any, big_sur:        "cc108f25de00b8089fc0af337892695482abcdab1168a8b190f3a32ad0de9ce4"
-    sha256 cellar: :any, catalina:       "4005982d761648d539b3a14f10222cdba9101f85ec605db090987a2c1f88741c"
-    sha256               x86_64_linux:   "317f866c76376454c49b2d26434b212a01780c93aa9ef50f065235ea7feb23f2"
+    sha256 cellar: :any, arm64_ventura:  "a70f1ef4da2f4efb5d1f3094bfa375778d04e4289bc64acd330aa39575129d8c"
+    sha256 cellar: :any, arm64_monterey: "2cebfdaa343bc9e675800237a5b8411e337c6ec5418be172f9d4ea6bf2fea88c"
+    sha256 cellar: :any, arm64_big_sur:  "d8bb1719e11f727dc469297a2d490bad773306f1dab4af48027fa70ee4b86c73"
+    sha256 cellar: :any, ventura:        "3684375648cc7b45edfa7f423d40d7dfa9ad90949d2080e10ff7ea7ff8782c09"
+    sha256 cellar: :any, monterey:       "6142b05b91f906c5350e29987635541f0f3d95ead8cef9b2275218c3831112b3"
+    sha256 cellar: :any, big_sur:        "da447dc99ac2fd7015f29577649828acda4638043ac426a79878b3d09f88e240"
+    sha256               x86_64_linux:   "3b48dbca3907f72453e399a137edbff08911cb914a306d30391dbdad3bc6905c"
   end
 
   depends_on "cmake" => :build

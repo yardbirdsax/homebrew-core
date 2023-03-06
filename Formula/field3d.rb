@@ -4,17 +4,22 @@ class Field3d < Formula
   url "https://github.com/imageworks/Field3D/archive/v1.7.3.tar.gz"
   sha256 "b6168bc27abe0f5e9b8d01af7794b3268ae301ac72b753712df93125d51a0fd4"
   license "BSD-3-Clause"
-  revision 7
+  revision 9
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_monterey: "dd7a5bc0753b005117617530c6be75c17df59a7c4a031ae1063ba6a87412f88e"
-    sha256 cellar: :any,                 arm64_big_sur:  "a9a29067970e29b57a31c05dae9bae5b6bd38325f46d9b82df207834c4f60179"
-    sha256 cellar: :any,                 monterey:       "3819ae35d571632bcfff8cb126caccdca67617eb51eb5094b48297badd77388f"
-    sha256 cellar: :any,                 big_sur:        "7a111aeb16124fb8197a0226ec5868bb85ba28e9d52307c23d0e8363a15a52a0"
-    sha256 cellar: :any,                 catalina:       "0a8b6db945e6d4316b0b5d908d4b9a48ab0e15814d027228c6d3e0eae3b53d3a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c726a57df42221704e420460d752a95318e3a48d6b157024bb2d97d4306d508c"
+    sha256 cellar: :any,                 arm64_ventura:  "01f10aea2d4feb02cf770ef2beb67d2603d43df433d5e5b922045e9e2f92af38"
+    sha256 cellar: :any,                 arm64_monterey: "2f8a59f6d8f8eec9b1dd0946876bb4304c0acf2d6f0a59316badd554bcf22f5c"
+    sha256 cellar: :any,                 arm64_big_sur:  "e61de0782adecfc668e47fbec1158573dc0143b6a65f11dc837aa413902e5fd6"
+    sha256 cellar: :any,                 ventura:        "58eb110354954de1ba4b9f1c81114cf128e5d3e1609b681964d5765364098483"
+    sha256 cellar: :any,                 monterey:       "ec3eec933c2123f29d3aca93b5cf70cdd26187cb811f817d1ac2846a9fb6bfca"
+    sha256 cellar: :any,                 big_sur:        "2fa65c2a7f992a9d979ff347dcce2c3d4f7a2061eb4820fa3961ad363d99e515"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c6b7c036967955a85f3b22c2f924c85b36688f1b4c1e608df07393095c86bedf"
   end
+
+  # Depends on deprecated `ilmbase` and upstream has been discussing
+  # archiving repo in https://groups.google.com/g/field3d-dev/c/nBrVsNQ9SHo
+  # Last release on 2020-03-11
+  deprecate! date: "2023-02-03", because: :unmaintained
 
   depends_on "cmake" => :build
   depends_on "boost"

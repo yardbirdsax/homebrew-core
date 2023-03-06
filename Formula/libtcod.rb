@@ -1,24 +1,26 @@
 class Libtcod < Formula
   desc "API for roguelike developers"
   homepage "https://github.com/libtcod/libtcod"
-  url "https://github.com/libtcod/libtcod/archive/1.22.3.tar.gz"
-  sha256 "a6f05f009db1f468338cf4cf984245a869ebb197b6d2524a8369c22ff9f1b9f5"
+  url "https://github.com/libtcod/libtcod/archive/1.23.1.tar.gz"
+  sha256 "dd00be7dde66aa7456bab8acf98b6a0ae73871bd5bee10a7838752fdd7007c6e"
   license "BSD-3-Clause"
 
   bottle do
-    sha256 cellar: :any,                 arm64_monterey: "c67d0c383ddd1d295868fb89e0151efe480288adde3e6524421b52f84e903cd6"
-    sha256 cellar: :any,                 arm64_big_sur:  "2f13f66cb9f9db4f46e44fdf2c39c45fa9a4430d87f4e2d1b18cf72b9f2c4284"
-    sha256 cellar: :any,                 monterey:       "068f20ec5903fb688f08f58269de93731df9e274009abaa6b95f585c46f59acf"
-    sha256 cellar: :any,                 big_sur:        "00dd7c29d120ed771a0a2fac7fdec86c950cbfb4414c6510f1f9752456d5d65e"
-    sha256 cellar: :any,                 catalina:       "569ab7f045b21bffefda4b751b0f7cbb1c7b3dcb230a4f076880e2e4ab982c82"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8d2b12d79d8429e87c6140f71abfedca5f6cdbc379927f945954dae5e70367e4"
+    sha256 cellar: :any,                 arm64_ventura:  "4d3d7be32377aa333d1e5352f28ace0d5985ebb0a2f95910e18553deb206463b"
+    sha256 cellar: :any,                 arm64_monterey: "d7777853052eee7141bdf456a8be5e96b2065d7f50c9b948a3f307c00f2c1f37"
+    sha256 cellar: :any,                 arm64_big_sur:  "1dd1c1908bc001d8d3fc6148b841bf64f774d49cecd84f99a59d5b5df8359abd"
+    sha256 cellar: :any,                 ventura:        "6e01727ebeac536f92ce375cc2a51aff1309e901ebe84b5d03558d61686bb3b6"
+    sha256 cellar: :any,                 monterey:       "375b0bd3b779a058256c33c65a84b94a035b038ce6e49a8030a27e6162e858e6"
+    sha256 cellar: :any,                 big_sur:        "ec1a87e97f42dabad818aa501b92a94df612eed7f7e20380a4a806a69ad25c82"
+    sha256 cellar: :any,                 catalina:       "8827b6154dbdf32f0806390d613321de3126dc89658cbc9a1fe0e3a45a5c5bf4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c481d057b749803c27882166d1e66c5877aef2f80cf5c38c18e6afed900287a7"
   end
 
   depends_on "autoconf" => :build
   depends_on "automake" => :build
   depends_on "libtool" => :build
   depends_on "pkg-config" => :build
-  depends_on "python@3.10" => :build
+  depends_on "python@3.11" => :build
   depends_on macos: :catalina
   depends_on "sdl2"
 

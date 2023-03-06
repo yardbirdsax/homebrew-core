@@ -1,21 +1,26 @@
 class Questdb < Formula
   desc "Time Series Database"
   homepage "https://questdb.io"
-  url "https://github.com/questdb/questdb/releases/download/6.5.2/questdb-6.5.2-no-jre-bin.tar.gz"
-  sha256 "dd5596331e7f83bdc7587319579c37faa417102d0833a4f4d4448428e8c40d67"
+  url "https://github.com/questdb/questdb/releases/download/7.0.1/questdb-7.0.1-no-jre-bin.tar.gz"
+  sha256 "90a20542d6fe48dc8b6eada80d375e951d8a47c1c0b4f774759157eafdf64616"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "767d2442a1abb8dec166aa0d66411c547b8268bd668a01e8417990af5ed5fdcf"
+    sha256 cellar: :any_skip_relocation, all: "53525fcb845f0845774edaae17e219b99be9b71377f07d1efbb323e28bbda98b"
   end
 
-  depends_on "openjdk@11"
+  depends_on "openjdk@17"
 
   def install
     rm_rf "questdb.exe"
     libexec.install Dir["*"]
-    (bin/"questdb").write_env_script libexec/"questdb.sh", Language::Java.overridable_java_home_env("11")
+    (bin/"questdb").write_env_script libexec/"questdb.sh", Language::Java.overridable_java_home_env("17")
     inreplace libexec/"questdb.sh", "/usr/local/var/questdb", var/"questdb"
+  end
+
+  def post_install
+    # Make sure the var/questdb directory exists
+    (var/"questdb").mkpath
   end
 
   service do

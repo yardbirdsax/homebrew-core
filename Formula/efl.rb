@@ -1,10 +1,10 @@
 class Efl < Formula
   desc "Enlightenment Foundation Libraries"
   homepage "https://www.enlightenment.org"
-  url "https://download.enlightenment.org/rel/libs/efl/efl-1.26.2.tar.xz"
-  sha256 "2979cfbc728a1a1f72ad86c2467d861ed91e664d3f17ef03190fb5c5f405301c"
+  url "https://download.enlightenment.org/rel/libs/efl/efl-1.26.3.tar.xz"
+  sha256 "d9f83aa0fd9334f44deeb4e4952dc0e5144683afac786feebce6030951617d15"
   license all_of: ["GPL-2.0-only", "LGPL-2.1-only", "BSD-2-Clause", "FTL", "zlib-acknowledgement"]
-  revision 4
+  revision 2
 
   livecheck do
     url "https://download.enlightenment.org/rel/libs/efl/"
@@ -12,13 +12,13 @@ class Efl < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_monterey: "e6da0a672ba04750d9b8567dd4b431e7b8e40a25fe100c4fcf468e52856fc576"
-    sha256 arm64_big_sur:  "3397324e77cda1f9f630278a6c7969f885c79d8846b9e24b1e908a4e69d504a3"
-    sha256 monterey:       "54218e4e73e3d92e0acc6a8ee5b87a78a22a02dad3af8a60f522c390ecb1c15c"
-    sha256 big_sur:        "3860756a115e6125d2493e7eeb57289595f5a85df5c0e38eec87b83ed0e8aa9c"
-    sha256 catalina:       "6893a7a957f096894872d4413a83558dce33ef73610e8d5a8af09c8e2da903b0"
-    sha256 x86_64_linux:   "489b3d01eb0cb29b4877f34a67654ea01d17c6cb818a59cfb16e5a7a7be0ee40"
+    sha256 arm64_ventura:  "2308441b83185c2d6da3e9cd5347ca912a77a3c147a6e982b1271435c4f0b825"
+    sha256 arm64_monterey: "d37e865d4c4cdc574c331a9d241e59055b618b868de4f02bf2c642418a605e73"
+    sha256 arm64_big_sur:  "8aedee8079107e06012114a044055139b116091aaeb065ebd2acfae61f172a38"
+    sha256 ventura:        "012848c11f48b1ce716a017628285ef205a4126ac650142d18c41bb1f301a49b"
+    sha256 monterey:       "f8fc215bb8dfc4b810ea51a6347ef44f7cddf51c4ae34b7c52ae6754a1ab6281"
+    sha256 big_sur:        "6d7ca4036bc1741a6c9dd0d32faca21283a06a2621cc27d813049c3cec2a1d04"
+    sha256 x86_64_linux:   "b866ef13beba78bcd5b3f0dfb8817d163ae9f23bd96c729e61e82444938a9dfa"
   end
 
   depends_on "meson" => :build

@@ -1,9 +1,9 @@
 class GoAT118 < Formula
   desc "Open source programming language to build simple/reliable/efficient software"
   homepage "https://go.dev/"
-  url "https://go.dev/dl/go1.18.6.src.tar.gz"
-  mirror "https://fossies.org/linux/misc/go1.18.6.src.tar.gz"
-  sha256 "a7f1d50424355dabce66d1112b1cae439b6ee5e4f15edba6f104c0a4b173e895"
+  url "https://go.dev/dl/go1.18.10.src.tar.gz"
+  mirror "https://fossies.org/linux/misc/go1.18.10.src.tar.gz"
+  sha256 "9cedcca58845df0c9474ae00274c44a95c9dfaefb132fc59921c28c7c106f8e6"
   license "BSD-3-Clause"
 
   livecheck do
@@ -12,15 +12,20 @@ class GoAT118 < Formula
   end
 
   bottle do
-    sha256 arm64_monterey: "b1a03891b767759e4ddb7ca7a4ccc374d52823dc49b7b16ae0e33ae22f499f9b"
-    sha256 arm64_big_sur:  "191203597646177ce179318499eceb7bc5ca0046d63a5865ae80837ed1704556"
-    sha256 monterey:       "2d1b3c2012bdbdef51feb1e1002e681c49637e5b4675f22f59c3b412b9ec091d"
-    sha256 big_sur:        "2b1afdf7a53e1006f24e4a8f7d87f19f2624be879dfe4fe7876b7e824f122c92"
-    sha256 catalina:       "7c6df0f28dbd368cd02a6addf0994f9b8ebc1c00b1ccf9492f76e1e40b6e1dd0"
-    sha256 x86_64_linux:   "89725ef8cfee0c7a63c615a5987dffd273c6e3ae30e15494151f2d804cb5861e"
+    sha256 arm64_ventura:  "15289dd579551ed629bda489e6ba7fb0d641d8ef468d6ed62a9fde136fd8406f"
+    sha256 arm64_monterey: "fb4e5c1a52261198a393492baa2a44983fccfc4f2917dde8c0509f13d0e27450"
+    sha256 arm64_big_sur:  "5873d1892e88cbedcbf289b9898c283ebcc8d0f1dd3dabf2f748f25a8a8e1a8f"
+    sha256 ventura:        "98e567fe4e5dfbd80a95c983bb851ee69d0cb15b7097966993e2e45a4c065489"
+    sha256 monterey:       "9d842f4470cd8aa9962447cab57f511e0b45faca9ccdd84ecdf6c859567689af"
+    sha256 big_sur:        "668e852707a63dbf4db3a240089baaa20dd239772e80f65ec5bb152afb7184b3"
+    sha256 x86_64_linux:   "cc61c960b7186af57e6cc1d1f9a82beace7a93523784d78a177429d1944aa5eb"
   end
 
   keg_only :versioned_formula
+
+  # EOL with Go 1.20 release (2023-02-01)
+  # Ref: https://go.dev/doc/devel/release#policy
+  deprecate! date: "2023-02-21", because: :unsupported
 
   # Don't update this unless this version cannot bootstrap the new version.
   resource "gobootstrap" do

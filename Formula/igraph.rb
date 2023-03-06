@@ -1,17 +1,18 @@
 class Igraph < Formula
   desc "Network analysis package"
   homepage "https://igraph.org/"
-  url "https://github.com/igraph/igraph/releases/download/0.10.1/igraph-0.10.1.tar.gz"
-  sha256 "11ac87336b7adc61b4cb3d9c29fd9ed74db383a1fd994f6c47a870a86f68038c"
+  url "https://github.com/igraph/igraph/releases/download/0.10.4/igraph-0.10.4.tar.gz"
+  sha256 "aa5700b58c5f1e1de1f4637ab14df15c6b20e25e51d0f5a260921818e8f02afc"
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any,                 arm64_monterey: "ee6d36318f165c383a93b7966f93853413df3d9af7c49b04ac0f07790c606992"
-    sha256 cellar: :any,                 arm64_big_sur:  "7e9af26e1c46bb848c30eb8a7e53251611240d1a8126ff8fdf81fcbc3c82deee"
-    sha256 cellar: :any,                 monterey:       "e19413eefd35ab00f6cad776c07cd199d42a1906fa142cf085ba58d4df7e8c55"
-    sha256 cellar: :any,                 big_sur:        "a723d0a6302744281284bba8f5a313bd031262379c3c5016342bf26ae57f67de"
-    sha256 cellar: :any,                 catalina:       "01c5b7f8d7033820b347909dda1d4ac26b6c6b594a4c7ef49750afd9fb8c2a36"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "77116cfc5415c32e2326fb32ba5cc6d3b63c3aa26a2e48ec0a1cee787d80f3b4"
+    sha256 cellar: :any,                 arm64_ventura:  "924cf6d732723f7c624e306aca84ca49b47b7a91a56edfcf7c4e1155490d9ec6"
+    sha256 cellar: :any,                 arm64_monterey: "d9860b5fa36ff4c63d91223535b2c1a86580dfc9683d81fbd6633adf93ac5c4b"
+    sha256 cellar: :any,                 arm64_big_sur:  "8f692932c28ac91985b3150ec7ed735c9b0748eba3796deeee83293a983b6a62"
+    sha256 cellar: :any,                 ventura:        "4c7aeea854bdd88082de24dd37f1ffb591f36f1cbe50bec0ca46d85635a8bf40"
+    sha256 cellar: :any,                 monterey:       "dee010f3c9cfbd3fe9f3ea53267be71c57e25bbf96213903e408d0c6c4a75058"
+    sha256 cellar: :any,                 big_sur:        "f373c0447546203bccf316ec435e111ecad273c4e4b9574c84db242ddb778800"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0812cf1e53956d61f4070917ad509096a2ab61e3e0f5a355edef47203547229c"
   end
 
   depends_on "cmake" => :build
@@ -19,7 +20,6 @@ class Igraph < Formula
   depends_on "glpk"
   depends_on "gmp"
   depends_on "openblas"
-  depends_on "suite-sparse"
 
   uses_from_macos "libxml2"
 
@@ -42,7 +42,6 @@ class Igraph < Formula
                       "-DIGRAPH_GRAPHML_SUPPORT=ON",
                       "-DIGRAPH_USE_INTERNAL_ARPACK=OFF",
                       "-DIGRAPH_USE_INTERNAL_BLAS=OFF",
-                      "-DIGRAPH_USE_INTERNAL_CXSPARSE=OFF",
                       "-DIGRAPH_USE_INTERNAL_GLPK=OFF",
                       "-DIGRAPH_USE_INTERNAL_GMP=OFF",
                       "-DIGRAPH_USE_INTERNAL_LAPACK=OFF",

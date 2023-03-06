@@ -3,39 +3,37 @@ class Pylint < Formula
 
   desc "It's not just a linter that annoys you!"
   homepage "https://github.com/PyCQA/pylint"
-  url "https://files.pythonhosted.org/packages/a0/a9/6538482ccd86ef43326b7aa2c806256ab8281f9bd969f58acc526af1a986/pylint-2.15.2.tar.gz"
-  sha256 "f63404a2547edb5247da263748771ac9a806ed1de4174cda01293c08ddbc2999"
+  url "https://files.pythonhosted.org/packages/56/5c/6bdcf113646b1dc0459d48e693932e1156376341b74a43ff0a4f79623710/pylint-2.16.3.tar.gz"
+  sha256 "0decdf8dfe30298cd9f8d82e9a1542da464db47da60e03641631086671a03621"
   license "GPL-2.0-or-later"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "4ff7d1755b507ea73218e530bf96ad4a804f11965c7df416f8ec6816ef62b87d"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "be1dde19fa9e731276c6687f19977cc91cf9186a8b9d922113d5e32ac5bd98aa"
-    sha256 cellar: :any_skip_relocation, monterey:       "9a8f6c341920304b5a94b2b8a2f2f0db1955c08ec55480bb88042c778e3505d9"
-    sha256 cellar: :any_skip_relocation, big_sur:        "34138caed042a934e10977edf2605394dc49d422886d22f3cdb1a95dbfb0143b"
-    sha256 cellar: :any_skip_relocation, catalina:       "bdb345cafeae740e891db167bf8549262532d0c01a81e40f162d22ee73478b64"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c3becdd36aebdaf9c95de67e6150bafa8fdfebdfe626406d2948fdec60ed1389"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "c37725f094f3125200afeb00d809593a37b154f944fea12f5725711c195ad884"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "275e3f288fe5a5c718d835957fb3d30bfd48167b2c60f0e8f4cb8b97cefbf4d6"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "252619584ff3c8e2e19110a68f40d552525e9990e7093816267329d4156961e3"
+    sha256 cellar: :any_skip_relocation, ventura:        "0d6279927eee89e82dd69da599fa6464afc1729a9693628f3f13283a23125704"
+    sha256 cellar: :any_skip_relocation, monterey:       "13b0413121238c2c1e40805003bb52aa28323491a362a4ba00b7a3809409be5b"
+    sha256 cellar: :any_skip_relocation, big_sur:        "3b90f4b50620e4efa157b06fbde2eddfa16c86ea304d6dc63dce7a3483601f75"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1ec199cb9999682c7429fdd02b3262fdbfedb332a71f9163791f2199ad2ae134"
   end
 
-  depends_on "python@3.10"
+  depends_on "isort"
+  depends_on "python-typing-extensions"
+  depends_on "python@3.11"
 
   resource "astroid" do
-    url "https://files.pythonhosted.org/packages/d4/a8/0b849573a58ba1d2f96e8a91e2ece9daced5fadcfc990d2d473b86814be3/astroid-2.12.9.tar.gz"
-    sha256 "0dafbfcf4ebdecd3c8f6d742c9d9c88508229ca823d5c98ab872d964f3321e56"
+    url "https://files.pythonhosted.org/packages/15/e5/7dea50225cd8b44f1488ae83a243467fe6d2a3c4f611d865085b4bba67e5/astroid-2.14.2.tar.gz"
+    sha256 "a3cf9f02c53dd259144a7e8f3ccd75d67c9a8c716ef183e0c1f291bc5d7bb3cf"
   end
 
   resource "dill" do
-    url "https://files.pythonhosted.org/packages/59/46/634d5316ee8984e7dac658fb2e297a19f50a1f4007b09acb9c7c4e15bd67/dill-0.3.5.1.tar.gz"
-    sha256 "d75e41f3eff1eee599d738e76ba8f4ad98ea229db8b085318aa2b3333a208c86"
-  end
-
-  resource "isort" do
-    url "https://files.pythonhosted.org/packages/ab/e9/964cb0b2eedd80c92f5172f1f8ae0443781a9d461c1372a3ce5762489593/isort-5.10.1.tar.gz"
-    sha256 "e8443a5e7a020e9d7f97f1d7d9cd17c88bcb3bc7e218bf9cf5095fe550be2951"
+    url "https://files.pythonhosted.org/packages/7c/e7/364a09134e1062d4d5ff69b853a56cf61c223e0afcc6906b6832bcd51ea8/dill-0.3.6.tar.gz"
+    sha256 "e5db55f3687856d8fbdab002ed78544e1c4559a130302693d839dfe8f93f2373"
   end
 
   resource "lazy-object-proxy" do
-    url "https://files.pythonhosted.org/packages/75/93/3fc1cc28f71dd10b87a53b9d809602d7730e84cc4705a062def286232a9c/lazy-object-proxy-1.7.1.tar.gz"
-    sha256 "d609c75b986def706743cdebe5e47553f4a5a1da9c5ff66d76013ef396b5a8a4"
+    url "https://files.pythonhosted.org/packages/20/c0/8bab72a73607d186edad50d0168ca85bd2743cfc55560c9d721a94654b20/lazy-object-proxy-1.9.0.tar.gz"
+    sha256 "659fb5809fa4629b8a1ac5106f669cfc7bef26fbb389dda53b3e010d1ac4ebae"
   end
 
   resource "mccabe" do
@@ -44,27 +42,27 @@ class Pylint < Formula
   end
 
   resource "platformdirs" do
-    url "https://files.pythonhosted.org/packages/ff/7b/3613df51e6afbf2306fc2465671c03390229b55e3ef3ab9dd3f846a53be6/platformdirs-2.5.2.tar.gz"
-    sha256 "58c8abb07dcb441e6ee4b11d8df0ac856038f944ab98b7be6b27b2a3c7feef19"
-  end
-
-  resource "tomli" do
-    url "https://files.pythonhosted.org/packages/c0/3f/d7af728f075fb08564c5949a9c95e44352e23dee646869fa104a3b2060a3/tomli-2.0.1.tar.gz"
-    sha256 "de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"
+    url "https://files.pythonhosted.org/packages/8f/5f/01180534cebac14f3a792bf2f74fc99d34531c950c308fdebd9721e85550/platformdirs-3.1.0.tar.gz"
+    sha256 "accc3665857288317f32c7bebb5a8e482ba717b474f3fc1d18ca7f9214be0cef"
   end
 
   resource "tomlkit" do
-    url "https://files.pythonhosted.org/packages/84/51/092a8b945edc3b93f2de091ab9596006673caac063e3fac14f0fa6c69b1c/tomlkit-0.11.4.tar.gz"
-    sha256 "3235a9010fae54323e727c3ac06fb720752fe6635b3426e379daec60fbd44a83"
+    url "https://files.pythonhosted.org/packages/ff/04/58b4c11430ed4b7b8f1723a5e4f20929d59361e9b17f0872d69681fd8ffd/tomlkit-0.11.6.tar.gz"
+    sha256 "71b952e5721688937fb02cf9d354dbcf0785066149d2855e44531ebdd2b65d73"
   end
 
   resource "wrapt" do
-    url "https://files.pythonhosted.org/packages/11/eb/e06e77394d6cf09977d92bff310cb0392930c08a338f99af6066a5a98f92/wrapt-1.14.1.tar.gz"
-    sha256 "380a85cf89e0e69b7cfbe2ea9f765f004ff419f34194018a6827ac0e3edfed4d"
+    url "https://files.pythonhosted.org/packages/f8/7d/73e4e3cdb2c780e13f9d87dc10488d7566d8fd77f8d68f0e416bfbd144c7/wrapt-1.15.0.tar.gz"
+    sha256 "d06730c6aed78cee4126234cf2d071e01b44b915e725a6cb439a879ec9754a3a"
   end
 
   def install
     virtualenv_install_with_resources
+
+    # we depend on isort, but that's a separate formula, so install a `.pth` file to link them
+    site_packages = Language::Python.site_packages("python3.11")
+    isort = Formula["isort"].opt_libexec
+    (libexec/site_packages/"homebrew-isort.pth").write isort/site_packages
   end
 
   test do

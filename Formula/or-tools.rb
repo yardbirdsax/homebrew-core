@@ -1,9 +1,10 @@
 class OrTools < Formula
   desc "Google's Operations Research tools"
   homepage "https://developers.google.com/optimization/"
-  url "https://github.com/google/or-tools/archive/v9.4.tar.gz"
-  sha256 "180fbc45f6e5ce5ff153bea2df0df59b15346f2a7f8ffbd7cb4aed0fb484b8f6"
+  url "https://github.com/google/or-tools/archive/v9.5.tar.gz"
+  sha256 "57f81b94949d35dc042690db3fa3f53245cffbf6824656e1a03f103a3623c939"
   license "Apache-2.0"
+  revision 2
   head "https://github.com/google/or-tools.git", branch: "stable"
 
   livecheck do
@@ -12,13 +13,13 @@ class OrTools < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_monterey: "20bc508ae78b76ad3d9a45ccc33b990d526813b3a4b8c14d7442368723613c51"
-    sha256 cellar: :any,                 arm64_big_sur:  "002887469e355d785e7ca16f6932e0218f151a2344977f2c5506105d0d1744c7"
-    sha256 cellar: :any,                 monterey:       "5f80b6b6fede8324e9cd53558057eb47d5e91081af7098db4f93e1e67b280a9e"
-    sha256 cellar: :any,                 big_sur:        "8a3a5a7b988dbcff82875424e90b4e625290f4c9a101a89c93815d9121da12b4"
-    sha256 cellar: :any,                 catalina:       "8beb1393eb22e984c9d715ff94f1b63d3a16b21ee5d50e6eb7595a491387ca68"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "baf89a9af23e9ddf7dfae1d113cba8a751b676a73bac5b38272117488fd8beac"
+    sha256 cellar: :any,                 arm64_ventura:  "c429d8b9808386c9f144463bd2f8afb14da34624e8521be1e53a55fd7a01ab11"
+    sha256 cellar: :any,                 arm64_monterey: "4ef792b8d4796c04e5537bfb89825f00d87886e58423af0e40e884519cf655bd"
+    sha256 cellar: :any,                 arm64_big_sur:  "cfb6281f645b4e46fb29c9eba26b4bb8cdd013ffb236077ee3f73151e9fc280e"
+    sha256 cellar: :any,                 ventura:        "2db38168d02bba4b2789bc669c1a92cb509320340e5a263c69cdbe29df7d2f26"
+    sha256 cellar: :any,                 monterey:       "2161939c2fb494d0759afef4cb2438721a69dfeaa65f2a8025af79cd858f9468"
+    sha256 cellar: :any,                 big_sur:        "d57db4e441107118b75511f45ff0ead435892bd888586ab4f7d559836fee5977"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "99c78e688c9c4cefcbdf6ef6cfc264968dac3d9e47d153c846a30f0f4ef0f2f1"
   end
 
   depends_on "cmake" => :build
@@ -38,11 +39,20 @@ class OrTools < Formula
 
   fails_with gcc: "5"
 
+  # Add missing <errno.h> include to numbers.cc
+  patch :DATA
+
   def install
-    system "cmake", "-S", ".", "-B", "build", *std_cmake_args,
-                    "-DUSE_SCIP=OFF",
-                    "-DBUILD_SAMPLES=OFF",
-                    "-DBUILD_EXAMPLES=OFF"
+    args = %w[
+      -DUSE_SCIP=OFF
+      -DBUILD_SAMPLES=OFF
+      -DBUILD_EXAMPLES=OFF
+    ]
+
+    # Support ABSL_LEGACY_THREAD_ANNOTATIONS, https://github.com/google/or-tools/issues/3655
+    # remove in next release
+    args << "-DCMAKE_CXX_FLAGS=-DABSL_LEGACY_THREAD_ANNOTATIONS"
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
     system "cmake", "--build", "build", "-v"
     system "cmake", "--build", "build", "--target", "install"
     pkgshare.install "ortools/linear_solver/samples/simple_lp_program.cc"
@@ -70,3 +80,17 @@ class OrTools < Formula
     system "./simple_sat_program"
   end
 end
+
+__END__
+diff --git a/ortools/base/numbers.cc b/ortools/base/numbers.cc
+index e9f5a57..e49182c 100644
+--- a/ortools/base/numbers.cc
++++ b/ortools/base/numbers.cc
+@@ -16,6 +16,7 @@
+
+ #include "ortools/base/numbers.h"
+
++#include <errno.h>
+ #include <cfloat>
+ #include <cstdint>
+ #include <cstdlib>

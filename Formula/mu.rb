@@ -4,8 +4,8 @@
 class Mu < Formula
   desc "Tool for searching e-mail messages stored in the maildir-format"
   homepage "https://www.djcbsoftware.nl/code/mu/"
-  url "https://github.com/djcb/mu/releases/download/v1.8.10/mu-1.8.10.tar.xz"
-  sha256 "a60b330e8a360255134b1fa1d9f672363ebf318d5cbe4b4b0bee1e9f94ae15c9"
+  url "https://github.com/djcb/mu/releases/download/v1.8.14/mu-1.8.14.tar.xz"
+  sha256 "1a9c5e15b5e8b67622f7e58dfadd453abf232c0b715bd5f89b955e704455219c"
   license "GPL-3.0-or-later"
   head "https://github.com/djcb/mu.git", branch: "master"
 
@@ -18,12 +18,13 @@ class Mu < Formula
   end
 
   bottle do
-    sha256 arm64_monterey: "3f2560981abd6a016c0a87ea0e2c22c8516c59cd48b1193d64b0faa07df0460d"
-    sha256 arm64_big_sur:  "b13e3b82950a4b60b63d7a6328646f6d4183ff1e2cef5199a797b84a871afb3d"
-    sha256 monterey:       "afdfec52961a37a6e1f047903f16e25b7eacff5d5ae442c2c1b4cce2ef9cffd4"
-    sha256 big_sur:        "56c7955f0b306add81f45755a12bff3e0199b1c46549c2a70f348c6b45837c86"
-    sha256 catalina:       "5f9a9fc7d6ebab692dcb2d7f1c5d8937f47c48cc0e44bebd7e2142d26fa3586d"
-    sha256 x86_64_linux:   "e615b5e61c118528aabd1c265426d4b9b16f2e2aabf08cbae799e22cfddf72cf"
+    sha256 arm64_ventura:  "a7374671eb123ef221ad1df86dba8b3fd9ad7d10e048f439245b88240ae15676"
+    sha256 arm64_monterey: "aff9b01cee886de6fbe057aa2fe33aead281911496a65f58e254586f04766912"
+    sha256 arm64_big_sur:  "88e297752713b5922ee0d4fe819677bbf2c1d787cf27ec90bbdfbeca7d402e6a"
+    sha256 ventura:        "ffcd38352e528ccae36b058d630a79e0240626a8d76ee3535bbdefbd90b69306"
+    sha256 monterey:       "5abf4fafe115819cf9a22bac48b7307157561c06e237d389af2bdd590e06dff4"
+    sha256 big_sur:        "252ae563cb147d3cbcdfb3cb4ba84b2febb0a4ebefd567ae449f2215a31fed5c"
+    sha256 x86_64_linux:   "07366478a9a8b5c3f328e73837f1c7dcf213a73a5c28ebd74d316378b6747dc2"
   end
 
   depends_on "emacs" => :build
@@ -35,9 +36,12 @@ class Mu < Formula
   depends_on "gettext"
   depends_on "glib"
   depends_on "gmime"
+  depends_on "guile" # Possible opportunistic linkage. TODO: Check if this can be removed.
   depends_on "xapian"
 
-  uses_from_macos "texinfo" => :build
+  on_system :linux, macos: :ventura_or_newer do
+    depends_on "texinfo" => :build
+  end
 
   conflicts_with "mu-repo", because: "both install `mu` binaries"
 

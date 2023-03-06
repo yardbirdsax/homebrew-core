@@ -1,8 +1,8 @@
 class PopplerQt5 < Formula
   desc "PDF rendering library (based on the xpdf-3.0 code base)"
   homepage "https://poppler.freedesktop.org/"
-  url "https://poppler.freedesktop.org/poppler-22.08.0.tar.xz"
-  sha256 "b493328721402f25cb7523f9cdc2f7d7c59f45ad999bde75c63c90604db0f20b"
+  url "https://poppler.freedesktop.org/poppler-23.03.0.tar.xz"
+  sha256 "b04148bf849c1965ada7eff6be4685130e3a18a84e0cce73bf9bc472ec32f2b4"
   license "GPL-2.0-only"
   head "https://gitlab.freedesktop.org/poppler/poppler.git", branch: "master"
 
@@ -11,13 +11,13 @@ class PopplerQt5 < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_monterey: "4853cf0f59a2d43b2dc1ee36bb199b3cf306e70718630338d494f743b5bf5451"
-    sha256 arm64_big_sur:  "329932614c8dc9d3b10deecfc26c7a787b4ea810e657bd1a0c0ae7385d83e8c9"
-    sha256 monterey:       "035d5675efb503e43f7ee6bd88bb1d75a5afcec9e2d7e094fd5e9e056e71036f"
-    sha256 big_sur:        "d804cc82ab548633b59172c3f2c48a205a4351ee9b02aa18d5101bf07f21da41"
-    sha256 catalina:       "ffcbc6c557151fd0e9c9d7246569e2909aa97fa03fcf26fd6db2846d3b1b61ad"
-    sha256 x86_64_linux:   "f89868c9d585140de94c0e3b0d699707ed1f86e1ea4be098102b4ae997e4646c"
+    sha256 arm64_ventura:  "2094ead0ecb063c41b03e7587ce78bea693bacc3d33f379c7969684a1cf6cc18"
+    sha256 arm64_monterey: "d1511c5ffea8356ffe3e087aa4520a093148170ee154145dfa21523efa5c10ed"
+    sha256 arm64_big_sur:  "fef4bdc8612d30d589855c0905d43b6e5b231bd72ce46c050ed6f8bc154f6e06"
+    sha256 ventura:        "39a3cb851e29ea6e22f53334d2ce640da0e4e77a564276df2efbd8473ebe3532"
+    sha256 monterey:       "f3fd4a4da6a47ca130e576c37da5cd3be719285f9969998e1dcffa9caa545601"
+    sha256 big_sur:        "5f6e81697a244f2267a4d44a53cef8e660449b326acc87cb1b15d7cc5150ccff"
+    sha256 x86_64_linux:   "d20e8e6b23e4219c7894eb8bd3971a817cb34cabfbcb539f1815690fb30cb784"
   end
 
   keg_only "it conflicts with poppler"
@@ -50,10 +50,6 @@ class PopplerQt5 < Formula
 
   def install
     ENV.cxx11
-
-    # Fix for BSD sed. Reported upstream at:
-    # https://gitlab.freedesktop.org/poppler/poppler/-/issues/1290
-    inreplace "CMakeLists.txt", "${SED} -i", "\\0 -e"
 
     args = std_cmake_args + %W[
       -DBUILD_GTK_TESTS=OFF

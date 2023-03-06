@@ -1,17 +1,18 @@
 class Opensearch < Formula
   desc "Open source distributed and RESTful search engine"
   homepage "https://github.com/opensearch-project/OpenSearch"
-  url "https://github.com/opensearch-project/OpenSearch/archive/2.3.0.tar.gz"
-  sha256 "a69d819f83420b5c0473548310051e7a79a0ef54603ab5544e3b9bd9dc2bae87"
+  url "https://github.com/opensearch-project/OpenSearch/archive/2.6.0.tar.gz"
+  sha256 "977c26b153146bee8295d439ee064fc5d4b9af4687e6b986da948cea8681fe7b"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "87b526aed59e67991da98dee964b06dd19e68f4b347b58299f82385c05646cbb"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "87b526aed59e67991da98dee964b06dd19e68f4b347b58299f82385c05646cbb"
-    sha256 cellar: :any_skip_relocation, monterey:       "7c1bf27bb24bb26efdcd5b9add7c1c8e7ee3cd733a8497bcc687f1d2a152b6cc"
-    sha256 cellar: :any_skip_relocation, big_sur:        "7c1bf27bb24bb26efdcd5b9add7c1c8e7ee3cd733a8497bcc687f1d2a152b6cc"
-    sha256 cellar: :any_skip_relocation, catalina:       "7c1bf27bb24bb26efdcd5b9add7c1c8e7ee3cd733a8497bcc687f1d2a152b6cc"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e857b786c4bb84c883c5e2c333752a144a7ea745826fc3c3c8e96269f7ecf968"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "d467a57ed11600107ca6f952d58b9d8eff81c9fa0e663fafa7ae9da6e327c930"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "297c52739486a92bf8dc832b38b666908a801464ac67cff433b7a8b9e065a430"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "362092684e6929d58deefd60986d24b717fe3cfa12ee5c8fda9b633ef0be6c2f"
+    sha256 cellar: :any_skip_relocation, ventura:        "a2a0fe3283ec3eb8eaf084823499d70ca7a47890475b55e8c43083a62c14d4e3"
+    sha256 cellar: :any_skip_relocation, monterey:       "93c6603092ace54608b76bfeeba40e4d7841f7d4b098d531e23bfa00343a0487"
+    sha256 cellar: :any_skip_relocation, big_sur:        "029ef4e524b7f4bd8720459720941e78cbf39e6f19aaf4da6124da956634da07"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "df8ab78559e1284f27fa2e1e56b2c047ddd90ef9604037b6e935c25a3f51bb19"
   end
 
   depends_on "gradle" => :build
@@ -80,7 +81,6 @@ class Opensearch < Formula
     EOS
   end
 
-  plist_options manual: "opensearch"
   service do
     run opt_bin/"opensearch"
     working_dir var

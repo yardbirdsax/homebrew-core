@@ -1,8 +1,8 @@
 class TerraformLs < Formula
   desc "Terraform Language Server"
   homepage "https://github.com/hashicorp/terraform-ls"
-  url "https://github.com/hashicorp/terraform-ls/archive/v0.29.2.tar.gz"
-  sha256 "95a21bb7f0a5df7adb7ca94cb4e0e8db0a318b4d39102ff8e79199c188a33823"
+  url "https://github.com/hashicorp/terraform-ls/archive/v0.30.3.tar.gz"
+  sha256 "bd4025876095d980d570c1f237cbdafe812a52e0277545493520ebf65dfaec9f"
   license "MPL-2.0"
   head "https://github.com/hashicorp/terraform-ls.git", branch: "main"
 
@@ -12,12 +12,13 @@ class TerraformLs < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "5e3fb1e39522b407161ac5f79da5c0ec186eaf658a736b1d57708d520765b4be"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "63198f8117af9caba2d75e09961680a49b4ff09b09685d6757cc6fdedd069214"
-    sha256 cellar: :any_skip_relocation, monterey:       "fbd54302b4972b4be24a34ae341c91f62c8ff4080e49cc069fdf7a3e0443adcc"
-    sha256 cellar: :any_skip_relocation, big_sur:        "786e323cb7eb606e92fe8f4886e1991cd7a9cfafdb66ad5b752b1cc930801252"
-    sha256 cellar: :any_skip_relocation, catalina:       "e35f506cd0d3b264050748f754e2ec180b8a086439d5b16a1e602277c8587c4f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a8cd3d9e597956330fdd4a701941cd802f3a0e320870fcef7819ca068e1d4d86"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "436bcbfefdaaefd3ab5bed2269f037795aca6ae4933b227a1569f340d6a385a2"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "436bcbfefdaaefd3ab5bed2269f037795aca6ae4933b227a1569f340d6a385a2"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "436bcbfefdaaefd3ab5bed2269f037795aca6ae4933b227a1569f340d6a385a2"
+    sha256 cellar: :any_skip_relocation, ventura:        "bbfd9f8f2da648f46e13a76d0e90623d6d3ed6c86481ab022f09b1086a5a7e73"
+    sha256 cellar: :any_skip_relocation, monterey:       "bbfd9f8f2da648f46e13a76d0e90623d6d3ed6c86481ab022f09b1086a5a7e73"
+    sha256 cellar: :any_skip_relocation, big_sur:        "bbfd9f8f2da648f46e13a76d0e90623d6d3ed6c86481ab022f09b1086a5a7e73"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e65ff9b062b18a913f97991ff447bc0f6cd1abfcab0db09b44cd6c84f31c8926"
   end
 
   depends_on "go" => :build
@@ -25,8 +26,7 @@ class TerraformLs < Formula
   def install
     ldflags = %W[
       -s -w
-      -X main.version=#{version}
-      -X main.versionPrerelease=#{tap.user}
+      -X main.rawVersion=#{version}+#{tap.user}
     ]
     system "go", "build", *std_go_args(ldflags: ldflags.join(" "))
   end

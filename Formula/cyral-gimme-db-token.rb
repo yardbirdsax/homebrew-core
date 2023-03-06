@@ -8,17 +8,19 @@ class CyralGimmeDbToken < Formula
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any,                 arm64_monterey: "02189487ce552fef4ff780a8c3a1f007dd34aaf3671f456eec2ca625981816e2"
-    sha256 cellar: :any,                 arm64_big_sur:  "222b9c7b096a82a4793b709f9388fc1c7f73ad4f7c8378c15f76e295d5a31395"
-    sha256 cellar: :any,                 monterey:       "6509267dca45c57eb5975f1d9bb41b1b1b14fb26e1088d5bf2b68690b0158f17"
-    sha256 cellar: :any,                 big_sur:        "e3dbc72de51ab66e636b730bc59ecea42e9b24912a46c6eef4958dcac569d6d7"
-    sha256 cellar: :any,                 catalina:       "bb5b8a65b10bb49936acfdfc21e5f0acd3c31b649057e943c1c143d15660feb0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "62b3067037a1544b6d3daf9220d1911d61d6cb656932716c3ae0fbe30754f296"
+    rebuild 5
+    sha256 cellar: :any,                 arm64_ventura:  "81bfb30f7bcd25c4d00f026162d661e4a8fb7b136ba34d3f06144a408960c6c8"
+    sha256 cellar: :any,                 arm64_monterey: "75f1d9ecf4e20d058a99f17cc956c114f19d15be37312c1e5800ee180309967b"
+    sha256 cellar: :any,                 arm64_big_sur:  "1eafce8aac303b114a6dcf81487c33600b35a549fe71d6638ba3a2e05204341a"
+    sha256 cellar: :any,                 ventura:        "c20a5a5e8d436eb1c9971a86caa4a69cfeee46dc5d389382ac66d801a3830036"
+    sha256 cellar: :any,                 monterey:       "35d12f35587eb6bb604c66876b20f995bbc2ab4722a6d334801e521080a0a384"
+    sha256 cellar: :any,                 big_sur:        "beda33066823eddc0b541961f0acfbe209b09aebc68157cb3097ea230ac40475"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a6ee1093d99dc2d1fdfac0c2f18590dcfdf44bf3fdd655761da5e17281c096ce"
   end
 
   depends_on "rust" => :build # for cryptography
   depends_on "openssl@1.1"
-  depends_on "python@3.10"
+  depends_on "python@3.11"
   depends_on "six"
 
   uses_from_macos "libffi"
@@ -28,18 +30,18 @@ class CyralGimmeDbToken < Formula
   end
 
   resource "awscli" do
-    url "https://files.pythonhosted.org/packages/65/8b/7082ac9078f0da4e46fa4c3a74f86b1bc7685358486eb8762e57cc365add/awscli-1.25.73.tar.gz"
-    sha256 "4caade303a115567240496a88cc00290fdc961da5b029e881b6cf1f4af874edd"
+    url "https://files.pythonhosted.org/packages/f0/83/23008808deafef9fe0d1d09a9a61d0a2811c04bacfc6eae0a90d885c9af4/awscli-1.27.69.tar.gz"
+    sha256 "2a8e646277d762f47b150ad7e71dfa88867411658a4943b416f35d9be7be4dd8"
   end
 
   resource "botocore" do
-    url "https://files.pythonhosted.org/packages/ab/9c/c790ba19f53e1ea7cfb96ca413012dcfcbbf82af1340e37becf7d2378ce0/botocore-1.27.72.tar.gz"
-    sha256 "6184ab43a59118541b88e0ede24ccd671553323ace95bb7c8de3082a5cc581cb"
+    url "https://files.pythonhosted.org/packages/db/31/720ac07bd096fdd24fbeb42111638b41fd220e618790b94ada77a6bd1f3e/botocore-1.29.69.tar.gz"
+    sha256 "7e1bebca013544fbc298cb58603bfccd5f71b49c720a5c33c07cf5dfc8145a1f"
   end
 
   resource "certifi" do
-    url "https://files.pythonhosted.org/packages/05/a8/e0966dcf948a9ab9321f23f121a37b96be191b15dc28e9134927fd42a8af/certifi-2022.6.15.2.tar.gz"
-    sha256 "aa08c101214127b9b0472ca6338315113c9487d45376fd3e669201b477c71003"
+    url "https://files.pythonhosted.org/packages/37/f7/2b1b0ec44fdc30a3d31dfebe52226be9ddc40cd6c0f34ffc8923ba423b69/certifi-2022.12.7.tar.gz"
+    sha256 "35824b4c3a97115964b408844d64aa14db1cc518f6562e8d7261699d1350a9e3"
   end
 
   resource "cffi" do
@@ -48,8 +50,8 @@ class CyralGimmeDbToken < Formula
   end
 
   resource "charset-normalizer" do
-    url "https://files.pythonhosted.org/packages/a1/34/44964211e5410b051e4b8d2869c470ae8a68ae274953b1c7de6d98bbcf94/charset-normalizer-2.1.1.tar.gz"
-    sha256 "5a3d016c7c547f69d6f81fb0db9449ce888b418b5b9952cc5e6e66843e9dd845"
+    url "https://files.pythonhosted.org/packages/96/d7/1675d9089a1f4677df5eb29c3f8b064aa1e70c1251a0a8a127803158942d/charset-normalizer-3.0.1.tar.gz"
+    sha256 "ebea339af930f8ca5d7a699b921106c6e29c617fe9606fa7baa043c1cdae326f"
   end
 
   resource "click" do
@@ -73,8 +75,8 @@ class CyralGimmeDbToken < Formula
   end
 
   resource "idna" do
-    url "https://files.pythonhosted.org/packages/62/08/e3fc7c8161090f742f504f40b1bccbfc544d4a4e09eb774bf40aafce5436/idna-3.3.tar.gz"
-    sha256 "9d643ff0a55b762d5cdb124b8eaa99c66322e2157b69160bc32796e824360e6d"
+    url "https://files.pythonhosted.org/packages/8b/e1/43beb3d38dba6cb420cefa297822eac205a277ab43e5ba5d5c46faf96438/idna-3.4.tar.gz"
+    sha256 "814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4"
   end
 
   resource "jmespath" do
@@ -103,8 +105,8 @@ class CyralGimmeDbToken < Formula
   end
 
   resource "requests" do
-    url "https://files.pythonhosted.org/packages/a5/61/a867851fd5ab77277495a8709ddda0861b28163c4613b011bc00228cc724/requests-2.28.1.tar.gz"
-    sha256 "7c5599b102feddaa661c826c56ab4fee28bfd17f5abca1ebbe3e7f19d7c97983"
+    url "https://files.pythonhosted.org/packages/9d/ee/391076f5937f0a8cdf5e53b701ffc91753e87b07d66bae4a09aa671897bf/requests-2.28.2.tar.gz"
+    sha256 "98b1b2782e3c6c4904938b84c0eb932721069dfdb9134313beff7c83c2df24bf"
   end
 
   resource "rsa" do
@@ -118,17 +120,15 @@ class CyralGimmeDbToken < Formula
   end
 
   resource "urllib3" do
-    url "https://files.pythonhosted.org/packages/b2/56/d87d6d3c4121c0bcec116919350ca05dc3afd2eeb7dc88d07e8083f8ea94/urllib3-1.26.12.tar.gz"
-    sha256 "3fa96cf423e6987997fc326ae8df396db2a8b7c667747d47ddd8ecba91f4a74e"
+    url "https://files.pythonhosted.org/packages/c5/52/fe421fb7364aa738b3506a2d99e4f3a56e079c0a798e9f4fa5e14c60922f/urllib3-1.26.14.tar.gz"
+    sha256 "076907bf8fd355cde77728471316625a4d2f7e713c125f51953bb5b3eecf4f72"
   end
 
+  # patch to use latest poetry_core to fix build
+  patch :DATA
+
   def install
-    # setuptools>=60 prefers its own bundled distutils, which is incompatabile with docutils~=0.15
-    # Force the previous behavior of using distutils from the stdlib
-    # Remove when fixed upstream: https://github.com/aws/aws-cli/pull/6011
-    with_env(SETUPTOOLS_USE_DISTUTILS: "stdlib") do
-      virtualenv_install_with_resources
-    end
+    virtualenv_install_with_resources
   end
 
   test do
@@ -139,3 +139,18 @@ class CyralGimmeDbToken < Formula
     assert_match "Error: Invalid value", shell_output("#{bin}/gimme_db_token unsupported 2>&1", 2)
   end
 end
+
+__END__
+diff --git a/pyproject.toml b/pyproject.toml
+index f88b284..e8b5fbd 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -28,6 +28,5 @@ flake8 = "^3.8.4"
+ [tool.poetry.scripts]
+ gimme_db_token = "gimme_db_token.__main__:run"
+ [build-system]
+-requires = ["poetry>=0.12"]
+-build-backend = "poetry.masonry.api"
+-
++requires = ["poetry_core>=1.0.0"]
++build-backend = "poetry.core.masonry.api"

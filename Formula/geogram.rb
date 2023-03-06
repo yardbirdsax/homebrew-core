@@ -1,23 +1,24 @@
 class Geogram < Formula
   desc "Programming library of geometric algorithms"
   homepage "https://brunolevy.github.io/geogram/"
-  url "https://brunolevy.github.io/geogram/Releases/geogram_1.8.0.tar.gz"
-  sha256 "7e59db5176ca22580055a5c48862d6fd50399f33551ab9bc20c80a4cc0adeb9e"
+  url "https://github.com/BrunoLevy/geogram/releases/download/v1.8.3/geogram_1.8.3.tar.gz"
+  sha256 "f75ab433fe2402bd14a165ce4081184b555b80443f17810139f244f55af56e7c"
   license all_of: ["BSD-3-Clause", :public_domain, "LGPL-3.0-or-later", "MIT"]
   head "https://github.com/BrunoLevy/geogram.git", branch: "main"
 
   livecheck do
-    url "https://brunolevy.github.io/geogram/Releases/"
-    regex(/href=.*?geogram[._-]v?(\d+(?:\.\d+)+)\.t/i)
+    url :stable
+    strategy :github_latest
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_monterey: "68878fb9bea83c3c49294f8eba28763c739c3fab9a69a7dfeeb9dc712362929c"
-    sha256 cellar: :any,                 arm64_big_sur:  "6e074cfbe89f210ee31944d0f28d479110072036d0f9e1a82eb80bbbeaee2bff"
-    sha256 cellar: :any,                 monterey:       "7e45ba031704d12d3ae114d063755c8c9977bdad41a2893b3a101b93ada74fe3"
-    sha256 cellar: :any,                 big_sur:        "4f6fec4a8880e11fa600ebf7bee5456471e60a3e764012a67b2e28593075c13e"
-    sha256 cellar: :any,                 catalina:       "1944cf02f77aae7134804276ee78052cdccf06532a2039a32e44d33d9cbd5997"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "02cf25788c6614a20b1a33347605d8bd4d6e7653e99d8f420b43b7fb7b053d24"
+    sha256 cellar: :any,                 arm64_ventura:  "adb37385a59e0f278d70f0fce6c6a01db525bfa3b20d5927f2c993c3384edde5"
+    sha256 cellar: :any,                 arm64_monterey: "b87eefae88560c648cef2f3adf71272ef8087d6e52660bd1365ced88a71f07a9"
+    sha256 cellar: :any,                 arm64_big_sur:  "f21b8fd2520d1700df922a0886df81207cca18f96bb1041a05e7e2ac1790fe9b"
+    sha256 cellar: :any,                 ventura:        "3a924fee6e4ad0e60576663964fb23fd93446471b2ff7cd4e5d5f63fba8f8ef1"
+    sha256 cellar: :any,                 monterey:       "ae6dde8bc72032bb6ff9b89498cbc19aa38f8e580aeee0e84e8c44707a68cb70"
+    sha256 cellar: :any,                 big_sur:        "6bd86fbe1008bbabfdc6a3f9aa731416fea32473cd58cb995395650b3a81124d"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f229343cdf5470735809a3dcda06b8573f9c4185ba570d8ce932b74bb5b4aa45"
   end
 
   depends_on "cmake" => :build
@@ -27,7 +28,7 @@ class Geogram < Formula
     depends_on "doxygen" => :build
   end
 
-  resource "bunny" do
+  resource "homebrew-bunny" do
     url "https://raw.githubusercontent.com/FreeCAD/Examples/be0b4f9/Point_cloud_ExampleFiles/PointCloud-Data_Stanford-Bunny.asc"
     sha256 "4fc5496098f4f4aa106a280c24255075940656004c6ef34b3bf3c78989cbad08"
   end
@@ -50,7 +51,7 @@ class Geogram < Formula
   end
 
   test do
-    resource("bunny").stage { testpath.install Dir["*"].first => "bunny.xyz" }
+    resource("homebrew-bunny").stage { testpath.install Dir["*"].first => "bunny.xyz" }
     system "#{bin}/vorpalite", "profile=reconstruct", "bunny.xyz", "bunny.meshb"
     assert_predicate testpath/"bunny.meshb", :exist?, "bunny.meshb should exist!"
   end

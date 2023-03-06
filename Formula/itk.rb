@@ -1,10 +1,9 @@
 class Itk < Formula
   desc "Insight Toolkit is a toolkit for performing registration and segmentation"
   homepage "https://itk.org"
-  url "https://github.com/InsightSoftwareConsortium/ITK/releases/download/v5.2.1/InsightToolkit-5.2.1.tar.gz"
-  sha256 "192d41bcdd258273d88069094f98c61c38693553fd751b54f8cda308439555db"
+  url "https://github.com/InsightSoftwareConsortium/ITK/releases/download/v5.3.0/InsightToolkit-5.3.0.tar.gz"
+  sha256 "57a4471133dc8f76bde3d6eb45285c440bd40d113428884a1487472b7b71e383"
   license "Apache-2.0"
-  revision 3
   head "https://github.com/InsightSoftwareConsortium/ITK.git", branch: "master"
 
   livecheck do
@@ -13,13 +12,13 @@ class Itk < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_monterey: "b9404867b0d10372dc178c78707c52ecfaace5812f15001809516f3a4ddca522"
-    sha256 arm64_big_sur:  "cdd5c6a59fe4a4c3b1c261250e3d9955d778cd9120d9cf8ea8b328fe24c21a9a"
-    sha256 monterey:       "ae2739cbc09f2308e883dedda290c14aed1f98d5fc8de8e233becdec3d3ae7a6"
-    sha256 big_sur:        "c95d53f403d23de160002aab5745c673b610a42c6db7bc4c9e773c9adee59b01"
-    sha256 catalina:       "3a4a3993689cc106e70476a74ad09efa57c1ac4fa397d0c4720c370a05cb328c"
-    sha256 x86_64_linux:   "7a59bef7c56ce8e09b9484b7261afc2280f5584a4e4b20930cb244856eb9fe02"
+    sha256 arm64_ventura:  "6c5ae4caaa5db0b4c9c5d5947f7432e7933e2ec4b0047ad656318c7eaf291376"
+    sha256 arm64_monterey: "999621dcc8212ac650e40035de6c6d9558f7564e2868e09040372d391f8e54e5"
+    sha256 arm64_big_sur:  "9d72b5bf086019b8a7b88a24f8188de0f1121630168f54cc94d161d50b8993d8"
+    sha256 ventura:        "e18ca58d6e7ef0b136e3d5bac7b13b027c6f21e4d6200c28735828f7eac0c462"
+    sha256 monterey:       "05b28cb5148887ced4e7b9f14c8a89b7e0dcfddf812bcecf61ef525703f16f3a"
+    sha256 big_sur:        "9220db75ade46836b878577fd095f6998117cdf2a937dd9b68614646e2a2d504"
+    sha256 x86_64_linux:   "99ffd8c6b3faf1dcde531cd549571726a3445e5c60173aa6d3e3ceff18e16486"
   end
 
   depends_on "cmake" => :build
@@ -35,8 +34,6 @@ class Itk < Formula
   on_linux do
     depends_on "alsa-lib"
     depends_on "unixodbc"
-
-    ignore_missing_libraries "libjvm.so"
   end
 
   fails_with gcc: "5"
@@ -68,7 +65,9 @@ class Itk < Formula
       -DModule_ITKVtkGlue=ON
       -DModule_SCIFIO=ON
     ]
-    args << "-DITK_USE_GPU=ON" if OS.mac?
+    # Cannot compile on macOS with this arg
+    # Upstream issue: https://github.com/InsightSoftwareConsortium/ITK/issues/3821
+    # args << "-DITK_USE_GPU=ON" if OS.mac?
 
     # Avoid references to the Homebrew shims directory
     inreplace "Modules/Core/Common/src/CMakeLists.txt" do |s|
@@ -86,6 +85,9 @@ class Itk < Formula
     system "cmake", "-S", ".", "-B", "build", *std_cmake_args, *args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
+
+    # Remove the bundled JRE installed by SCIFIO ImageIO plugin
+    (lib/"jre").rmtree if OS.linux? || Hardware::CPU.intel?
   end
 
   test do
@@ -102,9 +104,9 @@ class Itk < Formula
 
     v = version.major_minor
     # Build step
-    system ENV.cxx, "-std=c++11", "-isystem", "#{include}/ITK-#{v}", "-o", "test.cxx.o", "-c", "test.cxx"
+    system ENV.cxx, "-std=c++14", "-isystem", "#{include}/ITK-#{v}", "-o", "test.cxx.o", "-c", "test.cxx"
     # Linking step
-    system ENV.cxx, "-std=c++11", "test.cxx.o", "-o", "test",
+    system ENV.cxx, "-std=c++14", "test.cxx.o", "-o", "test",
                     lib/shared_library("libITKCommon-#{v}", 1),
                     lib/shared_library("libITKVNLInstantiation-#{v}", 1),
                     lib/shared_library("libitkvnl_algo-#{v}", 1),

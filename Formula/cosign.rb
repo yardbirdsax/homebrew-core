@@ -2,18 +2,19 @@ class Cosign < Formula
   desc "Container Signing"
   homepage "https://github.com/sigstore/cosign"
   url "https://github.com/sigstore/cosign.git",
-      tag:      "v1.12.0",
-      revision: "8483d6c71f153f38f237ba79c88d0fda6306e6e3"
+      tag:      "v2.0.0",
+      revision: "d6b9001f8e6ed745fb845849d623274c897d55f2"
   license "Apache-2.0"
   head "https://github.com/sigstore/cosign.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "63f6d06218eaef81f17988ab8d703ea65c3c14cd976b5d5f33735c04d49cc10d"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "1eb5d5e23fb056d22ec1f080b681596d4ec666a228c26c7eb4f4651f08e6ad4d"
-    sha256 cellar: :any_skip_relocation, monterey:       "3b13e0ccd162ee7a858c3ca93cf831664ce6e798ec23bc8d71c3135d35896fe6"
-    sha256 cellar: :any_skip_relocation, big_sur:        "386b6de77b50ffe80fd6a0200bbe3a2620077d6e4d7bcfda07b7ebc76437113e"
-    sha256 cellar: :any_skip_relocation, catalina:       "d26eb1f9dc0412ce93071eb7f0b939f730dbe89627e184d1c5c7071b13c81727"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e4b4b3f910c85389816063dcbd8e4fac62df151a0e89ae4d46c9fc2fdca53358"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "0b007ee871d719c1fe2f628bdd27d60c05d2ecde515cca3fc06323c7d5daae25"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "067fadd587cf4e31c61cedec28fbc70dc5483fb60a4b4c057d259c506e4993b5"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "067fadd587cf4e31c61cedec28fbc70dc5483fb60a4b4c057d259c506e4993b5"
+    sha256 cellar: :any_skip_relocation, ventura:        "305bd4b18fe5ea7bc53a749cf5c7c6c848d59667120024032c22a8f8a5fe41c0"
+    sha256 cellar: :any_skip_relocation, monterey:       "7bf9643d938e7ec7d1401c97fd14579d74ad9bf35bd66794a51eb630562b8588"
+    sha256 cellar: :any_skip_relocation, big_sur:        "680d5fbce46d1f4fcf11d34ddc4dc3fd4ca86ccf222e9811649c733c482497c3"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3703460a09438811208aa30de5efdeda2618ad839e0deae3021ab325beff601d"
   end
 
   depends_on "go" => :build
@@ -29,6 +30,8 @@ class Cosign < Formula
     ]
 
     system "go", "build", *std_go_args(ldflags: ldflags), "./cmd/cosign"
+
+    generate_completions_from_executable(bin/"cosign", "completion")
   end
 
   test do

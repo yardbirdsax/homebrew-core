@@ -2,25 +2,25 @@ class Agda < Formula
   desc "Dependently typed functional programming language"
   homepage "https://wiki.portal.chalmers.se/agda/"
   license "BSD-3-Clause"
-  revision 1
 
   stable do
-    url "https://hackage.haskell.org/package/Agda-2.6.2.2/Agda-2.6.2.2.tar.gz"
-    sha256 "e5be3761717b144f64e760d8589ec6fdc0dda60d40125c49cdd48f54185c527a"
+    url "https://hackage.haskell.org/package/Agda-2.6.3/Agda-2.6.3.tar.gz"
+    sha256 "beacc9802c470e42bb0707f9ffe7db488a936c635407dada5d4db060b58d6016"
 
     resource "stdlib" do
-      url "https://github.com/agda/agda-stdlib/archive/v1.7.1.tar.gz"
-      sha256 "6f92ae14664e5d1217e8366c647eb23ca88bc3724278f22dc6b80c23cace01df"
+      url "https://github.com/agda/agda-stdlib/archive/v1.7.2.tar.gz"
+      sha256 "d86a41b9d2e1d2e956ec91bdef9cb34646da11f50f76996761c9a1562c3c47a2"
     end
   end
 
   bottle do
-    sha256 arm64_monterey: "075fb9d1c1d3bb2ce9786958aad1c166c207e042c257422fed60fb7b56f6cd48"
-    sha256 arm64_big_sur:  "2db89fc4cfb9bc3b3676c042ca42dff4c7991b70ae42a5e370cd323487fed5d0"
-    sha256 monterey:       "e1d3778a1e0293edba2759e000fc7ee8cc2bda1042255c0a02d176b15c6653ce"
-    sha256 big_sur:        "c40f2ab5942348b945ca36cba679f0d55dfcdf14fa3d048e4712d450687ab9e5"
-    sha256 catalina:       "66e344fc29367ea27a055218f1cedb66019849c58110711409fdd52f38a839e2"
-    sha256 x86_64_linux:   "4742399788dd43bb888c31f95e176be233c2569d8999191f69902179509fac8a"
+    sha256 arm64_ventura:  "e6d794683df004cb540fc13038cb80378b7e5ee42fe8c20bd7c87cd7313606fe"
+    sha256 arm64_monterey: "ef61f482507d2e0f89c2df9136f83fee454701c570f7834d60da72ec0f707264"
+    sha256 arm64_big_sur:  "ccfb912d275052fb8d0a81ea3216e921c77f46cf0b2ec7b7dba5ef238f1868e1"
+    sha256 ventura:        "5dbae0ce1b653e7dc099e234e137bb703dc8ded804d2785aaab3129440befb6d"
+    sha256 monterey:       "afffee3246e21852bae17f1587a35a279fcdba0b87cda6fd8ed20c4166218a56"
+    sha256 big_sur:        "e3a67f21d8e018dc4bb3ba17f08e1906125a7f2920b1e36a3af691cd1ad4f6ad"
+    sha256 x86_64_linux:   "764d1eb2568588b1cb9a9e62dbc78e8caadd361424c2dde1b060f024cec399f9"
   end
 
   head do

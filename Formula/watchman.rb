@@ -1,37 +1,23 @@
 class Watchman < Formula
   desc "Watch files and take action when they change"
   homepage "https://github.com/facebook/watchman"
+  url "https://github.com/facebook/watchman/archive/v2023.02.27.00.tar.gz"
+  sha256 "e03fbcdcba1240bc5d62785edc4bc6dadaf6e81616832a8cc787743ae593bb2c"
   license "MIT"
-
-  stable do
-    url "https://github.com/facebook/watchman/archive/v2022.09.12.00.tar.gz"
-    sha256 "5143afc1641233839356c915b4361a1e097e3a56a326e1024ac2ae3ac419d4c7"
-
-    resource "edencommon" do
-      url "https://github.com/facebookexperimental/edencommon/archive/refs/tags/v2022.09.12.00.tar.gz"
-      sha256 "68a4376681c09ccf05f982fb74176bbc3de0785ac16fb62f6fb99bde3109cd8b"
-    end
-  end
+  head "https://github.com/facebook/watchman.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_monterey: "562c666261479a685bcd8103db1377905f9c90ce05c1ca84d3b0daff47ae1b5b"
-    sha256 cellar: :any,                 arm64_big_sur:  "e7cfb8e47919add563a904be6a6ac2a4b1bc169e643c808b546ea4b3b0f91aee"
-    sha256 cellar: :any,                 monterey:       "97bf90089b9ce8ec88c6a5d7ee88d7e766c4346b6e2c854ee2f16e9282564deb"
-    sha256 cellar: :any,                 big_sur:        "3f84efba90fc0040e63a1b92118fda55aa62c95b575beb7d55e656d14d20909e"
-    sha256 cellar: :any,                 catalina:       "2941e6a752f621de99184359a1a9b66b740ad59e99d98d1decc6190b4ff19484"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "56b2a541a7b9ab1282af70bd71ea06a1f396dcc77e18221f282c415c8f0d9227"
+    sha256 cellar: :any,                 arm64_ventura:  "65603ffbc669cba5e9dd7933fdbe098f55da17b90a2640ac2e1452252929391b"
+    sha256 cellar: :any,                 arm64_monterey: "e4b769f8928dc7d06c306c66302e6f3022f242d765741a0b85720a9b0cee8bbb"
+    sha256 cellar: :any,                 arm64_big_sur:  "d89b5b5eddee98558ccbab14b60c8e2ef52e87c215109baa6a030b12329ae268"
+    sha256 cellar: :any,                 ventura:        "f70ae74244602e85d0af9c5196d24aa2478a000e2043a6c2fc0ed6f357bf9714"
+    sha256 cellar: :any,                 monterey:       "311c5d61c55fffc3dd14aeca7fe109158b563a3b345af6fb9d2afb90cd778092"
+    sha256 cellar: :any,                 big_sur:        "16f80c272bf266b99e17480000bab9475a3ddd962a6c97f07e79301a09ed9f2c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "aa73eee563240351d26b3996fdc05f648674f90d38fdf8a1aeb432f8a7857afd"
   end
 
   # https://github.com/facebook/watchman/issues/963
   pour_bottle? only_if: :default_prefix
-
-  head do
-    url "https://github.com/facebook/watchman.git", branch: "main"
-
-    resource "edencommon" do
-      url "https://github.com/facebookexperimental/edencommon.git", branch: "main"
-    end
-  end
 
   depends_on "cmake" => :build
   depends_on "cpptoml" => :build
@@ -39,6 +25,7 @@ class Watchman < Formula
   depends_on "pkg-config" => :build
   depends_on "rust" => :build
   depends_on "boost"
+  depends_on "edencommon"
   depends_on "fb303"
   depends_on "fmt"
   depends_on "folly"
@@ -47,21 +34,15 @@ class Watchman < Formula
   depends_on "libevent"
   depends_on "openssl@1.1"
   depends_on "pcre2"
-  depends_on "python@3.10"
+  depends_on "python@3.11"
 
   fails_with gcc: "5"
 
   def install
-    resource("edencommon").stage do
-      system "cmake", "-S", ".", "-B", "_build",
-                      *std_cmake_args(install_prefix: buildpath/"edencommon")
-      system "cmake", "--build", "_build"
-      system "cmake", "--install", "_build"
-    end
-
-    # Fix build failure on Linux. Borrowed from Fedora:
-    # https://src.fedoraproject.org/rpms/watchman/blob/rawhide/f/watchman.spec#_70
-    inreplace "CMakeLists.txt", /^t_test/, "#t_test" if OS.linux?
+    # Fix "Process terminated due to timeout" by allowing a longer timeout.
+    inreplace "CMakeLists.txt",
+              /gtest_discover_tests\((.*)\)/,
+              "gtest_discover_tests(\\1 DISCOVERY_TIMEOUT 30)"
 
     # NOTE: Setting `BUILD_SHARED_LIBS=ON` will generate DSOs for Eden libraries.
     #       These libraries are not part of any install targets and have the wrong
@@ -69,15 +50,12 @@ class Watchman < Formula
     #       if they are built as shared libraries. They're not used by any other
     #       formulae, so let's link them statically instead. This is done by default.
     system "cmake", "-S", ".", "-B", "build",
-                    "-Dedencommon_DIR=#{buildpath}/edencommon/lib/cmake/edencommon",
                     "-DENABLE_EDEN_SUPPORT=ON",
                     "-DWATCHMAN_VERSION_OVERRIDE=#{version}",
                     "-DWATCHMAN_BUILDINFO_OVERRIDE=#{tap.user}",
                     "-DWATCHMAN_STATE_DIR=#{var}/run/watchman",
                     *std_cmake_args
-
-    # Workaround for `Process terminated due to timeout`
-    ENV.deparallelize { system "cmake", "--build", "build" }
+    system "cmake", "--build", "build"
     system "cmake", "--install", "build"
 
     path = Pathname.new(File.join(prefix, HOMEBREW_PREFIX))

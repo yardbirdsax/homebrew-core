@@ -1,18 +1,19 @@
 class Flow < Formula
   desc "Static type checker for JavaScript"
   homepage "https://flowtype.org/"
-  url "https://github.com/facebook/flow/archive/v0.187.0.tar.gz"
-  sha256 "15fec4e88beb21ebc63091f71e97f33a0453485c5fa14d811fbdcafd2444ab0b"
+  url "https://github.com/facebook/flow/archive/v0.201.0.tar.gz"
+  sha256 "74474c9cc47b87e6391895da6e23b9020086781b53dfab7585a099ac1da76568"
   license "MIT"
   head "https://github.com/facebook/flow.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "29deba8526a8223e74c6e4837070b319e0508a3c6819426af67a4606d648bc36"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "42eaa1d6b92d485f94d5e3192b8217c6fff6e31f30cb0b4498f70e388941635c"
-    sha256 cellar: :any_skip_relocation, monterey:       "8bc2e4aca6c32d96636eb628104e8e6b7cc466de37c71caada5db316407ed1cf"
-    sha256 cellar: :any_skip_relocation, big_sur:        "05c00c578005b21df8b56cce2643620c4a3a16e6c735c1b60289073607ccce08"
-    sha256 cellar: :any_skip_relocation, catalina:       "12f264c8904fd78bab64c676cf04f0f7eeaa3f7389400d659c27a39dc44bfd98"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "48eef49f87ef05f368ccace84db5c4c038e7e088e1e540c8df2c97a6bb265310"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "ad7b540c5de1d482eeb1b73fb05593830b3bd14397bfbc07d2b241423e2db235"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "d42b43b33983ff1c451a1b730de9c9fd745350809bac6f31a1be0d3a81df558a"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "0304e8f81e31de7e246ee4a1c3e0d0facdbf2e8b7896e41a5a9c7ad00efde950"
+    sha256 cellar: :any_skip_relocation, ventura:        "57dc265d1c94754dcc5dbd1133a642a165a80ccc7319e8a2b02ce225d1546985"
+    sha256 cellar: :any_skip_relocation, monterey:       "9fdd49cb7466156fedec562f982d68631e131d74c2b5839b89c3570f0178c532"
+    sha256 cellar: :any_skip_relocation, big_sur:        "66dbf50351f728afda1c65d2db019afac6ce918a9e9e7bfa955542ed547db6f7"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0be098d9e8d16520cddd1e0fc5527149309c98d5deacd0f4dd2171022f10d444"
   end
 
   depends_on "ocaml" => :build

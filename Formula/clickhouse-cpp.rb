@@ -1,31 +1,34 @@
 class ClickhouseCpp < Formula
   desc "C++ client library for ClickHouse"
   homepage "https://github.com/ClickHouse/clickhouse-cpp#readme"
-  url "https://github.com/ClickHouse/clickhouse-cpp/archive/refs/tags/v2.2.1.tar.gz"
-  sha256 "53eaccb1dbb96f82d27400a8e336bbf59c9bcb15495458c09e4c569717314f17"
+  url "https://github.com/ClickHouse/clickhouse-cpp/archive/refs/tags/v2.3.0.tar.gz"
+  sha256 "8eb8b49044247ccc57db73fdf41807a187d8a376d3469f255bab5c0eb0a64359"
   license "Apache-2.0"
   head "https://github.com/ClickHouse/clickhouse-cpp.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_monterey: "377f009e4829cbbf3fd978a5360b1a47c1661a0b863a1c2e5b4c053308d1e1e2"
-    sha256 cellar: :any,                 arm64_big_sur:  "3111e5045934df952b31dd4d85bdcf6dbe189b8ec9ecbcae411b91f6045277c2"
-    sha256 cellar: :any,                 monterey:       "b8403a8fe715ccf41b6cfe9f9f77649d5861e5dd4d9a7b9b9e690b81e7031c76"
-    sha256 cellar: :any,                 big_sur:        "157259692d2c331b507b96002924e3ae11f88da9f9c2d85761a4cf7827975a5b"
-    sha256 cellar: :any,                 catalina:       "081658e3fffc13644721bee90ece9c84079b981a90e6b0bd021334bf14b7104b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a2a024eae71d06d64c873ac160e28cf0f296557077b7ef2cede2374f01811e32"
+    sha256 cellar: :any,                 arm64_ventura:  "d416b409e0b3ea994d1862f98423903676b157bcb394b17b3ebbbd955f720620"
+    sha256 cellar: :any,                 arm64_monterey: "ad860cfc340915f420ac3a0f9f43a4ededae2af88f1f9d82d325ee78b59b7a81"
+    sha256 cellar: :any,                 arm64_big_sur:  "c1c3be5c26eba1691038d78ae71872f9b05674bde112b59f8f829045a82808a4"
+    sha256 cellar: :any,                 ventura:        "b0546b51446c0e27351f1890de99746d2fbd3b85053b8d21f299861515d15294"
+    sha256 cellar: :any,                 monterey:       "1c76150b5684c38b6cafc40fdf26a4eec68f664fab64b5cf672d9bd3623e50b0"
+    sha256 cellar: :any,                 big_sur:        "55b7fde1c2ac15a34defc526a4ccb12107c757263f5202ac7fc72d81d91ef572"
+    sha256 cellar: :any,                 catalina:       "b1a57158ed078088f38ce5da4207b4c10544e9268c35a17dd867e5788807ae7b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "59b4a9754fd3934831f20c2efe2398c4a56b4e7fb0de43aff7a50642e80b4bf6"
   end
 
   depends_on "cmake" => [:build, :test]
   depends_on "abseil"
-  depends_on "openssl@1.1"
+  depends_on "openssl@3"
 
   fails_with gcc: "5"
   fails_with gcc: "6"
 
   def install
     system "cmake", "-S", ".", "-B", "build",
-      "-DWITH_OPENSSL=ON", "-DOPENSSL_ROOT_DIR=#{Formula["openssl@1.1"].opt_prefix}", *std_cmake_args
+                    "-DWITH_OPENSSL=ON",
+                    "-DOPENSSL_ROOT_DIR=#{Formula["openssl@3"].opt_prefix}",
+                    *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
   end

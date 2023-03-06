@@ -2,9 +2,9 @@ class Puzzles < Formula
   desc "Collection of one-player puzzle games"
   homepage "https://www.chiark.greenend.org.uk/~sgtatham/puzzles/"
   # Extract https://www.chiark.greenend.org.uk/~sgtatham/puzzles/puzzles.tar.gz to get the version number
-  url "https://www.chiark.greenend.org.uk/~sgtatham/puzzles/puzzles-20220613.387d323.tar.gz"
-  version "20220613"
-  sha256 "55c9bb8310bd47bbef2e48241db96f10e38d18b91848718c45f48192d80dfe84"
+  url "https://www.chiark.greenend.org.uk/~sgtatham/puzzles/puzzles-20230305.fe40cda.tar.gz"
+  version "20230305"
+  sha256 "65a8634f0e30b35e2bb91a04cda3369e9d832ae069edc832c5dc0add354938f0"
   license "MIT"
   head "https://git.tartarus.org/simon/puzzles.git", branch: "main"
 
@@ -18,12 +18,13 @@ class Puzzles < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "78898d70b4e723eb3d1da639d006ad030cdecb063cf172f33b74595a54e54166"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "0829dbf31c926d1d5ab38f3a9fa67756138770b120b584d3cd0d7b9cc6a4b9f9"
-    sha256 cellar: :any_skip_relocation, monterey:       "34a03675e8665f28580452e1bed60137e763a9aa3af277f1e630338d6feeda7a"
-    sha256 cellar: :any_skip_relocation, big_sur:        "5bce35aebe3986e5dee56c50ee544dfcec9380c5a20c6e237292f4a3ac9cadfb"
-    sha256 cellar: :any_skip_relocation, catalina:       "3dc75b765c8f1ad509f47f98b00ba9d531f6379753841f4b35d86a724fdb471a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "4b2d91dea2ce91b42cb14c45bb2cb88b10aea1fcd46351b764fc33cdb59c4f37"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "168f7044dac99330576c9b856683c2791f95370be806ec0d8a6f5c3e245ddd49"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "c4fd754f840119b29f399d97ebac4bc17f4135506d061bcab2f364e89275db82"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "ba4c2121670ce1564ebe3f55bf1410b50b16ecca8565f293bc419290090ac585"
+    sha256 cellar: :any_skip_relocation, ventura:        "1210311dfd8f9214a6efa3fe3b1d0c3a410d544e63b605064047b1afdec4483f"
+    sha256 cellar: :any_skip_relocation, monterey:       "3ff5247c39b2dee51856da68cef268c203ea8b6874535fed3e06670741f66f19"
+    sha256 cellar: :any_skip_relocation, big_sur:        "381d219b49acd156dad13ebdf654b4a4ca556e48c751009825ee8f5b4351dc2d"
+    sha256                               x86_64_linux:   "00d3948f62b0d5b510e1baa377535ad7be73c4c2aed1471a15924af1eb4be713"
   end
 
   depends_on "cmake" => :build
@@ -38,6 +39,8 @@ class Puzzles < Formula
     depends_on "gtk+3"
     depends_on "pango"
   end
+
+  conflicts_with "samba", because: "both install `net` binaries"
 
   def install
     system "cmake", ".", *std_cmake_args

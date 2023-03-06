@@ -3,45 +3,32 @@ class Tmuxp < Formula
 
   desc "Tmux session manager. Built on libtmux"
   homepage "https://tmuxp.git-pull.com/"
-  url "https://files.pythonhosted.org/packages/bc/7e/3e13a95122e86f552f34a3a2edbbba49e87a057479f41358b6c4a7bf7393/tmuxp-1.15.0.tar.gz"
-  sha256 "2f41fdd7d33d1a067bf4def70657300deda1e0185455949959ea449b84970e5d"
+  url "https://files.pythonhosted.org/packages/ea/e3/80b5828fd233a86cb0dc43abef8df0a0e03c674ac8c2d4bc1a7726f7aa9e/tmuxp-1.27.0.tar.gz"
+  sha256 "40093eadc3588e10209095f67dad1b977747ac1e32c9843fa0d9545f7210311f"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "b8b0c7a9222fc630f4a8f2120d4004b41fd2550bc653cb4b387e1c99f19999d5"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "dfccdf61d55e542b463c13bf2b76d65686a59d8559f23181576f39112a1f0b2e"
-    sha256 cellar: :any_skip_relocation, monterey:       "4169c09c7b2279fd724b3048aa3aab8f09741e59918fa7dab1608bb9b4fb0bee"
-    sha256 cellar: :any_skip_relocation, big_sur:        "74d37c970680c2e2205270d249ed0c25b0930e5f936c12fba19cabadfc7bdd6d"
-    sha256 cellar: :any_skip_relocation, catalina:       "f8670776da89b8300dfd2a1a34ae0100735237793feb82dea93e5ed2b873e621"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7e046bc8584fc3df41b74f8e7c7b36a7d71ec9804a15144368b369f0ac8b1ee4"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "1a04489270cb9430a6901467bce1d055ae1ee1d9e8ade4fa0c0e9d9509effd19"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "866cb3e09eceaba99f2ac80dfe44190c96d44f398adfae896289aefe7aef7c27"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "38c6ffeb07dfcf49b49f4573239f4283a247b25918119a1faf86a9ef43a995b0"
+    sha256 cellar: :any_skip_relocation, ventura:        "9d79e71ee1ecc1255dbac671725d8d88632e0caea1278d533e9422715846fc27"
+    sha256 cellar: :any_skip_relocation, monterey:       "d88c05e350cacb35d855abc4f49f6e3b6b0b3630f7983597beb2b544911e5576"
+    sha256 cellar: :any_skip_relocation, big_sur:        "7be6e6856d68d51f158dd69d55f00ed89550dc9f69d8db48e1ad86f67d2b7a92"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "060589cd8ac47294b60b414fb598131505b614195854384af21972a131448083"
   end
 
-  depends_on "python@3.10"
+  depends_on "python@3.11"
+  depends_on "pyyaml"
   depends_on "tmux"
 
-  resource "click" do
-    url "https://files.pythonhosted.org/packages/59/87/84326af34517fca8c58418d148f2403df25303e02736832403587318e9e8/click-8.1.3.tar.gz"
-    sha256 "7682dc8afb30297001674575ea00d1814d808d6a36af415a82bd481d37ba7b8e"
-  end
-
   resource "colorama" do
-    url "https://files.pythonhosted.org/packages/2b/65/24d033a9325ce42ccbfa3ca2d0866c7e89cc68e5b9d92ecaba9feef631df/colorama-0.4.5.tar.gz"
-    sha256 "e6c6b4334fc50988a639d9b98aa429a0b57da6e17b9a44f0451f930b6967b7a4"
-  end
-
-  resource "kaptan" do
-    url "https://files.pythonhosted.org/packages/94/64/f492edfcac55d4748014b5c9f9a90497325df7d97a678c5d56443f881b7a/kaptan-0.5.12.tar.gz"
-    sha256 "1abd1f56731422fce5af1acc28801677a51e56f5d3c3e8636db761ed143c3dd2"
+    url "https://files.pythonhosted.org/packages/d8/53/6f443c9a4a8358a93a6792e2acffb9d9d5cb0a5cfd8802644b7b1c9a02e4/colorama-0.4.6.tar.gz"
+    sha256 "08695f5cb7ed6e0531a20572697297273c47b8cae5a63ffc6d6ed5c201be6e44"
   end
 
   resource "libtmux" do
-    url "https://files.pythonhosted.org/packages/17/3b/f97a9919864f929265decd41a30bfebd63cd26c035e11cb415060ad3b811/libtmux-0.15.1.tar.gz"
-    sha256 "54d2ee820be23a56dd1d520eb7571d79260192afedeb59098c47970a6f236c01"
-  end
-
-  resource "PyYAML" do
-    url "https://files.pythonhosted.org/packages/a0/a4/d63f2d7597e1a4b55aa3b4d6c5b029991d3b824b5bd331af8d4ab1ed687d/PyYAML-5.4.1.tar.gz"
-    sha256 "607774cbba28732bfa802b54baa7484215f530991055bb562efbed5b2f20a45e"
+    url "https://files.pythonhosted.org/packages/1f/cc/aafedc34ef147795a3f044b12c169301d3cb8e5ff046901ca8237d4fa3d6/libtmux-0.21.0.tar.gz"
+    sha256 "dc30b94ac25571c438a853ec75102fe5f1a2d7c8195b5ebdc6f71106760b15b3"
   end
 
   def install

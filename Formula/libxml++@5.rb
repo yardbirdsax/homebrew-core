@@ -11,8 +11,10 @@ class LibxmlxxAT5 < Formula
   end
 
   bottle do
+    sha256 cellar: :any,                 arm64_ventura:  "a0a175d17f147bbb84833ef4d68817287eca7f06727b079db2bff59fa68c4dac"
     sha256 cellar: :any,                 arm64_monterey: "9421a78d289abe9cbe85aae2d4b35be65d3cdc142f6c7fce8fc5e5e1d29ae747"
     sha256 cellar: :any,                 arm64_big_sur:  "28eb0093a129b7b8684db54399ccf65f57caa15534d29c91a5ee5912afcb5749"
+    sha256 cellar: :any,                 ventura:        "f264149e96b1915be258811fdf981d1a4ef791a1eb4dc70054f280e40f786a22"
     sha256 cellar: :any,                 monterey:       "4a1d6468ae69ad46ac361d401b97fd435eb152674ee17d28c1af7c182d0c4091"
     sha256 cellar: :any,                 big_sur:        "506f4ffdf7491d11af9ac6b9cb55a7e189298040a74b10e83a5159e7ca5839a7"
     sha256 cellar: :any,                 catalina:       "3fee4844226ffcd22178834583d01a4d9de309d1dccd19f15639e7391c384c0f"
@@ -22,17 +24,15 @@ class LibxmlxxAT5 < Formula
   depends_on "meson" => :build
   depends_on "ninja" => :build
   depends_on "pkg-config" => [:build, :test]
-  depends_on "python@3.10" => :build
+  depends_on "python@3.11" => :build
 
   uses_from_macos "libxml2"
 
   def install
     ENV.cxx11
-    mkdir "build" do
-      system "meson", *std_meson_args, ".."
-      system "ninja"
-      system "ninja", "install"
-    end
+    system "meson", "setup", "build", *std_meson_args
+    system "meson", "compile", "-C", "build", "--verbose"
+    system "meson", "install", "-C", "build"
   end
 
   test do

@@ -4,13 +4,17 @@ class F3d < Formula
   url "https://github.com/f3d-app/f3d/archive/refs/tags/v1.3.1.tar.gz"
   sha256 "653dc4044e14d0618c1d947a8ee85d2513e100b3fc24bd6e51830131a13e795d"
   license "BSD-3-Clause"
+  revision 1
 
   bottle do
-    sha256 cellar: :any, arm64_monterey: "eb43ad624a8cda6e60911b4de70631e5cfa71c7bc0ce2260337f1442243060f7"
-    sha256 cellar: :any, arm64_big_sur:  "267fcff261a954ec13a7cd01f59f4db0dbf01215e7df0404121edd9e88cae7c9"
-    sha256 cellar: :any, monterey:       "7e8cb99a85f499057447134306a1fc80d2a7d7a74f1dd58faa3ed633afcb90aa"
-    sha256 cellar: :any, big_sur:        "90819e0682f31fb0df1b634b0554d6cf672a37d0d2b06c0218f1d0c786565fdf"
-    sha256 cellar: :any, catalina:       "9ef83d637737e119fefc46f957d43c8d22c1e3a9fed97985919e6a7bad2da58e"
+    sha256 cellar: :any,                 arm64_ventura:  "1670039c44e7d3cf5dd1bed69f036b631ebb82eae0e7cad0a8d21e8c7dc61f58"
+    sha256 cellar: :any,                 arm64_monterey: "1730a7b915a69ef8a9369e7f032511a44bca9d280523cabaa69b2a64faeed122"
+    sha256 cellar: :any,                 arm64_big_sur:  "082b489a728ad43f9f80a8aaa3610a2028d3e2eedf8303062973625bd1348fb7"
+    sha256 cellar: :any,                 ventura:        "190ac079b6094bf7d5e1def52dcf255bf6339c4c5c6f56236ce76557f0558264"
+    sha256 cellar: :any,                 monterey:       "f7f44e7c2c788be7a6ab133c54c1aabdca2fa2aa882f9a8fdc88e8c5bc3f1c7c"
+    sha256 cellar: :any,                 big_sur:        "1978912917d63001226f844b18696ac2dee6f79e21f433d4f3c51b8090798920"
+    sha256 cellar: :any,                 catalina:       "9f118e2c5e7aeb9a84d2d04ed08fdfd7bdb922abdfd57c0c54409e3ed02e2209"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0deb4bb19364627fd611df0040de1803a623556b27f159e79e3077cf99f53f89"
   end
 
   depends_on "cmake" => :build

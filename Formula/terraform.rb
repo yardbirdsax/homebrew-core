@@ -1,8 +1,8 @@
 class Terraform < Formula
   desc "Tool to build, change, and version infrastructure"
   homepage "https://www.terraform.io/"
-  url "https://github.com/hashicorp/terraform/archive/v1.2.9.tar.gz"
-  sha256 "40aba75e2fcc3088a88b086a6038c8fb3b1dbe93ac769124c72ce1983558bec7"
+  url "https://github.com/hashicorp/terraform/archive/v1.3.9.tar.gz"
+  sha256 "243fcc54910a41b58a1c7a9be1d0f875100a68f51fb64fbe499d9003c44fbf73"
   license "MPL-2.0"
   head "https://github.com/hashicorp/terraform.git", branch: "main"
 
@@ -12,12 +12,13 @@ class Terraform < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "483a95ad0107cffbbd56d75ee9039f8f81b6f805f6c7b78ff687878a0987185b"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "07ea3c933beffa10cd07d88b687a909da2cc2f53284ab94bab0f15515168414e"
-    sha256 cellar: :any_skip_relocation, monterey:       "f10e7dfd1e76479fe7d568308349bed8f61dd97ea4b54f1c775e2625d95a29cc"
-    sha256 cellar: :any_skip_relocation, big_sur:        "3aa44b2d6b73f6aefe38bd7b18f3c954218d8c227eb30706a8b530817f96cc17"
-    sha256 cellar: :any_skip_relocation, catalina:       "86bafa862d741f18caea29a4e44a205c2212bd912a082239e92348316bc28280"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "346db9dd674f6d4ebe783b5bb32364834ae2ebd991e523d745ed3eaf56fde1ac"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "981152529294c111d8e9374e2bbe8d9cf330dedae306005d69dfc72f6652e3b3"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "be0f11caec4c8b00aa5fab878a3656ecc8c67177ce3ea8570eee0198983fa05e"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5715ffb9afd2256fd75dd35e05335bf770bc8697f5bbc6973c21c7a10c0d90dc"
+    sha256 cellar: :any_skip_relocation, ventura:        "e60a6bdff7e63d995729ddd2162ce55f3b4064e4f540181f2ac2355ee0ca77c2"
+    sha256 cellar: :any_skip_relocation, monterey:       "109cd562e856890f51e250d3dce76d0b0991c76047db8b092821f3806953ed5c"
+    sha256 cellar: :any_skip_relocation, big_sur:        "fb5ad5ce90982eeb4f4adf983b5b413ac2245e82599527000bd43818064b4d94"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "472fb3d3d1c245f395184b45ec2640ec9052c72fe5bf838cd70fd6beaf4b483e"
   end
 
   depends_on "go" => :build
@@ -37,7 +38,7 @@ class Terraform < Formula
     # https://github.com/hashicorp/terraform/issues/26532#issuecomment-720570774
     ENV["CGO_ENABLED"] = "1"
 
-    system "go", "build", *std_go_args, "-ldflags", "-s -w"
+    system "go", "build", *std_go_args(ldflags: "-s -w")
   end
 
   test do

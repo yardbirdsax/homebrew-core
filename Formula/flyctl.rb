@@ -2,8 +2,8 @@ class Flyctl < Formula
   desc "Command-line tools for fly.io services"
   homepage "https://fly.io"
   url "https://github.com/superfly/flyctl.git",
-      tag:      "v0.0.391",
-      revision: "53b6144b749f598bf68cf15e22941aafcd4499f9"
+      tag:      "v0.0.475",
+      revision: "a5acc104908d632d253d7f2757fcc7b06c14c5f2"
   license "Apache-2.0"
   head "https://github.com/superfly/flyctl.git", branch: "master"
 
@@ -13,17 +13,16 @@ class Flyctl < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "a2ca11203c12c629ab72d5be51757ea1456481128e29a9958bc176105207adc6"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "a2ca11203c12c629ab72d5be51757ea1456481128e29a9958bc176105207adc6"
-    sha256 cellar: :any_skip_relocation, monterey:       "683c6a9bdc700415b13e3c5e1ac2c40a17b633c358405a09b5e399b63c5e317e"
-    sha256 cellar: :any_skip_relocation, big_sur:        "683c6a9bdc700415b13e3c5e1ac2c40a17b633c358405a09b5e399b63c5e317e"
-    sha256 cellar: :any_skip_relocation, catalina:       "683c6a9bdc700415b13e3c5e1ac2c40a17b633c358405a09b5e399b63c5e317e"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "558749a21936111d5c1a6d353537c72f5cb1cab00243cce2be51ad2a22be8dfb"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "18f498fc102ac725f12ca9511953c0ae149957e6ed713bdb43897b88df846829"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "18f498fc102ac725f12ca9511953c0ae149957e6ed713bdb43897b88df846829"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "18f498fc102ac725f12ca9511953c0ae149957e6ed713bdb43897b88df846829"
+    sha256 cellar: :any_skip_relocation, ventura:        "4313f5b7a33b3c0548edafd51af54d453f79b7982b325ca4babe4011aace0211"
+    sha256 cellar: :any_skip_relocation, monterey:       "4313f5b7a33b3c0548edafd51af54d453f79b7982b325ca4babe4011aace0211"
+    sha256 cellar: :any_skip_relocation, big_sur:        "4313f5b7a33b3c0548edafd51af54d453f79b7982b325ca4babe4011aace0211"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "9da9de0d9720ca4c0e20fb8fa8f2a5d191191ca8bb65c416a55783ac8ff743e1"
   end
 
-  # Required latest gvisor.dev/gvisor/pkg/gohacks
-  # Try to switch to the latest go on the next release
-  depends_on "go@1.18" => :build
+  depends_on "go" => :build
 
   def install
     ENV["CGO_ENABLED"] = "0"
@@ -44,7 +43,7 @@ class Flyctl < Formula
   test do
     assert_match "flyctl v#{version}", shell_output("#{bin}/flyctl version")
 
-    flyctl_status = shell_output("flyctl status 2>&1", 1)
+    flyctl_status = shell_output("#{bin}/flyctl status 2>&1", 1)
     assert_match "Error No access token available. Please login with 'flyctl auth login'", flyctl_status
   end
 end

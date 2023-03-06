@@ -3,41 +3,28 @@ require "language/node"
 class FirebaseCli < Formula
   desc "Firebase command-line tools"
   homepage "https://firebase.google.com/docs/cli/"
-  url "https://registry.npmjs.org/firebase-tools/-/firebase-tools-11.9.0.tgz"
-  sha256 "3d44dffee4acc766242ca4ace1834236d338487b6a7303b9ce0fcf2e6e07edc9"
+  url "https://registry.npmjs.org/firebase-tools/-/firebase-tools-11.24.0.tgz"
+  sha256 "1c1c2ef32d4cf300e8eff2634fdd9645fa28c726fea019ebe1f781939edc9c2e"
   license "MIT"
   head "https://github.com/firebase/firebase-tools.git", branch: "master"
 
   bottle do
-    sha256                               arm64_monterey: "1521d51df4cf4fc33a1713ad0d6fac5e11034ba641a4f69a5ce9bb649fbf6cb6"
-    sha256                               arm64_big_sur:  "f88a6cd2bc4d70a73938042c08faea40d4c0f0a85cae8d75713ffb31050ba150"
-    sha256 cellar: :any_skip_relocation, monterey:       "830c4b1bde030eaf1799f621c3e0d8888c9dd887a27a40e2ceb03befba6b0cc5"
-    sha256 cellar: :any_skip_relocation, big_sur:        "830c4b1bde030eaf1799f621c3e0d8888c9dd887a27a40e2ceb03befba6b0cc5"
-    sha256 cellar: :any_skip_relocation, catalina:       "830c4b1bde030eaf1799f621c3e0d8888c9dd887a27a40e2ceb03befba6b0cc5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a371cc34f641c01e98cb76eb9935e835bdea20fc7879c79e0281262aa8171ad4"
+    sha256                               arm64_ventura:  "8ed09430890c48a9e662279c757000c0a40c530b43687aaf99b4512ddae9eb9a"
+    sha256                               arm64_monterey: "142d20d4975f884da2aa393f55dbbf9da10dcdbd2babb66968410d5cfe70c8e0"
+    sha256                               arm64_big_sur:  "4dcaa11d034902b11141ceed328e15f817fb4028b34ca34c391dcaeadc8337cb"
+    sha256 cellar: :any_skip_relocation, ventura:        "98ed18c0ff11792a2288ab60349a2795c2e72cacd0e5d8d2d1da0959cb0ac20a"
+    sha256 cellar: :any_skip_relocation, monterey:       "98ed18c0ff11792a2288ab60349a2795c2e72cacd0e5d8d2d1da0959cb0ac20a"
+    sha256 cellar: :any_skip_relocation, big_sur:        "98ed18c0ff11792a2288ab60349a2795c2e72cacd0e5d8d2d1da0959cb0ac20a"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "165958f985a422fe7ed0fe024c6e0a892f1249c5c4d3d4c6b68f261e2c9a2f85"
   end
 
   depends_on "node"
 
   uses_from_macos "expect" => :test
 
-  on_macos do
-    depends_on "macos-term-size"
-  end
-
   def install
     system "npm", "install", *Language::Node.std_npm_install_args(libexec)
     bin.install_symlink Dir["#{libexec}/bin/*"]
-
-    term_size_vendor_dir = libexec/"lib/node_modules/firebase-tools/node_modules/term-size/vendor"
-    term_size_vendor_dir.rmtree # remove pre-built binaries
-
-    if OS.mac?
-      macos_dir = term_size_vendor_dir/"macos"
-      macos_dir.mkpath
-      # Replace the vendored pre-built term-size with one we build ourselves
-      ln_sf (Formula["macos-term-size"].opt_bin/"term-size").relative_path_from(macos_dir), macos_dir
-    end
   end
 
   test do

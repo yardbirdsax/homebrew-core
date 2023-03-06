@@ -1,19 +1,19 @@
 class Osmcoastline < Formula
   desc "Extracts coastline data from OpenStreetMap planet file"
   homepage "https://osmcode.org/osmcoastline/"
-  url "https://github.com/osmcode/osmcoastline/archive/v2.3.1.tar.gz"
-  sha256 "ab4a94b9bc5a5ab37b14ac4e9cbdf113d5fcf2d5a040a4eed958ffbc6cc1aa63"
+  url "https://github.com/osmcode/osmcoastline/archive/v2.4.0.tar.gz"
+  sha256 "2c1a28313ed19d6e2fb1cb01cde8f4f44ece378393993b0059f447c5fce11f50"
   license "GPL-3.0-or-later"
-  revision 5
+  revision 1
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_monterey: "8cf2013bade4dab5cfac258a2dc3f8f45d81a5426b7e3d43ffea2f23a6cc88b2"
-    sha256 cellar: :any,                 arm64_big_sur:  "2d66f5eb8a2c12d2e05874d877ecdf65f01a850b8539c2374cf49398d21414bf"
-    sha256 cellar: :any,                 monterey:       "532b6f87af7c10219e791e5fb1ee6be1fb3b4cdb3e72ae0bb7e9aa82c246c8e4"
-    sha256 cellar: :any,                 big_sur:        "91fb5971b1f93694ceea006794ad55cd56be046355e0bae1b7f4200d508b8585"
-    sha256 cellar: :any,                 catalina:       "126abf7580ab4ae6aae425218176ddd9b0b44a6554d7ab06c6a0f47fd8c752d2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6fd71a1becdab054689376a0d5c7c14bcfc557d1346818afe51fe76753171163"
+    sha256 cellar: :any,                 arm64_ventura:  "269ea3be14f5395ed5e3d453937ae693470c3594e2d7389fb3180dc7e08b6c80"
+    sha256 cellar: :any,                 arm64_monterey: "17174749a13c700e3ae41146e6d69bda6ff5d8ee53be2f31c49fc9de602f3878"
+    sha256 cellar: :any,                 arm64_big_sur:  "1072decf9e48f16fe2583bed1c0f1044a2cf7e8bb9433820bfa2c9c123f7f2a2"
+    sha256 cellar: :any,                 ventura:        "04618e0e1ceed887d6cc7d5f8fb6ac601fa7cca7da3448ce22beeab44caefbd6"
+    sha256 cellar: :any,                 monterey:       "c914fa3fe6a150e9b9e3ffeec02efc4d27fb6617c88367ccfc1681b7ee56c5db"
+    sha256 cellar: :any,                 big_sur:        "481e2ac605a060679dc8472f68ccb01adcee971c5c8f00e3926014eb4e2148fa"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8026a3742b442711009fca9f49048b5c8c6e3a402dc0dc6bedc08c9f124d825c"
   end
 
   depends_on "cmake" => :build

@@ -1,8 +1,8 @@
 class Lean < Formula
   desc "Theorem prover"
   homepage "https://leanprover-community.github.io/"
-  url "https://github.com/leanprover-community/lean/archive/v3.48.0.tar.gz"
-  sha256 "07e42b5b040825b6fc2b320784541e1dcc94d189db1ef9f51573ec3eaec74727"
+  url "https://github.com/leanprover-community/lean/archive/v3.50.3.tar.gz"
+  sha256 "00316c946de2aa4f1b6655ea8bd92b21ff184afd305891e6803c7631753f5b87"
   license "Apache-2.0"
   head "https://github.com/leanprover-community/lean.git", branch: "master"
 
@@ -20,13 +20,13 @@ class Lean < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_monterey: "d0afd57b78f244e7e238b6c9c5e8e2cb9139bd626f254d7841fa1108aa62ebe0"
-    sha256 cellar: :any,                 arm64_big_sur:  "42d22be3d5d21532f4abb0e68ab738605cad858faa0d490d21cc5764398b8e2f"
-    sha256 cellar: :any,                 monterey:       "db773f3b61ae44d9d40a6f33880c917a9c8bb696789a57e9bd2ec8046ef201b9"
-    sha256 cellar: :any,                 big_sur:        "ce9af32ea03cef2cd8f88656c4500e5da674b22ea654a43d334818ae6bfe82a5"
-    sha256 cellar: :any,                 catalina:       "c73d8d54f020206e7eaeb0439471091485950906e588ee1055848f6d536aead0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d01d00611801cf87a1e16a54ed954243cea3ea3dd500b65f7be7e5d2c883039b"
+    sha256 cellar: :any,                 arm64_ventura:  "8dbb51ed79cbfa8521ba6827fbcd3a19bc0b0c7a4caf1fc2084c769f0b07d682"
+    sha256 cellar: :any,                 arm64_monterey: "52f3fbb2af5e69d02ccccdef798dbc0300ce7a399afafd49ef9ccd4bc657cb4a"
+    sha256 cellar: :any,                 arm64_big_sur:  "bb0331dbdcd1de6b8f2d24938ef96658ebd10de90fcb6e084a297994473b8bbc"
+    sha256 cellar: :any,                 ventura:        "c085fa626d89dd857de35c19df59ea13d835bc3a595824b1b78bf364b950b24f"
+    sha256 cellar: :any,                 monterey:       "bcbceb47384c0e6903a61874d16485dc2a3d5a5a1c684e05a1baae01ed2356e1"
+    sha256 cellar: :any,                 big_sur:        "d1076aebc8c7f3c834578c542e4bc01b5e55e327b0363494a2bdf9027cfa17d2"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8be25df029dfc12cd9f95a2bde42fe0e37e88fd8294adb62a0533356764635c7"
   end
 
   depends_on "cmake" => :build

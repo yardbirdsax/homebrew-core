@@ -1,10 +1,10 @@
 class Rsync < Formula
   desc "Utility that provides fast incremental file transfer"
   homepage "https://rsync.samba.org/"
-  url "https://rsync.samba.org/ftp/rsync/rsync-3.2.6.tar.gz"
-  mirror "https://mirrors.kernel.org/gentoo/distfiles/rsync-3.2.6.tar.gz"
-  mirror "https://www.mirrorservice.org/sites/rsync.samba.org/rsync-3.2.6.tar.gz"
-  sha256 "fb3365bab27837d41feaf42e967c57bd3a47bc8f10765a3671efd6a3835454d3"
+  url "https://rsync.samba.org/ftp/rsync/rsync-3.2.7.tar.gz"
+  mirror "https://mirrors.kernel.org/gentoo/distfiles/rsync-3.2.7.tar.gz"
+  mirror "https://www.mirrorservice.org/sites/rsync.samba.org/rsync-3.2.7.tar.gz"
+  sha256 "4e7d9d3f6ed10878c58c5fb724a67dacf4b6aac7340b13e488fb2dc41346f2bb"
   license "GPL-3.0-or-later"
 
   livecheck do
@@ -13,16 +13,18 @@ class Rsync < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_monterey: "184eaa2a354031d53d8554f05e83b8c50039d14559e59fc8d558cacaaea19867"
-    sha256 cellar: :any,                 arm64_big_sur:  "f981530420a9c2a55090a9c314ad5d824b38832340551541956eaf907df38d0a"
-    sha256 cellar: :any,                 monterey:       "5bcc10544cfc7c573aca88a95329c8a1ef87c57d34bc33bf7ce79c491e37cb7b"
-    sha256 cellar: :any,                 big_sur:        "568310e2736cf2d7ea4da24f59b4f9e63756764ccee5f61390ccd518c980c546"
-    sha256 cellar: :any,                 catalina:       "7de1d3454f65f6b0d22544583de6b6ca568695adeadce54e36a3798ee0dd0ef6"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ecbd308c771400561a49c9aa15a0738b3875cfe1c0b52b85744d160cca7494dc"
+    sha256 cellar: :any,                 arm64_ventura:  "e3b86c84539aee3348b90d9d36d0f21d1243fa558aaf06f8801d9e5d56d2fd65"
+    sha256 cellar: :any,                 arm64_monterey: "b7a8807e03cbb7a2cf29a866a3e3939b62adf9b2899207db74a41f7d4a2ceca3"
+    sha256 cellar: :any,                 arm64_big_sur:  "8d32a4bab7c933a71f38ec82519cbc2059f5561a2b6a65d576000f602ae53ac5"
+    sha256 cellar: :any,                 ventura:        "46580672114f2bad46e724fe3f24ee42512b2fb6509e52736d9c0121e5dacbba"
+    sha256 cellar: :any,                 monterey:       "188b82cf9ff79825f8a03c4729d2b45b259c7ab1e3cdecbe5b903c5c82b09b3b"
+    sha256 cellar: :any,                 big_sur:        "80b623812954e23d5f40849a46baa66b064358dbbc88257e2c60c175cfaa5f9f"
+    sha256 cellar: :any,                 catalina:       "40333c17217324536b17db6a7de53915b9a86336ecac91e71c1131e5f71a67e0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "a91692c5fc5b38bc0d8f86fde53870a1fce5bf7ce4353a4d8ae09c556b65baa8"
   end
 
   depends_on "lz4"
-  depends_on "openssl@1.1"
+  depends_on "openssl@3"
   depends_on "popt"
   depends_on "xxhash"
   depends_on "zstd"

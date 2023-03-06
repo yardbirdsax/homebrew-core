@@ -3,18 +3,19 @@ class AwsSdkCpp < Formula
   homepage "https://github.com/aws/aws-sdk-cpp"
   # aws-sdk-cpp should only be updated every 10 releases on multiples of 10
   url "https://github.com/aws/aws-sdk-cpp.git",
-      tag:      "1.9.340",
-      revision: "028f4ca29fe7f6c613744a3d8ec23c4ead45357f"
+      tag:      "1.11.30",
+      revision: "1729b68bfcbfdd28ec5de3a94d5792ec4a54d01d"
   license "Apache-2.0"
   head "https://github.com/aws/aws-sdk-cpp.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any,                 arm64_monterey: "36acd7c70f79c391a61361745f2b7538d489695d6ee4fc8da5fd682ab1c8e250"
-    sha256 cellar: :any,                 arm64_big_sur:  "6c954af60347dfac5a61209994f0e0616aa72664996b5d0883fc36e1d751afb8"
-    sha256 cellar: :any,                 monterey:       "56808c4e37547dc68c7d709a49cc088f0ab43fa30adfcc70252bcb957f4c0d16"
-    sha256 cellar: :any,                 big_sur:        "9af2ebaa7a2ff95e23bea30005834d853f7979a7b18a2a39983f7f5c0322b2ba"
-    sha256 cellar: :any,                 catalina:       "36889643c101c27131519221b89ecce45a94130c4e082bb43e8f4fefff47c9f3"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ebb484f372f672867044f3e792f51911d628ee2591f26c18745c59b0524eec31"
+    sha256 cellar: :any,                 arm64_ventura:  "8aa9867a3aa62098a266e2ebeb300059d8baee0c95d72c7d68b5f1d62f49314a"
+    sha256 cellar: :any,                 arm64_monterey: "c4847e1e820bb6443213a86cd2c1d7e91f14a73643d43b16a68ceb5f7051fe80"
+    sha256 cellar: :any,                 arm64_big_sur:  "0415cbf6902b4faaf38a2e18768983e802aa474ef4fe92041d00e5015394569c"
+    sha256 cellar: :any,                 ventura:        "a78a4e19d098aa19cb906fb9a76928ac59f9d169334d7dcbeb41a7e531ee4d48"
+    sha256 cellar: :any,                 monterey:       "1fbf46af20812f671ee8f87426f8ff64c5843e4abcdd719db7dd07e88ac372de"
+    sha256 cellar: :any,                 big_sur:        "2c97fc4bdc2beaf060d07be5608d23234fa746d8f4cfb7c5189915cd13e5d534"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7000e684b3db5d0e8930cd46bdb6d2febc557d690a7efdcd4500b4fd4f6e7941"
   end
 
   depends_on "cmake" => :build
@@ -25,14 +26,16 @@ class AwsSdkCpp < Formula
 
   def install
     ENV.append "LDFLAGS", "-Wl,-rpath,#{rpath}"
-    mkdir "build" do
-      args = %w[
-        -DENABLE_TESTING=OFF
-      ]
-      system "cmake", "..", *std_cmake_args, *args
-      system "make"
-      system "make", "install"
-    end
+    # Avoid OOM failure on Github runner
+    ENV.deparallelize if OS.linux? && ENV["HOMEBREW_GITHUB_ACTIONS"]
+    # Work around build failure with curl >= 7.87.0.
+    # TODO: Remove when upstream PR is merged and in release
+    # PR ref: https://github.com/aws/aws-sdk-cpp/pull/2265
+    ENV.append_to_cflags "-Wno-deprecated-declarations" unless OS.mac?
+
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args, "-DENABLE_TESTING=OFF"
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
 
     lib.install Dir[lib/"mac/Release/*"].select { |f| File.file? f }
   end

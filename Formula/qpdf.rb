@@ -1,17 +1,18 @@
 class Qpdf < Formula
   desc "Tools for and transforming and inspecting PDF files"
   homepage "https://github.com/qpdf/qpdf"
-  url "https://github.com/qpdf/qpdf/releases/download/v11.0.0/qpdf-11.0.0.tar.gz"
-  sha256 "8d99e98893f68f52ca3b579770e7e6f4c96612084d6a0e7e05854a6d631b8fe6"
+  url "https://github.com/qpdf/qpdf/releases/download/v11.3.0/qpdf-11.3.0.tar.gz"
+  sha256 "547cee67de77b5c4ef4917e57d2db9c848cfe3aa950361f68d36367a3a03936e"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any,                 arm64_monterey: "2e6ee49528ec16b9b75803ca18d8b1c3f5fb04007a951c5ff26f199791aed0ba"
-    sha256 cellar: :any,                 arm64_big_sur:  "c9df69b0d26c61cc6fe23ec8f31e541f2c22daa030bf66752af54b28efb2ef8d"
-    sha256 cellar: :any,                 monterey:       "6249200d021e01a2e6ddf9ed17cabfe6f31eb105d97a6c4afda37342b1660c7f"
-    sha256 cellar: :any,                 big_sur:        "b665d2dccb58f69fc0bf60acdaecfbf8e4e346ba796d143a8574e01688cc645b"
-    sha256 cellar: :any,                 catalina:       "af97af23f5e4311ca937b1c5b5da867b7d8947ace7f082ad88ae726f9c984485"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "946de1ef971947ffba69831c2923a458228d6b716389efb79ff4106d64903233"
+    sha256 cellar: :any,                 arm64_ventura:  "a4529c932fbece58c7e9f724a8509a1c1b1d60981f0a5d00c5e4470e786eccd9"
+    sha256 cellar: :any,                 arm64_monterey: "e1fe188290f9e218bdd20f52ea0d1a0d394adb2c67d886c89d359a610a683b76"
+    sha256 cellar: :any,                 arm64_big_sur:  "fd9162c3ae0bca6c8b6b13bd820a8f05597bfe42c34226d86279608b442f0ba5"
+    sha256 cellar: :any,                 ventura:        "e5c6e6ca73f18b9a0c18ab5624d12936788e8ec0498aaecc4d3982d5faefd669"
+    sha256 cellar: :any,                 monterey:       "591917b6c49a5884be4fd3dbdceb576c24d23feab4d06153d079fad0ccc8f66f"
+    sha256 cellar: :any,                 big_sur:        "d93fdf642414b2d8a4a3e48e6a088add5a42c1453710a8ca05759b892fedf4fe"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c157b9f90eda69e4c346c57e72edd536e3e6e5d75861fd696e7a18085478b99f"
   end
 
   depends_on "cmake" => :build

@@ -1,8 +1,8 @@
 class Gdcm < Formula
   desc "Grassroots DICOM library and utilities for medical files"
   homepage "https://sourceforge.net/projects/gdcm/"
-  url "https://github.com/malaterre/GDCM/archive/v3.0.18.tar.gz"
-  sha256 "d3e9d83d73f05f5d33a72725d3cf7c33adaa2fbbf136a2dd95087b47933a4cfc"
+  url "https://github.com/malaterre/GDCM/archive/v3.0.21.tar.gz"
+  sha256 "7c456162a2de722cc90e3bdc46900302b1c367540a7131268d7bfd2a819cb5ed"
   license "BSD-3-Clause"
 
   livecheck do
@@ -11,12 +11,13 @@ class Gdcm < Formula
   end
 
   bottle do
-    sha256 arm64_monterey: "2882fc6066cfc778616c61ebe61b8dd6a084ca9dd49249c267210d3aca07fb08"
-    sha256 arm64_big_sur:  "cfae7d30d79a63551b847a9db691a7f9e98041a64099ce483904a85217a05e3c"
-    sha256 monterey:       "524019259dd16e288c90471294ea1b37e956eda37736c8a2916baba8495786d2"
-    sha256 big_sur:        "5fc7c2b3091088312fc4ae54e1c954ba89c4643a090b490fea8cc4e5ad58d7bd"
-    sha256 catalina:       "4fa9fa2c5faf80ba8aa2ec3e810f77d9e45e9bbafa9d2f6147001762d3eab2ba"
-    sha256 x86_64_linux:   "b43a4f216c9ff4a6c668fdec953efe70b7a51e441ad9ad833d46ee292b1805e6"
+    sha256 arm64_ventura:  "3bf3bf38b2a89d79576b5cf2bdd8f68ad72047fb9029d4c6e69e5af41af74706"
+    sha256 arm64_monterey: "01dc34dbaadaed73e79c49a30c4d402c88f971285c88d499477853c70ab8a01a"
+    sha256 arm64_big_sur:  "040c819850b7d276ce72e0ea7fc4544379a286660c0b39adde3c362019bc70d2"
+    sha256 ventura:        "bb5d8f691405c5067deb7176a10d380a9e12906b80ba00d07a0a988f1ceb091c"
+    sha256 monterey:       "2cffcbfc838b33f99c8bf97a22e9f5880310a2d3e30709b363cade4b7554df2c"
+    sha256 big_sur:        "03823f279d09ec76c9e24c14f20435219aefc6839bcb06e469f0ae5a4d69a348"
+    sha256 x86_64_linux:   "7610b3e286220a7a88e177d3b970c69ae83da1464fbbeec31f48f9fa1b478b50"
   end
 
   depends_on "cmake" => :build
@@ -25,7 +26,7 @@ class Gdcm < Formula
   depends_on "swig" => :build
   depends_on "openjpeg"
   depends_on "openssl@1.1"
-  depends_on "python@3.10"
+  depends_on "python@3.11"
 
   uses_from_macos "expat"
   uses_from_macos "zlib"
@@ -37,7 +38,7 @@ class Gdcm < Formula
   fails_with gcc: "5"
 
   def python3
-    which("python3.10")
+    which("python3.11")
   end
 
   def install

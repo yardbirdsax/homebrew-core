@@ -1,18 +1,19 @@
 class Pangomm < Formula
   desc "C++ interface to Pango"
   homepage "https://www.pango.org/"
-  url "https://download.gnome.org/sources/pangomm/2.50/pangomm-2.50.0.tar.xz"
-  sha256 "a27aa77e017b9afce9e751d85bd1cf890abbb3a58bf59d0fac917eef82db3b5b"
+  url "https://download.gnome.org/sources/pangomm/2.50/pangomm-2.50.1.tar.xz"
+  sha256 "ccc9923413e408c2bff637df663248327d72822f11e394b423e1c5652b7d9214"
   license "LGPL-2.1-only"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any, arm64_monterey: "59de56c6a4d3f2b8a15333356753d1963837460e83a03bcfd573989b52b5af31"
-    sha256 cellar: :any, arm64_big_sur:  "c0a230a9aac8bbbb950d58676b14232ebc7a3361fd42b6bc55bbb4cfc505f48a"
-    sha256 cellar: :any, monterey:       "38fd4cffb42aa0aeee7b836b245d932681616bdaa99940289977cb3a62d9beba"
-    sha256 cellar: :any, big_sur:        "bdcec6b945cca9af6c9aaa8d7ae65ddd18f16b3acc5d053daaf6d5c111c8f20a"
-    sha256 cellar: :any, catalina:       "383a8e00e5459b350d53228fd5623d52bd9aa618eeeb8410ab7255158a5d3a74"
-    sha256               x86_64_linux:   "fa8fb430d4fc22f2f493e8ced97e2518f6403cbca50879eb14ec91f327217cda"
+    sha256 cellar: :any, arm64_ventura:  "240d818a0f389065c06f1b6cb55a7a65b28181717dd4ee5017d93bf7e8575608"
+    sha256 cellar: :any, arm64_monterey: "cd508f02963834ff60dc5b02ccd2f6516373c6f63698b153bae6f5521b6fbe56"
+    sha256 cellar: :any, arm64_big_sur:  "8133d833f805dcf72e25e766fe02feecd52ba937bc5ea6fd9a49cedad914fc41"
+    sha256 cellar: :any, ventura:        "3243026755b4a058991bb6bcdbbe8a2504255e3c324eafc2c55a538c2ac6e7d8"
+    sha256 cellar: :any, monterey:       "e460a123e6a56d4ceea894435fa9ac65acc3f9875708f9d24b0f5a75e11d43b2"
+    sha256 cellar: :any, big_sur:        "9044bfea7d53b7916e7e5ba23da64b71b4a3b01e505553af8b07760a889b4f47"
+    sha256 cellar: :any, catalina:       "72142eb96fbd86564dabeab768e93a0e7b271c328a25ed9288eb129779e983d1"
+    sha256               x86_64_linux:   "50fbc4de8c8a95af450e0ee638e02e8a20ac5ace7cb15a2d334143b1bade658d"
   end
 
   depends_on "meson" => :build

@@ -1,23 +1,22 @@
 class Purescript < Formula
   desc "Strongly typed programming language that compiles to JavaScript"
   homepage "https://www.purescript.org/"
-  url "https://hackage.haskell.org/package/purescript-0.15.4/purescript-0.15.4.tar.gz"
-  sha256 "df279079a7c78c5b1fa813846797e696787f5dd567b1b6e042f7ab6a2701868f"
+  # TODO: Try to switch `ghc@9.2` to `ghc` when purescript.cabal allows base>=4.17
+  url "https://hackage.haskell.org/package/purescript-0.15.7/purescript-0.15.7.tar.gz"
+  sha256 "8e50c34e01897ed7f2db867f6248a054ad93cd5bf8682c832a0ebbdbeb9b32cf"
   license "BSD-3-Clause"
-  revision 1
   head "https://github.com/purescript/purescript.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "7d2d01f66f7cb985296b1b4801db52a3c47686bba33b4cf36ba8cb405bd45c76"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "64c3b8e647e8fb4b350752742f0368ad53ca0e384a6f0658118d9eb8d3f28a1d"
-    sha256 cellar: :any_skip_relocation, monterey:       "d7ad06ab5c115f7edd2db2644aeeec186cf969ebc7933430a27a0d47cb340236"
-    sha256 cellar: :any_skip_relocation, big_sur:        "ebda8f4eb5ce1151fb27645529426d4c380a3cd3bd6c0782e429985d1167dd58"
-    sha256 cellar: :any_skip_relocation, catalina:       "e9ebb7b6dab162ee3ce9e057f39328a53f15fa7b7558af6e6ea1d8cda9b6cf65"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "67a8df7632e6bd654de3a2963fe3739d6441a7054538a4c1bf6eb7207d535bea"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "4c7879d45f85d8c5bad87eaa4fc6b863c532d922c3d659535378aeedf98c57f2"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "6ac93f3d18b1a926af83d4147660d4c063e3a7c849d7f06640b56a0222b2bae7"
+    sha256 cellar: :any_skip_relocation, ventura:        "a39c1e703d789d9a53de221abcbec712fec5cead9635bbacd3cd1eff5610baab"
+    sha256 cellar: :any_skip_relocation, monterey:       "cd49695ea28dcf2a9293a90cf9a48b0445bfdf7bf0f011f89f1ac542a0ddf287"
+    sha256 cellar: :any_skip_relocation, big_sur:        "57743bb4580e43a26fb9a3a109fe632e3d93a79953e927baf83faa47d4a8e94c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3d13222cbdbca1e5bb032f4ba1b2433a7cf8a2628ffbfa210f8160df6796bbc5"
   end
 
-  depends_on "ghc" => :build
+  depends_on "ghc@9.2" => :build
   depends_on "haskell-stack" => :build
 
   uses_from_macos "ncurses"

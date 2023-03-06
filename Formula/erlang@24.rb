@@ -2,8 +2,8 @@ class ErlangAT24 < Formula
   desc "Programming language for highly scalable real-time systems"
   homepage "https://www.erlang.org/"
   # Download tarball from GitHub; it is served faster than the official tarball.
-  url "https://github.com/erlang/otp/releases/download/OTP-24.3.4.5/otp_src_24.3.4.5.tar.gz"
-  sha256 "0b57d49e62958350676e8f32a39008d420dca4bc20f2d7e38c0671ab2ba62f14"
+  url "https://github.com/erlang/otp/releases/download/OTP-24.3.4.9/otp_src_24.3.4.9.tar.gz"
+  sha256 "f1365d55cde2aeb170fb5b25ec73dcf691ef94771b8601b61c078941e2cbd78f"
   license "Apache-2.0"
 
   livecheck do
@@ -12,22 +12,26 @@ class ErlangAT24 < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_monterey: "38448ebb0c645e8d9779397779bee3247026af5c183821b1d1ce716be854a5aa"
-    sha256 cellar: :any,                 arm64_big_sur:  "2314b8dd30f47b8cf38a4dcb62baaddbed3c5f98bf817478842423e3166eaada"
-    sha256 cellar: :any,                 monterey:       "bc4b810f408cb78251675728b3eae68196d51d82d5d9391fa7bc580d91c563f3"
-    sha256 cellar: :any,                 big_sur:        "353a7ddc38f0f1efbab4847792ed2f4ac4b1cddbb899c11c86eeb968859ec98e"
-    sha256 cellar: :any,                 catalina:       "b35d03ab317f9c1feb07fe0dd686b004557f663b828d147d8a72e346cc56c8f0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "96f95df4665e78f05819703019d674d0141a3a7c089462feb89610b7242fa62f"
+    sha256 cellar: :any,                 arm64_ventura:  "145db8a44cbb333736b1553b253467716112d4e1ba4955166ff04fa23691e7ba"
+    sha256 cellar: :any,                 arm64_monterey: "17dd0ac3baa2ed341c383164123385646e64f33ca8adb05719b3f4b56e90f2a8"
+    sha256 cellar: :any,                 arm64_big_sur:  "d7597fcfa43c6710172b36b0be9b360d2ab78320d2dd3cd2a374e2ad408c1f97"
+    sha256 cellar: :any,                 ventura:        "c089a3129981b70deb975eace80e7fd6763ddf712af75b2946f7cd74b6e81a57"
+    sha256 cellar: :any,                 monterey:       "8fd8b79ec54a70c893f908bcc5afc76b5e3ae703afcdc4b71d64bd7e39fa229f"
+    sha256 cellar: :any,                 big_sur:        "6a02117f5968710111d4b4f83eac4903edb963fa1f43e735ac4a1e63bb924233"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "de3b48ac88ed4f0d1e04d3ee4f50ff6d2acfb033b2c708c966a21de696c7f926"
   end
 
   keg_only :versioned_formula
 
   depends_on "openssl@3"
+  depends_on "unixodbc"
   depends_on "wxwidgets" # for GUI apps like observer
 
+  uses_from_macos "libxslt" => :build # for xsltproc
+
   resource "html" do
-    url "https://github.com/erlang/otp/releases/download/OTP-24.3.4.5/otp_doc_html_24.3.4.5.tar.gz"
-    sha256 "fdbf945ba3a9cfd8ac59e8d6888cb18983e4e99982fbc0ea028e7e014aaaa641"
+    url "https://github.com/erlang/otp/releases/download/OTP-24.3.4.9/otp_doc_html_24.3.4.9.tar.gz"
+    sha256 "8023ac1a51fa3bd60242c691262e1a4352779c0f97da23785d0b0e4a9d457f14"
   end
 
   def install
@@ -48,6 +52,7 @@ class ErlangAT24 < Formula
       --enable-smp-support
       --enable-threads
       --enable-wx
+      --with-odbc=#{Formula["unixodbc"].opt_prefix}
       --with-ssl=#{Formula["openssl@3"].opt_prefix}
       --without-javac
     ]
@@ -63,7 +68,7 @@ class ErlangAT24 < Formula
     system "make", "install"
 
     # Build the doc chunks (manpages are also built by default)
-    system "make", "docs", "DOC_TARGETS=chunks"
+    ENV.deparallelize { system "make", "docs", "DOC_TARGETS=chunks" }
     ENV.deparallelize { system "make", "install-docs" }
 
     doc.install resource("html")

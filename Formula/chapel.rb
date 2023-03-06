@@ -1,26 +1,26 @@
 class Chapel < Formula
   desc "Programming language for productive parallel computing at scale"
   homepage "https://chapel-lang.org/"
-  url "https://github.com/chapel-lang/chapel/releases/download/1.28.0/chapel-1.28.0.tar.gz"
-  sha256 "64eacfb5915e1b3c487e865f819faf9bb8771c9f83aac6512698ded1baab250e"
+  url "https://github.com/chapel-lang/chapel/releases/download/1.29.0/chapel-1.29.0.tar.gz"
+  sha256 "f87bc7285c4641ed540f806c63ab904137b650b1e232a11c15f76e874e079804"
   license "Apache-2.0"
   head "https://github.com/chapel-lang/chapel.git", branch: "main"
 
   bottle do
-    sha256 arm64_monterey: "ee7336633417e084163e3281cc857bb26e35419287bf0d8fda10de6401f70334"
-    sha256 arm64_big_sur:  "fd09c428382d29c0d6971fb6d419f153be564fb032b67099cda5a6759972d24b"
-    sha256 monterey:       "b0a42a389cb3cdefb3406c0f2b10272a2ad8997133e7eaf9c12019380171eede"
-    sha256 big_sur:        "c16b22bd51d93b6030d49d67244329f86461c08296286de6efe7fc0471227597"
-    sha256 catalina:       "414bd03e035995b787ba6bac49c7357997e9bf6e3350dfde2da4f156e6594146"
-    sha256 x86_64_linux:   "917f9c0b5d6f95315e9802bd6cde35e903120cff619077ccbd06c19c2a434e8b"
+    rebuild 1
+    sha256 arm64_ventura:  "8334d9cce471a9bacfbe8552ead3d28d730e7af0c96c036d47f23679b41aa18a"
+    sha256 arm64_monterey: "8f39f5b62a3c929c9e666279adc377f6f1427e3d17be7fc80a0744a6f061229e"
+    sha256 arm64_big_sur:  "4bc63c52fb948046a29604fdda5b16943c3e3af8de56cb668c1560f2d68b2503"
+    sha256 ventura:        "629240cca25b97de4712b70ca3c12dc2b45cf491f79bf3db76ecdb9e39be6e81"
+    sha256 monterey:       "c13b6f38cc00a193ee94983c3e512e329b4f33358263feaa84a9dec24595015d"
+    sha256 big_sur:        "8170472696b28130225bb6436d07157af4fee7874b4833806a6c0aead3013b73"
+    sha256 x86_64_linux:   "d8c10f52877206a51e095ec1cf3d515b90cdc4c168f34d777e5e7ea154f642eb"
   end
 
+  depends_on "cmake"
   depends_on "gmp"
-  # Chapel only supports  LLVM 14 and older. When LLVM15 releases,  our formula would need to change
-  # this line to llvm@14.
-  depends_on "llvm"
-
-  depends_on "python@3.10"
+  depends_on "llvm@14"
+  depends_on "python@3.11"
 
   # LLVM is built with gcc11 and we will fail on linux with gcc version 5.xx
   fails_with gcc: "5"
@@ -37,8 +37,8 @@ class Chapel < Formula
 
   def install
     # Always detect Python used as dependency rather than needing aliased Python formula
-    python = "python3.10"
-    # It should be noted that this will expand to: 'for cmd in python3.10 python3 python python2; do'
+    python = "python3.11"
+    # It should be noted that this will expand to: 'for cmd in python3.11 python3 python python2; do'
     # in our find-python.sh script.
     inreplace "util/config/find-python.sh", /^(for cmd in )(python3 )/, "\\1#{python} \\2"
 

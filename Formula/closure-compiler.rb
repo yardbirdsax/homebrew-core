@@ -1,8 +1,8 @@
 class ClosureCompiler < Formula
   desc "JavaScript optimizing compiler"
   homepage "https://developers.google.com/closure/compiler"
-  url "https://search.maven.org/remotecontent?filepath=com/google/javascript/closure-compiler/v20220905/closure-compiler-v20220905.jar"
-  sha256 "fb57fa20b7a830efba6beb8bdf2f793c06dccabd8a5e1d323107f3b147028341"
+  url "https://search.maven.org/remotecontent?filepath=com/google/javascript/closure-compiler/v20230228/closure-compiler-v20230228.jar"
+  sha256 "8fa53351d2b7e9769697fed4e323fac2fd216e02d95136ed0f8a1d357f9bc307"
   license "Apache-2.0"
 
   livecheck do
@@ -11,7 +11,13 @@ class ClosureCompiler < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, all: "f7c49d8547d5af6c0caecb678be725e644911b6f147367889e15e0bc33bf141a"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "8b4d8a76512026d3c59aec84ed9b8986eb9825548616e14725895fde20fe87a0"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "8b4d8a76512026d3c59aec84ed9b8986eb9825548616e14725895fde20fe87a0"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "8b4d8a76512026d3c59aec84ed9b8986eb9825548616e14725895fde20fe87a0"
+    sha256 cellar: :any_skip_relocation, ventura:        "8b4d8a76512026d3c59aec84ed9b8986eb9825548616e14725895fde20fe87a0"
+    sha256 cellar: :any_skip_relocation, monterey:       "8b4d8a76512026d3c59aec84ed9b8986eb9825548616e14725895fde20fe87a0"
+    sha256 cellar: :any_skip_relocation, big_sur:        "8b4d8a76512026d3c59aec84ed9b8986eb9825548616e14725895fde20fe87a0"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "e113b3243041ff959f785c31e26efb8a6813a6c6e93ff624c74a85afd378f252"
   end
 
   depends_on "openjdk"

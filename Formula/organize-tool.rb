@@ -8,17 +8,21 @@ class OrganizeTool < Formula
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "028d514ae49e3a1e99b5f9c1b8748f17bd10302e369e6b41f496562de800fe28"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "4a5b9932fe5918c9ff704c4d98cd36495fd550432f626552e14f102e8bc883f4"
-    sha256 cellar: :any_skip_relocation, monterey:       "083006c6582fa0d27a01689fdfe84bd61136fadacf2e969346baf8bd3274e259"
-    sha256 cellar: :any_skip_relocation, big_sur:        "5b7850b5e1e8f232a5d28b012f775ffa30bee1a263c7ab3da3fe32df9df00e98"
-    sha256 cellar: :any_skip_relocation, catalina:       "ad51cd2567cb6322a682a59923a21d2fca22b5f62d6205bf5b58333f5496f97f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "677d372a36d7fe3d6f1c04e87c26c9f973a41b95221d4250ec131a9bdf490f4d"
+    rebuild 3
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "e743e2c82e800ba3b7373922afbdaf37b92ef914fac3767d4e85523a068ed876"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "008e3e92d26913fb599ce0d940c533039c2dbd0e97e7490e952080a62dc4ce2e"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "9d84cd1e40ee50029aa037d45e5d78c86a9859b82fde2caae666c504e5a79018"
+    sha256 cellar: :any_skip_relocation, ventura:        "7f3b4ab25187f9226eec8c859a78a177e18fc7a7f0059a177a31eb9cbc038f10"
+    sha256 cellar: :any_skip_relocation, monterey:       "44a1669f4476b6c61dca27601ad5593811797053e34a806b65c2a2aa6e3da813"
+    sha256 cellar: :any_skip_relocation, big_sur:        "968cccc0730921ce26df6a7e4974d6fb1a77c52f6e6a935f3e50da173ab4ca46"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "065a5a465a094371fc84033efb14e049df48f3db8dd3c80e66cb21049d0adae3"
   end
 
   depends_on "freetype"
   depends_on "openjpeg"
-  depends_on "python@3.10"
+  depends_on "pygments"
+  depends_on "python@3.11"
+  depends_on "pyyaml"
   depends_on "six"
 
   resource "appdirs" do
@@ -61,16 +65,6 @@ class OrganizeTool < Formula
     sha256 "7f91197cc9e48f989d12e4e6fbc46495c446636dfc81b9ccf50bb0ec74b91d4b"
   end
 
-  resource "Pygments" do
-    url "https://files.pythonhosted.org/packages/e0/ef/5905cd3642f2337d44143529c941cc3a02e5af16f0f65f81cbef7af452bb/Pygments-2.13.0.tar.gz"
-    sha256 "56a8508ae95f98e2b9bdf93a6be5ae3f7d8af858b43e02c5a2ff083726be40c1"
-  end
-
-  resource "PyYAML" do
-    url "https://files.pythonhosted.org/packages/36/2b/61d51a2c4f25ef062ae3f74576b01638bebad5e045f747ff12643df63844/PyYAML-6.0.tar.gz"
-    sha256 "68fb519c14306fec9720a2a5b45bc9f0c8d1b9c72adf45c37baedfcd949c35a2"
-  end
-
   resource "rich" do
     url "https://files.pythonhosted.org/packages/bb/2d/c902484141330ded63c6c40d66a9725f8da5e818770f67241cf429eef825/rich-12.5.1.tar.gz"
     sha256 "63a5c5ce3673d3d5fbbf23cd87e11ab84b6b451436f1b7f19ec54b6bc36ed7ca"
@@ -92,7 +86,7 @@ class OrganizeTool < Formula
   end
 
   def install
-    venv = virtualenv_create(libexec, "python3.10")
+    venv = virtualenv_create(libexec, "python3.11")
     dependencies = resources.map(&:name).to_set
     if OS.linux?
       # `macos-tags` and its dependencies are only needed on macOS

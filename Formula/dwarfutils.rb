@@ -1,8 +1,8 @@
 class Dwarfutils < Formula
   desc "Dump and produce DWARF debug information in ELF objects"
   homepage "https://www.prevanders.net/dwarf.html"
-  url "https://www.prevanders.net/libdwarf-0.4.2.tar.xz"
-  sha256 "c4369b6d9a929cb9e206f0cd65c325e76bbd1e66d49da19da5e7bc0cb8e6841a"
+  url "https://www.prevanders.net/libdwarf-0.6.0.tar.xz"
+  sha256 "8d6f2e67ac6fae59c7019bf41b58fa620187a136cd5977e117f15b820ffc7e75"
   license all_of: ["BSD-2-Clause", "LGPL-2.1-or-later", "GPL-2.0-or-later"]
   version_scheme 1
 
@@ -12,12 +12,13 @@ class Dwarfutils < Formula
   end
 
   bottle do
-    sha256 arm64_monterey: "c809b3968af17d21341d29e067bf9d5bb75d148828f17fcd47c6ea90eaebe0da"
-    sha256 arm64_big_sur:  "61774aa3d47a48235a39742d166d1a30c5ee55ebe2cbe9691c9a4d6b69af55bb"
-    sha256 monterey:       "bb48f47b33093d9f1ce94cc3ef7db30e42aaf14707cc29b32e0d41dd124e1157"
-    sha256 big_sur:        "9b7f9ae528f37c4782b28baeae1219fe2a054e568fb65483cbb0db8232ba70e1"
-    sha256 catalina:       "3292001f4c1720e9c54d0cd4f73df39bbf9136a55843225b2b96bd46b46dfea7"
-    sha256 x86_64_linux:   "0b9487a05bc61649e8b7c752cd7b78f69547790366ef08dadccc999356951377"
+    sha256 arm64_ventura:  "d559e3a464b50bec8e31b3f4459c3f481108c1476cfb04015e2cb1f2270cca7f"
+    sha256 arm64_monterey: "442d4318258f2388763b9a244316d76c2762c53a008e6a7692b6425f509aeec6"
+    sha256 arm64_big_sur:  "15a9dc9bb2e9926d0c379268af31d77eed9b10f23c70269afb771ad8133e2d27"
+    sha256 ventura:        "a358259d75d04b5eb3f27838094aac4517aee7b51ac7d5cd583a6ef0f943b45c"
+    sha256 monterey:       "a50e7c8026586f7677600c87e0de1f81d8d250740fbcbd479e9a0e75a6ad25c1"
+    sha256 big_sur:        "9616bc58e2a3fb15607cc8a732cb46ea52f6d7bdcc3bf7644f6a6e0c546e782c"
+    sha256 x86_64_linux:   "54545056dd397064fa10c8963e95b59fbbc4ac84a309de264bbbfd153b1311ee"
   end
 
   head do

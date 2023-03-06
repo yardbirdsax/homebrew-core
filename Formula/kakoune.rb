@@ -1,8 +1,8 @@
 class Kakoune < Formula
   desc "Selection-based modal text editor"
   homepage "https://github.com/mawww/kakoune"
-  url "https://github.com/mawww/kakoune/releases/download/v2021.11.08/kakoune-2021.11.08.tar.bz2"
-  sha256 "aa30889d9da11331a243a8f40fe4f6a8619321b19217debac8f565e06eddb5f4"
+  url "https://github.com/mawww/kakoune/releases/download/v2022.10.31/kakoune-2022.10.31.tar.bz2"
+  sha256 "fb317b62c9048ddc7567fe83dfc409c252ef85778b24bd2863be2762d4e4e58b"
   license "Unlicense"
   head "https://github.com/mawww/kakoune.git", branch: "master"
 
@@ -13,27 +13,31 @@ class Kakoune < Formula
 
   bottle do
     rebuild 1
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "5092de013e5a673a4d1e5f0576ad48ad98175f75269c3860e906fd4ddb16ea0f"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "6702288ef929636e9cca45f49d59bd2bdfc48b62a163163d3186bb32560f4e28"
-    sha256 cellar: :any_skip_relocation, monterey:       "402fb3821ccb65bab8d917d70c69aa372b59f0649b30b1655794a4e1b7495a94"
-    sha256 cellar: :any_skip_relocation, big_sur:        "bae4c38b2ddae7663e0edb080b8725fd4811cd90823d7c26610726b26caf0155"
-    sha256 cellar: :any_skip_relocation, catalina:       "0620ffadba67da01ce4944c7514533aa1b2591a5ef006e33a196624c68e3035d"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ac5e0f28176c38db9527cb6b7cf0f560e43e5d8cffd0e33eb00ca4bc4cd0f7a2"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "771d79380fd9f1cf319e5e855b5218c33eae4d5c19ed7884710d7b596d2db1b0"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "da6968f945e5f07e97e63cbcc91b664dcd88c0d7e24077f6a0ce3663d185922d"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "805deb07df38ad4f5cb0f79d3898962d663fb036972d7b68b4fb584fc8a456b8"
+    sha256 cellar: :any_skip_relocation, ventura:        "1d6d075af2af9fe2641232745ce68f83ca56f84d2c98117702df2f93e7faaa8f"
+    sha256 cellar: :any_skip_relocation, monterey:       "04163a55a1f74fa8c16eb11b26baee11ca7729cd4d6439c251db964fd8df7606"
+    sha256 cellar: :any_skip_relocation, big_sur:        "fae1f0775f82b821689516906464b2502807736fa9048d691f5d1bf2742b47e7"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "0e008cd070d41894c2633d4686bfda79b5295d06b2352bd8ec4dc2ad4df799df"
   end
 
-  depends_on macos: :high_sierra # needs C++17
-  depends_on "ncurses"
-
-  uses_from_macos "libxslt" => :build
+  uses_from_macos "llvm" => :build, since: :big_sur
 
   on_linux do
     depends_on "binutils" => :build
-    depends_on "linux-headers@5.15" => :build
-    depends_on "pkg-config" => :build
   end
 
-  fails_with gcc: "5"
-  fails_with gcc: "6"
+  fails_with :clang do
+    build 1200
+    cause "Requires C++20"
+  end
+
+  # See <https://github.com/mawww/kakoune/blob/v2022.10.31/README.asciidoc#building>
+  fails_with :gcc do
+    version "10.2"
+    cause "Requires GCC >= 10.3"
+  end
 
   def install
     cd "src" do

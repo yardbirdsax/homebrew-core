@@ -1,10 +1,10 @@
 class Cmake < Formula
   desc "Cross-platform make"
   homepage "https://www.cmake.org/"
-  url "https://github.com/Kitware/CMake/releases/download/v3.24.2/cmake-3.24.2.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/cmake-3.24.2.tar.gz"
-  mirror "http://fresh-center.net/linux/misc/legacy/cmake-3.24.2.tar.gz"
-  sha256 "0d9020f06f3ddf17fb537dc228e1a56c927ee506b486f55fe2dc19f69bf0c8db"
+  url "https://github.com/Kitware/CMake/releases/download/v3.25.2/cmake-3.25.2.tar.gz"
+  mirror "http://fresh-center.net/linux/misc/cmake-3.25.2.tar.gz"
+  mirror "http://fresh-center.net/linux/misc/legacy/cmake-3.25.2.tar.gz"
+  sha256 "c026f22cb931dd532f648f087d587f07a1843c6e66a3dfca4fb0ea21944ed33c"
   license "BSD-3-Clause"
   head "https://gitlab.kitware.com/cmake/cmake.git", branch: "master"
 
@@ -16,18 +16,19 @@ class Cmake < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "059834cf5a851dd7bbb7af20bcd6c3f5bf6530d1d7a143b74995a1e5235a857d"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5e3de5c55f543596e7e883dbf175497c2b5affff37bdf5fbf37922b50a84f75d"
-    sha256 cellar: :any_skip_relocation, monterey:       "fc9cb2aa232dacabf2c689d1c414971e76773c84a91fe65548338447a66c3860"
-    sha256 cellar: :any_skip_relocation, big_sur:        "4bf28f6c3cc967b8989e352404e7132a3393dcea1ee82d84b920c868fcbdbc7c"
-    sha256 cellar: :any_skip_relocation, catalina:       "de92be9bafb7d4c8959c275792aa46b923c329869a2915653cc1564c55ba05ba"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "94d71c01399d11fd622f1bf3dd659c6c59c61cc033f687dc6a206e5ef3b02509"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "9b84d2b9844ae326750b498d6143eba05ba90ba85e2413ff8bbba8df52b69cb7"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "9c795988bd14da5691a246221bbadff427ef2bdabe213a7f97ad5e69b3f8a39e"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "cc74b5362b7fc2d4c51ba4ac5d0859bf0557ddeb4ac2a518522f31785af102f7"
+    sha256 cellar: :any_skip_relocation, ventura:        "f502d6ccb79b82ec25b2f4222c15d29e31fb906325ea80609d0e829ead9080f2"
+    sha256 cellar: :any_skip_relocation, monterey:       "e08c954dfd2cd60b1275370d6e5bbc569af9480fb70c224f4aec44306f04cef4"
+    sha256 cellar: :any_skip_relocation, big_sur:        "6e98740a0ec57228faa96fbdeb0636c46577a9b5c5c803960513e9d16f4f0737"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6ab7740bbe65b3c5fa816e986a347007c8608083862735ad990d1497779a7d82"
   end
 
   uses_from_macos "ncurses"
 
   on_linux do
-    depends_on "openssl@1.1"
+    depends_on "openssl@3"
   end
 
   # The completions were removed because of problems with system bash

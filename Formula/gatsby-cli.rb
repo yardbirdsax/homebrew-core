@@ -4,24 +4,21 @@ class GatsbyCli < Formula
   desc "Gatsby command-line interface"
   homepage "https://www.gatsbyjs.org/docs/gatsby-cli/"
   # gatsby-cli should only be updated every 10 releases on multiples of 10
-  url "https://registry.npmjs.org/gatsby-cli/-/gatsby-cli-4.23.0.tgz"
-  sha256 "c2c1e43c34898223c3a349f4d94420cb6cc3befbb464c0a1be098ae837fc0733"
+  url "https://registry.npmjs.org/gatsby-cli/-/gatsby-cli-5.7.0.tgz"
+  sha256 "9250b020c004af542c1f64a5af845f77f899fba5a6a51ce2bb6f5cc90078e0c4"
   license "MIT"
 
   bottle do
-    sha256                               arm64_monterey: "f047e469381dfd62938a173c037abf021db442e8a57de96484d3ebe3b4317ad8"
-    sha256                               arm64_big_sur:  "695e951770094c31e36f2528f66de7ad08c514868a03b7eb4d77a63f3b0a013f"
-    sha256                               monterey:       "7d1545ed1bfa41c086c3f8bfd865701870d6d715738cf275f9f4aa39dcd09961"
-    sha256                               big_sur:        "5444529f0afbfa28cf9326e868d729dff9c2b75d9caf575f2b0449cf83546d4b"
-    sha256                               catalina:       "1f4df8c251249cff5e4df731f3fa97f8196f0ab6ecc4a30c0ca698222feab0b5"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f5b760483072c2dbe17a25758ac4e62701efaea9e2a220baf4eea1f4a355b7d2"
+    sha256                               arm64_ventura:  "e1377580f96a1b98d54563acbf90af730f1cb2027d6d3e2f272171b40c169922"
+    sha256                               arm64_monterey: "06b0eb7132a1342b4611ccfb6419efefb90b3a44adf222b154f907beacc79e32"
+    sha256                               arm64_big_sur:  "e1fe50cb90f84031ff23d33fd5fe34b85330e2b649c77c1738c5d215f6f985f1"
+    sha256                               ventura:        "efcacb04bf31eade018d5157f3127ff31376f367436ada578bb9187571c24757"
+    sha256                               monterey:       "defbc94b94682706072acf0fe1a3099c7517e0afd439749d5d13fa01762b443a"
+    sha256                               big_sur:        "ab8bdd76a6f2a79d81b6f3b8f37ab4f65984f9906509465a56a50b877a5b857b"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1416730204ff61c51cd3e2c31dc91863cb6db0995754b71b7422b7d93e0a67f2"
   end
 
   depends_on "node"
-
-  on_macos do
-    depends_on "macos-term-size"
-  end
 
   on_linux do
     depends_on "xsel"
@@ -40,15 +37,6 @@ class GatsbyCli < Formula
                     .map(&:unlink)
                     .empty? && raise("Unable to find #{mod} musl library to delete.")
       end
-    end
-
-    term_size_vendor_dir = node_modules/"term-size/vendor"
-    term_size_vendor_dir.rmtree # remove pre-built binaries
-    if OS.mac?
-      macos_dir = term_size_vendor_dir/"macos"
-      macos_dir.mkpath
-      # Replace the vendored pre-built term-size with one we build ourselves
-      ln_sf (Formula["macos-term-size"].opt_bin/"term-size").relative_path_from(macos_dir), macos_dir
     end
 
     clipboardy_fallbacks_dir = node_modules/"clipboardy/fallbacks"

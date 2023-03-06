@@ -1,18 +1,19 @@
 class Hurl < Formula
   desc "Run and Test HTTP Requests with plain text and curl"
   homepage "https://hurl.dev"
-  url "https://github.com/Orange-OpenSource/hurl/archive/refs/tags/1.7.0.tar.gz"
-  sha256 "6f5b01de19a1c3376a714c9636aa8d4497d060826a5656cb94785fb4be3468e5"
+  url "https://github.com/Orange-OpenSource/hurl/archive/refs/tags/2.0.1.tar.gz"
+  sha256 "6fa3524be56027748aa13afc72487fc07f5b1ef3bf4ccdeb9c641436b3dcd4d3"
   license "Apache-2.0"
   head "https://github.com/Orange-OpenSource/hurl.git", branch: "master"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "32757008a6c9ef3534903f0df53b1866216cb0adb2ecba3aba36a3744b643618"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "16383fba0fb749d7b14f61ffdd079bee7932b4c2bdbd32d886e9a2858fc34d0d"
-    sha256 cellar: :any_skip_relocation, monterey:       "eb3f5aa56cb32d06c5b2c8fd1bad3ac319b70fc6eae21e5ecf6813693a9c9736"
-    sha256 cellar: :any_skip_relocation, big_sur:        "ece4522f6de010f78e92d7783978aac70f3ceaa2fd697effe0643b25e5199870"
-    sha256 cellar: :any_skip_relocation, catalina:       "2f99add5ceeecc9816ad4f376c6097553b3d8c738541a3a9d3462cc5dd6eb34a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "65a039d31e6cbd088f486badf5eb2cacc288c181bae7b15911125d8c12bb02f7"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "ec06767e3c13ce75cbc38d4a58a9a666bcdde27cebdeca334f9e8938b3132bcf"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "4f6d0d17661b13880620f78eedd1a2645a1ba2f730221eb26caa7ae72a02864c"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "c1fbcbd68edfe5292957ec1b7c3cd4897f53632acc62c18367bc74be39104f49"
+    sha256 cellar: :any_skip_relocation, ventura:        "ace14dc57f016b28abc0e35332b7d369216decb7f113babc95381afeb93db992"
+    sha256 cellar: :any_skip_relocation, monterey:       "fb1fb9e4956f4c2da9d35a85843443895272a73f46028e9650c8b8ea97c1aec9"
+    sha256 cellar: :any_skip_relocation, big_sur:        "cb418a569526fb28b0503543c1b5b6c5cc7b51d94ba15e03393589586b40446c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "8da8fefe3b5d1f603cf93b5a9ee8716e889d881b54d9ccf8b1c4fee1c2f0816e"
   end
 
   depends_on "rust" => :build

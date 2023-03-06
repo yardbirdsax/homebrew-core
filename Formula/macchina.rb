@@ -1,17 +1,18 @@
 class Macchina < Formula
   desc "System information fetcher, with an emphasis on performance and minimalism"
   homepage "https://github.com/Macchina-CLI/macchina"
-  url "https://github.com/Macchina-CLI/macchina/archive/v6.1.1.tar.gz"
-  sha256 "cd7e34c6e12943f2aa90473468c75c83027971254113b4dce07a446af9b3ae1b"
+  url "https://github.com/Macchina-CLI/macchina/archive/refs/tags/v6.1.8.tar.gz"
+  sha256 "e827f640b55fe47a6127dd0c276e76b597e3cb83916be37351cdd6a81d75311e"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "ff53d717037457da0882859bb157ad4904ff4344ab05375cdf87796ca4dae0cb"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "e7e16015191d796cab9637ae255176164c605cb6f717ef80c33d71932e62d5e1"
-    sha256 cellar: :any_skip_relocation, monterey:       "b287ffbfa0d2d1e46a62b4980d5ed6a4db7f1c17229fb7f6b8a88949003efae9"
-    sha256 cellar: :any_skip_relocation, big_sur:        "2a6f2ce67eb6ecc65d6351962d5ce2b0007b37f0d6ce63efc5fff73cc44ec48d"
-    sha256 cellar: :any_skip_relocation, catalina:       "4abda43fa59f5b435f9271e041c02095c3781d0a0ef2924d553b01204c230e1f"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "db537652b33e1c2c2d32efcb84f96beb37cdf977feffb4f8ed19503006b8b976"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "a84ad65d11dd14e60ee2c8edaed0b2e72d361962282a2ab6d1cfde6a3262c2ab"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "209d70fda58e9b2610d0c8feb9e04c7359f28850e76050b53c179b4ea15c24ea"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d9c48eb3d2043d04a82638cf91205e99dbcc197f3163640bbc0c03d93cd7cb65"
+    sha256 cellar: :any_skip_relocation, ventura:        "f381950c7974cfa9384ccb2800f883c73df3cb435c551d3b8469010c04d66c06"
+    sha256 cellar: :any_skip_relocation, monterey:       "f87bff4db1b3732b9603af15c560cb0e386e5f2ac02ece28e71d941fab7b08aa"
+    sha256 cellar: :any_skip_relocation, big_sur:        "2551a0ae491d1d4f51d72ed804898faf5bacfd9e7db57cf6fd1452c1202275bf"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f8f175c9bcdeec3a3974cfb53c4324d1d9dd8dc6b0825182875773e2f6cea94d"
   end
 
   depends_on "rust" => :build

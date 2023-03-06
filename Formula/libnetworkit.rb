@@ -10,13 +10,15 @@ class Libnetworkit < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_monterey: "f412ddb92c943b849582a36a9acb6b4deefff24098a158ed911c9b73fba09613"
-    sha256 cellar: :any,                 arm64_big_sur:  "f35f2328303856caa57b80f77eb7d086e54b8eb69ef5fdd90095001a3c7ee75e"
-    sha256 cellar: :any,                 monterey:       "02e0ce1069e1d3b420da7cc290255d9f2c0c7fb166bb575b8b219416fa9c6f1f"
-    sha256 cellar: :any,                 big_sur:        "8a7b5ed41ed3d65512547ac593df74db3af3dcd70547996775f434d92d0d24c4"
-    sha256 cellar: :any,                 catalina:       "86fe07599074e4be03ba5aa653f49f995aa9353dee1f98427b7b68d80542e18b"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "944d9df37170ba7101900432c4e1bca1e8d742f11429387f59d604d645a7b718"
+    rebuild 2
+    sha256 cellar: :any,                 arm64_ventura:  "4437de1a0c2d7538c67a504135165825198403b7b8285f578db27c4d5284fa86"
+    sha256 cellar: :any,                 arm64_monterey: "6bc1e0d3d759aed8800327120850737934ae106dcd9d6c66efb348b7c9e67b1e"
+    sha256 cellar: :any,                 arm64_big_sur:  "8cb2f1613a8e9154ac7f6fa74a8b5175ae2ae599532be959bf3425a8a2e3a27b"
+    sha256 cellar: :any,                 ventura:        "916d6b37da3b65b7636b061019705b34a099ba7806a9da63d632d006901f92d1"
+    sha256 cellar: :any,                 monterey:       "666f4a00feef2523ba39656fc77e2edadb70902b805ea54b37bfb282b94bae88"
+    sha256 cellar: :any,                 big_sur:        "3203b49d96a9df9e76e7d7f38133f7657a0121728e164c7dfa12f6f83ce67398"
+    sha256 cellar: :any,                 catalina:       "b6624ef3b304d677a9f454342dfd61281834f177a72205bf9f25f47b8e390344"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c8576a8e5f2dcbe074f3c34c15ae0fa8b9f77841ab6eaa7c65da026b1a73bf33"
   end
 
   depends_on "cmake" => :build
@@ -30,19 +32,10 @@ class Libnetworkit < Formula
   fails_with gcc: "5"
 
   def install
-    mkdir "build" do
-      flags = ["-DNETWORKIT_EXT_TLX=#{Formula["tlx"].opt_prefix}"]
-      # GCC includes libgomp for OpenMP support and does not need any extra flags to use it.
-      if OS.mac?
-        flags += [
-          "-DOpenMP_CXX_FLAGS='-Xpreprocessor -fopenmp -I#{Formula["libomp"].opt_prefix}/include'",
-          "-DOpenMP_CXX_LIB_NAMES='omp'",
-          "-DOpenMP_omp_LIBRARY=#{Formula["libomp"].opt_prefix}/lib/libomp.dylib",
-        ]
-      end
-      system "cmake", ".", *std_cmake_args, *flags, ".."
-      system "make", "install"
-    end
+    system "cmake", "-S", ".", "-B", "build", *std_cmake_args,
+                    "-DNETWORKIT_EXT_TLX=#{Formula["tlx"].opt_prefix}"
+    system "cmake", "--build", "build"
+    system "cmake", "--install", "build"
   end
 
   test do
@@ -55,7 +48,8 @@ class Libnetworkit < Formula
         return 0;
       }
     EOS
-    system ENV.cxx, "test.cpp", "-L#{lib}", "-lnetworkit", "-o", "test", "-std=c++14"
+    omp_flags = OS.mac? ? ["-I#{Formula["libomp"].opt_include}"] : []
+    system ENV.cxx, "test.cpp", "-L#{lib}", "-lnetworkit", "-o", "test", "-std=c++14", *omp_flags
     system "./test"
   end
 end

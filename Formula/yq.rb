@@ -1,8 +1,8 @@
 class Yq < Formula
-  desc "Process YAML documents from the CLI"
+  desc "Process YAML, JSON, XML, CSV and properties documents from the CLI"
   homepage "https://github.com/mikefarah/yq"
-  url "https://github.com/mikefarah/yq/archive/v4.27.5.tar.gz"
-  sha256 "0b9ed8759c53534978a661786845eb3c6ec425aee15bab4742d1bead73e28150"
+  url "https://github.com/mikefarah/yq/archive/v4.31.2.tar.gz"
+  sha256 "82d5ef2ab01bc5065e7efe671d92fb82e53f41dc67b04cab6c3b22fd144bd009"
   license "MIT"
   head "https://github.com/mikefarah/yq.git", branch: "master"
 
@@ -12,12 +12,13 @@ class Yq < Formula
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "c81af5b058c43087e6343f02b7bba15a0ae4a14c65808fa1393b78b3547ba7f3"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "29be87494b289cafe53a4a668ae2822d63759d1424cea1d930080f119fba443f"
-    sha256 cellar: :any_skip_relocation, monterey:       "2ce02a5fa5d6c24066e37ecd4ecfec498ee88e6d47714fa06bd3a61bde068a7f"
-    sha256 cellar: :any_skip_relocation, big_sur:        "34b405fa60f83954e4fea597443333d0cf3cbc2923e4fb2fd3b9fae04e9c7f89"
-    sha256 cellar: :any_skip_relocation, catalina:       "cb1e207ccccf6b9cc7c92cfd2c586aba2ecfb9afc9172f02cdfdc5e522a9b414"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "f40ec294198b1162515a830d0170fb87626712ef797f845a59c21db30ed2c618"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "b0f90b8141b90347e22fad656d567a636cbd90b739e798ddebf8a89aa67d10a3"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "b0f90b8141b90347e22fad656d567a636cbd90b739e798ddebf8a89aa67d10a3"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "b0f90b8141b90347e22fad656d567a636cbd90b739e798ddebf8a89aa67d10a3"
+    sha256 cellar: :any_skip_relocation, ventura:        "387224c793ed2d18773f763482f3098ac0e27dcc8d392764c86fa2b1daac572c"
+    sha256 cellar: :any_skip_relocation, monterey:       "387224c793ed2d18773f763482f3098ac0e27dcc8d392764c86fa2b1daac572c"
+    sha256 cellar: :any_skip_relocation, big_sur:        "387224c793ed2d18773f763482f3098ac0e27dcc8d392764c86fa2b1daac572c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "451d55a153d217734aa6bb12ecbcffd79a1eac90f811051cc74a07bc7029d062"
   end
 
   depends_on "go" => :build

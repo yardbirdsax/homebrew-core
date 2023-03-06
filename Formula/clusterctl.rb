@@ -2,29 +2,29 @@ class Clusterctl < Formula
   desc "Home for the Cluster Management API work, a subproject of sig-cluster-lifecycle"
   homepage "https://cluster-api.sigs.k8s.io"
   url "https://github.com/kubernetes-sigs/cluster-api.git",
-      tag:      "v1.2.2",
-      revision: "3c462340b2973b2e5aa15034725a5824f04de0ab"
+      tag:      "v1.3.5",
+      revision: "58770484dee6c99c10e32c06652e9f9643f78e9e"
   license "Apache-2.0"
   head "https://github.com/kubernetes-sigs/cluster-api.git", branch: "main"
 
   # Upstream creates releases on GitHub for the two most recent major/minor
   # versions (e.g., 0.3.x, 0.4.x), so the "latest" release can be incorrect. We
-  # don't check the Git tags because, for this project, a version may not be
-  # considered released until the GitHub release is created. The first-party
-  # website doesn't clearly list the latest version and we have to isolate it
-  # from a GitHub URL used in a curl command in the installation instructions.
+  # don't check the Git tags for this project because a version may not be
+  # considered released until the GitHub release is created.
   livecheck do
-    url "https://cluster-api.sigs.k8s.io/user/quick-start.html"
-    regex(%r{/cluster-api/releases/download/v?(\d+(?:\.\d+)+)/}i)
+    url "https://github.com/kubernetes-sigs/cluster-api/releases?q=prerelease%3Afalse"
+    regex(%r{href=["']?[^"' >]*?/tag/v?(\d+(?:\.\d+)+)["' >]}i)
+    strategy :page_match
   end
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "b122ade1ef5cdf74cc5f0e7859f60acb94f9b65fc7875b2061949c51ff1945f0"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "bffe7e045e893dca9bfb3c3dff77a3c9bfb7a9781fbe4755fe4538dc2aec2897"
-    sha256 cellar: :any_skip_relocation, monterey:       "23c591f5f31b49c3dc2bf0d21233b842932a61e47bd8c21b2f79333e8e0af42c"
-    sha256 cellar: :any_skip_relocation, big_sur:        "059cf6f88b5fa72da50b837ab5ea68e42fea58dec03141e039c1c4e6c558f379"
-    sha256 cellar: :any_skip_relocation, catalina:       "a62d092275481dd516259002228f28a0dd540937e7dc455ec4009a56066dd224"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "b33df6bea91e1407556628a2ceae853b63e9e8496203d220fbf0e7c6662dd389"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "aa1ddb987b10d0df6e8d51cc9e100977b6c538123d2b2c062f4018804e9407fa"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "aa1ddb987b10d0df6e8d51cc9e100977b6c538123d2b2c062f4018804e9407fa"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "aa1ddb987b10d0df6e8d51cc9e100977b6c538123d2b2c062f4018804e9407fa"
+    sha256 cellar: :any_skip_relocation, ventura:        "225d61c4e0bf132e705daf07c47994c90f4d1dfd2e67ac07f38f1b4bbcfb8fa1"
+    sha256 cellar: :any_skip_relocation, monterey:       "225d61c4e0bf132e705daf07c47994c90f4d1dfd2e67ac07f38f1b4bbcfb8fa1"
+    sha256 cellar: :any_skip_relocation, big_sur:        "225d61c4e0bf132e705daf07c47994c90f4d1dfd2e67ac07f38f1b4bbcfb8fa1"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6c803b8956551de23aee81009d37fd64dfc151ae78dd0d5796e4bf9e37a57665"
   end
 
   depends_on "go" => :build

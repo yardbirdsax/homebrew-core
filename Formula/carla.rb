@@ -1,19 +1,10 @@
 class Carla < Formula
   desc "Audio plugin host supporting LADSPA, LV2, VST2/3, SF2 and more"
   homepage "https://kxstudio.linuxaudio.org/Applications:Carla"
+  url "https://github.com/falkTX/Carla/archive/v2.5.3.tar.gz"
+  sha256 "4fe6772a52e677c926c4d21ce10a20888ddab487b0bb9dd7314e262a3200a342"
   license "GPL-2.0-or-later"
-  revision 1
   head "https://github.com/falkTX/Carla.git", branch: "main"
-
-  stable do
-    url "https://github.com/falkTX/Carla/archive/v2.4.3.tar.gz"
-    sha256 "0092926e5167f3a5eb592f0055e5491803354ae42947e706db0dc548d9e786d3"
-
-    # Fix build failure on Monterey.
-    # This change was merged in https://github.com/falkTX/Carla/commit/1e5c9900ae0341ada21b18a58219cbfb70559653
-    # Remove with next release.
-    patch :DATA
-  end
 
   livecheck do
     url :stable
@@ -21,13 +12,13 @@ class Carla < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_monterey: "84ff0ddeb198c505271993cce92e05d6fd1c1a4bfdfbf1701121464715dc2601"
-    sha256 cellar: :any,                 arm64_big_sur:  "d809ab0142ec1c144b64ed44f730241dc9909fb00b71dcab2f8b8c1a0775f38c"
-    sha256 cellar: :any,                 monterey:       "16458248b4067b67d0ea33acf71e6f58af58c79f53cde2d40efbf2cb0aa56d63"
-    sha256 cellar: :any,                 big_sur:        "bb03c8a8b000baabd032e8f888a50b4d0a049449cbc281e809334e0693c23391"
-    sha256 cellar: :any,                 catalina:       "82026c919f5be0c50f0d6e95507e0f6bae64100d86c8ef526ed2a9c458f72a1a"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "ac3e0ecaaaebdcbd00de563e9a84eec272f12b9f9b5101ece647ca5ee5b80f5e"
+    sha256 cellar: :any,                 arm64_ventura:  "af4603464e92f63b973f418c6756e7b5ef0597fc68bde190537023533f4e71a3"
+    sha256 cellar: :any,                 arm64_monterey: "5cae6077d549dfa5736c5a0a21bb0689cf09507664ee1c51e52913f2bbb04004"
+    sha256 cellar: :any,                 arm64_big_sur:  "27e94c1b2b9c15483c29fc3a55e26ef05f6dc645eee27d2b11586a681ffb474f"
+    sha256 cellar: :any,                 ventura:        "8e21634e6fb47bbe96c0ff3f64609b0d42ef5c43c3c02552e08fbaa2dc4eb80d"
+    sha256 cellar: :any,                 monterey:       "55d77147433c3cb484c235e0ac5b306669e5a6d256e1fa6285189f236763a3e0"
+    sha256 cellar: :any,                 big_sur:        "90e5abcd75da09eed552d1cb272353450af73af44118c04c8eb2b86567450728"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "284aeaa8d6d5fceb4e2c6c5ab6c07143e238adf309cddaa8ecd79c4a8eb76adb"
   end
 
   depends_on "pkg-config" => :build
@@ -35,7 +26,7 @@ class Carla < Formula
   depends_on "liblo"
   depends_on "libmagic"
   depends_on "pyqt@5"
-  depends_on "python@3.10"
+  depends_on "python@3.11"
 
   fails_with gcc: "5"
 
@@ -44,7 +35,7 @@ class Carla < Formula
     system "make", "install", "PREFIX=#{prefix}"
 
     inreplace bin/"carla", "PYTHON=$(which python3 2>/dev/null)",
-                           "PYTHON=#{Formula["python@3.10"].opt_bin}/python3.10"
+                           "PYTHON=#{Formula["python@3.11"].opt_bin}/python3.11"
   end
 
   test do
@@ -52,21 +43,3 @@ class Carla < Formula
     system lib/"carla/carla-discovery-native", "internal", ":all"
   end
 end
-
-__END__
-diff --git a/source/discovery/carla-discovery.cpp b/source/discovery/carla-discovery.cpp
-index e5a1fec..5c01d85 100644
---- a/source/discovery/carla-discovery.cpp
-+++ b/source/discovery/carla-discovery.cpp
-@@ -58,11 +58,9 @@
- #ifdef CARLA_OS_MAC
- # define Component CocoaComponent
- # define MemoryBlock CocoaMemoryBlock
--# define Point CocoaPoint
- # import <Foundation/Foundation.h>
- # undef Component
- # undef MemoryBlock
--# undef Point
- # include "CarlaMacUtils.cpp"
- # include <spawn.h>
- # if defined(USING_JUCE) && defined(__aarch64__)

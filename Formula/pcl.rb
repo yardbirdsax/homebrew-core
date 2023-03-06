@@ -1,20 +1,20 @@
 class Pcl < Formula
   desc "Library for 2D/3D image and point cloud processing"
   homepage "https://pointclouds.org/"
-  url "https://github.com/PointCloudLibrary/pcl/archive/pcl-1.12.1.tar.gz"
-  sha256 "dc0ac26f094eafa7b26c3653838494cc0a012bd1bdc1f1b0dc79b16c2de0125a"
+  url "https://github.com/PointCloudLibrary/pcl/archive/pcl-1.13.0.tar.gz"
+  sha256 "b6f6769b84d3d8313e48278388b923e32cf519e6a27a4876c2170d587b33721d"
   license "BSD-3-Clause"
-  revision 3
+  revision 2
   head "https://github.com/PointCloudLibrary/pcl.git", branch: "master"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_monterey: "f1091db410f232c80a97a4707269bbe163b32ded8fa34012979f7085a91ce2bc"
-    sha256 cellar: :any,                 arm64_big_sur:  "aa25a02752699f6c30d722cd36d3109aac0e6bbc6581400e5034357a139e7180"
-    sha256 cellar: :any,                 monterey:       "b295450a53106253cea2b583e01beb3a8266f66a1239d8c74c00da455388507f"
-    sha256 cellar: :any,                 big_sur:        "c3f63490eff9bb375c5b3d67574a33da3201645d45fe98550f880a7b2235e76c"
-    sha256 cellar: :any,                 catalina:       "c307c5b31d29137a136a62bcefe357ba6890b9fcbfd1eed539219039f640f298"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "dae3fcc56c7e2e675baa22b5691b7b6a84ea464b487e0b6a9219a35f8002f593"
+    sha256 cellar: :any,                 arm64_ventura:  "a6f1cf06d839ebf014c2595423e76b11df7b5432cad49d56ecfe352a5d27db9d"
+    sha256 cellar: :any,                 arm64_monterey: "04a04a07f89b13e0a7ed50dd17b163ecffee6c3ecd487753acd5396f43bf2acb"
+    sha256 cellar: :any,                 arm64_big_sur:  "8dc05550e4b08debdbf1ad135013e7cb860abd43f32bd4262e5ecc5fe65f8cea"
+    sha256 cellar: :any,                 ventura:        "1896b72ac0e30f8418d61e4c9f4c858ed1040fff4cb9f481d129ebf9df3d35ab"
+    sha256 cellar: :any,                 monterey:       "91493152414e609f705f1d1c98329c57a069e7856bb425ab7620a36291ef6129"
+    sha256 cellar: :any,                 big_sur:        "88b4a5e40bcaab179befab7781794bad2248e1b7ab7d35a4e4241e459493dcb6"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "1f8846c606117b712f2878f16d5f171f673b3746cd9984db2c1a4be65294262c"
   end
 
   depends_on "cmake" => [:build, :test]
@@ -32,13 +32,6 @@ class Pcl < Formula
 
   on_macos do
     depends_on "libomp"
-  end
-
-  fails_with gcc: "5" # qt@5 is built with GCC
-
-  patch do
-    url "https://github.com/PointCloudLibrary/pcl/commit/e964409b4accfd9070093dbc3c9cf5fb216cd877.patch?full_index=1"
-    sha256 "78c77388e6c82105d028d5e42662a37c497c35982622a6f8bc875b1c411ab375"
   end
 
   def install
@@ -65,6 +58,9 @@ class Pcl < Formula
     else
       "-DBUILD_apps_modeler:BOOL=OFF"
     end
+
+    # The AppleClang versions shipped on current MacOS versions do not support the -march=native flag on arm
+    args << "-DPCL_ENABLE_MARCHNATIVE:BOOL=OFF" if build.bottle?
 
     mkdir "build" do
       system "cmake", "..", *args

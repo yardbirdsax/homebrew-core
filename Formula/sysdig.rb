@@ -2,7 +2,7 @@ class Sysdig < Formula
   desc "System-level exploration and troubleshooting tool"
   homepage "https://sysdig.com/"
   license "Apache-2.0"
-  revision 5
+  revision 9
 
   stable do
     url "https://github.com/draios/sysdig/archive/0.29.3.tar.gz"
@@ -22,12 +22,12 @@ class Sysdig < Formula
   end
 
   bottle do
-    sha256                               arm64_monterey: "269b52120377c6293d54ae37788f92e1fe9ba9c9143a4928aa1ed5740eb36665"
-    sha256                               arm64_big_sur:  "88a9f42c3650693bdcb943d68f9726203013eedf4d8fa3b9d1c3b38fd5128ed2"
-    sha256                               monterey:       "e6304e8ba358b2eb737c983d6f7741403711fc9fadc797554e558edbdb1f4481"
-    sha256                               big_sur:        "2fdcdd112021ac2bf1b8e2c089dc4bef6772815098d425f83e49374672842e90"
-    sha256                               catalina:       "a32420986d8d0c60b8b24ee204e87615f82e1df6f0ed18592381f5423db4c454"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d66503b65d4f0a5a15155b8bd8250be498bffb934e49dd63cd49d9105d73d5a1"
+    sha256 arm64_ventura:  "25d9766a9870e4d5696f2ed126c4d1fbecd2761446a8f3fe5c4c08586ad19a0f"
+    sha256 arm64_monterey: "e5e391dc281e5e0e25956eb063882383268bd17aad46adf4b52c2fed01cdad9a"
+    sha256 arm64_big_sur:  "47a7283c72b2986715910f9fc97831a4f3a76502c66efda9b8ffeff407a3a262"
+    sha256 ventura:        "f0eec8a21aac55fe9a9bcc420a66dbe605a16393fb28e023343d5e0268271260"
+    sha256 monterey:       "012c921f362759cd62668245a5a7626ff2402b980da1c628e2811e0c0128f8fb"
+    sha256 big_sur:        "3ea079c0f1aa61de2372e5788bffcf150fda93fad184b8852695f2a414cc17f5"
   end
 
   head do
@@ -82,13 +82,15 @@ class Sysdig < Formula
               "set(CMAKE_EXE_LINKER_FLAGS \"-pagezero_size 10000 -image_base 100000000\")",
               ""
 
-    args = std_cmake_args + %W[
+    # Keep C++ standard in sync with `abseil.rb`.
+    args = %W[
       -DSYSDIG_VERSION=#{version}
       -DUSE_BUNDLED_DEPS=OFF
       -DCREATE_TEST_TARGETS=OFF
       -DBUILD_LIBSCAP_EXAMPLES=OFF
       -DDIR_ETC=#{etc}
       -DFALCOSECURITY_LIBS_SOURCE_DIR=#{buildpath}/falcosecurity-libs
+      -DCMAKE_CXX_STANDARD=17
     ]
 
     # `USE_BUNDLED_*=OFF` flags are implied by `USE_BUNDLED_DEPS=OFF`, but let's be explicit.
@@ -98,7 +100,7 @@ class Sysdig < Formula
 
     args << "-DBUILD_DRIVER=OFF" if OS.linux?
 
-    system "cmake", "-S", ".", "-B", "build", *args
+    system "cmake", "-S", ".", "-B", "build", *args, *std_cmake_args
     system "cmake", "--build", "build"
     system "cmake", "--install", "build"
 

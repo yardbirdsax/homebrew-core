@@ -1,8 +1,8 @@
 class Qbs < Formula
   desc "Build tool for developing projects across multiple platforms"
   homepage "https://wiki.qt.io/Qbs"
-  url "https://download.qt.io/official_releases/qbs/1.23.1/qbs-src-1.23.1.tar.gz"
-  sha256 "8667bb6b91eeabbc29c4111bdb6d3cd54137092b8e574a47171169d3e17d4bef"
+  url "https://download.qt.io/official_releases/qbs/1.24.1/qbs-src-1.24.1.tar.gz"
+  sha256 "1f1a92c840e708bbbc30705e3b0bb1d0cd47ffcf679d566dd071a1768ee65992"
   license :cannot_represent
   head "https://code.qt.io/qbs/qbs.git", branch: "master"
 
@@ -12,13 +12,13 @@ class Qbs < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_monterey: "7910e22de1d208e3cf794549c57cdc78d6c651463c1aeae4d8a5d72454cb590e"
-    sha256 cellar: :any,                 arm64_big_sur:  "15cb2014c7faafa70a7f64654940dfef908df0e4f657da120ecc6f2b88ce3e67"
-    sha256 cellar: :any,                 monterey:       "ec7c1ef1ad9814ba5e0bb2c9619cdbd67e7e52d38208cebd0bea3b7261bd3d64"
-    sha256 cellar: :any,                 big_sur:        "aec65e729c112f4d04d014a62a859d3d1396919040f3c1792a09d710083d98c8"
-    sha256 cellar: :any,                 catalina:       "a3bec37e6e7c7a1d4250c0f63a2a3c4bd59956f9a22e4a3e90bbf748af6743a2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "6da623ca66d640bab7fa20b000faf0fef7742dbbb40a9a15465900c9d4682bea"
+    sha256 cellar: :any,                 arm64_ventura:  "04c2e75a135fc98f9880d37ad19a02d28ba1f0c038b79d441fd935d3a2510bf2"
+    sha256 cellar: :any,                 arm64_monterey: "f01f4fbe4a9a2a507be3883913c72d17a0f0b243a13b9efa7f9c3ba2bcde0d95"
+    sha256 cellar: :any,                 arm64_big_sur:  "328eae689524bcfdf3fba2954c7125fb6d03cac6b9c683a0405426cbd47091e3"
+    sha256 cellar: :any,                 ventura:        "4a407b17d052e9f6d755d7b047ff109247f107a06cf0227e183210aeee498dff"
+    sha256 cellar: :any,                 monterey:       "43aba951297187a5e2fbedee085b64a0997a3e1ac1cf2029d8e1b83936a2b043"
+    sha256 cellar: :any,                 big_sur:        "ca9a8dba616fbfab1c702e36c63195ab2d85bd0804d81fc6c066d5a95eced857"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "2a73a47a8ab85d9fc02df51215dfb9536e7c428e0b1ac2cff43b9ab1f3716644"
   end
 
   depends_on "cmake" => :build

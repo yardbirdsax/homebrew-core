@@ -3,17 +3,18 @@ require "language/node"
 class AwsCdk < Formula
   desc "AWS Cloud Development Kit - framework for defining AWS infra as code"
   homepage "https://github.com/aws/aws-cdk"
-  url "https://registry.npmjs.org/aws-cdk/-/aws-cdk-2.41.0.tgz"
-  sha256 "0e9939a2f800593899dceb10cb65cbdc5fc46faad41a1d0b29a63047537f27bd"
+  url "https://registry.npmjs.org/aws-cdk/-/aws-cdk-2.67.0.tgz"
+  sha256 "23fd01b28d945eb6af155a12e171f2d96de41e2187d29a459baa4081fe8af941"
   license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "689eb32deba796586725df9c69696d2a10b3e6a9c3b61857f5fcb41e97e3caf2"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "689eb32deba796586725df9c69696d2a10b3e6a9c3b61857f5fcb41e97e3caf2"
-    sha256 cellar: :any_skip_relocation, monterey:       "ddab46ea8863c39a2524f89dd7a35b414df5b93c4ceccae81624e46439bfa193"
-    sha256 cellar: :any_skip_relocation, big_sur:        "ddab46ea8863c39a2524f89dd7a35b414df5b93c4ceccae81624e46439bfa193"
-    sha256 cellar: :any_skip_relocation, catalina:       "ddab46ea8863c39a2524f89dd7a35b414df5b93c4ceccae81624e46439bfa193"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c27a0cf6a817b4bf79635bd82568ed2a7b0998b418e557eb13b5d020d475cd6a"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "373c3b13392cf6cd7839a3700e59597db77504868fb34c1dfd79dae35d4610cc"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "373c3b13392cf6cd7839a3700e59597db77504868fb34c1dfd79dae35d4610cc"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "373c3b13392cf6cd7839a3700e59597db77504868fb34c1dfd79dae35d4610cc"
+    sha256 cellar: :any_skip_relocation, ventura:        "5c70a15e2df3a6fe8bb4fc2448d562dfc5c541fb5a64f4091ab831fb025a68a4"
+    sha256 cellar: :any_skip_relocation, monterey:       "5c70a15e2df3a6fe8bb4fc2448d562dfc5c541fb5a64f4091ab831fb025a68a4"
+    sha256 cellar: :any_skip_relocation, big_sur:        "5c70a15e2df3a6fe8bb4fc2448d562dfc5c541fb5a64f4091ab831fb025a68a4"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "5fd4aad6aa553d42f9fc197452ab193905ead4903465d170b15d75b062608121"
   end
 
   depends_on "node"

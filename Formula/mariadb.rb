@@ -1,10 +1,9 @@
 class Mariadb < Formula
   desc "Drop-in replacement for MySQL"
   homepage "https://mariadb.org/"
-  url "https://downloads.mariadb.com/MariaDB/mariadb-10.8.3/source/mariadb-10.8.3.tar.gz"
-  sha256 "887eadc55176ac1ead1fccfc89ade4b5990ef192745ad4dcd879acb41c050892"
+  url "https://downloads.mariadb.com/MariaDB/mariadb-10.11.2/source/mariadb-10.11.2.tar.gz"
+  sha256 "1c89dee0caed0f68bc2a1d203eb98a123150e6a179f6ee0f1fc0ba3f08dc71dc"
   license "GPL-2.0-only"
-  revision 1
 
   # This uses a placeholder regex to satisfy the `PageMatch` strategy
   # requirement. In the future, this will be updated to use a `Json` strategy
@@ -21,13 +20,13 @@ class Mariadb < Formula
   end
 
   bottle do
-    rebuild 1
-    sha256 arm64_monterey: "26865f1cd7779f31e24637b02ab9dfb2bced57e00314f1e345eae444a6b41560"
-    sha256 arm64_big_sur:  "57ad96779d8310f87083143da1878233185c4573ef3b4e22ca35441efbaf82b3"
-    sha256 monterey:       "8df94b657126b6c2a16eb240c75ddd08286b16a51dec11823d18db039ddcc0aa"
-    sha256 big_sur:        "c8dc67dfa037bc6d982bf7653e7770f8a618ae6ff3d9e6422ea3ffbaa9e6010b"
-    sha256 catalina:       "7b0164df6ba088b3080bc6515719c0fdb784d33677acaf003e4a5de99e084431"
-    sha256 x86_64_linux:   "a09e8b55bc948a0e5ece29c18dd86865c2fe8e62cbfe9b6f1c4f3238878fb06f"
+    sha256 arm64_ventura:  "6b65a5ce4521ebdea09409de26b89853e577321c1f106dea2c1f07a45d23cea7"
+    sha256 arm64_monterey: "2d5fda58c720769bb973bce1b80e26f8405fccdbf05b2d63a3c0f582318917d7"
+    sha256 arm64_big_sur:  "7c853067d56e24cd480eaaa5266122b8ff22fd1c15a298ade4b49813f8be119d"
+    sha256 ventura:        "64f0437b9f957593bd36f1c2922ea503a6ee4daf80ec2779a282e76855a26e3b"
+    sha256 monterey:       "80b40e32e3243e5b3e50ae90de7dc131e6e51ea74375d1dbb30f767833602888"
+    sha256 big_sur:        "a50e9c1ed6e33364a921dae1e7a252aa6280e3b39aa012cd923a97abb79ad57b"
+    sha256 x86_64_linux:   "a3b657261becd4083f072c33f2e4d951cca860242e94ac78b7d5b68667a26bc4"
   end
 
   depends_on "bison" => :build
@@ -41,6 +40,7 @@ class Mariadb < Formula
 
   uses_from_macos "bzip2"
   uses_from_macos "libxcrypt"
+  uses_from_macos "libxml2"
   uses_from_macos "ncurses"
   uses_from_macos "zlib"
 
@@ -97,10 +97,9 @@ class Mariadb < Formula
     # Disable RocksDB on Apple Silicon (currently not supported)
     args << "-DPLUGIN_ROCKSDB=NO" if Hardware::CPU.arm?
 
-    system "cmake", ".", *std_cmake_args, *args
-
-    system "make"
-    system "make", "install"
+    system "cmake", "-S", ".", "-B", "_build", *std_cmake_args, *args
+    system "cmake", "--build", "_build"
+    system "cmake", "--install", "_build"
 
     # Fix my.cnf to point to #{etc} instead of /etc
     (etc/"my.cnf.d").mkpath

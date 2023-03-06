@@ -1,8 +1,8 @@
 class Fastlane < Formula
   desc "Easiest way to build and release mobile apps"
   homepage "https://fastlane.tools"
-  url "https://github.com/fastlane/fastlane/archive/2.210.0.tar.gz"
-  sha256 "0f07de18f44c204640d028c3fbe210f738481dea62bee7e23ccd0bd4d7bf750f"
+  url "https://github.com/fastlane/fastlane/archive/2.212.1.tar.gz"
+  sha256 "ea1a726fca8f7b98f0c6703b474e98f5ff40123f23d15740a4ffe783817ed15b"
   license "MIT"
   head "https://github.com/fastlane/fastlane.git", branch: "master"
 
@@ -12,15 +12,16 @@ class Fastlane < Formula
   end
 
   bottle do
-    sha256 cellar: :any,                 arm64_monterey: "4b5f4064301830e5561bf95a17dd2f916227f0a3dd60da079faaa0996a2ffd85"
-    sha256 cellar: :any,                 arm64_big_sur:  "26d0a87c7d13074fd3aa6e2d5a64a9891e50d9b66bfaa5889e2e4cdae11eba4d"
-    sha256 cellar: :any,                 monterey:       "ab2a354c1204215de5cfd0d1d4bb30daac6d5701e5d6314b4e30c995bd372b57"
-    sha256 cellar: :any,                 big_sur:        "13c028cd099d44132623271808e11d5d73808096338a1d80c574b5c8d1b751fb"
-    sha256 cellar: :any,                 catalina:       "2221bf9cae4935875591caaf2795a0fd69525a06fd7ce16091740b8d7785b0ad"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "87e85833439c10044da6e85cb311451b193ab7927545b1b3e96790987f1f3f18"
+    sha256 cellar: :any,                 arm64_ventura:  "2921963cac8ca922e893a9f7bf0526522fa06c22dcb495f788dd2856beb3ef28"
+    sha256 cellar: :any,                 arm64_monterey: "8121ca97b89a7fa774bece457979427e093006dfdd8235b2d8557a98d523fd85"
+    sha256 cellar: :any,                 arm64_big_sur:  "7497d172f96fba61d5c395d5ca66c9f0489dacf727761ad87976282b70f37d05"
+    sha256 cellar: :any,                 ventura:        "fc78dca37c9bda5977d4c9315c845e465962f97fabae67e4e68270eab8757e27"
+    sha256 cellar: :any,                 monterey:       "edf4d1a0fdd8103d79bfb2aa6ca5248e0bd3b9cbca4edeaf57e3f6b1e16278fc"
+    sha256 cellar: :any,                 big_sur:        "1be49f78ee1047b8256b3e3e272086297568120a1b238da7e3b80e3b5d9221f7"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "d767cb027354f049d07829f86249ade8a7d268eb0a85f369bd3b7a8713f13aab"
   end
 
-  depends_on "ruby"
+  depends_on "ruby@3.1"
 
   on_macos do
     depends_on "terminal-notifier"

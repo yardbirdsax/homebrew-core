@@ -1,17 +1,18 @@
 class Zellij < Formula
   desc "Pluggable terminal workspace, with terminal multiplexer as the base feature"
   homepage "https://zellij.dev"
-  url "https://github.com/zellij-org/zellij/archive/v0.31.4.tar.gz"
-  sha256 "286b08523457cdadee89bb1839f8d08ac402af00f3e27063520a7ed9ee7afc8a"
+  url "https://github.com/zellij-org/zellij/archive/v0.34.4.tar.gz"
+  sha256 "687e30a3e6916cdd7189ab04ff4b170bc5e09edd937637f0388b3f8432d0fc49"
   license "MIT"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "2e93a21f0963b6071a60bdb572c008fb9aa80f1b80ad985b0feed01b33c4f1bf"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "5b811eb9747bb2195848372c95a5bfe01390404ad5dd361a9436940cf2470209"
-    sha256 cellar: :any_skip_relocation, monterey:       "9e2fa6f827a5751dc62c0e0dca528f12d2205d8872ce551ba48b3f8b8d9afffc"
-    sha256 cellar: :any_skip_relocation, big_sur:        "aa40ddd39c2c743a2947f51867e02fa313c0e24397b8b35d91a72c73c55e2eba"
-    sha256 cellar: :any_skip_relocation, catalina:       "dee94b6b2596c37675313aa07c72bee3d4cd6fe50850d5644887d9dff00386c2"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "3eedaa5cb90d3b1392104d0fb27080030f518889011ccf27bc8e269334965315"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "f5441641d0d340f0bc3ad2a6fb1c64c13bade8e6a7586d4b9331cd53d0f26c74"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "b45bf371093febf1da924fe3a9d241733e3c128b5ebfc330787981ffe78d1d92"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "59267ce4d52a9dd39021048d39334aaf5919f6e94880b88a8227ccd9e698fea5"
+    sha256 cellar: :any_skip_relocation, ventura:        "65fd10a1538a817dc2a9133264026c7dbde53e7d98340b3ed5833df05f1952a5"
+    sha256 cellar: :any_skip_relocation, monterey:       "6dbd74c04d6c5161261f42105bfb13dd7512bcb815497b8029f35b8ed72c0eea"
+    sha256 cellar: :any_skip_relocation, big_sur:        "45e195e4b9db695160738bdaa6fc2ef565fd5c1bcf5fb87d852f1429a29cf005"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c66afab475ce488b82bfcd06116d6424ff98d97dd59d012832ee2b56ce83cea1"
   end
 
   depends_on "rust" => :build
@@ -23,7 +24,7 @@ class Zellij < Formula
   end
 
   test do
-    assert_match(/keybinds:.*/, shell_output("#{bin}/zellij setup --dump-config"))
+    assert_match("keybinds", shell_output("#{bin}/zellij setup --dump-config"))
     assert_match("zellij #{version}", shell_output("#{bin}/zellij --version"))
   end
 end

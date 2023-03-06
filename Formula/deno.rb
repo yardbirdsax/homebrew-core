@@ -1,23 +1,24 @@
 class Deno < Formula
   desc "Secure runtime for JavaScript and TypeScript"
   homepage "https://deno.land/"
-  url "https://github.com/denoland/deno/releases/download/v1.25.2/deno_src.tar.gz"
-  sha256 "eff1388028c8f7bd91a37eff18fa55a00a0b96f22ef11fec2d10c46d5347a44b"
+  url "https://github.com/denoland/deno/releases/download/v1.31.1/deno_src.tar.gz"
+  sha256 "d39666180142d936e187c9eb9e2037e1db246c387b0d50ad2d7fed37271856ba"
   license "MIT"
   head "https://github.com/denoland/deno.git", branch: "main"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "d1cb89e15ef431c9f32ed057b21bd84f783b11d03676682b88206a0b91cd8081"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "3db49300d931b8b65ae3fbe363dc7886106eb21fbcf7490d5dff30f2de33821d"
-    sha256 cellar: :any_skip_relocation, monterey:       "6ccfa9d8a64e3a70763e368e4174edae69f517b075cb69845a70597465fb1e5e"
-    sha256 cellar: :any_skip_relocation, big_sur:        "45de0cc5cc1b2ca4600dffcd84baf81a04a63c8e554ebc3c73f1fbcc811762b3"
-    sha256 cellar: :any_skip_relocation, catalina:       "d545d22b4ad595ac4523aeb4fe69098b72086a8259bdf9b57065960617cebe2c"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "22fb6138f8ff6fe482096fdb2595471414054fe770d4c939178daa97668d9613"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "44ef5aa97de2c15ff84acd11fdc26757e7cdf85add89cf24f62f77baab22c2b9"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "b8e132732de9d39bea44ba45d1a62431ca2670bbe419df91517c5ce117947523"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "d024586fd5acf202c7ebad04cecaa578044fbc985b47006f7b3fe995e4c1e2ef"
+    sha256 cellar: :any_skip_relocation, ventura:        "83f603ab32b29f88531e0efb74b477771af8853352ffd23ab006546c5099e61c"
+    sha256 cellar: :any_skip_relocation, monterey:       "44296854e2c31e9863faa533aca442a93a18a64ce85c1eaf4b0ab04812d0c535"
+    sha256 cellar: :any_skip_relocation, big_sur:        "62da1c5fae6fa0942ff13c03185abd14812c034be77b2f16cf99d84fd24e194c"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "90bc33e668e3c95139d414c05c162ef3ed7a2b56c404c08b8f74c87017e2ece7"
   end
 
   depends_on "llvm" => :build
   depends_on "ninja" => :build
-  depends_on "python@3.10" => :build
+  depends_on "python@3.11" => :build
   depends_on "rust" => :build
 
   uses_from_macos "xz"
@@ -35,32 +36,25 @@ class Deno < Formula
 
   # Temporary resources to work around build failure due to files missing from crate
   # We use the crate as GitHub tarball lacks submodules and this allows us to avoid git overhead.
-  # TODO: Remove this and `v8` resource when https://github.com/denoland/rusty_v8/pull/1063 is released
+  # TODO: Remove this and `v8` resource when https://github.com/denoland/rusty_v8/issues/1065 is resolved
   resource "rusty-v8" do
-    url "https://static.crates.io/crates/v8/v8-0.49.0.crate"
-    sha256 "5a1cbad73336d67babcbe5e3b03c907c8d2ff77fc6f997570af219bbd9fdb6ce"
+    url "https://static.crates.io/crates/v8/v8-0.63.0.crate"
+    sha256 "547e58962ac268fe0b1fbfb653ed341a08e3953994f7f7c978e46ec30afdf8f0"
   end
 
   resource "v8" do
-    url "https://github.com/denoland/v8/archive/1f7df8c39451f3d53e9acef4b7b0476cf4f5eb66.tar.gz"
-    sha256 "5098e515c62e42c0c0754b0daf832f16c081bc53d27b7121bc917fb52759c65a"
+    url "https://github.com/denoland/v8/archive/d2bc1d933bfcbb9f0641b8cfd4a38692e4f005bc.tar.gz"
+    sha256 "6aabe19d3181504fc55339a0072c214b8053c1405a8ee621be9a268ac309f503"
   end
 
   # To find the version of gn used:
-  # 1. Find v8 version: https://github.com/denoland/deno/blob/v#{version}/core/Cargo.toml
+  # 1. Find v8 version: https://github.com/denoland/deno/blob/v#{version}/Cargo.toml#L43
   # 2. Find ninja_gn_binaries tag: https://github.com/denoland/rusty_v8/tree/v#{v8_version}/tools/ninja_gn_binaries.py
   # 3. Find short gn commit hash from commit message: https://github.com/denoland/ninja_gn_binaries/tree/#{ninja_gn_binaries_tag}
   # 4. Find full gn commit hash: https://gn.googlesource.com/gn.git/+/#{gn_commit}
   resource "gn" do
     url "https://gn.googlesource.com/gn.git",
-        revision: "bf4e17dc67b2a2007475415e3f9e1d1cf32f6e35"
-  end
-
-  # To find the version of tinycc used, check the commit hash referenced from
-  # https://github.com/denoland/deno/tree/v#{version}/ext/ffi
-  resource "tinycc" do
-    url "https://github.com/TinyCC/tinycc.git",
-        revision: "afc136262e93ae85fb3643005b36dbfc30d99c42"
+        revision: "70d6c60823c0233a0f35eccc25b2b640d2980bdc"
   end
 
   def install
@@ -73,41 +67,31 @@ class Deno < Formula
     resource("v8").stage do
       cp_r "tools/builtins-pgo", buildpath/"v8/v8/tools/builtins-pgo"
     end
-    inreplace %w[core/Cargo.toml serde_v8/Cargo.toml],
+    inreplace "Cargo.toml",
               /^v8 = { version = ("[\d.]+"),.*}$/,
-              "v8 = { version = \\1, path = \"../v8\" }"
+              "v8 = { version = \\1, path = \"./v8\" }"
 
     if OS.mac? && (MacOS.version < :mojave)
       # Overwrite Chromium minimum SDK version of 10.15
       ENV["FORCE_MAC_SDK_MIN"] = MacOS.version
     end
 
-    python3 = "python3.10"
+    python3 = "python3.11"
     # env args for building a release build with our python3, ninja and gn
-    ENV.prepend_path "PATH", Formula["python@3.10"].libexec/"bin"
-    ENV["PYTHON"] = Formula["python@3.10"].opt_bin/python3
+    ENV.prepend_path "PATH", Formula["python@3.11"].libexec/"bin"
+    ENV["PYTHON"] = Formula["python@3.11"].opt_bin/python3
     ENV["GN"] = buildpath/"gn/out/gn"
     ENV["NINJA"] = Formula["ninja"].opt_bin/"ninja"
     # build rusty_v8 from source
     ENV["V8_FROM_SOURCE"] = "1"
     # Build with llvm and link against system libc++ (no runtime dep)
     ENV["CLANG_BASE_PATH"] = Formula["llvm"].prefix
-    ENV.remove "HOMEBREW_LIBRARY_PATHS", Formula["llvm"].opt_lib
 
     resource("gn").stage buildpath/"gn"
     cd "gn" do
       system python3, "build/gen.py"
       system "ninja", "-C", "out"
     end
-
-    resource("tinycc").stage buildpath/"tinycc"
-    cd "tinycc" do
-      ENV.append_to_cflags "-fPIE" if OS.linux?
-      system "./configure", "--cc=#{ENV.cc}"
-      system "make"
-    end
-
-    ENV["TCC_PATH"] = buildpath/"tinycc"
 
     # cargo seems to build rusty_v8 twice in parallel, which causes problems,
     # hence the need for -j1

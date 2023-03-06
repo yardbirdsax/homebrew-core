@@ -1,17 +1,18 @@
 class Rex < Formula
   desc "Command-line tool which executes commands on remote servers"
   homepage "https://www.rexify.org"
-  url "https://cpan.metacpan.org/authors/id/F/FE/FERKI/Rex-1.13.4.tar.gz"
-  sha256 "a86e9270159b41c9a8fce96f9ddc97c5caa68167ca4ed33e97908bfce17098cf"
-  revision 1
+  url "https://cpan.metacpan.org/authors/id/F/FE/FERKI/Rex-1.14.0.tar.gz"
+  sha256 "447c496e46848ca17d96497a258169da9bdc290bab446514ec57ccfe6e654b3f"
+  license "Apache-2.0"
 
   bottle do
-    sha256 cellar: :any_skip_relocation, arm64_monterey: "f298c2f718406756536bd571aa58ad510e8b29b17e2a1cf3a1921affde39f954"
-    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "191daba59b48d777de85ccbff1500c46ce422274911fbc70818b9017102d2907"
-    sha256 cellar: :any_skip_relocation, monterey:       "88a8982c502280a6a7d137f922d300d6bc318eae91a872873067aef2459b63e5"
-    sha256 cellar: :any_skip_relocation, big_sur:        "fd29c062470ff6efcf12e43bba2c5ac8d2f71e4069bad912858b858f9643a712"
-    sha256 cellar: :any_skip_relocation, catalina:       "442d8d513cd938ff72eb2a4340618f4eaa26d9ecf755ccbaa94557981f3593b0"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "aef159c2c11cc5d544c7b450eb0b783ad6658342b9631e6c8b5890cbd634190a"
+    sha256 cellar: :any_skip_relocation, arm64_ventura:  "112f0484497ff23cb21b3a14b132a1f35e4880eb9b6a4ca9968b251221612259"
+    sha256 cellar: :any_skip_relocation, arm64_monterey: "112f0484497ff23cb21b3a14b132a1f35e4880eb9b6a4ca9968b251221612259"
+    sha256 cellar: :any_skip_relocation, arm64_big_sur:  "34eb60481263dab0e658c21f13044da0e06bc1d99d82bee61e7af88237c714df"
+    sha256 cellar: :any_skip_relocation, ventura:        "ceb9c8689dfdafd08b391dc4ca93c8e0a2432d3ae4316d6e604e85243aa3907a"
+    sha256 cellar: :any_skip_relocation, monterey:       "ceb9c8689dfdafd08b391dc4ca93c8e0a2432d3ae4316d6e604e85243aa3907a"
+    sha256 cellar: :any_skip_relocation, big_sur:        "1ed010e5763cffa442340883614f414fe150c9d16285e0cd6c84071c163cc963"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "7498ec8e144643cecb35434ab2a7c35af2eb627533d5b6f75f3bd09c78709efc"
   end
 
   uses_from_macos "perl", since: :big_sur
@@ -260,7 +261,7 @@ class Rex < Formula
   end
 
   test do
-    assert_match "\(R\)\?ex #{version}", shell_output("#{bin}/rex -v"), "rex -v is expected to print out Rex version"
+    assert_match "(R)?ex #{version}", shell_output("#{bin}/rex -v"), "rex -v is expected to print out Rex version"
     system bin/"rexify", "brewtest"
     assert_predicate testpath/"brewtest/Rexfile", :exist?,
                      "rexify is expected to create a new Rex project and pre-populate its Rexfile"

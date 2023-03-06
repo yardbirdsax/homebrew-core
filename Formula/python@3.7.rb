@@ -1,8 +1,8 @@
 class PythonAT37 < Formula
   desc "Interpreted, interactive, object-oriented programming language"
   homepage "https://www.python.org/"
-  url "https://www.python.org/ftp/python/3.7.14/Python-3.7.14.tar.xz"
-  sha256 "4157ae31eb81af19e81c36882610491b0fb8f50e00fa8a17b095c88908b9c45c"
+  url "https://www.python.org/ftp/python/3.7.16/Python-3.7.16.tar.xz"
+  sha256 "8338f0c2222d847e904c955369155dc1beeeed806e8d5ef04b00ef4787238bfd"
   license "Python-2.0"
 
   livecheck do
@@ -11,15 +11,18 @@ class PythonAT37 < Formula
   end
 
   bottle do
-    sha256 monterey:     "a02a89eb6f8a379bcd90ddf2d281f5f68a3c0e98ed87d5f6ff74e61b66c77801"
-    sha256 big_sur:      "ec09c6766739428f23583df20993573173f27368154726d6d6f5149fb5430ceb"
-    sha256 catalina:     "59ffd3aad788e411d8f93ab029384492b472130f3a2029185590b6af24a31d7f"
-    sha256 x86_64_linux: "7a3fcbc9b9675f394ba45128748522ec2fda511335fbe3f4f3bdfe771049ec01"
+    sha256 ventura:      "36df3753c31cd484baf76d0a5fd86fbf6a535f9471eea7da75ce9710213ddc84"
+    sha256 monterey:     "6f5d5dbcb09c6a747c511fea853d971e91abe9b84892c2b435e4e113cfd1aacf"
+    sha256 big_sur:      "53723ea42f0f296159b9af4b5f409f4a51cf13922fb05ec5f54ce0d105c41ab4"
+    sha256 x86_64_linux: "86492ae50222d0908a2b27e07a9d06f01d58888cac2577366e62bb3f41c5c81e"
   end
 
   # setuptools remembers the build flags python is built with and uses them to
   # build packages later. Xcode-only systems need different flags.
   pour_bottle? only_if: :clt_installed
+
+  # https://devguide.python.org/versions/#versions
+  disable! date: "2023-06-27", because: :deprecated_upstream
 
   depends_on "pkg-config" => :build
   depends_on arch: :x86_64
@@ -46,18 +49,18 @@ class PythonAT37 < Formula
              "bin/easy_install-3.6", "bin/easy_install-3.7"
 
   resource "setuptools" do
-    url "https://files.pythonhosted.org/packages/cc/83/7ea9d9b3a6ff3225aca2fce5e4df373bee7e0a74c539711a4fbfda53374f/setuptools-65.3.0.tar.gz"
-    sha256 "7732871f4f7fa58fb6bdcaeadb0161b2bd046c85905dbaa066bdcbcc81953b57"
+    url "https://files.pythonhosted.org/packages/b6/21/cb9a8d0b2c8597c83fce8e9c02884bce3d4951e41e807fc35791c6b23d9a/setuptools-65.6.3.tar.gz"
+    sha256 "a7620757bf984b58deaf32fc8a4577a9bbc0850cf92c20e1ce41c38c19e5fb75"
   end
 
   resource "pip" do
-    url "https://files.pythonhosted.org/packages/4b/30/e15b806597e67057e07a5acdc135216ccbf76a5f1681a324533b61066b0b/pip-22.2.2.tar.gz"
-    sha256 "3fd1929db052f056d7a998439176d3333fa1b3f6c1ad881de1885c0717608a4b"
+    url "https://files.pythonhosted.org/packages/a3/50/c4d2727b99052780aad92c7297465af5fe6eec2dbae490aa9763273ffdc1/pip-22.3.1.tar.gz"
+    sha256 "65fd48317359f3af8e593943e6ae1506b66325085ea64b706a998c6e83eeaf38"
   end
 
   resource "wheel" do
-    url "https://files.pythonhosted.org/packages/c0/6c/9f840c2e55b67b90745af06a540964b73589256cb10cc10057c87ac78fc2/wheel-0.37.1.tar.gz"
-    sha256 "e9a504e793efbca1b8e0e9cb979a249cf4a0a7b5b8c9e8b65a5e39d49529c1c4"
+    url "https://files.pythonhosted.org/packages/a2/b8/6a06ff0f13a00fc3c3e7d222a995526cbca26c1ad107691b6b1badbbabf1/wheel-0.38.4.tar.gz"
+    sha256 "965f5259b566725405b05e7cf774052044b1ed30119b5d586b2703aafe8719ac"
   end
 
   # Patch for MACOSX_DEPLOYMENT_TARGET on Big Sur. Upstream currently does
@@ -355,17 +358,16 @@ class PythonAT37 < Formula
       import re
       import os
       import sys
-
       if sys.version_info[0] != 3:
           # This can only happen if the user has set the PYTHONPATH for 3.x and run Python 2.x or vice versa.
           # Every Python looks at the PYTHONPATH variable and we can't fix it here in sitecustomize.py,
           # because the PYTHONPATH is evaluated after the sitecustomize.py. Many modules (e.g. PyQt4) are
           # built only for a specific version of Python and will fail with cryptic error messages.
           # In the end this means: Don't set the PYTHONPATH permanently if you use different Python versions.
-          exit('Your PYTHONPATH points to a site-packages dir for Python 3.x but you are running Python ' +
-               str(sys.version_info[0]) + '.x!\\n     PYTHONPATH is currently: "' + str(os.environ['PYTHONPATH']) + '"\\n' +
-               '     You should `unset PYTHONPATH` to fix this.')
-
+          exit(f'Your PYTHONPATH points to a site-packages dir for Python 3.x '
+               f'but you are running Python {sys.version_info[0]}.x!\\n'
+               f'     PYTHONPATH is currently: "{os.environ["PYTHONPATH"]}"\\n'
+               f'     You should `unset PYTHONPATH` to fix this.')
       # Only do this for a brewed python:
       if os.path.realpath(sys.executable).startswith('#{rack}'):
           # Shuffle /Library site-packages to the end of sys.path
@@ -374,12 +376,10 @@ class PythonAT37 < Formula
           sys.path = [p for p in sys.path if not p.startswith(library_site)]
           # .pth files have already been processed so don't use addsitedir
           sys.path.extend(library_packages)
-
           # the Cellar site-packages is a symlink to the HOMEBREW_PREFIX
           # site_packages; prefer the shorter paths
-          long_prefix = re.compile(r'#{rack}/[0-9\._abrc]+/Frameworks/Python\.framework/Versions/#{version.major_minor}/lib/python#{version.major_minor}/site-packages')
+          long_prefix = re.compile(r'#{rack}/[0-9._abrc]+/Frameworks/Python.framework/Versions/#{version.major_minor}/lib/python#{version.major_minor}/site-packages')
           sys.path = [long_prefix.sub('#{site_packages}', p) for p in sys.path]
-
           # Set the sys.executable to use the opt_prefix. Only do this if PYTHONEXECUTABLE is not
           # explicitly set and we are not in a virtualenv:
           if 'PYTHONEXECUTABLE' not in os.environ and sys.prefix == sys.base_prefix:

@@ -2,18 +2,18 @@ class Xgboost < Formula
   desc "Scalable, Portable and Distributed Gradient Boosting Library"
   homepage "https://xgboost.ai/"
   url "https://github.com/dmlc/xgboost.git",
-      tag:      "v1.6.2",
-      revision: "b9934246faa9a25e10a12339685dfbe56d56f70b"
+      tag:      "v1.7.4",
+      revision: "36ad160501251336bfe69b602acc37ab3ec32d69"
   license "Apache-2.0"
 
   bottle do
-    rebuild 1
-    sha256 cellar: :any,                 arm64_monterey: "1aeec8fe6a690e23d01dd6b68df579ae368b9b390e11d00fce901cc6e9bfcdac"
-    sha256 cellar: :any,                 arm64_big_sur:  "f18aea395d946633e2c9202a9febaf8b8603bd559a916dca73e42536c4c0b2b1"
-    sha256 cellar: :any,                 monterey:       "a76dcfb550c66a22bc4af81b29b39174937c22890a1a10c240458066ac6c5155"
-    sha256 cellar: :any,                 big_sur:        "d319a6a9f67c01d5fca092aa64e24a7c1b932ec1ce84cfb5055212997bbab38c"
-    sha256 cellar: :any,                 catalina:       "30450f1da0a5057f5b15f64953ba13de0988572cc558cec67ec58e1ac14dedfd"
-    sha256 cellar: :any_skip_relocation, x86_64_linux:   "c929dfbac8cc958af26b5c9acc8029e0199a2ae7a8c948595c9665578b7839b3"
+    sha256 cellar: :any,                 arm64_ventura:  "7b14c010e20409a8798f06d4893bd7fb78c0352a1024e844da161da90fbf088b"
+    sha256 cellar: :any,                 arm64_monterey: "db4edb482f9b550bf208e577a0f264d6c02e7753ff88d942923a83b08dc342a0"
+    sha256 cellar: :any,                 arm64_big_sur:  "5b3c8a3cbdf2e5e74a0e400072eeb7b44da2a698c9597acb9c6c26c5836252ea"
+    sha256 cellar: :any,                 ventura:        "143ba340e50de7e1f823c6db88eca5a7f8f39bb4e7346dd4543d937f01420785"
+    sha256 cellar: :any,                 monterey:       "1f0d75eccf5fb8473cb5a734b307622afeef1aa5254c30a507e9ded236802952"
+    sha256 cellar: :any,                 big_sur:        "ffd80fec8c1de3107a6260455c34d755de7b932ca7ca05f393d1fd53f4c006e7"
+    sha256 cellar: :any_skip_relocation, x86_64_linux:   "abe8ae583ef79d382d69aba8f006ae7c8e21f6c1f1f22c14f659b45ca2d28f40"
   end
 
   depends_on "cmake" => :build
@@ -35,11 +35,9 @@ class Xgboost < Formula
   # Starting in XGBoost 1.6.0, compiling with GCC 5.4.0 results in:
   # src/linear/coordinate_common.h:414:35: internal compiler error: in tsubst_copy, at cp/pt.c:13039
   # This compiler bug is fixed in more recent versions of GCC: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80543
-  # Upstream issue filed at https://github.com/dmlc/xgboost/issues/7820
   fails_with gcc: "5"
 
   def install
-    ENV.remove "HOMEBREW_LIBRARY_PATHS", Formula["llvm"].opt_lib
     ENV.llvm_clang if OS.mac? && (DevelopmentTools.clang_build_version <= 1100)
 
     system "cmake", "-S", ".", "-B", "build", *std_cmake_args

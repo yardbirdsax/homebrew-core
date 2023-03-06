@@ -1,10 +1,9 @@
 class Mpd < Formula
   desc "Music Player Daemon"
   homepage "https://www.musicpd.org/"
-  url "https://www.musicpd.org/download/mpd/0.23/mpd-0.23.9.tar.xz"
-  sha256 "2becaba980402e8dc7972ccc3476e493b7ae2eeb720d31fa6712472ed48e9f2d"
+  url "https://www.musicpd.org/download/mpd/0.23/mpd-0.23.12.tar.xz"
+  sha256 "b7fca62284ecc25a681ea6a07abc49200af5353be42cb5a31e3173be9d8702e7"
   license "GPL-2.0-or-later"
-  revision 2
   head "https://github.com/MusicPlayerDaemon/MPD.git", branch: "master"
 
   livecheck do
@@ -13,12 +12,13 @@ class Mpd < Formula
   end
 
   bottle do
-    sha256 cellar: :any, arm64_monterey: "124436d2f73c34e3583e1adc613f51529ab5abed906291dd838621ec7b9b21c4"
-    sha256 cellar: :any, arm64_big_sur:  "6a09ae779448e9b7a7d92bf342dcb078ca5ba575290bc462057b5fa374b548a2"
-    sha256 cellar: :any, monterey:       "cdfab2b417635beab09807daa140589e22435bc9e25326621d8414532bb41495"
-    sha256 cellar: :any, big_sur:        "e061cf900241b73fb3050fa1640e7b40f5c99ae7e48f9c487bccf5ef9edc7f80"
-    sha256 cellar: :any, catalina:       "ace352bac9c1b56cd0645956addf840cba48589f34d26704189b4bcedbed2c0b"
-    sha256               x86_64_linux:   "e743df83acf32841900d9bd557ce621030df8fbf667cfaabdb8d25e3edf73929"
+    sha256 cellar: :any, arm64_ventura:  "43c66ea0ac59c83f3f9fd24086c2d68833426ec5d79b5f1cbb88dec0dffce42f"
+    sha256 cellar: :any, arm64_monterey: "9a0c545f9daf10c985ce0f9916937836c43fdcdc89c17ac2638450f02bc92aca"
+    sha256 cellar: :any, arm64_big_sur:  "7e0d3c147166899df4f408f82c971dff1f82cc1e76e846083c508c71d4aadbb4"
+    sha256 cellar: :any, ventura:        "78a264dab7a090b474bf4698689e0f05a730ae727aa1be562e6aea9426249835"
+    sha256 cellar: :any, monterey:       "a94c6380d6be9f39411c00d56d8c638e26b352408740add3d1e1486493a59ce5"
+    sha256 cellar: :any, big_sur:        "76a2a531ef84b28e49aa52aa7a5db65fec8dc84cfd28dd6e28fce82fe046ca01"
+    sha256               x86_64_linux:   "5cb33974c1728e9357bb1739b844fa44d0c98b6c3b2a26397f2abf35035e8ffa"
   end
 
   depends_on "boost" => :build
